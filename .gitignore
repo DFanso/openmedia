@@ -147,3 +147,62 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# macOS / editors
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Agent worktrees (see AGENTS.md)
+.worktrees/
+
+# Rust / Tauri
+/src-tauri/target/
+/target/
+/src-tauri/gen/schemas/
+/src-tauri/WixTools/
+/src-tauri/resources/engine.js
+
+# iOS / Xcode (generated project keeps its own .gitignore; these are a safety net)
+DerivedData/
+xcuserdata/
+*.xcuserstate
+*.xcarchive
+*.ipa
+Pods/
+
+# Android / Gradle (same: safety net)
+.gradle/
+local.properties
+*.apk
+*.aab
+*.hprof
+/src-tauri/gen/android/app/build/
+/src-tauri/gen/android/build/
+/src-tauri/gen/android/app/src/main/jniLibs/
+
+# Signing material and updater keys: NEVER commit
+*.jks
+*.keystore
+keystore.properties
+*.p12
+*.p8
+*.cer
+*.mobileprovision
+*.provisionprofile
+*.key
+*.pem
+!/docs/**/*.pem
+
+# Test output
+playwright-report/
+test-results/
+
+# Raw, unscrubbed captures of real sites (scrub, then move into recipes/fixtures/)
+/recipes/fixtures-raw/
+/captures/
