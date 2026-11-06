@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/skepjandi/openmedia/main/assets/logo.svg" alt="OpenMedia logo" height="96">
+</p>
+
 # OpenMedia Wiki
 
 > Project knowledge base for contributors and AI agents. All pages are automatically synced to the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) on every merge to `main`.

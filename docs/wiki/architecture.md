@@ -156,6 +156,8 @@ The recipe schema is defined once in Rust (`serde` + `schemars`), exported as JS
 ```
 src/                       Shell (React)
   app/ features/{browser,recipes,ai,settings}/ shared/
+assets/
+  logo.svg                 Brand mark (source of truth for app icons)
 engine/                    Injected page script (TS) -> src-tauri/resources/engine.js
 src-tauri/
   src/

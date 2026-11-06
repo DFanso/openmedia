@@ -15,3 +15,11 @@ All notable changes to OpenMedia are documented here.
 **Change:** Add `AGENTS.md` (wiki-first, worktree-only, architecture invariants for a no-backend BYOK app), this changelog, the `docs/wiki/` source tree with its sync workflow, and a phased roadmap. Extend `.gitignore` for Tauri/Rust, iOS/Android, signing material, and agent worktrees.
 
 **PR:** n/a (initial bootstrap)
+
+### docs: add logo and README
+
+**What:** The project had no brand mark or README content.
+
+**Change:** Add `assets/logo.svg`, reference it from `README.md` and the wiki index (absolute raw URL there, since relative paths do not resolve in the flattened GitHub Wiki), and plan icon generation in Phase 1.
+
+**PR:** n/a

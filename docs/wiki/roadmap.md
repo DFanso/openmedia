@@ -62,6 +62,7 @@ Scaffold the real project and the guardrails.
 - Shell: home (site list), browser view (address bar, back/forward/reload, tabs), settings skeleton.
 - Profiles (create, name, isolated store), per-profile site list.
 - Settings/recipes persistence in app data dir.
+- App icons: generate all platform icons from `assets/logo.svg` with `yarn tauri icon`. The source logo is not square and has wide margins, so first add a square, padded 1024×1024 master (e.g. `assets/icon-source.svg`) rather than editing `logo.svg`; check the result at small sizes and in the iOS rounded-mask and Android adaptive-icon safe zones.
 - Flip [Development Guide](./development-guide.md), [Architecture](./architecture.md), [Platform Support](./platform-support.md) to `Implemented` where true.
 
 **Exit:** open any URL in a profile on macOS, iOS and Android simulators/devices; navigation works; sessions persist per profile; CI green.
