@@ -4,6 +4,13 @@ import UIKit
 import WebKit
 
 private let bridgeHandlerName = "openmedia"
+/// A WKWebView's default user agent has no `Safari` token, which Google reads as an embedded
+/// browser and refuses to sign in from. Report what Mobile Safari reports (it freezes the OS
+/// version in the string and shows the real one after `Version/`).
+private let safariUserAgent: String = {
+  let major = UIDevice.current.systemVersion.split(separator: ".").first.map(String.init) ?? "18"
+  return "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/\(major).0 Mobile/15E148 Safari/604.1"
+}()
 private let allowedSchemes: Set<String> = ["http", "https"]
 
 struct RectArgs: Decodable {
@@ -111,6 +118,9 @@ final class TouchRouter: UIView {
 class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
   private var shell: WKWebView?
   private var siteView: WKWebView?
+  /// A window the page opened with `window.open` (Google and Apple sign-in run in one). It sits
+  /// above the site view until the page closes it, and shares the page's data store.
+  private var popup: WKWebView?
   private var router: TouchRouter?
   private var events: Channel?
   private var observations: [NSKeyValueObservation] = []
@@ -151,6 +161,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
           profileId: profileId, script: args.documentStartScript, ruleLists: ruleLists)
       )
       view.allowsBackForwardNavigationGestures = true
+      view.customUserAgent = safariUserAgent
       view.navigationDelegate = self
       view.uiDelegate = self
       view.overrideUserInterfaceStyle = self.colorScheme
@@ -180,6 +191,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     onSiteView(invoke) { view in
       if let shell = self.shell, let host = shell.superview {
         view.frame = shell.convert(args.rect.cgRect, to: host)
+        self.popup?.frame = view.frame
       }
     }
   }
@@ -323,10 +335,38 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     for navigationAction: WKNavigationAction,
     windowFeatures: WKWindowFeatures
   ) -> WKWebView? {
-    if navigationAction.targetFrame == nil, let url = navigationAction.request.url, webURL(url.absoluteString) != nil {
+    guard navigationAction.targetFrame == nil else { return nil }
+    if navigationAction.navigationType == .other {
+      return openPopup(configuration: configuration)
+    }
+    if let url = navigationAction.request.url, webURL(url.absoluteString) != nil {
       webView.load(navigationAction.request)
     }
     return nil
+  }
+
+  func webViewDidClose(_ webView: WKWebView) {
+    if webView === popup { closePopup() }
+  }
+
+  private func openPopup(configuration: WKWebViewConfiguration) -> WKWebView? {
+    guard let siteView, let host = shell?.superview else { return nil }
+    closePopup()
+    let view = WKWebView(frame: siteView.frame, configuration: configuration)
+    view.navigationDelegate = self
+    view.uiDelegate = self
+    view.customUserAgent = safariUserAgent
+    view.overrideUserInterfaceStyle = colorScheme
+    host.insertSubview(view, aboveSubview: siteView)
+    popup = view
+    router?.siteView = view
+    return view
+  }
+
+  private func closePopup() {
+    popup?.removeFromSuperview()
+    popup = nil
+    router?.siteView = siteView
   }
 
   // MARK: Helpers
@@ -399,6 +439,9 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: profileId)
     // iPhone defaults to fullscreen-only video, which covers the shell's controls. Muted video may
     // autoplay inline; audio still needs a tap.
+    // Sign-in with Google or Apple opens a popup from script that runs after the tap; without
+    // this WebKit blocks it and the button does nothing.
+    configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
     configuration.allowsInlineMediaPlayback = true
     configuration.mediaTypesRequiringUserActionForPlayback = .audio
     let controller = WKUserContentController()
@@ -439,6 +482,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
   }
 
   private func tearDown() {
+    closePopup()
     observations.removeAll()
     if let view = siteView {
       view.configuration.userContentController.removeAllUserScripts()
