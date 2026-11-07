@@ -1,37 +1,45 @@
+import { useMemo } from "react";
 import { useApp } from "../../app/store";
-import { CloseIcon } from "../../shared/icons";
+import { iconsByHost } from "../../shared/favorites";
+import { ArrowIcon, HistoryIcon } from "../../shared/icons";
+import { Screen } from "../../shared/Screen";
+import { SiteTile } from "../../shared/SiteTile";
 import { describeAddress } from "./address";
 
 const NO_HISTORY: string[] = [];
 
-/** Addresses the user typed, newest first. Full-screen so nothing from the page shows through. */
+/** Addresses the user typed, newest first. */
 export function HistorySheet() {
   const open = useApp((s) => s.sheet === "history");
   const history = useApp((s) => s.state?.history) ?? NO_HISTORY;
+  const favorites = useApp((s) => s.state?.favorites);
   const closeSheet = useApp((s) => s.closeSheet);
   const openHistory = useApp((s) => s.openHistory);
+  const icons = useMemo(() => iconsByHost(favorites ?? []), [favorites]);
   if (!open) return null;
 
   return (
-    <div data-hit="" className="fixed inset-0 z-50 flex flex-col bg-ink">
-      <header className="flex items-center justify-between px-5 pt-[calc(env(safe-area-inset-top)+12px)] pb-3">
-        <h1 className="text-xs font-medium tracking-[0.22em] text-paper/60 uppercase">History</h1>
-        <button
-          type="button"
-          aria-label="Close history"
-          onClick={closeSheet}
-          className="grid size-11 place-items-center rounded-full text-paper/80"
-        >
-          <CloseIcon />
-        </button>
-      </header>
-
+    <Screen
+      title="History"
+      subtitle={
+        history.length === 0
+          ? "Nothing searched yet"
+          : `${history.length} ${history.length === 1 ? "site" : "sites"}, newest first`
+      }
+      closeLabel="Close history"
+      onClose={closeSheet}
+    >
       {history.length === 0 ? (
-        <p className="px-5 pt-6 text-sm leading-relaxed text-paper/55">
-          Sites you search for appear here. Clear them any time in Settings.
-        </p>
+        <div className="flex flex-col items-center gap-3 px-8 pt-16 text-center">
+          <span className="grid size-14 place-items-center rounded-full bg-paper/[0.06] text-paper/50">
+            <HistoryIcon />
+          </span>
+          <p className="max-w-xs text-sm leading-relaxed text-paper/55">
+            Sites you search for appear here. Clear them any time in Settings.
+          </p>
+        </div>
       ) : (
-        <ul className="flex-1 overflow-y-auto px-2 pb-[calc(env(safe-area-inset-bottom)+32px)]">
+        <ul className="divide-y divide-hair overflow-hidden rounded-2xl border border-hair bg-paper/[0.04]">
           {history.map((url) => {
             const { host, rest } = describeAddress(url);
             return (
@@ -39,20 +47,26 @@ export function HistorySheet() {
                 <button
                   type="button"
                   onClick={() => openHistory(url)}
-                  className="block w-full rounded-2xl px-3 py-3 text-left active:bg-paper/[0.06]"
+                  className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-paper/[0.06]"
                 >
-                  <span className="block truncate text-base text-paper">{host}</span>
-                  {rest && (
-                    <span className="mt-0.5 block truncate text-xs text-paper/45 tabular-nums">
-                      {rest}
-                    </span>
-                  )}
+                  <SiteTile name={host} icon={icons.get(new URL(url).host)} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-base font-medium">{host}</span>
+                    {rest && (
+                      <span className="mt-0.5 block truncate text-sm text-paper/50 tabular-nums">
+                        {rest}
+                      </span>
+                    )}
+                  </span>
+                  <span className="shrink-0 text-paper/35">
+                    <ArrowIcon />
+                  </span>
                 </button>
               </li>
             );
           })}
         </ul>
       )}
-    </div>
+    </Screen>
   );
 }

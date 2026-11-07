@@ -15,24 +15,22 @@ The web is the product. The screen is one full-bleed page, from under the status
 | Drag the button | Moves it; on release it snaps to the nearer left or right edge and remembers its place |
 | Pull the page down from the top | Native pull-to-refresh (`UIRefreshControl`); only where the page's own scroll view is at the top |
 
-Defaults: Instagram, Facebook, Twitter, Reddit, YouTube. Each fan item shows the site's icon when one is known, otherwise a monogram, on clear glass. The command bar also has back, forward and reload. Favorites change only in Settings: the command bar has no "add this page" button, so browsing never alters the list.
+Defaults: Instagram, Facebook, Twitter, Reddit, YouTube. Each fan item shows the site's icon when one is known, otherwise a monogram, on clear glass. The command bar also has back, forward and reload. Favorites change only in Settings: the command bar has no "add this page" button, so browsing never alters the list. The list has no length limit, but the fan shows only the first six (`QUICK_ACCESS_LIMIT` in `shared/favorites.ts`): the quick-access menu. Order decides membership; moving a favorite up in Settings puts it there.
 
 ## Settings
 
-Eight sections in one scrolling screen (the settings glyph is a sliders icon):
+Six sections in one scrolling screen (the settings glyph is a sliders icon). Settings and History share one page frame (`shared/Screen.tsx`): a large title, a hairline under the header, and a scrolling body of rounded groups whose rows are separated by hairlines. Site icons come from the favorites' cached icons, with a monogram tile otherwise (`shared/SiteTile.tsx`).
 
 - **Appearance:** System, Light or Dark. Stored in `library.json` and applied to the app and, through the native view's `overrideUserInterfaceStyle`, to sites that follow `prefers-color-scheme`.
-- **Ad blocking:** a global switch for the bundled EasyList and EasyPrivacy rules; changing it reloads the open pages.
-- **Sites:** one collapsible card per bundled recipe (Instagram, Facebook, X (Twitter), Reddit, YouTube). Each card lists its options as switches, annoyances first and then content, each with a one-line description. A switch ON means the thing is hidden. Annoyances (install prompts, pop-ups that block the page, ad slots) start ON; content (Reels, Shorts, Stories, suggestions, whole feeds) starts OFF. Changing a switch saves it and reloads the open page under the recompiled recipe script. The card also holds the site's bottom margin. See [Site Playbooks](./site-playbooks.md) for what each option covers.
-- **Bottom margin:** a slider (0 to 200 px, saved when released) that keeps the bottom of every page clear, for sites whose menus slide under the screen edge. A site card can override it; "Use the shared margin" removes the override. The shell asks Rust which site the current page belongs to (`bottom_margin_for`) and shrinks the native view's rectangle from the bottom; the strip underneath shows the app background.
-- **Favorites:** edit name and address, reorder, remove, add (up to 6). Saved with its own button.
-- **History:** "Clear history" (with a confirm step) empties the searched addresses and forgets the last page, like a browser. Favorites, open sessions and logins are untouched.
+- **Browsing:** the global ad-blocking switch for the bundled EasyList and EasyPrivacy rules (changing it reloads the open pages); the floating back button switch; and the shared bottom margin, a slider (0 to 200 px, saved when released) that keeps the bottom of every page clear, for sites whose menus slide under the screen edge. A recipe can override the margin; "Use the shared margin" removes the override. The shell asks Rust which site the current page belongs to (`bottom_margin_for`) and shrinks the native view's rectangle from the bottom; the strip underneath shows the app background.
+- **Pre-made recipes:** one collapsible card per bundled recipe (Instagram, Facebook, X (Twitter), Reddit, YouTube). Each card lists its options as switches, annoyances first and then content, each with a one-line description. A switch ON means the thing is hidden. Annoyances (install prompts, pop-ups that block the page, ad slots) start ON; content (Reels, Shorts, Stories, suggestions, whole feeds) starts OFF. Changing a switch saves it and reloads the open page under the recompiled recipe script. The card also holds the recipe's bottom margin. A star on each card adds the recipe's site (its `meta.homepage`) to the favorites or removes every favorite that opens it (`set_site_favorite`); a site counts as favorited when any favorite matches the recipe's `match` patterns. See [Site Playbooks](./site-playbooks.md) for what each option covers.
+- **Favorites:** a "Quick access" group (the first six) and a "More favorites" group below it. Tap a row to edit its name and address or remove it; arrows reorder, and moving across the boundary moves a favorite in or out of quick access. Every change saves at once, so the list never disagrees with the stars above it.
 - **AI assistant:** bring-your-own-key providers. See [AI Assistant](./ai-assistant.md#implemented-provider-settings).
-- **Guide:** "Reset onboarding" marks the first-run guide unseen and shows it again.
+- **Data and help:** "Clear history" (with a confirm step) empties the searched addresses and forgets the last page, like a browser; favorites, open sessions and logins are untouched. "Replay" marks the first-run guide unseen and shows it again.
 
 ## History
 
-The history button sits in the fan directly above settings. It opens a full-screen list of the addresses the user typed, newest first, up to 100, one line for the site and a faint second line for the path. A repeat moves to the top. Tapping an entry follows the [session](#sessions) rules above.
+The history button sits in the fan directly above settings. It opens a full-screen list of the addresses the user typed, newest first, up to 100: a site tile, the host, and a faint second line for the path. A repeat moves to the top. Tapping an entry follows the [session](#sessions) rules above.
 
 ## Onboarding
 

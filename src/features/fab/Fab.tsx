@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { useApp } from "../../app/store";
+import { quickAccess } from "../../shared/favorites";
 import { useInsets, useViewport } from "../../shared/viewport";
 import {
   FAB_SIZE,
@@ -57,7 +58,7 @@ export function Fab() {
   const holdTimer = useRef(0);
   const ignorePress = useRef(false);
 
-  const list = useMemo(() => favorites ?? [], [favorites]);
+  const list = useMemo(() => quickAccess(favorites ?? []), [favorites]);
   const resting = fabCenter(position.edge, position.yRatio * viewport.height, viewport, insets);
   const layout = useMemo(
     () => fanLayout(resting, position.edge, viewport, insets, list.length),

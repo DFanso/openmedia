@@ -7,8 +7,8 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub enum Error {
     #[error("a favorite needs a name of 1-20 characters")]
     InvalidFavoriteName,
-    #[error("at most {0} favorites are allowed")]
-    TooManyFavorites(usize),
+    #[error("no such site to favorite")]
+    UnknownSite,
     #[error("the bottom margin can be at most {0} pixels")]
     InvalidMargin(u32),
     #[error("no such site option")]

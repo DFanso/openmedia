@@ -52,7 +52,7 @@ A `script` rule exists as a gated escape hatch (see [Trust levels](#trust-levels
 | `origin` | `bundled` \| `user` \| `ai` \| `imported` | Drives [trust level](#trust-levels). |
 | `match` | string[] | URL patterns (scheme + host + path glob). A recipe applies when any matches the top-level page URL. |
 | `rules` | Rule[] | Ordered. Each independently toggleable. |
-| `meta` | object | Optional: `author`, `homepage`, `lastVerified` (date), `notes`. |
+| `meta` | object | Optional: `author`, `homepage`, `lastVerified` (date), `notes`. `homepage` must be an `http(s)` address; Settings uses it as the page a favorite of the recipe opens, and hides the star on a recipe without one. Every bundled recipe sets it, and it must itself match the recipe's `match` patterns (tested). |
 
 ## Options (user-facing toggles)
 
