@@ -29,7 +29,7 @@ impl<R: Runtime> Siteview<R> {
         Err(Error::DesktopUnsupported)
     }
 
-    pub fn set_visible(&self, _request: SetVisibleRequest) -> Result<()> {
+    pub fn set_interactive_regions(&self, _request: SetInteractiveRegionsRequest) -> Result<()> {
         Err(Error::DesktopUnsupported)
     }
 
@@ -46,10 +46,6 @@ impl<R: Runtime> Siteview<R> {
     }
 
     pub fn reload(&self) -> Result<()> {
-        Err(Error::DesktopUnsupported)
-    }
-
-    pub fn delete_profile_data(&self, _request: DeleteProfileDataRequest) -> Result<()> {
         Err(Error::DesktopUnsupported)
     }
 }

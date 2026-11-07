@@ -22,11 +22,11 @@ pub(crate) async fn set_rect<R: Runtime>(app: AppHandle<R>, request: SetRectRequ
 }
 
 #[command]
-pub(crate) async fn set_visible<R: Runtime>(
+pub(crate) async fn set_interactive_regions<R: Runtime>(
     app: AppHandle<R>,
-    request: SetVisibleRequest,
+    request: SetInteractiveRegionsRequest,
 ) -> Result<()> {
-    app.siteview().set_visible(request)
+    app.siteview().set_interactive_regions(request)
 }
 
 #[command]
@@ -51,13 +51,4 @@ pub(crate) async fn go_forward<R: Runtime>(app: AppHandle<R>) -> Result<()> {
 #[command]
 pub(crate) async fn reload<R: Runtime>(app: AppHandle<R>) -> Result<()> {
     app.siteview().reload()
-}
-
-#[command]
-pub(crate) async fn delete_profile_data<R: Runtime>(
-    app: AppHandle<R>,
-    request: DeleteProfileDataRequest,
-) -> Result<()> {
-    parse_profile_id(&request.profile)?;
-    app.siteview().delete_profile_data(request)
 }

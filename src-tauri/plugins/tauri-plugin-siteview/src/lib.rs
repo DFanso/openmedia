@@ -37,12 +37,11 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             commands::open,
             commands::close,
             commands::set_rect,
-            commands::set_visible,
+            commands::set_interactive_regions,
             commands::navigate,
             commands::go_back,
             commands::go_forward,
             commands::reload,
-            commands::delete_profile_data,
         ])
         .setup(|app, api| {
             #[cfg(mobile)]

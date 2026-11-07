@@ -14,11 +14,9 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            commands::list_profiles,
-            commands::create_profile,
-            commands::delete_profile,
-            commands::add_site,
-            commands::remove_site,
+            commands::get_state,
+            commands::set_favorites,
+            commands::set_last_url,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

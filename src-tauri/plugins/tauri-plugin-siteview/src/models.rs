@@ -23,19 +23,16 @@ pub struct SetRectRequest {
     pub rect: Rect,
 }
 
+/// Rectangles, in shell CSS pixels, where touches belong to the shell. Everywhere else a touch
+/// goes to the site view underneath.
 #[derive(Debug, Clone, Deserialize)]
-pub struct SetVisibleRequest {
-    pub visible: bool,
+pub struct SetInteractiveRegionsRequest {
+    pub regions: Vec<Rect>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct NavigateRequest {
     pub url: String,
-}
-
-#[derive(Debug, Clone, Deserialize)]
-pub struct DeleteProfileDataRequest {
-    pub profile: String,
 }
 
 /// Events the native side sends to Core. Everything here is data from a hostile page or

@@ -7,12 +7,11 @@ Shell-only control of the native site view. Never grant to a site webview.
 - `allow-open`
 - `allow-close`
 - `allow-set-rect`
-- `allow-set-visible`
+- `allow-set-interactive-regions`
 - `allow-navigate`
 - `allow-go-back`
 - `allow-go-forward`
 - `allow-reload`
-- `allow-delete-profile-data`
 
 ## Permission Table
 
@@ -201,6 +200,32 @@ Enables the reload command without any pre-configured scope.
 <td>
 
 Denies the reload command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`siteview:allow-set-interactive-regions`
+
+</td>
+<td>
+
+Enables the set_interactive_regions command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`siteview:deny-set-interactive-regions`
+
+</td>
+<td>
+
+Denies the set_interactive_regions command without any pre-configured scope.
 
 </td>
 </tr>

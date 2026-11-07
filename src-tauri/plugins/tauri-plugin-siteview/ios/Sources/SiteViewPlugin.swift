@@ -27,16 +27,12 @@ class SetRectArgs: Decodable {
   let rect: RectArgs
 }
 
-class SetVisibleArgs: Decodable {
-  let visible: Bool
+class SetInteractiveRegionsArgs: Decodable {
+  let regions: [RectArgs]
 }
 
 class NavigateArgs: Decodable {
   let url: String
-}
-
-class DeleteProfileDataArgs: Decodable {
-  let profile: String
 }
 
 struct StateEvent: Encodable {
@@ -71,16 +67,37 @@ private final class WeakMessageHandler: NSObject, WKScriptMessageHandler {
   }
 }
 
-/// Hosts one native WKWebView above the Tauri shell webview. The shell owns layout and reports
-/// the rectangle; the site view never receives Tauri IPC, only the write-only `openmedia` bridge.
+/// Transparent view above both webviews. It never handles touches itself: it decides, per touch,
+/// whether the shell (inside an interactive region) or the site view underneath receives it.
+final class TouchRouter: UIView {
+  weak var shell: WKWebView?
+  weak var siteView: WKWebView?
+  var regions: [CGRect] = []
+
+  override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+    guard let shell, bounds.contains(point) else { return nil }
+    let inShell = convert(point, to: shell)
+    let shellOwnsTouch = siteView == nil || regions.contains { $0.contains(inShell) }
+    let target: UIView = shellOwnsTouch ? shell : (siteView ?? shell)
+    return target.hitTest(convert(point, to: target), with: event)
+  }
+}
+
+/// Hosts one native WKWebView *below* the Tauri shell webview. The shell is transparent and draws
+/// the floating controls; the shell owns layout and reports the site rectangle. The site view
+/// never receives Tauri IPC, only the write-only `openmedia` bridge.
 class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
   private var shell: WKWebView?
   private var siteView: WKWebView?
+  private var router: TouchRouter?
   private var events: Channel?
   private var observations: [NSKeyValueObservation] = []
 
   override func load(webview: WKWebView) {
     shell = webview
+    webview.isOpaque = false
+    webview.backgroundColor = .clear
+    webview.scrollView.backgroundColor = .clear
   }
 
   // MARK: Commands
@@ -96,21 +113,22 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
       return
     }
     DispatchQueue.main.async {
-      guard let host = self.shell?.superview, let frame = self.frame(for: args.rect) else {
+      guard let shell = self.shell, let host = shell.superview else {
         invoke.reject("shell webview is not ready")
         return
       }
       self.tearDown()
       let view = WKWebView(
-        frame: frame,
+        frame: shell.convert(args.rect.cgRect, to: host),
         configuration: self.makeConfiguration(profileId: profileId, script: args.documentStartScript)
       )
       view.allowsBackForwardNavigationGestures = true
       view.navigationDelegate = self
       view.uiDelegate = self
-      host.addSubview(view)
+      host.insertSubview(view, belowSubview: shell)
       self.siteView = view
       self.events = args.onEvent
+      self.installRouter(in: host).siteView = view
       self.observe(view)
       view.load(URLRequest(url: url))
       invoke.resolve()
@@ -127,15 +145,18 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
   @objc public func setRect(_ invoke: Invoke) throws {
     let args = try invoke.parseArgs(SetRectArgs.self)
     onSiteView(invoke) { view in
-      if let frame = self.frame(for: args.rect) {
-        view.frame = frame
+      if let shell = self.shell, let host = shell.superview {
+        view.frame = shell.convert(args.rect.cgRect, to: host)
       }
     }
   }
 
-  @objc public func setVisible(_ invoke: Invoke) throws {
-    let args = try invoke.parseArgs(SetVisibleArgs.self)
-    onSiteView(invoke) { $0.isHidden = !args.visible }
+  @objc public func setInteractiveRegions(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(SetInteractiveRegionsArgs.self)
+    DispatchQueue.main.async {
+      self.router?.regions = args.regions.map(\.cgRect)
+      invoke.resolve()
+    }
   }
 
   @objc public func navigate(_ invoke: Invoke) throws {
@@ -157,22 +178,6 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
 
   @objc public func reload(_ invoke: Invoke) {
     onSiteView(invoke) { $0.reload() }
-  }
-
-  @objc public func deleteProfileData(_ invoke: Invoke) throws {
-    let args = try invoke.parseArgs(DeleteProfileDataArgs.self)
-    guard let profileId = UUID(uuidString: args.profile) else {
-      invoke.reject("invalid profile id")
-      return
-    }
-    Task { @MainActor in
-      do {
-        try await WKWebsiteDataStore.remove(forIdentifier: profileId)
-        invoke.resolve()
-      } catch {
-        invoke.reject(error.localizedDescription)
-      }
-    }
   }
 
   // MARK: Bridge
@@ -219,6 +224,17 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
   }
 
   // MARK: Helpers
+
+  private func installRouter(in host: UIView) -> TouchRouter {
+    if let router { return router }
+    let router = TouchRouter(frame: host.bounds)
+    router.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    router.backgroundColor = .clear
+    router.shell = shell
+    host.addSubview(router)
+    self.router = router
+    return router
+  }
 
   private func makeConfiguration(profileId: UUID, script: String?) -> WKWebViewConfiguration {
     let configuration = WKWebViewConfiguration()
@@ -268,6 +284,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
       view.removeFromSuperview()
     }
     siteView = nil
+    router?.siteView = nil
     events = nil
   }
 
@@ -280,11 +297,6 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
       action(view)
       invoke.resolve()
     }
-  }
-
-  private func frame(for rect: RectArgs) -> CGRect? {
-    guard let shell, let host = shell.superview else { return nil }
-    return shell.convert(rect.cgRect, to: host)
   }
 
   private func webURL(_ string: String) -> URL? {

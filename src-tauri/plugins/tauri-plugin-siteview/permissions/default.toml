@@ -4,10 +4,9 @@ permissions = [
   "allow-open",
   "allow-close",
   "allow-set-rect",
-  "allow-set-visible",
+  "allow-set-interactive-regions",
   "allow-navigate",
   "allow-go-back",
   "allow-go-forward",
   "allow-reload",
-  "allow-delete-profile-data",
 ]

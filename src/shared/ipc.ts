@@ -1,16 +1,21 @@
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 
-export interface Site {
-  id: string;
-  url: string;
-  title: string;
-}
-
-export interface Profile {
+export interface Favorite {
   id: string;
   name: string;
-  sites: Site[];
+  url: string;
+}
+
+export interface FavoriteInput {
+  name: string;
+  url: string;
+}
+
+export interface AppState {
+  profileId: string;
+  favorites: Favorite[];
+  lastUrl: string | null;
 }
 
 export interface Rect {
@@ -33,11 +38,9 @@ async function command(name: string, args?: Record<string, unknown>): Promise<vo
 }
 
 export const library = {
-  listProfiles: () => invoke<Profile[]>("list_profiles"),
-  createProfile: (name: string) => invoke<Profile>("create_profile", { name }),
-  deleteProfile: (profileId: string) => command("delete_profile", { profileId }),
-  addSite: (profileId: string, url: string) => invoke<Site>("add_site", { profileId, url }),
-  removeSite: (profileId: string, siteId: string) => command("remove_site", { profileId, siteId }),
+  getState: () => invoke<AppState>("get_state"),
+  setFavorites: (favorites: FavoriteInput[]) => invoke<Favorite[]>("set_favorites", { favorites }),
+  setLastUrl: (url: string) => command("set_last_url", { url }),
 };
 
 export const siteView = {
@@ -45,6 +48,8 @@ export const siteView = {
     command("plugin:siteview|open", { request: { profile, url, rect } }),
   close: () => command("plugin:siteview|close"),
   setRect: (rect: Rect) => command("plugin:siteview|set_rect", { request: { rect } }),
+  setInteractiveRegions: (regions: Rect[]) =>
+    command("plugin:siteview|set_interactive_regions", { request: { regions } }),
   navigate: (url: string) => command("plugin:siteview|navigate", { request: { url } }),
   goBack: () => command("plugin:siteview|go_back"),
   goForward: () => command("plugin:siteview|go_forward"),
@@ -56,9 +61,6 @@ export const siteView = {
 };
 
 export function errorMessage(error: unknown): string {
-  return typeof error === "string"
-    ? error
-    : error instanceof Error
-      ? error.message
-      : "Unknown error";
+  if (typeof error === "string") return error;
+  return error instanceof Error ? error.message : "Unknown error";
 }

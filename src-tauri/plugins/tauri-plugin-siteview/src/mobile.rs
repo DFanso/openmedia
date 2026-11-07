@@ -13,6 +13,9 @@ pub const STATE_EVENT: &str = "siteview:state";
 pub const ERROR_EVENT: &str = "siteview:error";
 pub const BRIDGE_EVENT: &str = "siteview:bridge";
 
+#[cfg(target_os = "android")]
+compile_error!("the Android site view is not implemented yet; see docs/wiki/platform-support.md");
+
 #[cfg(target_os = "ios")]
 tauri::ios_plugin_binding!(init_plugin_siteview);
 
@@ -20,9 +23,6 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
     app: &AppHandle<R>,
     api: PluginApi<R, C>,
 ) -> Result<Siteview<R>> {
-    #[cfg(target_os = "android")]
-    let handle = api.register_android_plugin("dev.openmedia.siteview", "SiteViewPlugin")?;
-    #[cfg(target_os = "ios")]
     let handle = api.register_ios_plugin(init_plugin_siteview)?;
 
     let app = app.clone();
@@ -87,10 +87,10 @@ impl<R: Runtime> Siteview<R> {
         self.run("setRect", serde_json::json!({ "rect": request.rect }))
     }
 
-    pub fn set_visible(&self, request: SetVisibleRequest) -> Result<()> {
+    pub fn set_interactive_regions(&self, request: SetInteractiveRegionsRequest) -> Result<()> {
         self.run(
-            "setVisible",
-            serde_json::json!({ "visible": request.visible }),
+            "setInteractiveRegions",
+            serde_json::json!({ "regions": request.regions }),
         )
     }
 
@@ -108,12 +108,5 @@ impl<R: Runtime> Siteview<R> {
 
     pub fn reload(&self) -> Result<()> {
         self.run("reload", ())
-    }
-
-    pub fn delete_profile_data(&self, request: DeleteProfileDataRequest) -> Result<()> {
-        self.run(
-            "deleteProfileData",
-            serde_json::json!({ "profile": request.profile }),
-        )
     }
 }

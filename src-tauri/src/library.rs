@@ -10,32 +10,50 @@ use uuid::Uuid;
 
 use crate::error::{Error, Result};
 
-const DEFAULT_PROFILE_NAME: &str = "Personal";
-const MAX_PROFILE_NAME_CHARS: usize = 40;
-const FORMAT_VERSION: u32 = 1;
+const FORMAT_VERSION: u32 = 2;
+pub const MAX_FAVORITES: usize = 6;
+const MAX_FAVORITE_NAME_CHARS: usize = 20;
+
+const DEFAULT_FAVORITES: [(&str, &str); 4] = [
+    ("Instagram", "https://www.instagram.com/"),
+    ("Facebook", "https://www.facebook.com/"),
+    ("Twitter", "https://twitter.com/"),
+    ("Reddit", "https://www.reddit.com/"),
+];
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Site {
-    pub id: Uuid,
-    pub url: String,
-    pub title: String,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Profile {
+pub struct Favorite {
     pub id: Uuid,
     pub name: String,
-    pub sites: Vec<Site>,
+    pub url: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct FavoriteInput {
+    pub name: String,
+    pub url: String,
+}
+
+/// Everything the shell needs at startup.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AppState {
+    pub profile_id: Uuid,
+    pub favorites: Vec<Favorite>,
+    pub last_url: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct LibraryData {
     version: u32,
-    profiles: Vec<Profile>,
+    profile_id: Uuid,
+    favorites: Vec<Favorite>,
+    last_url: Option<String>,
 }
 
-/// Profiles and their saved sites, persisted as one JSON file. Holds no secrets and no cookies:
-/// site sessions live in the native per-profile data store.
+/// The user's favorites and last page, persisted as one JSON file. Holds no secrets and no
+/// cookies: site sessions live in the native data store of `profile_id`.
 pub struct Library {
     path: PathBuf,
     data: Mutex<LibraryData>,
@@ -44,11 +62,8 @@ pub struct Library {
 impl Library {
     pub fn load(path: PathBuf) -> Result<Self> {
         let data = match fs::read_to_string(&path) {
-            Ok(text) => serde_json::from_str(&text)?,
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => LibraryData {
-                version: FORMAT_VERSION,
-                profiles: vec![new_profile(DEFAULT_PROFILE_NAME)],
-            },
+            Ok(text) => parse(&text)?,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => default_data(),
             Err(e) => return Err(e.into()),
         };
         let library = Self {
@@ -62,69 +77,33 @@ impl Library {
         Ok(library)
     }
 
-    pub fn profiles(&self) -> Result<Vec<Profile>> {
-        Ok(self.lock()?.profiles.clone())
-    }
-
-    pub fn create_profile(&self, name: &str) -> Result<Profile> {
-        let name = name.trim();
-        if name.is_empty() || name.chars().count() > MAX_PROFILE_NAME_CHARS {
-            return Err(Error::InvalidProfileName);
-        }
-        let mut data = self.lock()?;
-        if data
-            .profiles
-            .iter()
-            .any(|p| p.name.to_lowercase() == name.to_lowercase())
-        {
-            return Err(Error::DuplicateProfileName);
-        }
-        let profile = new_profile(name);
-        data.profiles.push(profile.clone());
-        self.save(&data)?;
-        Ok(profile)
-    }
-
-    pub fn can_delete_profile(&self, id: Uuid) -> Result<()> {
+    pub fn state(&self) -> Result<AppState> {
         let data = self.lock()?;
-        if !data.profiles.iter().any(|p| p.id == id) {
-            return Err(Error::ProfileNotFound);
-        }
-        if data.profiles.len() == 1 {
-            return Err(Error::LastProfile);
-        }
-        Ok(())
+        Ok(AppState {
+            profile_id: data.profile_id,
+            favorites: data.favorites.clone(),
+            last_url: data.last_url.clone(),
+        })
     }
 
-    pub fn delete_profile(&self, id: Uuid) -> Result<()> {
-        self.can_delete_profile(id)?;
+    pub fn set_favorites(&self, inputs: Vec<FavoriteInput>) -> Result<Vec<Favorite>> {
+        if inputs.len() > MAX_FAVORITES {
+            return Err(Error::TooManyFavorites(MAX_FAVORITES));
+        }
+        let favorites = inputs
+            .into_iter()
+            .map(favorite_from_input)
+            .collect::<Result<Vec<_>>>()?;
         let mut data = self.lock()?;
-        data.profiles.retain(|p| p.id != id);
-        self.save(&data)
-    }
-
-    pub fn add_site(&self, profile_id: Uuid, url: &str) -> Result<Site> {
-        let parsed = parse_web_url(url)?;
-        let host = parsed.host_str().unwrap_or_default();
-        let site = Site {
-            id: Uuid::new_v4(),
-            url: parsed.to_string(),
-            title: host.strip_prefix("www.").unwrap_or(host).to_owned(),
-        };
-        let mut data = self.lock()?;
-        data.profile_mut(profile_id)?.sites.push(site.clone());
+        data.favorites = favorites.clone();
         self.save(&data)?;
-        Ok(site)
+        Ok(favorites)
     }
 
-    pub fn remove_site(&self, profile_id: Uuid, site_id: Uuid) -> Result<()> {
+    pub fn set_last_url(&self, url: &str) -> Result<()> {
+        let url = parse_web_url(url)?.to_string();
         let mut data = self.lock()?;
-        let sites = &mut data.profile_mut(profile_id)?.sites;
-        let before = sites.len();
-        sites.retain(|s| s.id != site_id);
-        if sites.len() == before {
-            return Err(Error::SiteNotFound);
-        }
+        data.last_url = Some(url);
         self.save(&data)
     }
 
@@ -138,21 +117,40 @@ impl Library {
     }
 }
 
-impl LibraryData {
-    fn profile_mut(&mut self, id: Uuid) -> Result<&mut Profile> {
-        self.profiles
-            .iter_mut()
-            .find(|p| p.id == id)
-            .ok_or(Error::ProfileNotFound)
+fn parse(text: &str) -> Result<LibraryData> {
+    let data: LibraryData = serde_json::from_str(text)?;
+    if data.version != FORMAT_VERSION {
+        return Err(Error::UnsupportedVersion(data.version));
+    }
+    Ok(data)
+}
+
+fn default_data() -> LibraryData {
+    LibraryData {
+        version: FORMAT_VERSION,
+        profile_id: Uuid::new_v4(),
+        favorites: DEFAULT_FAVORITES
+            .iter()
+            .map(|(name, url)| Favorite {
+                id: Uuid::new_v4(),
+                name: (*name).to_owned(),
+                url: (*url).to_owned(),
+            })
+            .collect(),
+        last_url: None,
     }
 }
 
-fn new_profile(name: &str) -> Profile {
-    Profile {
+fn favorite_from_input(input: FavoriteInput) -> Result<Favorite> {
+    let name = input.name.trim();
+    if name.is_empty() || name.chars().count() > MAX_FAVORITE_NAME_CHARS {
+        return Err(Error::InvalidFavoriteName);
+    }
+    Ok(Favorite {
         id: Uuid::new_v4(),
         name: name.to_owned(),
-        sites: Vec::new(),
-    }
+        url: parse_web_url(&input.url)?.to_string(),
+    })
 }
 
 fn write_atomically(path: &Path, bytes: &[u8]) -> std::io::Result<()> {
@@ -174,84 +172,105 @@ mod tests {
         (dir, library)
     }
 
-    #[test]
-    fn first_run_creates_one_default_profile() {
-        let (_dir, library) = library();
-        let profiles = library.profiles().unwrap();
-        assert_eq!(profiles.len(), 1);
-        assert_eq!(profiles[0].name, "Personal");
+    fn input(name: &str, url: &str) -> FavoriteInput {
+        FavoriteInput {
+            name: name.into(),
+            url: url.into(),
+        }
     }
 
     #[test]
-    fn changes_survive_a_reload() {
+    fn first_run_has_the_four_default_favorites_in_order() {
+        let (_dir, library) = library();
+        let names: Vec<_> = library
+            .state()
+            .unwrap()
+            .favorites
+            .into_iter()
+            .map(|f| f.name)
+            .collect();
+        assert_eq!(names, ["Instagram", "Facebook", "Twitter", "Reddit"]);
+    }
+
+    #[test]
+    fn the_profile_id_is_stable_across_reloads() {
         let (dir, library) = library();
-        let profile = library.profiles().unwrap().remove(0);
-        library
-            .add_site(profile.id, "https://www.instagram.com/")
-            .unwrap();
+        let first = library.state().unwrap().profile_id;
         let reloaded = Library::load(dir.path().join("library.json")).unwrap();
-        let sites = reloaded.profiles().unwrap().remove(0).sites;
-        assert_eq!(sites.len(), 1);
-        assert_eq!(sites[0].title, "instagram.com");
+        assert_eq!(reloaded.state().unwrap().profile_id, first);
     }
 
     #[test]
-    fn site_urls_must_be_web_urls() {
-        let (_dir, library) = library();
-        let profile = library.profiles().unwrap().remove(0);
-        assert!(library.add_site(profile.id, "javascript:alert(1)").is_err());
-        assert!(library.add_site(profile.id, "file:///etc/passwd").is_err());
-        assert!(library.profiles().unwrap()[0].sites.is_empty());
-    }
-
-    #[test]
-    fn profile_names_are_trimmed_unique_and_bounded() {
-        let (_dir, library) = library();
-        assert!(matches!(
-            library.create_profile("   "),
-            Err(Error::InvalidProfileName)
-        ));
-        assert!(matches!(
-            library.create_profile(&"x".repeat(41)),
-            Err(Error::InvalidProfileName)
-        ));
-        assert!(matches!(
-            library.create_profile(" personal "),
-            Err(Error::DuplicateProfileName)
-        ));
-        assert_eq!(library.create_profile(" Work ").unwrap().name, "Work");
-    }
-
-    #[test]
-    fn the_last_profile_cannot_be_deleted() {
-        let (_dir, library) = library();
-        let only = library.profiles().unwrap().remove(0);
-        assert!(matches!(
-            library.delete_profile(only.id),
-            Err(Error::LastProfile)
-        ));
-        let work = library.create_profile("Work").unwrap();
-        library.delete_profile(only.id).unwrap();
-        assert_eq!(library.profiles().unwrap(), vec![work]);
-    }
-
-    #[test]
-    fn sites_are_scoped_to_their_profile() {
-        let (_dir, library) = library();
-        let personal = library.profiles().unwrap().remove(0);
-        let work = library.create_profile("Work").unwrap();
-        let site = library
-            .add_site(personal.id, "https://youtube.com")
+    fn edited_favorites_and_last_url_survive_a_reload() {
+        let (dir, library) = library();
+        library
+            .set_favorites(vec![input(" YouTube ", "https://m.youtube.com")])
             .unwrap();
-        assert!(matches!(
-            library.remove_site(work.id, site.id),
-            Err(Error::SiteNotFound)
-        ));
-        library.remove_site(personal.id, site.id).unwrap();
+        library.set_last_url("https://m.youtube.com/feed").unwrap();
+        let state = Library::load(dir.path().join("library.json"))
+            .unwrap()
+            .state()
+            .unwrap();
+        assert_eq!(state.favorites.len(), 1);
+        assert_eq!(state.favorites[0].name, "YouTube");
+        assert_eq!(
+            state.last_url.as_deref(),
+            Some("https://m.youtube.com/feed")
+        );
     }
 
     #[test]
-    fn a_corrupt_library_is_reported_not_overwritten() {
+    fn favorites_may_be_emptied() {
+        let (_dir, library) = library();
+        assert!(library.set_favorites(vec![]).unwrap().is_empty());
+    }
+
+    #[test]
+    fn favorite_urls_must_be_web_urls_and_nothing_is_saved_on_error() {
+        let (_dir, library) = library();
+        let before = library.state().unwrap().favorites;
+        for url in ["javascript:alert(1)", "file:///etc/passwd", "nope"] {
+            assert!(
+                library.set_favorites(vec![input("x", url)]).is_err(),
+                "{url}"
+            );
+        }
+        assert_eq!(library.state().unwrap().favorites, before);
+    }
+
+    #[test]
+    fn favorite_names_are_trimmed_and_bounded() {
+        let (_dir, library) = library();
+        let bad = ["   ", &"x".repeat(21)];
+        for name in bad {
+            assert!(matches!(
+                library.set_favorites(vec![input(name, "https://a.com")]),
+                Err(Error::InvalidFavoriteName)
+            ));
+        }
+    }
+
+    #[test]
+    fn the_favorite_count_is_capped() {
+        let (_dir, library) = library();
+        let seven: Vec<_> = (0..=MAX_FAVORITES)
+            .map(|i| input(&format!("s{i}"), "https://a.com"))
+            .collect();
+        assert!(matches!(
+            library.set_favorites(seven),
+            Err(Error::TooManyFavorites(_))
+        ));
+    }
+
+    #[test]
+    fn last_url_rejects_non_web_urls() {
+        let (_dir, library) = library();
+        assert!(library.set_last_url("javascript:1").is_err());
+        assert_eq!(library.state().unwrap().last_url, None);
+    }
+
+    #[test]
+    fn corrupt_or_foreign_files_are_reported_not_overwritten() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("library.json");
         fs::write(&path, "{not json").unwrap();
@@ -259,6 +278,14 @@ mod tests {
             Library::load(path.clone()),
             Err(Error::Corrupt(_))
         ));
-        assert_eq!(fs::read_to_string(path).unwrap(), "{not json");
+        assert_eq!(fs::read_to_string(&path).unwrap(), "{not json");
+
+        let old = r#"{"version":1,"profileId":"6f1a1c1e-0000-4000-8000-00000000000a","favorites":[],"lastUrl":null}"#;
+        fs::write(&path, old).unwrap();
+        assert!(matches!(
+            Library::load(path.clone()),
+            Err(Error::UnsupportedVersion(1))
+        ));
+        assert_eq!(fs::read_to_string(path).unwrap(), old);
     }
 }
