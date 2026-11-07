@@ -16,12 +16,18 @@ pub fn run() {
         .plugin(tauri_plugin_siteview::init())
         .setup(|app| {
             let data_dir = app.path().app_data_dir()?;
-            app.manage(library::Library::load(data_dir.join("library.json"))?);
+            let library = library::Library::load(data_dir.join("library.json"))?;
+            let ad_block_enabled = library.ad_block_enabled()?;
+            app.manage(library);
             app.manage(usage::Usage::load(data_dir.join("usage.json"))?);
             app.manage(recipes::Recipes::load(data_dir.join("recipes"))?);
-            app.manage(ad_block::AdBlock::bundled(
-                app.path().app_cache_dir()?.join("ad-block"),
-            ));
+            let ad_block = ad_block::AdBlock::bundled(app.path().app_cache_dir()?.join("ad-block"));
+            app.manage(ad_block.clone());
+            if ad_block_enabled {
+                // Converting the lists takes seconds on the first run; do it while the shell loads
+                // so the first page open does not wait. A failure surfaces when a page opens.
+                tauri::async_runtime::spawn_blocking(move || ad_block.rule_lists());
+            }
             app.manage(commands::Secrets(Box::new(secrets::KeychainStore)));
             Ok(())
         })

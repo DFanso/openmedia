@@ -113,7 +113,7 @@ A hidden session whose web content process dies is dropped natively and the shel
 ## Known gaps
 
 - The command bar opens from the top so the keyboard cannot cover it; keyboard behavior on a device is unverified.
-- Page scrolling, pinch, pull-to-refresh and edge-swipe back through the touch router are unverified on a device.
+- Page scrolling, inertia, pull-to-refresh, long-press and sheet scrolling were verified on the simulator; pinch, hold-slide-lift and edge-swipe back could not be driven with `idb`, and nothing was tried on a device ([Platform Support](./platform-support.md#verified-results)).
 - With no bottom bar the page runs under the home indicator; a site's own bottom controls may sit close to it.
 - The fan has no sound or haptics.
 - Closing sessions for memory is by count, idle time and the OS memory warning, not by measured memory or CPU: WebKit has no public per-page CPU or memory figure that this app could read [INFERENCE: not exhaustively checked]. See [Sessions](#sessions).

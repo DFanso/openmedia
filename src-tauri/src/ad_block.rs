@@ -8,7 +8,7 @@ use std::{
     borrow::Cow,
     fs,
     path::{Path, PathBuf},
-    sync::Arc,
+    sync::{Arc, Mutex},
 };
 
 use adblock::{
@@ -59,6 +59,8 @@ impl Source {
 struct Inner {
     dir: PathBuf,
     sources: Vec<Source>,
+    /// One conversion at a time: the launch-time warm-up and the first `open_site` can overlap.
+    conversion: Mutex<()>,
 }
 
 /// The bundled blocklists and the directory their converted JSON is cached in. Cheap to clone.
@@ -71,13 +73,21 @@ impl AdBlock {
             .iter()
             .map(|(name, text)| Source::new(name, Cow::Borrowed(*text)))
             .collect();
-        Self(Arc::new(Inner { dir, sources }))
+        Self(Arc::new(Inner {
+            dir,
+            sources,
+            conversion: Mutex::new(()),
+        }))
     }
 
     /// The lists for the native side, converting any whose JSON is not on disk yet. A list's id
     /// changes with its content, so a file that exists is current and is never rewritten.
     pub fn rule_lists(&self) -> Result<Vec<ContentRuleList>> {
         let inner = &self.0;
+        let _one_at_a_time = inner
+            .conversion
+            .lock()
+            .map_err(|_| Error::AdBlock("a conversion panicked".into()))?;
         fs::create_dir_all(&inner.dir)?;
         let mut lists = Vec::with_capacity(inner.sources.len());
         for source in &inner.sources {
@@ -255,6 +265,7 @@ mod tests {
         AdBlock(Arc::new(Inner {
             dir: dir.to_owned(),
             sources: vec![Source::new("test", Cow::Borrowed(text))],
+            conversion: Mutex::new(()),
         }))
     }
 

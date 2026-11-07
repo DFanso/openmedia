@@ -1,4 +1,4 @@
-import { hideSplash } from "./splash";
+import { hideSplash, hideSplashWhen } from "./splash";
 import { useEffect } from "react";
 import { BackButton } from "../features/back/BackButton";
 import { Fab } from "../features/fab/Fab";
@@ -13,6 +13,12 @@ import { useApplyTheme } from "../shared/theme";
 import { useApp } from "./store";
 import { useHitRegions } from "./useHitRegions";
 
+/** True with no page to wait for, or once the visible page has reported an address. */
+function activePageHasUrl(): boolean {
+  const { activeId, sessions } = useApp.getState();
+  return activeId === null || sessions.some((s) => s.id === activeId && s.url !== null);
+}
+
 export function App() {
   const load = useApp((s) => s.load);
   const error = useApp((s) => s.error);
@@ -25,7 +31,7 @@ export function App() {
   useEffect(() => startUsageTracking(), []);
 
   useEffect(() => {
-    void load().finally(hideSplash);
+    void load().then(() => hideSplashWhen(activePageHasUrl, useApp.subscribe), hideSplash);
   }, [load]);
 
   return (

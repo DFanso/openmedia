@@ -29,7 +29,7 @@ iOS and Android first. macOS next (same engine as iOS, fastest desktop path), th
 
 ## Verified results
 
-Runs on the iPhone 17 Pro Max simulator (iOS 26.5). The first used a throwaway spike (not kept); later ones drove the real app's components, partly against a local fixture page over `http://localhost`. Not verified: a real device, a real finger (gestures below were synthetic pointer events), page scrolling and pinch through the touch router, rotation, keyboard, any login, and anything on Android or desktop.
+Runs on the iPhone 17 Pro Max simulator (iOS 26.5). The first used a throwaway spike (not kept); later ones drove the real app's components, partly against a local fixture page over `http://localhost`. Not verified: a real device, a real finger for the earlier rows (those gestures were synthetic pointer events), rotation, any login, and anything on Android or desktop. See the gesture table below for what `idb` touches covered.
 
 | Check | Result |
 |-------|--------|
@@ -55,12 +55,46 @@ Runs on the iPhone 17 Pro Max simulator (iOS 26.5). The first used a throwaway s
 | API key flow on the simulator: save a key through Rust to the Keychain, read back `hasKey`, remove it | Yes. The provider JSON handed to the shell did not contain the key, and a failed connection test returned "Could not reach the provider." without it. A test against a real provider that accepts the key was **not** run |
 | Theme: Light, Dark and System apply to the app and persist; Light and Dark render cleanly in settings | Yes, by eye. Sites following `prefers-color-scheme` through `overrideUserInterfaceStyle` were not checked |
 | Reset onboarding: the guide opens again and `onboarded` is false in `library.json` | Yes |
-| Pull-to-refresh (`UIRefreshControl` on the site view's scroll view) | **Not verified.** It compiles and is wired to reload; nobody has pulled the page |
 | Sessions on a throwaway simulator (`iPhone 17`, iOS 26.5) against a local fixture server that logged every request, with the shell driven by real taps: a typed address opens a new session; tapping a favorite whose session is live switches to it with no new request; a history entry whose typed session is live switches with no new request | Yes |
 | Pinning: tapping a link to another host, and a `target=_blank` link to another host, each opened the popup browser and left the session's page unchanged; a same-host link loaded in place | Yes (the popup's own load reached the fixture server; the session's did not navigate) |
 | Cap: after opening 10 typed sessions on top of the restored one, a history entry for an old one made a new request (its session had been closed), and a recent one made none | Yes |
 | Memory warning: posting `UIApplication.didReceiveMemoryWarningNotification` from a temporary debug hook (removed afterwards) closed the hidden sessions: the favorite's page was requested again. The Simulator's own "Simulate Memory Warning" menu could not be driven without accessibility permission | Yes for the chain from the notification to closing. The 20-minute idle sweep was only unit-tested, and a web content process dying was not exercised |
 | History: the fan's history button lists the typed addresses newest first; "Clear history" with confirm left `history: []` and `lastUrl: null` in `library.json` with favorites intact | Yes, by eye and by reading the file |
+
+**Flashes and gestures (iPhone 17 Pro Max simulator, iOS 26.5, debug build, loopback fixture server).** Video of the screen from `simctl io recordVideo`, sampled at 30 fps; a frame counts as unthemed when the page region averages pure black or white. "Before" is `origin/main`, "after" is this change. Slow page = the fixture delays its response 4 s.
+
+| Scenario | Before | After |
+|----------|--------|-------|
+| Cold start, dark | black for 1100 ms (launch screen), then black again 433 ms between splash and page | 0 ms (launch screen and splash are both the app's ink) |
+| Cold start, light | white 1167 ms + white 467 ms | 0 ms |
+| First launch after install (no compiled rule lists), dark | black 6.97 s, page at about 8.3 s | 0 ms unthemed, page at about 2.3 s; lists compile in the background (about 4 s) |
+| Open a new session, page answers in 0.5 s, dark | black 500 ms | 0 ms (ink until the page paints) |
+| Open a new session, slow page, dark / light | black 5.77 s / white 4.53 s | 0 ms; ink / paper for the whole wait |
+| Switch to a live session (5 switches) | no unthemed frame, no reload | same |
+
+A single black or white frame at the moment a new page is revealed remained after the first fix (reveal on `didCommit`, then on the page's first two animation frames); a 0.15 s fade-in removed it. Not measured: a real device, a release build, Instagram-sized pages, a web content process killed by the OS.
+
+| Gesture | Result |
+|---------|--------|
+| Page scroll | Verified: a 400 pt drag moved `scrollY` by 390 (page log) |
+| Inertia | Verified: a 400 pt fast flick ended at `scrollY` 1006 |
+| Tap a link | Verified: click and navigation seen by the fixture server |
+| Pull to refresh | Verified: the page was requested again after a slow pull at the top |
+| Text input focus and keyboard | Verified: focus event on the field; the bottom band went from 3% to 100% non-page pixels |
+| Long-press a link | Verified: no click; 84% of the page pixels changed (menu and preview) |
+| Floating button tap, hold (fan), drag to either edge | Verified (screenshot pixel checks; the left-to-right drag by a screenshot) |
+| Hold, lift, then tap a favorite | Verified earlier (see above) and by switching sessions in the measurements |
+| Settings sheet scrolls, page below does not | Verified: 14% of the sheet's pixels moved, no `scrollY` event from the page |
+| Hold-slide-lift on the fan | **Not verified**: `idb` cannot hold a touch and then move it; the state machine is unit-tested |
+| Pinch zoom | **Not verified**: `idb` sends one finger |
+| iOS edge-swipe back and forward | **Not verified**: `idb`'s edge swipes did nothing in Mobile Safari either (control), so the tool, not the app, is the limit |
+| History sheet and command bar scrolling | **Not verified** |
+
+**Causes found.** The launch storyboard used the system background (white or black). A new `WKWebView` draws its own white or black until its first frame, and `open` also awaited the WebKit compile of the content rule lists (seconds on the first run) and, in Rust, the list conversion, before the view existed. The shell is transparent, so the window showed through. The splash faded out when state loaded, not when a page existed.
+
+**Fixes.** `SiteViewPlugin` puts a themed backdrop view under every page and keeps a new page at alpha 0 until its first frames are reported (native-only `openmediaPaint` handler, `didFinish`, or 1.5 s after commit), then fades it in. `open` looks lists up in WebKit's store and loads at once; missing lists compile in the background and attach to open pages without a reload (so the very first page after an install or list update is not blocked; its next navigation is). Rust converts the lists at launch. The launch storyboard uses a `LaunchBackground` color (ink / paper). The splash waits for the first page address, at most 4 s.
+
+**Not pursued.** Pre-warming a `WKWebView`: a second open took the same 470 ms to commit as the first, so there is no process start to hide. Launch-screen color follows the system appearance, not the in-app theme override.
 
 **Found while testing:** a synchronous Tauri command that calls into the plugin deadlocks the app (it blocks the main thread waiting for native code that needs the main thread). Commands that reach native code must be `async`; see `open_site`.
 
@@ -76,7 +110,7 @@ The site view is a native view *below* the Tauri shell, so the shell's floating 
 - The shell webview is transparent (`isOpaque = false`, clear backgrounds). The shell reserves a full-screen rectangle inside the safe area and reports it with `set_rect`; the native site view fills it.
 - A transparent `TouchRouter` view sits above both. The shell reports the rectangles of its interactive elements (`[data-hit]`) with `set_interactive_regions`; a touch inside one goes to the shell, any other touch goes to the page. With no site view open, the shell gets every touch.
 - Opening the fan, the command bar or settings adds a full-screen interactive region, so the page cannot be touched underneath them.
-- **Sessions.** The plugin keeps one `WKWebView` per session (a dictionary keyed by the shell's session UUID), all stacked below the shell, all but the active one `isHidden`. `open` adds a view and shows it; `activate` shows an existing one without reloading; `close` removes one. Every session uses the same profile data store, so logins are shared. The touch router points at the active view only. A session's content rule lists are swapped on all views; hidden ones reload when next shown. Lifetime policy lives in the shell ([UI Design](./ui-design.md#sessions)); the plugin only reports `siteview:memory` (from `UIApplication.didReceiveMemoryWarningNotification`) and `siteview:closed` (a hidden session's web content process died).
+- **Sessions.** The plugin keeps one `WKWebView` per session (a dictionary keyed by the shell's session UUID), all stacked below the shell, all but the active one `isHidden`. `open` adds a view and shows it; `activate` shows an existing one without reloading; `close` removes one. Every session uses the same profile data store, so logins are shared. The touch router points at the active view only. A session's content rule lists are swapped on all views; hidden ones reload when next shown. A backdrop view (the app's ink or paper) sits under every page, and a new page stays invisible until it has painted. Lifetime policy lives in the shell ([UI Design](./ui-design.md#sessions)); the plugin only reports `siteview:memory` (from `UIApplication.didReceiveMemoryWarningNotification`) and `siteview:closed` (a hidden session's web content process died).
 - **Domain pinning and the popup.** `decidePolicyFor`, `createWebViewWith` and the first-load rule all go through `DomainScope.verdict` (`ios/Sources/DomainScope.swift`, pure Foundation, checked by `scripts/test-domain-scope.sh`). Outside-domain main-frame navigations are cancelled and shown in an `SFSafariViewController` presented from the top view controller.
 - Native gestures (iOS edge-swipe back) stay on the site view; state changes are mirrored to the shell via `siteview:state` events.
 - Tap-to-pick, AI chat, and the rule list live in the command bar and settings; the picker highlight lives in the page (engine).

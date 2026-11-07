@@ -5,6 +5,23 @@ import UIKit
 import WebKit
 
 private let bridgeHandlerName = "openmedia"
+/// A page is shown only once it has painted: until then the backdrop shows, never the blank white
+/// or black a new web view draws. The page reports its first frames through this native-only
+/// handler (it reaches no Tauri IPC and nothing else); a page that fakes it only shows itself.
+private let paintHandlerName = "openmediaPaint"
+private let firstPaintScript = """
+  (function () {
+    var frames = 0;
+    function tick() {
+      if (++frames < 2) { requestAnimationFrame(tick); return; }
+      window.webkit.messageHandlers.\(paintHandlerName).postMessage(0);
+    }
+    requestAnimationFrame(tick);
+  })();
+  """
+/// A page that commits but never reports a frame is shown after this long.
+private let paintTimeout: TimeInterval = 1.5
+private let revealDuration: TimeInterval = 0.15
 /// A WKWebView's default user agent has no `Safari` token, which Google reads as an embedded
 /// browser and refuses to sign in from. Report what Mobile Safari reports (it freezes the OS
 /// version in the string and shows the real one after `Version/`).
@@ -13,6 +30,13 @@ private let safariUserAgent: String = {
   return "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/\(major).0 Mobile/15E148 Safari/604.1"
 }()
 private let allowedSchemes: Set<String> = ["http", "https"]
+/// The shell's own background (`--color-ink` in `index.css`, the splash in `index.html`): light
+/// `#f4f7fc`, dark `#070b14`. It follows the view's interface style, which the shell's theme sets.
+private let backdropColor = UIColor { traits in
+  traits.userInterfaceStyle == .light
+    ? UIColor(red: 0xF4 / 255, green: 0xF7 / 255, blue: 0xFC / 255, alpha: 1)
+    : UIColor(red: 0x07 / 255, green: 0x0B / 255, blue: 0x14 / 255, alpha: 1)
+}
 
 struct RectArgs: Decodable {
   let x: Double
@@ -113,6 +137,19 @@ private final class WeakMessageHandler: NSObject, WKScriptMessageHandler {
   }
 }
 
+private final class WeakPaintHandler: NSObject, WKScriptMessageHandler {
+  weak var target: SiteViewPlugin?
+
+  init(_ target: SiteViewPlugin) {
+    self.target = target
+  }
+
+  func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
+    guard message.frameInfo.isMainFrame, let view = message.webView else { return }
+    target?.reveal(view)
+  }
+}
+
 /// One open page: its native view and the domain it is pinned to.
 private final class Session {
   let id: String
@@ -123,6 +160,8 @@ private final class Session {
   var settled = false
   /// A hidden session whose content rule lists changed reloads when it is shown again.
   var needsReload = false
+  /// Ids of the content rule lists attached to this view, so a late compile attaches each once.
+  var ruleListIds: Set<String> = []
   var observations: [NSKeyValueObservation] = []
 
   init(id: String, view: WKWebView, scope: String) {
@@ -166,8 +205,15 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
   /// The shell's page rectangle, in shell coordinates; every session's view fills it.
   private var pageRect: CGRect?
   /// The shell reports regions once per layout change, possibly before the router exists (the
-  /// first `open` can wait on a rule list compile), so keep them for the router to start with.
+  /// router is made with the first `open`), so keep them for the router to start with.
   private var interactiveRegions: [CGRect] = []
+  /// Full-screen view under every page: the app's own background shows wherever a page has not
+  /// painted yet, instead of the window's white or black.
+  private var backdrop: UIView?
+  /// Rule lists WebKit is still compiling; a list is compiled once however many pages open.
+  private var compilingRuleListIds: Set<String> = []
+  /// Bumped when the shell replaces the rule lists, so a late compile cannot undo that.
+  private var ruleListGeneration = 0
 
   override func load(webview: WKWebView) {
     shell = webview
@@ -177,6 +223,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     NotificationCenter.default.addObserver(
       forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: .main
     ) { [weak self] _ in self?.send(MemoryWarningEvent()) }
+    DispatchQueue.main.async { self.installBackdrop() }
   }
 
   // MARK: Commands
@@ -193,23 +240,26 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
       return
     }
     Task { @MainActor in
-      let (ruleLists, ruleListFailure) = await self.loadRuleLists(args.contentRuleLists ?? [])
+      let lists = args.contentRuleLists ?? []
+      let (cached, missing) = await self.lookUpRuleLists(lists)
       guard let shell = self.shell, let host = shell.superview else {
         invoke.reject("shell webview is not ready")
         return
       }
       if let existing = self.sessions[args.session] { self.dispose(existing) }
       self.pageRect = args.rect.cgRect
+      self.installBackdrop()
       let view = WKWebView(
         frame: shell.convert(args.rect.cgRect, to: host),
         configuration: self.makeConfiguration(
-          profileId: profileId, script: args.documentStartScript, ruleLists: ruleLists)
+          profileId: profileId, script: args.documentStartScript, ruleLists: cached)
       )
       view.allowsBackForwardNavigationGestures = true
       view.customUserAgent = safariUserAgent
       view.navigationDelegate = self
       view.uiDelegate = self
       view.overrideUserInterfaceStyle = self.colorScheme
+      view.alpha = 0
       let refresh = UIRefreshControl()
       refresh.addAction(UIAction { [weak view] _ in view?.reload() }, for: .valueChanged)
       view.scrollView.refreshControl = refresh
@@ -217,14 +267,15 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
 
       let session = Session(
         id: args.session, view: view, scope: DomainScope.registrableDomain(of: url.host ?? ""))
+      session.ruleListIds = Set(cached.map(\.identifier))
       self.sessions[session.id] = session
       self.events = args.onEvent
       _ = self.installRouter(in: host)
       self.observe(session)
       self.show(session)
-      if let ruleListFailure { self.send(ErrorEvent(message: ruleListFailure)) }
       view.load(URLRequest(url: url))
       invoke.resolve()
+      self.compileInBackground(missing, keeping: lists)
     }
   }
 
@@ -299,6 +350,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
       default: self.colorScheme = .unspecified
       }
       self.sessions.values.forEach { $0.view.overrideUserInterfaceStyle = self.colorScheme }
+      self.backdrop?.overrideUserInterfaceStyle = self.colorScheme
       invoke.resolve()
     }
   }
@@ -325,11 +377,13 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
         invoke.resolve()
         return
       }
+      self.ruleListGeneration += 1
       let (ruleLists, failure) = await self.loadRuleLists(args.lists)
       for session in self.sessions.values {
         let controller = session.view.configuration.userContentController
         controller.removeAllContentRuleLists()
         ruleLists.forEach { controller.add($0) }
+        session.ruleListIds = Set(ruleLists.map(\.identifier))
         if session.id == self.activeId {
           session.view.reload()
         } else {
@@ -349,11 +403,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     DispatchQueue.main.async {
       for session in self.sessions.values {
         let controller = session.view.configuration.userContentController
-        controller.removeAllUserScripts()
-        if !args.script.isEmpty {
-          controller.addUserScript(
-            WKUserScript(source: args.script, injectionTime: .atDocumentStart, forMainFrameOnly: false))
-        }
+        self.installUserScripts(on: controller, recipe: args.script)
         if session.id == self.activeId {
           session.view.reload()
         } else {
@@ -405,11 +455,13 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
   /// While a session is still on its first load, a redirect may change its domain; the session
   /// adopts wherever the first page committed.
   func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+    scheduleReveal(webView)
     guard let session = session(of: webView), !session.settled, let host = webView.url?.host else { return }
     session.scope = DomainScope.registrableDomain(of: host)
   }
 
   func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    reveal(webView)
     session(of: webView)?.settled = true
   }
 
@@ -423,11 +475,13 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     send(ErrorEvent(message: error.localizedDescription))
   }
 
-  /// A dead web content process leaves a blank view. The visible page reloads; a hidden one is
-  /// dropped and the shell is told, so it reopens fresh when the user comes back to it.
+  /// A dead web content process leaves a blank view. The visible page reloads, with the backdrop
+  /// showing until it commits; a hidden one is dropped and the shell is told, so it reopens fresh
+  /// when the user comes back to it.
   func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
     guard let session = session(of: webView) else { return }
     if session.id == activeId {
+      webView.alpha = 0
       webView.reload()
     } else {
       dispose(session)
@@ -491,6 +545,41 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     top.present(controller, animated: true)
   }
 
+  /// Fades the page in. A new web view draws one blank frame before its first, and a fade keeps
+  /// that frame down to a few percent over the backdrop.
+  func reveal(_ view: WKWebView) {
+    guard view.alpha == 0 else { return }
+    UIView.animate(withDuration: revealDuration, delay: 0, options: [.beginFromCurrentState, .allowUserInteraction]) {
+      view.alpha = 1
+    }
+  }
+
+  private func scheduleReveal(_ view: WKWebView) {
+    DispatchQueue.main.asyncAfter(deadline: .now() + paintTimeout) { [weak self, weak view] in
+      if let view { self?.reveal(view) }
+    }
+  }
+
+  private func installUserScripts(on controller: WKUserContentController, recipe: String?) {
+    controller.removeAllUserScripts()
+    controller.addUserScript(
+      WKUserScript(source: firstPaintScript, injectionTime: .atDocumentStart, forMainFrameOnly: true))
+    if let recipe, !recipe.isEmpty {
+      controller.addUserScript(
+        WKUserScript(source: recipe, injectionTime: .atDocumentStart, forMainFrameOnly: false))
+    }
+  }
+
+  private func installBackdrop() {
+    guard backdrop == nil, let host = shell?.superview else { return }
+    let view = UIView(frame: host.bounds)
+    view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    view.backgroundColor = backdropColor
+    view.overrideUserInterfaceStyle = colorScheme
+    host.insertSubview(view, at: 0)
+    backdrop = view
+  }
+
   private func installRouter(in host: UIView) -> TouchRouter {
     if let router { return router }
     let router = TouchRouter(frame: host.bounds)
@@ -509,29 +598,79 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
   @MainActor
   private func loadRuleLists(_ lists: [RuleListArgs]) async -> ([WKContentRuleList], String?) {
     guard !lists.isEmpty else { return ([], nil) }
+    let (cached, missing) = await lookUpRuleLists(lists)
+    let (compiled, failure) = await compileRuleLists(missing)
+    if let store = WKContentRuleListStore.default() {
+      await removeStaleRuleLists(keeping: Set(lists.map(\.id)), in: store)
+    }
+    return (cached + compiled, failure)
+  }
+
+  /// The lists WebKit already has compiled, and the ones it does not. Cheap, so a page can open
+  /// without waiting for a compile.
+  @MainActor
+  private func lookUpRuleLists(_ lists: [RuleListArgs]) async -> ([WKContentRuleList], [RuleListArgs]) {
+    guard let store = WKContentRuleListStore.default() else { return ([], lists) }
+    var found: [WKContentRuleList] = []
+    var missing: [RuleListArgs] = []
+    for list in lists {
+      if let cached = await lookUp(list.id, in: store) {
+        found.append(cached)
+      } else {
+        missing.append(list)
+      }
+    }
+    return (found, missing)
+  }
+
+  @MainActor
+  private func compileRuleLists(_ lists: [RuleListArgs]) async -> ([WKContentRuleList], String?) {
+    guard !lists.isEmpty else { return ([], nil) }
     guard let store = WKContentRuleListStore.default() else {
       return ([], "Ad blocking is off: the content rule store is unavailable.")
     }
-    var loaded: [WKContentRuleList] = []
+    var compiled: [WKContentRuleList] = []
     var failure: String?
     for list in lists {
-      if let cached = await lookUp(list.id, in: store) {
-        loaded.append(cached)
-        continue
-      }
       do {
         let json = try String(contentsOfFile: list.path, encoding: .utf8)
-        if let compiled = try await store.compileContentRuleList(
+        if let result = try await store.compileContentRuleList(
           forIdentifier: list.id, encodedContentRuleList: json)
         {
-          loaded.append(compiled)
+          compiled.append(result)
         }
       } catch {
         failure = "Ad blocking is partly off: a filter list could not be loaded."
       }
     }
-    await removeStaleRuleLists(keeping: Set(lists.map(\.id)), in: store)
-    return (loaded, failure)
+    return (compiled, failure)
+  }
+
+  /// The first page after an install or a list update must not wait several seconds for WebKit to
+  /// compile the lists: it opens now, and the lists attach to every open page when they are ready,
+  /// protecting the next navigation. Nothing reloads, so the user's page is never disturbed.
+  private func compileInBackground(_ missing: [RuleListArgs], keeping lists: [RuleListArgs]) {
+    let fresh = missing.filter { compilingRuleListIds.insert($0.id).inserted }
+    guard !fresh.isEmpty else { return }
+    let generation = ruleListGeneration
+    Task { @MainActor in
+      let (compiled, failure) = await self.compileRuleLists(fresh)
+      fresh.forEach { self.compilingRuleListIds.remove($0.id) }
+      if let store = WKContentRuleListStore.default() {
+        await self.removeStaleRuleLists(keeping: Set(lists.map(\.id)), in: store)
+      }
+      if generation == self.ruleListGeneration {
+        for session in self.sessions.values { self.attach(compiled, to: session) }
+      }
+      if let failure { self.send(ErrorEvent(message: failure)) }
+    }
+  }
+
+  private func attach(_ ruleLists: [WKContentRuleList], to session: Session) {
+    let controller = session.view.configuration.userContentController
+    for list in ruleLists where session.ruleListIds.insert(list.identifier).inserted {
+      controller.add(list)
+    }
   }
 
   private func lookUp(_ id: String, in store: WKContentRuleListStore) async -> WKContentRuleList? {
@@ -565,11 +704,10 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     configuration.allowsInlineMediaPlayback = true
     configuration.mediaTypesRequiringUserActionForPlayback = .audio
     let controller = WKUserContentController()
-    if let script, !script.isEmpty {
-      controller.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentStart, forMainFrameOnly: false))
-    }
+    installUserScripts(on: controller, recipe: script)
     ruleLists.forEach { controller.add($0) }
     controller.add(WeakMessageHandler(self), name: bridgeHandlerName)
+    controller.add(WeakPaintHandler(self), name: paintHandlerName)
     configuration.userContentController = controller
     return configuration
   }
@@ -611,6 +749,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     view.stopLoading()
     view.configuration.userContentController.removeAllUserScripts()
     view.configuration.userContentController.removeScriptMessageHandler(forName: bridgeHandlerName)
+    view.configuration.userContentController.removeScriptMessageHandler(forName: paintHandlerName)
     view.navigationDelegate = nil
     view.uiDelegate = nil
     view.removeFromSuperview()
