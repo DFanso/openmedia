@@ -1,10 +1,10 @@
 # Roadmap
 
-> **Status: Design.** Current phase: **0 — Feasibility spikes** (not started). Update this page when phases start, finish, or change.
+> **Status: Phase 1 in progress, iOS first.** Done: Tauri scaffold, `tauri-plugin-siteview` (iOS), favorites persistence, the floating-button shell, CI. Android code was removed until iOS is stable; desktop is deferred. Update this page when phases start, finish, or change.
 
 ## Goal
 
-A Tauri v2 app (macOS, iOS, Android first; Windows/Linux after) where the user opens any site and reshapes it. Bundled recipes cover popular sites; an AI assistant using the user's own key writes recipes for anything else. No backend.
+A Tauri v2 app (iOS and Android first; macOS, Windows, Linux after) where the user opens any site and reshapes it. Bundled recipes cover popular sites; an AI assistant using the user's own key writes recipes for anything else. No backend.
 
 ## Principles
 
@@ -37,7 +37,7 @@ Throwaway code in a `spikes/` branch/worktree (not merged to `main`); outputs ar
 | ID | Spike | Question answered | Pass criteria |
 |----|-------|-------------------|---------------|
 | S1 | Desktop site view (macOS) | Does `add_child` + `initialization_script` host Instagram and YouTube, log in, and inject at document start? | Logged-in Instagram web renders in a child webview; a hardcoded CSS rule hides the Reels nav item with no visible flash on cold load and on SPA navigation |
-| S2 | The bridge | Can the engine send messages to Core without general IPC exposure? | Engine posts a message that Core receives; **a negative test proves a site view cannot invoke any other command**. Chosen option recorded in [Security](./security.md#the-bridge-open-decision) |
+| S2 | The bridge | Can the engine send messages to Core without general IPC exposure? | Engine posts a message that Core receives; **a negative test proves a site view cannot invoke any other command**. Chosen option recorded in [Security](./security.md#the-bridge) |
 | S3 | iOS native site view | Can an in-repo plugin host a `WKWebView` above the Tauri webview, positioned by a shell-reported rect? | Rect follows layout changes, rotation, keyboard; `WKUserScript` injection works; script message handler delivers to Rust |
 | S4 | Android native site view | Same as S3 on Android; document-start injection support | Same pass criteria; document whether `addDocumentStartJavaScript` is available and what the fallback costs |
 | S5 | Profile isolation | Separate cookie jars per profile on each platform | Log in as account A in profile 1; profile 2 is logged out. Record min OS versions and fallbacks |
@@ -59,13 +59,13 @@ Scaffold the real project and the guardrails.
 - CI (`.github/workflows/ci.yml`): `ts:check`, `lint`, `format:check`, `test`, `cargo fmt/clippy/test`. Husky/lint-staged if desired.
 - `SiteView` trait + desktop implementation + iOS/Android plugin skeletons from the spike learnings (rewritten cleanly, not copy-pasted spike code).
 - The chosen bridge, with the negative-IPC integration test as a permanent regression test.
-- Shell: home (site list), browser view (address bar, back/forward/reload, tabs), settings skeleton.
-- Profiles (create, name, isolated store), per-profile site list.
+- Shell: one full-screen page, floating draggable button (tap: command bar, hold: favorites fan and settings), settings for favorites. See [UI Design](./ui-design.md).
+- One hidden profile with its own isolated data store. Multiple profiles are deferred, not dropped.
 - Settings/recipes persistence in app data dir.
 - App icons: generate all platform icons from `assets/logo.svg` with `yarn tauri icon`. The source logo is not square and has wide margins, so first add a square, padded 1024×1024 master (e.g. `assets/icon-source.svg`) rather than editing `logo.svg`; check the result at small sizes and in the iOS rounded-mask and Android adaptive-icon safe zones.
 - Flip [Development Guide](./development-guide.md), [Architecture](./architecture.md), [Platform Support](./platform-support.md) to `Implemented` where true.
 
-**Exit:** open any URL in a profile on macOS, iOS and Android simulators/devices; navigation works; sessions persist per profile; CI green.
+**Exit:** open any URL on an iOS simulator and device; navigation works; the session persists; CI green. Android and desktop follow.
 
 ## Phase 2 — Engine and recipes
 
@@ -75,7 +75,7 @@ The vertical slice, then breadth.
 - Recipe store + URL resolution + merged bundle.
 - Engine: CSS-first application, observer fallback, SPA navigation, `hide`/`remove`/`css`/`redirect`/`media`, reversibility, circuit breaker ([Site Runtime](./site-runtime.md)).
 - Match reporting → rule health, stale detection.
-- **First hand-written bundled recipe: Instagram without Reels**, with DOM fixtures and a fixture test.
+- **First bundled recipe.** Started with **Reddit without app prompts** because it is what the app hit first (see the decision log); it has DOM fixtures and a fixture test. Instagram without Reels is still to do. Done so far: the recipe schema subset, validation, the CSS compile and the document-start delivery, in `src-tauri/src/recipes/` (see [Recipe Format](./recipe-format.md#implemented-subset)).
 - Customize panel: rule list, toggles, delete, undo.
 - **Element picker** (no AI): tap element → proposed target → `hide` rule.
 - Engine test harness: Playwright loads fixtures with the engine, asserts hidden/remaining sets.
@@ -152,12 +152,22 @@ All without a backend.
 | 2026-11-07 | No push notifications, parent/family plans, or accounts | Require a backend | A backend decision is made |
 | 2026-11-07 | Do not use Android Accessibility to block native apps | Policy and trust cost; out of scope | User demand |
 | 2026-11-07 | Defaults: React, Zustand, Tailwind, yarn, Vitest, Playwright | Boring; yarn matches the author's other projects | Before Phase 1 only; cheap to change until the scaffold exists |
+| 2026-11-07 | iOS and Android are first-class; desktop deferred | Mobile is the product. S1 (desktop child webview) moves out of the critical path | Mobile is blocked, or desktop demand appears |
+| 2026-11-07 | iOS 17 minimum | `WKWebsiteDataStore(forIdentifier:)` needs it; verified working on iOS 26.5 simulator | A non-isolated fallback is accepted |
+| 2026-11-07 | Android must refuse to open sites without `MULTI_PROFILE` and `WEB_MESSAGE_LISTENER` (decided; the code was removed with the Kotlin plugin) | A silent shared cookie jar breaks the profile-isolation invariant | Real devices in the target range lack the feature |
+| 2026-11-07 | Bridge B on mobile: native message handler delivers into a Rust-created `Channel` | Verified on iOS: the page has no Tauri IPC, and Rust receives the message | Android verification fails |
+| 2026-11-07 | Shell is one page with a floating button; no home screen, tabs, or address bar | User direction: the web is the product, controls stay out of the way | Users need several simultaneous tabs |
+| 2026-11-07 | Site view sits below a transparent shell, with a native touch router | A control drawn in the shell cannot float over a native view that sits above it | The router breaks page scrolling or pinch on a device |
+| 2026-11-07 | Single hidden profile for now; Android Kotlin code removed | Profile UI is out of scope for the new UI; the Android code assumed the old layering. Recover it from commit `591636a` | Multiple accounts per site are wanted; Android work starts |
+| 2026-11-07 | Fix Reddit's "use the app" prompts with a bundled recipe (hide rules), not by changing the user agent | Site knowledge belongs in data; the wiki's risk register rules out UA spoofing. The web view's user agent has no `Safari` token, which sites can use to detect an embedded view; changing that is a separate, deliberate decision | Hiding is not enough for a site, or the user asks for a Safari-like user agent |
+| 2026-11-07 | The shell opens pages only through the app's `open_site` command; the plugin's `open` is not granted to it | The recipe script is attached in Rust, so the shell cannot open a page without it | A second caller needs `open` |
+| 2026-11-07 | The accent color follows the logo (cyan `#06aff8`), replacing the warm amber chosen earlier | The user asked for the logo to be used; amber clashed with it | The brand changes |
 
 ## Open questions
 
 1. **Bridge mechanism** (S2): remote-capability command vs native channel on desktop.
 2. **Secret store** (S6): adopt third-party plugin vs in-repo.
-3. **Minimum iOS version**: iOS 17 gives `WKWebsiteDataStore(forIdentifier:)`; older gives one profile.
+3. **Minimum iOS version**: decided, iOS 17. See the decision log.
 4. **Do we support multiple tabs per profile on mobile in v1?** Memory and plugin complexity; start with one active site view plus a lightweight switcher.
 5. **Licensing**: choose a license before opening to contributors (not yet decided).
 6. **Monetization**: none assumed. Not planned; no code depends on it.

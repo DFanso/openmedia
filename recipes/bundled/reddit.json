@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "id": "reddit.no-app-nag",
+  "name": "Reddit without app prompts",
+  "version": "1.0.0",
+  "origin": "bundled",
+  "match": ["https://*.reddit.com/*"],
+  "rules": [
+    {
+      "id": "open-app-button",
+      "label": "\"Open App\" button in the header",
+      "type": "hide",
+      "target": { "css": "#open-app-header-cta" }
+    },
+    {
+      "id": "app-banner",
+      "label": "App banner under the header",
+      "type": "hide",
+      "target": { "css": "#xpromo-small-header" }
+    },
+    {
+      "id": "app-modal",
+      "label": "Blocking \"use the app\" modal",
+      "type": "hide",
+      "target": { "css": "configured-xpromo-modal, .configured-xpromo" }
+    },
+    {
+      "id": "unlock-scroll",
+      "label": "Keep the page scrollable behind a prompt",
+      "type": "css",
+      "target": { "css": "html, body" },
+      "declarations": { "overflow-y": "auto" }
+    }
+  ],
+  "meta": {
+    "lastVerified": "2026-11-07",
+    "notes": "Names observed on the live mobile site: #open-app-header-cta, #xpromo-small-header, configured-xpromo-modal (experiment mweb3x_feeds_blocking_xpromo_lo_page_fade, trigger global_feeds_30_sec). The first two were confirmed present and hidden. The blocking modal is created after about 30 seconds in a feed and could not be reproduced on demand, so the modal and unlock-scroll rules are untested against the live blocking state."
+  }
+}

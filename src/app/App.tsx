@@ -1,0 +1,41 @@
+import { useEffect } from "react";
+import { Fab } from "../features/fab/Fab";
+import { Onboarding } from "../features/onboarding/Onboarding";
+import { CommandBar } from "../features/sheet/CommandBar";
+import { SettingsScreen } from "../features/settings/SettingsScreen";
+import { WebLayer } from "../features/web/WebLayer";
+import { useApp } from "./store";
+import { useHitRegions } from "./useHitRegions";
+
+export function App() {
+  const load = useApp((s) => s.load);
+  const error = useApp((s) => s.error);
+  const sheet = useApp((s) => s.sheet);
+  const reportError = useApp((s) => s.reportError);
+  useHitRegions();
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return (
+    <>
+      <WebLayer />
+      <Fab />
+      <CommandBar />
+      <SettingsScreen />
+      <Onboarding />
+      {error && sheet !== "settings" && (
+        <button
+          type="button"
+          data-hit=""
+          onClick={() => reportError(null)}
+          className="glass fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+12px)] z-20 rounded-2xl px-4 py-3 text-left text-sm text-accent"
+        >
+          {error}
+          <span className="mt-1 block text-xs text-paper/50">Tap to dismiss</span>
+        </button>
+      )}
+    </>
+  );
+}

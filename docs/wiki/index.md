@@ -22,6 +22,7 @@ A Tauri v2 app for desktop and mobile that loads any website in an embedded webv
 | [AI Assistant](./ai-assistant.md) | BYOK providers, snapshot redaction, structured generation, repair loop |
 | [Security](./security.md) | Threat model, invariants, IPC boundary, key storage, legal and store-policy risks |
 | [Platform Support](./platform-support.md) | Desktop vs iOS vs Android: what works, what needs a native plugin, open verifications |
+| [UI Design](./ui-design.md) | The floating-button interface: tone, tokens, gestures, layering, what is and is not connected |
 | [Prior Art](./prior-art.md) | SocialLite and others: what they do, what we copy, where we differ |
 | [Roadmap](./roadmap.md) | Phased build plan with exit criteria, spikes, decision log, risks |
 | [Development Guide](./development-guide.md) | Planned toolchain, commands, conventions |

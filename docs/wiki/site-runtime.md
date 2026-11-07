@@ -50,7 +50,7 @@ Toggled by Core. Overlays a highlight on hover/tap, shows a breadcrumb of ancest
 
 ## Reporting (page → Core)
 
-The engine sends small, typed messages: `ready`, `urlChanged`, `matchReport { ruleId → count }`, `snapshot`, `pickerResult`, `redirectSuspended`. Transport is the **bridge**, whose mechanism is an open decision (candidates and constraints in [Security](./security.md#the-bridge-open-decision) and [Platform Support](./platform-support.md#open-verifications)). The engine treats the bridge as lossy and fire-and-forget; Core never trusts message contents beyond schema validation.
+The engine sends small, typed messages: `ready`, `urlChanged`, `matchReport { ruleId → count }`, `snapshot`, `pickerResult`, `redirectSuspended`. Transport is the **bridge**: on mobile a native message handler feeding a Rust `Channel` (decided; see [Security](./security.md#the-bridge) and [Platform Support](./platform-support.md#verified-results)). The engine treats the bridge as lossy and fire-and-forget; Core never trusts message contents beyond schema validation.
 
 Because the page's own scripts share the realm with the bridge handle, **the engine assumes anything it can call, hostile page code can also call**. Messages must therefore be low-privilege by construction: they can only inform Core, never trigger actions.
 

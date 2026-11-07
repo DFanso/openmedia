@@ -1,0 +1,277 @@
+@import "tailwindcss";
+@import "@fontsource-variable/schibsted-grotesk";
+
+@theme {
+  --font-sans: "Schibsted Grotesk Variable", ui-sans-serif, sans-serif;
+  --color-ink: #070b14;
+  --color-paper: #eef3fa;
+  --color-accent: #06aff8;
+  --color-navy: #021669;
+  --color-hair: rgb(190 220 255 / 0.16);
+  --ease-spring: cubic-bezier(0.22, 1.5, 0.36, 1);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  background: transparent;
+  color: var(--color-paper);
+  font-family: var(--font-sans);
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+input {
+  -webkit-user-select: text;
+  user-select: text;
+  font-variant-numeric: tabular-nums;
+}
+
+.glass {
+  background: rgb(9 14 26 / 0.64);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  backdrop-filter: blur(18px) saturate(1.3);
+  border: 1px solid var(--color-hair);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 0.35);
+}
+
+/* The floating button is light so the blue logo reads over any page. */
+.fab {
+  background: rgb(255 255 255 / 0.92);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  backdrop-filter: blur(14px) saturate(1.4);
+  border: 1px solid rgb(255 255 255 / 0.6);
+  box-shadow:
+    0 6px 22px rgb(0 0 0 / 0.35),
+    0 0 0 1px rgb(2 22 105 / 0.08);
+}
+
+.fab-logo {
+  pointer-events: none;
+}
+
+.fab-aura {
+  position: absolute;
+  inset: -12px;
+  border-radius: 9999px;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    circle,
+    rgb(6 175 248 / 0.8) 0%,
+    rgb(6 175 248 / 0.34) 45%,
+    transparent 70%
+  );
+  filter: blur(6px);
+}
+
+.fab-ring {
+  position: absolute;
+  inset: -3px;
+  width: 62px;
+  height: 62px;
+  pointer-events: none;
+}
+
+.fab-ring circle {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 182.2;
+  stroke-dashoffset: 182.2;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  opacity: 0;
+}
+
+/* Holding: a ring fills over the hold time while a halo pulses and its hue drifts. */
+.fab[data-hold="charging"] .fab-aura {
+  animation:
+    aura-in 380ms ease-out 80ms forwards,
+    aura-pulse 760ms ease-in-out 80ms infinite;
+}
+
+.fab[data-hold="charging"] .fab-ring circle {
+  opacity: 1;
+  animation: ring-fill 380ms linear 80ms forwards;
+}
+
+.fab[data-hold="open"] .fab-aura {
+  opacity: 0.9;
+  animation: aura-pulse 1400ms ease-in-out infinite;
+}
+
+.fab[data-hold="open"] .fab-ring circle {
+  opacity: 1;
+  stroke-dashoffset: 0;
+}
+
+.fab[data-hold="charging"] .fab-logo,
+.fab[data-hold="open"] .fab-logo {
+  animation: logo-hue 1000ms ease-in-out infinite;
+}
+
+@keyframes aura-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.9;
+  }
+}
+
+@keyframes aura-pulse {
+  0%,
+  100% {
+    filter: blur(6px) hue-rotate(0deg);
+    transform: scale(1);
+  }
+  50% {
+    filter: blur(9px) hue-rotate(80deg);
+    transform: scale(1.22);
+  }
+}
+
+@keyframes ring-fill {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes logo-hue {
+  0%,
+  100% {
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    filter: hue-rotate(35deg) saturate(1.2);
+  }
+}
+
+.fan-item {
+  transition:
+    transform 420ms var(--ease-spring) calc(var(--i) * 35ms),
+    opacity 160ms linear calc(var(--i) * 35ms),
+    visibility 0s;
+}
+
+.fan-item[data-open="false"] {
+  transform: translate(var(--dx), var(--dy)) scale(0.3);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    transform 200ms ease-in calc((var(--n) - var(--i)) * 18ms),
+    opacity 160ms linear calc((var(--n) - var(--i)) * 18ms),
+    visibility 0s linear 420ms;
+}
+
+.fan-item[data-open="true"] {
+  transform: translate(0, 0) scale(1);
+  opacity: 1;
+}
+
+.command-bar {
+  transition:
+    transform 320ms var(--ease-spring),
+    opacity 140ms linear;
+}
+
+.command-bar[data-open="false"] {
+  transform: translateY(-24px);
+  opacity: 0;
+}
+
+/* Onboarding illustrations */
+.demo-fan-item {
+  animation: demo-pop 3600ms var(--ease-spring) infinite;
+  animation-delay: calc(var(--i) * 120ms + 700ms);
+  opacity: 0;
+}
+
+.demo-halo {
+  animation: aura-pulse 1400ms ease-in-out infinite;
+}
+
+.demo-tap {
+  animation: demo-tap 2400ms ease-out infinite;
+}
+
+.demo-slide {
+  animation: demo-slide 3600ms ease-in-out infinite;
+}
+
+@keyframes demo-pop {
+  0%,
+  8% {
+    opacity: 0;
+    transform: translate(var(--from-x), var(--from-y)) scale(0.3);
+  }
+  20%,
+  72% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  88%,
+  100% {
+    opacity: 0;
+    transform: translate(var(--from-x), var(--from-y)) scale(0.3);
+  }
+}
+
+@keyframes demo-tap {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+  70%,
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+@keyframes demo-slide {
+  0%,
+  100% {
+    transform: translateY(-48px);
+  }
+  50% {
+    transform: translateY(48px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fan-item,
+  .fan-item[data-open="false"],
+  .command-bar {
+    transition-duration: 1ms;
+    transition-delay: 0s;
+  }
+
+  .fab[data-hold] .fab-aura,
+  .fab[data-hold] .fab-logo,
+  .demo-fan-item,
+  .demo-halo,
+  .demo-tap,
+  .demo-slide {
+    animation: none;
+  }
+
+  .fab[data-hold="charging"] .fab-aura,
+  .fab[data-hold="open"] .fab-aura,
+  .demo-fan-item {
+    opacity: 0.9;
+  }
+
+  .fab[data-hold="charging"] .fab-ring circle {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}

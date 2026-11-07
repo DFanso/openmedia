@@ -1,0 +1,10 @@
+dist
+src-tauri
+node_modules
+docs
+yarn.lock
+.github
+AGENTS.md
+README.md
+CHANGELOG.md
+recipes/fixtures

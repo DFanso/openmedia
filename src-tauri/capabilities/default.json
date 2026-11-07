@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability for the shell (main webview). Site views never receive a capability.",
+  "windows": ["main"],
+  "permissions": ["core:default", "siteview:default"]
+}

@@ -1,15 +1,15 @@
 # Platform Support
 
-> **Status: Design.** Rows marked **verify** are assumptions to be settled by the Phase 0 spikes; results get recorded here and in the roadmap decision log.
+> **Status: Partially implemented.** The iOS site view exists (`src-tauri/plugins/tauri-plugin-siteview`, Swift). Only the iOS checks under [Verified results](#verified-results) were run, on one simulator; everything else marked **verify** is still unproven. The Android Kotlin code was removed (see the [roadmap](./roadmap.md#decision-log)) and will be rewritten after iOS is stable. Desktop is deferred.
 
 ## The core constraint
 
 Tauri's multi-webview API (`Window::add_child`) is gated behind the `unstable` Cargo feature and **desktop-only**; upstream tracks mobile support in [#11794](https://github.com/tauri-apps/tauri/issues/11794) and [#11528](https://github.com/tauri-apps/tauri/issues/11528), both open. A mobile app has one Tauri webview, and navigating it to a site would destroy the shell. So:
 
-- **Desktop:** site view = Tauri child webview.
-- **Mobile:** site view = native webview hosted by our own Tauri plugin (`tauri-plugin-siteview`, Swift + Kotlin), positioned over a rectangle the shell reports.
+- **Mobile (iOS, Android) — first-class:** site view = native webview hosted by our own Tauri plugin (`tauri-plugin-siteview`; Swift today, Kotlin to come), positioned over a rectangle the shell reports. iOS first.
+- **Desktop — deferred:** site view = Tauri child webview. The plugin's desktop build returns `DesktopUnsupported` until this is built.
 
-Both implement the same Rust `SiteView` trait ([Architecture](./architecture.md#siteview-rust-two-implementations)).
+The shell talks to one plugin API (`open`, `set_rect`, `navigate`, …); desktop will implement the same surface ([Architecture](./architecture.md#siteview-rust-two-implementations)).
 
 ## Matrix
 
@@ -22,19 +22,52 @@ Both implement the same Rust `SiteView` trait ([Architecture](./architecture.md#
 | Page → Core channel | Bridge A (**verify**) | Bridge A (**verify**) | Bridge A (**verify**) | Bridge B (script message handler) | Bridge B (web message listener) |
 | Secret store | Keychain | Credential Manager | Secret Service | Keychain | Keystore-backed |
 | Auto-update | updater plugin | updater plugin | updater plugin | App Store | Play Store |
-| Priority | **1** | 3 | 3 | **1** | **2** |
+| Priority | 3 | 4 | 4 | **1** | **1** |
 
-macOS and iOS first (same engine, fastest feedback, and the primary mobile use case). Android second. Windows/Linux after the engine and format settle; Linux WebKitGTK is the most likely to need per-site workarounds.
+iOS and Android first. macOS next (same engine as iOS, fastest desktop path), then Windows/Linux after the engine and format settle; Linux WebKitGTK is the most likely to need per-site workarounds.
+
+## Verified results
+
+Runs on the iPhone 17 Pro Max simulator (iOS 26.5). The first used a throwaway spike (not kept); later ones drove the real app's components, partly against a local fixture page over `http://localhost`. Not verified: a real device, a real finger (gestures below were synthetic pointer events), page scrolling and pinch through the touch router, rotation, keyboard, any login, and anything on Android or desktop.
+
+| Check | Result |
+|-------|--------|
+| `WKUserScript` at `.atDocumentStart` runs before `<body>` exists | Yes (`readyState: "loading"`, no body) |
+| CSS injected at document start hides an element with no flash | Yes: hidden at parse time, at first frame, and for an element inserted after a `pushState` |
+| Page → Rust via script message handler and a Rust-created `Channel` (no Tauri IPC on the page) | Works; origin is delivered with the message |
+| Site view sees Tauri objects (`__TAURI_INTERNALS__`, `__TAURI__`, `webkit.messageHandlers.ipc`) | No; fetches to `ipc://` and `tauri://` are rejected |
+| Native frame equals the rect the shell reported, and follows a resize | Yes |
+| Per-profile isolation with `WKWebsiteDataStore(forIdentifier:)` | Yes: a second profile saw no cookie or localStorage; the first kept both. The real app also creates a `WebsiteDataStore/<profile uuid>` directory |
+| Real app: add a site, open it, native title and URL reach the shell as `siteview:state` events | Yes |
+| Real app: page-initiated navigation enables Back; Back returns to the first page | Yes |
+| Real app: `navigate("javascript:alert(1)")` | Rejected in Rust: "only http and https urls can be opened" |
+| Real app: page message reaches the shell as `siteview:bridge` with origin `http://localhost`; the page sees no `__TAURI_INTERNALS__` or `ipc` handler | Yes |
+| Real app: a real HTTPS site loads in the native view | Yes: the Reddit mobile site loaded (logged out) when the app restored its last page. An earlier `example.com` attempt failed; the host's own `curl` also failed at that moment, so it was likely a transient network problem, not an app fault |
+| Site view below a transparent shell: native hit test sends touches inside reported regions to the shell and everything else to the page | Yes, from a native log: the button's centre went to the shell and the screen centre to the page; with the fan, command bar or an error banner open, the corresponding regions went to the shell |
+| Gestures on the floating button (synthetic pointer events through the real components): tap opens the assistant; hold opens the fan; sliding onto a favorite and lifting selects it; lifting then tapping selects it; a drag snaps to the nearer edge and the position persists; sliding onto settings opens it; saving favorites persists to `library.json` | Yes |
+| Real app: the Reddit recipe's document-start script is injected, and the orange "Open App" button in the header is gone (compare with the same page before) | Yes, by eye on a screenshot of the live mobile site. The blocking "use the app" modal appears after about 30 seconds in a feed and could not be reproduced on demand, so hiding it and the scroll unlock are untested against the live blocking state |
+| Real app: the hold feedback (ring fills, halo pulses with a drifting hue) and the fan over a real page, with the logo on the button | Yes, by eye on a screenshot taken during a synthetic hold |
+| Real app: onboarding renders (steps 1 and 3 seen, with the animated fan demo) | Yes, by eye; steps 2 and 4 and the Skip and Start buttons were driven by the test harness but not inspected |
+| Video playing inline (`allowsInlineMediaPlayback`) | **Not verified.** Before this setting, an autoplaying Reddit video went fullscreen and covered the shell's controls; the setting is the documented fix and was not re-tested with a video |
+
+**Found while testing:** a synchronous Tauri command that calls into the plugin deadlocks the app (it blocks the main thread waiting for native code that needs the main thread). Commands that reach native code must be `async`; see `open_site`.
+
+**Decisions that follow:**
+
+- **iOS 17 is the minimum.** `forIdentifier:` is iOS 17+, and the Tauri iOS template defaults to 15, so `tauri.conf.json` sets `bundle.iOS.minimumSystemVersion` to 17.0. This resolves the roadmap's open question on older iOS versions.
+- **Android must require `WebViewFeature.MULTI_PROFILE` and `WEB_MESSAGE_LISTENER`** (decided, not built). If either is missing, `open` should fail with a message asking the user to update System WebView. A silent single-profile fallback would break the profile-isolation invariant.
 
 ## Layout model (mobile)
 
-The shell is the Tauri webview; the site view is a native view drawn above it. The shell never overlaps the site view with its own UI; it **resizes** the site rect instead:
+The site view is a native view *below* the Tauri shell, so the shell's floating controls draw over the page:
 
-- Browser chrome (address/tabs) and the customize sheet are shell UI. When the sheet opens, the shell tells the plugin the new, smaller rect.
-- Tap-to-pick, AI chat, and rule list live in the sheet; the picker highlight lives in the page (engine).
-- Native gestures (iOS edge-swipe back) are handled by the plugin and mirrored to the shell via events.
+- The shell webview is transparent (`isOpaque = false`, clear backgrounds). The shell reserves a full-screen rectangle inside the safe area and reports it with `set_rect`; the native site view fills it.
+- A transparent `TouchRouter` view sits above both. The shell reports the rectangles of its interactive elements (`[data-hit]`) with `set_interactive_regions`; a touch inside one goes to the shell, any other touch goes to the page. With no site view open, the shell gets every touch.
+- Opening the fan, the command bar or settings adds a full-screen interactive region, so the page cannot be touched underneath them.
+- Native gestures (iOS edge-swipe back) stay on the site view; state changes are mirrored to the shell via `siteview:state` events.
+- Tap-to-pick, AI chat, and the rule list live in the command bar and settings; the picker highlight lives in the page (engine).
 
-Fallback if the native-plugin approach fails Phase 0: navigate the main webview to the site and inject shell UI as an overlay in the page. Much weaker (shell dies on navigation, UI shares a realm with the hostile page), so treated as a last resort and not planned.
+Fallback if the native-plugin approach fails: navigate the main webview to the site and inject shell UI as an overlay in the page. Much weaker (shell dies on navigation, UI shares a realm with the hostile page), so treated as a last resort and not planned.
 
 ## Known platform constraints
 

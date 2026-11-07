@@ -1,6 +1,8 @@
 # Prior Art
 
 > **Status: Research** (as of 2026-11-07). Facts come from the products' own public pages; inferences are labelled.
+>
+> **Re-checked 2026-11-07 against <https://sociallite.app/faq/>:** iOS embedded optimized versions, redirect instead of modifying native apps, Android Accessibility hybrid, up to 10 Instagram accounts, Post Mode, Sleep Mode, Parent plan, message notifications, analytics collection, the limitation list, and the beta platform list. **Not re-checked:** store ratings and the 1M+ users claim, the "embedded web browser" quote from the terms, the daily-allowance feature (not on the FAQ page), and the Chrome extension.
 
 ## SocialLite ([sociallite.app](https://sociallite.app/))
 
