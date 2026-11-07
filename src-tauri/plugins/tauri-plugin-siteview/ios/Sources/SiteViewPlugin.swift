@@ -111,6 +111,9 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
   private var events: Channel?
   private var observations: [NSKeyValueObservation] = []
   private var colorScheme: UIUserInterfaceStyle = .unspecified
+  /// The shell reports regions once per layout change, possibly before the router exists (the
+  /// first `open` can wait on a rule list compile), so keep them for the router to start with.
+  private var interactiveRegions: [CGRect] = []
 
   override func load(webview: WKWebView) {
     shell = webview
@@ -180,7 +183,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
   @objc public func setInteractiveRegions(_ invoke: Invoke) throws {
     let args = try invoke.parseArgs(SetInteractiveRegionsArgs.self)
     DispatchQueue.main.async {
-      self.router?.regions = args.regions.map(\.cgRect)
+      self.interactiveRegions = args.regions.map(\.cgRect)
+      self.router?.regions = self.interactiveRegions
       invoke.resolve()
     }
   }
@@ -309,6 +313,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     router.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     router.backgroundColor = .clear
     router.shell = shell
+    router.regions = interactiveRegions
     host.addSubview(router)
     self.router = router
     return router
