@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { BackButton } from "../features/back/BackButton";
 import { Fab } from "../features/fab/Fab";
 import { Onboarding } from "../features/onboarding/Onboarding";
 import { CommandBar } from "../features/sheet/CommandBar";
@@ -25,6 +26,7 @@ export function App() {
     <>
       <WebLayer />
       <Fab />
+      <BackButton />
       <CommandBar />
       <SettingsScreen />
       <Onboarding />

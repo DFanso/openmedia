@@ -140,6 +140,12 @@ pub async fn set_ad_block(
     library.set_ad_block(enabled)
 }
 
+/// Shows or hides the floating back button. The shell draws it; nothing native changes.
+#[tauri::command]
+pub fn set_back_button(library: State<'_, Library>, enabled: bool) -> Result<()> {
+    library.set_back_button(enabled)
+}
+
 /// A provider as the shell sees it: settings plus whether a key exists, never the key itself.
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]

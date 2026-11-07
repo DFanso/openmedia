@@ -23,6 +23,7 @@ export interface AppState {
   onboarded: boolean;
   theme: Theme;
   adBlock: boolean;
+  backButton: boolean;
 }
 
 export type ProviderKind = "anthropic" | "openAiCompatible";
@@ -79,6 +80,7 @@ export const library = {
   setTheme: (theme: Theme) => command("set_theme", { theme }),
   /** Persists the choice and reloads the open page under it; see `set_ad_block` in Rust. */
   setAdBlock: (enabled: boolean) => command("set_ad_block", { enabled }),
+  setBackButton: (enabled: boolean) => command("set_back_button", { enabled }),
   /** Opens the page natively with the recipe script attached; see `open_site` in Rust. */
   openSite: (url: string, rect: Rect) => command("open_site", { url, rect }),
 };
