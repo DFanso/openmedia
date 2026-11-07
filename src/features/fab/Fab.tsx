@@ -25,9 +25,7 @@ import logoMark from "../../assets/logo-mark.svg";
 
 const idle: GestureState = { phase: "idle" };
 
-/** The button grows while held so a thumb does not hide the ring; the ring box is 100 px wide. */
 const HOLD_SCALE = 1.3;
-const HOLD_REACH = 50 * HOLD_SCALE + 6;
 
 const monogram = (name: string) => name.trim().charAt(0).toUpperCase() || "·";
 
@@ -157,10 +155,6 @@ export function Fab() {
   const hidden = sheet !== "none" || onboardingOpen;
   const holdState = gesture.phase === "pressing" ? "charging" : fanOpen ? "open" : "idle";
   const enlarged = gesture.phase === "pressing" || fanOpen;
-  // While enlarged the ring reaches past the screen edge; slide the button inward to keep it whole.
-  const edgeGap = position.edge === "left" ? center.x : viewport.width - center.x;
-  const inwardShift = enlarged ? Math.max(0, HOLD_REACH - edgeGap) : 0;
-  const shiftX = position.edge === "left" ? inwardShift : -inwardShift;
 
   return (
     <>
@@ -243,7 +237,7 @@ export function Fab() {
         style={{
           width: FAB_SIZE,
           height: FAB_SIZE,
-          transform: `translate(${center.x + shiftX - FAB_SIZE / 2}px, ${center.y - FAB_SIZE / 2}px)${
+          transform: `translate(${center.x - FAB_SIZE / 2}px, ${center.y - FAB_SIZE / 2}px)${
             enlarged ? ` scale(${HOLD_SCALE})` : ""
           }`,
           transition: gesture.phase === "dragging" ? "none" : "transform 320ms var(--ease-spring)",
@@ -254,8 +248,8 @@ export function Fab() {
         }`}
       >
         <img src={logoMark} alt="" draggable={false} className="fab-logo relative size-10" />
-        <svg className="fab-ring" viewBox="0 0 100 100" aria-hidden="true">
-          <circle cx="50" cy="50" r="47" />
+        <svg className="fab-ring" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="31" pathLength="1" />
         </svg>
       </button>
     </>

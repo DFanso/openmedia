@@ -26,7 +26,7 @@
 
 ## Highlights
 
-- **Floating button:** tap to type an address, hold to fan out your favorites (Instagram, Facebook, Twitter, Reddit by default, with their site icons) and settings, drag it to either edge. It grows while held so a thumb does not hide the ring.
+- **Floating button:** tap to type an address, hold to fan out your favorites (Instagram, Facebook, Twitter, Reddit, YouTube by default, with their site icons) and settings, drag it to either edge. A thin progress ring hugs its edge while held.
 - **Favorites:** edit, reorder, and add the current page from the app.
 - **Pull to refresh** on the page, and **light, dark or system** theme that sites can follow.
 - **Ad and tracker blocking:** EasyList and EasyPrivacy are built into the app and compiled to WebKit content rules, so ads and trackers are blocked before they load, with no list downloads. One switch in Settings.
