@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-07
 
+### feat(ui): new logo, padded app icon, draggable back button
+
+**What:** The logo was replaced; the app icon needed more padding and the optional back button was pinned to the bottom instead of floating.
+
+**Change:** Update `assets/logo.svg`, regenerate `assets/icon-source.svg` (logo at 62% of a 1024 square) and all platform icons, and use the new mark for the floating button and first-run guide. The back button is now draggable, snaps to the nearer edge and remembers its position (`om.back`).
+
 ### feat(settings): free and paid model recommendations for BYOK
 
 **What:** The AI assistant settings gave no hint where to get a key or which providers have free models.
