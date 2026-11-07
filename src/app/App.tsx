@@ -3,6 +3,7 @@ import { BackButton } from "../features/back/BackButton";
 import { Fab } from "../features/fab/Fab";
 import { Onboarding } from "../features/onboarding/Onboarding";
 import { CommandBar } from "../features/sheet/CommandBar";
+import { HistorySheet } from "../features/history/HistorySheet";
 import { SettingsScreen } from "../features/settings/SettingsScreen";
 import { WebLayer } from "../features/web/WebLayer";
 import { useApplyTheme } from "../shared/theme";
@@ -29,6 +30,7 @@ export function App() {
       <BackButton />
       <CommandBar />
       <SettingsScreen />
+      <HistorySheet />
       <Onboarding />
       {error && sheet !== "settings" && (
         <button

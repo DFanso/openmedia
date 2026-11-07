@@ -58,8 +58,10 @@ input {
 }
 
 /* Clear glass: no blur, so the page shows through sharp. A faint tint, a bright rim and an inner
-   highlight read as a lens; the shadow keeps it visible on white pages. */
-.fab {
+   highlight read as a lens; the shadow keeps it visible on white pages. The floating button and
+   every fan item share it, so no item has a solid background. */
+.fab,
+.fab-glass {
   background: linear-gradient(145deg, rgb(255 255 255 / 0.32), rgb(255 255 255 / 0.08) 55%);
   border: 1px solid rgb(255 255 255 / 0.6);
   box-shadow:

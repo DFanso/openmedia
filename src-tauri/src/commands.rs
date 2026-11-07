@@ -3,7 +3,7 @@ use tauri::{AppHandle, Emitter, State};
 use tauri_plugin_siteview::{
     ContentRuleList, FetchFaviconRequest, OpenRequest, Rect, SetContentRuleListsRequest,
     SiteviewExt,
-    validate::{parse_profile_id, parse_web_url},
+    validate::{parse_profile_id, parse_session_id, parse_web_url},
 };
 use uuid::Uuid;
 
@@ -37,6 +37,18 @@ pub fn set_favorites(
 #[tauri::command]
 pub fn set_last_url(library: State<'_, Library>, url: String) -> Result<()> {
     library.set_last_url(&url)
+}
+
+/// Records an address the user typed; returns the history, newest first.
+#[tauri::command]
+pub fn add_history(library: State<'_, Library>, url: String) -> Result<Vec<String>> {
+    library.add_history(&url)
+}
+
+/// Forgets every searched address and the remembered last page.
+#[tauri::command]
+pub fn clear_history(library: State<'_, Library>) -> Result<()> {
+    library.clear_history()
 }
 
 #[tauri::command]
@@ -85,6 +97,8 @@ async fn build_rule_lists(ad_block: &AdBlock) -> Result<Vec<ContentRuleList>> {
 /// A failure to build the rule lists does not stop browsing; the page opens unblocked and the shell
 /// is told why.
 ///
+/// `session` names the new site view; earlier sessions stay open underneath it.
+///
 /// Must be `async`: a synchronous command runs on the main thread, and the plugin call waits for
 /// native code that itself needs the main thread, which deadlocks the app.
 #[tauri::command]
@@ -93,11 +107,13 @@ pub async fn open_site(
     library: State<'_, Library>,
     script: State<'_, RecipeScript>,
     ad_block: State<'_, AdBlock>,
+    session: String,
     url: String,
     rect: Rect,
 ) -> Result<()> {
     let profile = library.state()?.profile_id.to_string();
     parse_profile_id(&profile)?;
+    parse_session_id(&session)?;
     parse_web_url(&url)?;
     let mut blocking_failure = None;
     let content_rule_lists = if library.ad_block_enabled()? {
@@ -109,6 +125,7 @@ pub async fn open_site(
         Vec::new()
     };
     app.siteview().open(OpenRequest {
+        session,
         profile,
         url,
         rect,

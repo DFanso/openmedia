@@ -1,5 +1,16 @@
 import { create } from "zustand";
 import {
+  applyState,
+  findFavoriteSession,
+  findTypedSession,
+  newSession,
+  startSource,
+  sessionsToClose,
+  type Pressure,
+  type Session,
+  type SessionSource,
+} from "../features/web/sessions";
+import {
   errorMessage,
   library,
   siteView,
@@ -11,20 +22,22 @@ import {
 import type { Edge } from "../features/fab/geometry";
 import { loadPosition } from "../features/fab/position";
 
-export type Sheet = "none" | "assistant" | "settings";
+export type Sheet = "none" | "assistant" | "history" | "settings";
 
-export interface NavigationRequest {
-  url: string;
-  nonce: number;
-}
+/** What the web layer must do natively next; `nonce` makes a repeat of the same action distinct. */
+export type SessionAction = { nonce: number } & (
+  | { type: "open"; id: string; url: string; previousId: string | null }
+  | { type: "activate"; id: string }
+);
 
 interface AppStore {
   state: AppState | null;
   error: string | null;
   sheet: Sheet;
   onboardingOpen: boolean;
-  request: NavigationRequest | null;
-  page: SiteViewState | null;
+  sessions: Session[];
+  activeId: string | null;
+  action: SessionAction | null;
   /** Edge the floating button rests on; the back button takes the other one. */
   fabEdge: Edge;
   load: () => Promise<void>;
@@ -33,18 +46,33 @@ interface AppStore {
   /** Marks the guide unseen again and shows it now. */
   resetGuide: () => Promise<void>;
   finishGuide: () => Promise<void>;
-  goTo: (url: string) => void;
-  setPage: (page: SiteViewState) => void;
+  /** An address the user typed: always a new session, and remembered in history. */
+  openAddress: (url: string) => void;
+  /** A favorite: switches to its live session if there is one, otherwise opens a new one. */
+  openFavorite: (url: string) => void;
+  /** A history entry: switches to the live session typed with it, otherwise opens a new one. */
+  openHistory: (url: string) => void;
+  setSessionState: (state: SiteViewState) => void;
+  /** A native `open` failed: forget the session and go back to the one that was showing. */
+  sessionOpenFailed: (id: string) => void;
+  /** The native side already closed these; forget them. */
+  forgetSessions: (ids: string[]) => void;
+  /** Closes old, surplus or (under memory pressure) all hidden sessions. */
+  trimSessions: (pressure: Pressure) => void;
   reportError: (message: string | null) => void;
   saveFavorites: (favorites: FavoriteInput[]) => Promise<boolean>;
+  clearHistory: () => Promise<void>;
   setTheme: (theme: Theme) => Promise<void>;
   setAdBlock: (enabled: boolean) => Promise<void>;
   setBackButton: (enabled: boolean) => Promise<void>;
   setFabEdge: (edge: Edge) => void;
 }
 
+/** The page the user is looking at. */
+export const selectPage = (store: AppStore): Session | null =>
+  store.sessions.find((session) => session.id === store.activeId) ?? null;
+
 let nonce = 0;
-const nextRequest = (url: string): NavigationRequest => ({ url, nonce: ++nonce });
 
 export const useApp = create<AppStore>((set, get) => {
   const fetchIcons = async () => {
@@ -56,13 +84,42 @@ export const useApp = create<AppStore>((set, get) => {
     }
   };
 
+  const markUsed = (sessions: Session[], id: string | null, now: number) =>
+    sessions.map((session) => (session.id === id ? { ...session, lastUsed: now } : session));
+
+  const startSession = (url: string, source: SessionSource) => {
+    const now = Date.now();
+    const id = crypto.randomUUID();
+    const previousId = get().activeId;
+    set((current) => ({
+      sessions: [...markUsed(current.sessions, previousId, now), newSession(id, source, url, now)],
+      activeId: id,
+      sheet: "none",
+      action: { nonce: ++nonce, type: "open", id, url, previousId },
+    }));
+    get().trimSessions("routine");
+  };
+
+  const switchTo = (id: string) => {
+    const now = Date.now();
+    const previousId = get().activeId;
+    set((current) => ({
+      sessions: markUsed(markUsed(current.sessions, previousId, now), id, now),
+      activeId: id,
+      sheet: "none",
+      action: { nonce: ++nonce, type: "activate", id },
+    }));
+    get().trimSessions("routine");
+  };
+
   return {
     state: null,
     error: null,
     sheet: "none",
     onboardingOpen: false,
-    request: null,
-    page: null,
+    sessions: [],
+    activeId: null,
+    action: null,
     fabEdge: loadPosition().edge,
 
     load: async () => {
@@ -70,11 +127,8 @@ export const useApp = create<AppStore>((set, get) => {
         const state = await library.getState();
         const start = state.lastUrl ?? state.favorites[0]?.url;
         void siteView.setColorScheme(state.theme).catch(() => {});
-        set({
-          state,
-          onboardingOpen: !state.onboarded,
-          request: start ? nextRequest(start) : null,
-        });
+        set({ state, onboardingOpen: !state.onboarded });
+        if (start) startSession(start, startSource(state.favorites, start));
         void fetchIcons();
       } catch (error) {
         set({ error: errorMessage(error) });
@@ -106,8 +160,65 @@ export const useApp = create<AppStore>((set, get) => {
       }
     },
 
-    goTo: (url) => set({ request: nextRequest(url), sheet: "none" }),
-    setPage: (page) => set({ page }),
+    openAddress: (url) => {
+      startSession(url, "typed");
+      void library
+        .addHistory(url)
+        .then((history) =>
+          set((current) => ({ state: current.state && { ...current.state, history } })),
+        )
+        .catch((error: unknown) => set({ error: errorMessage(error) }));
+    },
+
+    openFavorite: (url) => {
+      const live = findFavoriteSession(get().sessions, url);
+      if (live) switchTo(live.id);
+      else startSession(url, "favorite");
+    },
+
+    openHistory: (url) => {
+      const live = findTypedSession(get().sessions, url);
+      if (live) switchTo(live.id);
+      else get().openAddress(url);
+    },
+
+    setSessionState: (page) =>
+      set((current) => ({
+        sessions: current.sessions.map((session) =>
+          session.id === page.session ? applyState(session, page) : session,
+        ),
+      })),
+
+    sessionOpenFailed: (id) =>
+      set((current) => {
+        const action = current.action;
+        const previousId = action?.type === "open" && action.id === id ? action.previousId : null;
+        const sessions = current.sessions.filter((session) => session.id !== id);
+        return {
+          sessions,
+          activeId:
+            current.activeId === id
+              ? sessions.some((session) => session.id === previousId)
+                ? previousId
+                : (sessions[0]?.id ?? null)
+              : current.activeId,
+        };
+      }),
+
+    forgetSessions: (ids) =>
+      set((current) => ({
+        sessions: current.sessions.filter((session) => !ids.includes(session.id)),
+        activeId: ids.includes(current.activeId ?? "") ? null : current.activeId,
+      })),
+
+    trimSessions: (pressure) => {
+      const { sessions, activeId } = get();
+      const doomed = sessionsToClose(sessions, activeId, Date.now(), pressure);
+      if (doomed.length === 0) return;
+      doomed.forEach((id) => void siteView.close(id).catch(() => {}));
+      get().forgetSessions(doomed);
+    },
+
     reportError: (error) => set({ error }),
 
     saveFavorites: async (favorites) => {
@@ -122,6 +233,17 @@ export const useApp = create<AppStore>((set, get) => {
       } catch (error) {
         set({ error: errorMessage(error) });
         return false;
+      }
+    },
+
+    clearHistory: async () => {
+      try {
+        await library.clearHistory();
+        set((current) => ({
+          state: current.state && { ...current.state, history: [], lastUrl: null },
+        }));
+      } catch (error) {
+        set({ error: errorMessage(error) });
       }
     },
 

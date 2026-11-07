@@ -47,9 +47,10 @@ One trait, two backends. Everything above it is platform-agnostic.
 
 | Operation | Purpose |
 |-----------|---------|
-| `open(profile, url, rect)` | Create the site view with the profile's isolated data store, below the transparent shell |
+| `open(session, profile, url, rect)` | Create a site view for a new session with the profile's isolated data store, below the transparent shell, and show it. Earlier sessions stay alive, hidden |
+| `activate(session)` / `close(session)` | Show a live session without reloading it / tear one down. The shell decides which to close |
 | `set_rect(rect)` / `set_interactive_regions(rects)` | The shell owns layout: where the page draws, and which regions of the screen belong to the shell rather than the page |
-| `navigate`, `back`, `forward`, `reload` | Browser controls |
+| `navigate`, `back`, `forward`, `reload` | Browser controls on the visible session |
 | `set_recipes(bundle)` | Push the resolved recipe bundle for this site; engine re-applies live |
 | `request_snapshot(opts)` | Ask the engine for a pruned, redacted DOM snapshot |
 | `events` | Stream: navigation, title, load state, match reports, picker results |
@@ -75,7 +76,7 @@ A self-contained script bundled to a single IIFE and injected at document start 
 
 ### Shell (React)
 
-One full-screen page with a floating button on top ([UI Design](./ui-design.md)): tap opens the command bar (addresses now, AI chat later), hold fans out favorites and settings, settings edits the favorites. Later: customize panel (rule list with toggles, picker), provider keys, privacy preview. Talks to Rust over Tauri IPC only.
+One full-screen page with a floating button on top ([UI Design](./ui-design.md)): tap opens the command bar (addresses now, AI chat later), hold fans out favorites, history and settings, settings edits the favorites and clears history. The shell keeps the list of live sessions (one native view each) and decides which to switch to, open or close ([Sessions](./ui-design.md#sessions)); the native side only opens, shows and closes, and pins each session to its domain. Later: customize panel (rule list with toggles, picker), provider keys, privacy preview. Talks to Rust over Tauri IPC only.
 
 ## Core data flows
 
@@ -88,7 +89,7 @@ sequenceDiagram
   participant C as Core
   participant V as Site view
   U->>S: pick Instagram from the favorites fan
-  S->>C: open(profile, url, rect)
+  S->>C: open(session, profile, url, rect)
   C->>C: resolve recipes matching URL
   C->>V: create view with isolated data store + engine + recipe bundle (init script)
   V->>V: engine applies CSS rules before first paint

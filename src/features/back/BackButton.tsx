@@ -1,4 +1,4 @@
-import { useApp } from "../../app/store";
+import { selectPage, useApp } from "../../app/store";
 import { BackIcon } from "../../shared/icons";
 import { errorMessage, siteView } from "../../shared/ipc";
 import { EDGE_MARGIN } from "../fab/geometry";
@@ -6,7 +6,7 @@ import { EDGE_MARGIN } from "../fab/geometry";
 /** Optional floating back button (Settings, off by default). Shown only when the page can go back. */
 export function BackButton() {
   const enabled = useApp((s) => s.state?.backButton ?? false);
-  const canGoBack = useApp((s) => s.page?.canGoBack ?? false);
+  const canGoBack = useApp((s) => selectPage(s)?.canGoBack ?? false);
   const fabEdge = useApp((s) => s.fabEdge);
   const sheet = useApp((s) => s.sheet);
   const onboardingOpen = useApp((s) => s.onboardingOpen);

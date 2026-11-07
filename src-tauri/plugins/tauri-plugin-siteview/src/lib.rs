@@ -35,6 +35,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::new("siteview")
         .invoke_handler(tauri::generate_handler![
             commands::open,
+            commands::activate,
             commands::close,
             commands::set_rect,
             commands::set_interactive_regions,

@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useApp } from "../../app/store";
+import { selectPage, useApp } from "../../app/store";
 import { errorMessage, siteView, type Favorite } from "../../shared/ipc";
 import {
   ArrowIcon,
@@ -19,10 +19,10 @@ const NO_FAVORITES: Favorite[] = [];
 /** Opens from the top so the keyboard never covers it. Addresses open directly. */
 export function CommandBar() {
   const open = useApp((s) => s.sheet === "assistant");
-  const page = useApp((s) => s.page);
+  const page = useApp(selectPage);
   const favorites = useApp((s) => s.state?.favorites) ?? NO_FAVORITES;
   const closeSheet = useApp((s) => s.closeSheet);
-  const goTo = useApp((s) => s.goTo);
+  const openAddress = useApp((s) => s.openAddress);
   const saveFavorites = useApp((s) => s.saveFavorites);
   const [text, setText] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
@@ -36,7 +36,7 @@ export function CommandBar() {
     }
     setText("");
     setNotice(null);
-    goTo(url);
+    openAddress(url);
   };
 
   const run = (action: () => Promise<void>) =>

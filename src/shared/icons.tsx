@@ -74,3 +74,10 @@ export const SlidersIcon = () => (
     <circle cx="17" cy="17" r="2" />
   </Icon>
 );
+
+export const HistoryIcon = () => (
+  <Icon>
+    <path d="M4 12a8 8 0 1 0 2.6-5.9M4 4v5h5" />
+    <path d="M12 8v4.5l3 1.8" />
+  </Icon>
+);
