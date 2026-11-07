@@ -60,8 +60,11 @@ System prompt (in `src-tauri/src/ai/prompt.rs`, versioned):
 
 1. Role: edit a recipe for the given site; output only a patch conforming to the schema.
 2. The recipe schema and rule semantics (see [Recipe Format](./recipe-format.md)), with **target-selection guidance**: prefer `ariaLabel`/`href`/`role`/`text` over `css`; never use hashed or generated-looking class names; prefer `hide` over `remove`; use the narrowest target that satisfies the request.
+   The prompt also carries the "Rules for writing a selector" from [Site Playbooks](./site-playbooks.md#rules-for-writing-a-selector-for-the-in-app-assistant) and, for the page's host, that site's section (anchors that are stable, containers that must never be hidden, what CSS cannot do). A smaller model has little site knowledge of its own, so the playbook is part of the prompt contract, not background reading. When a playbook changes, the prompt changes with it.
 3. Hard prohibitions: no `script` rules (the assistant cannot emit them in v1), no cross-origin redirects, no automation of site actions.
 4. Inputs: user request, current URL (path only), viewport class, existing recipe (for edits), snapshot.
+
+A bundled recipe's options are part of the context: the model sees which options exist and their state, and a request like "hide Reels" should become a switch for the existing option rather than new rules.
 
 The response is a **patch**: `{ addRules[], updateRules[], removeRuleIds[], summary }`, not a full recipe, so edits are diffable and the UI can show "AI will: hide Reels tab; hide Suggested posts".
 

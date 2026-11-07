@@ -16,6 +16,7 @@ import {
   siteView,
   type AppState,
   type FavoriteInput,
+  type SiteSettings,
   type SiteViewState,
   type Theme,
 } from "../shared/ipc";
@@ -40,6 +41,7 @@ interface AppStore {
   action: SessionAction | null;
   /** Edge the floating button rests on; the back button takes the other one. */
   fabEdge: Edge;
+  sites: SiteSettings[];
   load: () => Promise<void>;
   openSheet: (sheet: Sheet) => void;
   closeSheet: () => void;
@@ -64,8 +66,30 @@ interface AppStore {
   clearHistory: () => Promise<void>;
   setTheme: (theme: Theme) => Promise<void>;
   setAdBlock: (enabled: boolean) => Promise<void>;
+  loadSites: () => Promise<void>;
+  setSiteOption: (recipeId: string, optionId: string, enabled: boolean) => Promise<void>;
+  setBottomMargin: (pixels: number) => Promise<void>;
+  /** `null` returns the site to the shared margin. */
+  setSiteBottomMargin: (recipeId: string, pixels: number | null) => Promise<void>;
   setBackButton: (enabled: boolean) => Promise<void>;
   setFabEdge: (edge: Edge) => void;
+}
+
+function updateSite(
+  sites: SiteSettings[],
+  recipeId: string,
+  change: (site: SiteSettings) => SiteSettings,
+): SiteSettings[] {
+  return sites.map((site) => (site.recipeId === recipeId ? change(site) : site));
+}
+
+function withOption(site: SiteSettings, optionId: string, enabled: boolean): SiteSettings {
+  return {
+    ...site,
+    options: site.options.map((option) =>
+      option.id === optionId ? { ...option, enabled } : option,
+    ),
+  };
 }
 
 /** The page the user is looking at. */
@@ -121,6 +145,7 @@ export const useApp = create<AppStore>((set, get) => {
     activeId: null,
     action: null,
     fabEdge: loadPosition().edge,
+    sites: [],
 
     load: async () => {
       try {
@@ -130,6 +155,7 @@ export const useApp = create<AppStore>((set, get) => {
         set({ state, onboardingOpen: !state.onboarded });
         if (start) startSession(start, startSource(state.favorites, start));
         void fetchIcons();
+        void get().loadSites();
       } catch (error) {
         set({ error: errorMessage(error) });
       }
@@ -277,6 +303,42 @@ export const useApp = create<AppStore>((set, get) => {
       }
     },
 
+    loadSites: async () => {
+      try {
+        set({ sites: await library.getSites() });
+      } catch (error) {
+        set({ error: errorMessage(error) });
+      }
+    },
+
+    setSiteOption: async (recipeId, optionId, enabled) => {
+      const before = get().sites;
+      set({ sites: updateSite(before, recipeId, (site) => withOption(site, optionId, enabled)) });
+      try {
+        await library.setSiteOption(recipeId, optionId, enabled);
+      } catch (error) {
+        set({ sites: before, error: errorMessage(error) });
+      }
+    },
+
+    setBottomMargin: async (pixels) => {
+      const previous = get().state?.bottomMargin;
+      set((current) => ({
+        state: current.state && { ...current.state, bottomMargin: pixels },
+      }));
+      try {
+        await library.setBottomMargin(pixels);
+      } catch (error) {
+        set((current) => ({
+          state:
+            current.state && previous !== undefined
+              ? { ...current.state, bottomMargin: previous }
+              : current.state,
+          error: errorMessage(error),
+        }));
+      }
+    },
+
     setBackButton: async (enabled) => {
       const previous = get().state?.backButton;
       set((current) => ({ state: current.state && { ...current.state, backButton: enabled } }));
@@ -293,6 +355,15 @@ export const useApp = create<AppStore>((set, get) => {
       }
     },
 
+    setSiteBottomMargin: async (recipeId, pixels) => {
+      const before = get().sites;
+      set({ sites: updateSite(before, recipeId, (site) => ({ ...site, bottomMargin: pixels })) });
+      try {
+        await library.setSiteBottomMargin(recipeId, pixels);
+      } catch (error) {
+        set({ sites: before, error: errorMessage(error) });
+      }
+    },
     setFabEdge: (fabEdge) => set({ fabEdge }),
   };
 });

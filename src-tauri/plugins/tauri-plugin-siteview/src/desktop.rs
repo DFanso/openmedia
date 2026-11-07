@@ -63,6 +63,10 @@ impl<R: Runtime> Siteview<R> {
         Err(Error::DesktopUnsupported)
     }
 
+    pub fn set_document_start_script(&self, _request: SetDocumentStartScriptRequest) -> Result<()> {
+        Err(Error::DesktopUnsupported)
+    }
+
     pub fn set_content_rule_lists(&self, _request: SetContentRuleListsRequest) -> Result<()> {
         Err(Error::DesktopUnsupported)
     }

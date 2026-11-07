@@ -5,6 +5,7 @@ mod error;
 mod library;
 mod recipes;
 mod secrets;
+mod sites;
 
 use tauri::Manager;
 
@@ -15,7 +16,7 @@ pub fn run() {
         .setup(|app| {
             let path = app.path().app_data_dir()?.join("library.json");
             app.manage(library::Library::load(path)?);
-            app.manage(recipes::RecipeScript::bundled()?);
+            app.manage(recipes::Recipes::bundled()?);
             app.manage(ad_block::AdBlock::bundled(
                 app.path().app_cache_dir()?.join("ad-block"),
             ));
@@ -34,6 +35,11 @@ pub fn run() {
             commands::refresh_icons,
             commands::open_site,
             commands::set_ad_block,
+            commands::get_sites,
+            commands::set_site_option,
+            commands::set_bottom_margin,
+            commands::set_site_bottom_margin,
+            commands::bottom_margin_for,
             commands::set_back_button,
             commands::ai_state,
             commands::ai_save_provider,

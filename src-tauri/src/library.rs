@@ -11,12 +11,15 @@ use uuid::Uuid;
 
 use crate::ai::{AiSettings, MAX_PROVIDERS, ProviderConfig, ProviderInput};
 use crate::error::{Error, Result};
+use crate::recipes::OptionChoices;
 
 const FORMAT_VERSION: u32 = 4;
 pub const MAX_FAVORITES: usize = 6;
 const MAX_HISTORY: usize = 100;
 const MAX_FAVORITE_NAME_CHARS: usize = 20;
 const MAX_ICON_CHARS: usize = 200_000;
+/// Enough to clear a home indicator and a tab bar; more would leave no page to look at.
+pub const MAX_BOTTOM_MARGIN: u32 = 200;
 const ICON_PREFIX: &str = "data:image/png;base64,";
 
 const YOUTUBE_FAVORITE: (&str, &str) = ("YouTube", "https://m.youtube.com/");
@@ -64,6 +67,8 @@ pub struct AppState {
     pub onboarded: bool,
     pub theme: Theme,
     pub ad_block: bool,
+    /// Pixels kept clear under every page, unless the site has its own.
+    pub bottom_margin: u32,
     pub back_button: bool,
 }
 
@@ -81,6 +86,15 @@ struct LibraryData {
     /// On by default; the shell can turn blocking off.
     #[serde(default = "enabled")]
     ad_block: bool,
+    /// Toggles the user changed, by recipe id and then option id. Anything absent keeps the
+    /// recipe's default, so shipping a recipe with a new option needs no migration.
+    #[serde(default)]
+    site_options: OptionChoices,
+    #[serde(default)]
+    bottom_margin: u32,
+    /// Per-site bottom margins by recipe id; a site without an entry uses `bottom_margin`.
+    #[serde(default)]
+    site_bottom_margins: BTreeMap<String, u32>,
     /// Off by default; the shell can show a floating back button over the page.
     #[serde(default)]
     back_button: bool,
@@ -131,6 +145,7 @@ impl Library {
             onboarded: data.onboarded,
             theme: data.theme,
             ad_block: data.ad_block,
+            bottom_margin: data.bottom_margin,
             back_button: data.back_button,
         })
     }
@@ -196,6 +211,46 @@ impl Library {
     pub fn set_ad_block(&self, enabled: bool) -> Result<()> {
         let mut data = self.lock()?;
         data.ad_block = enabled;
+        self.save(&data)
+    }
+
+    pub fn site_options(&self) -> Result<OptionChoices> {
+        Ok(self.lock()?.site_options.clone())
+    }
+
+    /// Records one toggle. The caller has already checked that the recipe and option exist.
+    pub fn set_site_option(&self, recipe: &str, option: &str, enabled: bool) -> Result<()> {
+        let mut data = self.lock()?;
+        data.site_options
+            .entry(recipe.to_owned())
+            .or_default()
+            .insert(option.to_owned(), enabled);
+        self.save(&data)
+    }
+
+    pub fn bottom_margin(&self) -> Result<u32> {
+        Ok(self.lock()?.bottom_margin)
+    }
+
+    pub fn set_bottom_margin(&self, pixels: u32) -> Result<()> {
+        let pixels = checked_margin(pixels)?;
+        let mut data = self.lock()?;
+        data.bottom_margin = pixels;
+        self.save(&data)
+    }
+
+    pub fn site_bottom_margins(&self) -> Result<BTreeMap<String, u32>> {
+        Ok(self.lock()?.site_bottom_margins.clone())
+    }
+
+    /// `None` returns the site to the shared margin.
+    pub fn set_site_bottom_margin(&self, recipe: &str, pixels: Option<u32>) -> Result<()> {
+        let pixels = pixels.map(checked_margin).transpose()?;
+        let mut data = self.lock()?;
+        match pixels {
+            Some(pixels) => data.site_bottom_margins.insert(recipe.to_owned(), pixels),
+            None => data.site_bottom_margins.remove(recipe),
+        };
         self.save(&data)
     }
 
@@ -299,6 +354,13 @@ impl Library {
     }
 }
 
+fn checked_margin(pixels: u32) -> Result<u32> {
+    if pixels > MAX_BOTTOM_MARGIN {
+        return Err(Error::InvalidMargin(MAX_BOTTOM_MARGIN));
+    }
+    Ok(pixels)
+}
+
 fn enabled() -> bool {
     true
 }
@@ -361,6 +423,9 @@ fn default_data() -> LibraryData {
         onboarded: false,
         theme: Theme::System,
         ad_block: true,
+        site_options: OptionChoices::new(),
+        bottom_margin: 0,
+        site_bottom_margins: BTreeMap::new(),
         back_button: false,
         icons: BTreeMap::new(),
         history: Vec::new(),
@@ -719,6 +784,63 @@ mod tests {
             library.upsert_provider(provider("one too many")),
             Err(Error::TooManyProviders(_))
         ));
+    }
+
+    #[test]
+    fn site_toggles_persist_per_site_and_leave_other_options_alone() {
+        let (dir, library) = library();
+        assert!(library.site_options().unwrap().is_empty());
+        library.set_site_option("a.default", "x", true).unwrap();
+        library.set_site_option("a.default", "y", false).unwrap();
+        library.set_site_option("b.default", "x", false).unwrap();
+        let choices = reload(&dir).site_options().unwrap();
+        assert!(choices["a.default"]["x"]);
+        assert!(!choices["a.default"]["y"]);
+        assert!(!choices["b.default"]["x"]);
+    }
+
+    #[test]
+    fn the_bottom_margin_defaults_to_zero_is_bounded_and_persists() {
+        let (dir, library) = library();
+        assert_eq!(library.state().unwrap().bottom_margin, 0);
+        library.set_bottom_margin(48).unwrap();
+        assert!(matches!(
+            library.set_bottom_margin(MAX_BOTTOM_MARGIN + 1),
+            Err(Error::InvalidMargin(_))
+        ));
+        assert_eq!(reload(&dir).bottom_margin().unwrap(), 48);
+    }
+
+    #[test]
+    fn a_site_margin_can_be_set_and_returned_to_the_shared_one() {
+        let (dir, library) = library();
+        library
+            .set_site_bottom_margin("a.default", Some(24))
+            .unwrap();
+        assert_eq!(reload(&dir).site_bottom_margins().unwrap()["a.default"], 24);
+        assert!(
+            library
+                .set_site_bottom_margin("a.default", Some(999))
+                .is_err()
+        );
+        library.set_site_bottom_margin("a.default", None).unwrap();
+        assert!(reload(&dir).site_bottom_margins().unwrap().is_empty());
+    }
+
+    #[test]
+    fn a_library_saved_before_site_options_existed_loads_with_defaults() {
+        let (dir, library) = library();
+        library.set_bottom_margin(8).unwrap();
+        let path = dir.path().join("library.json");
+        let mut json: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
+        for key in ["siteOptions", "bottomMargin", "siteBottomMargins"] {
+            json.as_object_mut().unwrap().remove(key);
+        }
+        fs::write(&path, json.to_string()).unwrap();
+        let reloaded = reload(&dir);
+        assert!(reloaded.site_options().unwrap().is_empty());
+        assert_eq!(reloaded.bottom_margin().unwrap(), 0);
     }
 
     #[test]

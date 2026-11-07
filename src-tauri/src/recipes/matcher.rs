@@ -1,4 +1,6 @@
+use regex::Regex;
 use serde::Serialize;
+use url::Url;
 
 use crate::error::{Error, Result};
 
@@ -50,6 +52,16 @@ impl Matcher {
         })
     }
 
+    /// Applies the same regex strings the injected script tests, so Rust and the page agree on
+    /// what matches.
+    pub fn matches(&self, url: &Url) -> bool {
+        let tested =
+            |pattern: &str, text: &str| Regex::new(pattern).is_ok_and(|regex| regex.is_match(text));
+        (self.scheme == "*" || self.scheme == url.scheme())
+            && url.host_str().is_some_and(|host| tested(&self.host, host))
+            && tested(&self.path, url.path())
+    }
+
     /// Patterns that cover every site are only acceptable for bundled recipes.
     pub fn is_broad(&self) -> bool {
         self.host == "^.*$"
@@ -58,22 +70,12 @@ impl Matcher {
 
 #[cfg(test)]
 mod tests {
-    use regex::Regex;
-    use url::Url;
-
     use super::*;
 
-    /// Applies the same regex strings the injected script tests, so the Rust oracle and the page
-    /// agree on what matches.
     fn matches(pattern: &str, url: &str) -> bool {
-        let m = Matcher::parse(pattern).unwrap();
-        let url = Url::parse(url).unwrap();
-        let scheme_ok = m.scheme == "*" || m.scheme == url.scheme();
-        let host_ok = Regex::new(&m.host)
+        Matcher::parse(pattern)
             .unwrap()
-            .is_match(url.host_str().unwrap());
-        let path_ok = Regex::new(&m.path).unwrap().is_match(url.path());
-        scheme_ok && host_ok && path_ok
+            .matches(&Url::parse(url).unwrap())
     }
 
     #[test]

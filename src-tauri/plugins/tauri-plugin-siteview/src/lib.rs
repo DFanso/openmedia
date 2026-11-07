@@ -46,6 +46,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             commands::set_color_scheme,
             commands::fetch_favicon,
             commands::set_content_rule_lists,
+            commands::set_document_start_script,
         ])
         .setup(|app, api| {
             #[cfg(mobile)]

@@ -1,0 +1,166 @@
+{
+  "schema": 1,
+  "id": "instagram.default",
+  "name": "Instagram",
+  "version": "1.0.0",
+  "origin": "bundled",
+  "match": ["https://*.instagram.com/*"],
+  "options": [
+    {
+      "id": "app-prompts",
+      "label": "Hide \"use the app\" pop-ups",
+      "description": "The full-screen \"See this in the app\" overlay and the Open app button, shown when you are not logged in.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "reels",
+      "label": "Hide Reels",
+      "description": "The Reels tab, Reels and other videos in your feed, and the Reels tab on profiles. The /reels/ page itself can still be opened by address.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "explore-tab",
+      "label": "Hide the Explore tab",
+      "description": "Removes Explore (search) from the bottom bar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "stories",
+      "label": "Hide Stories",
+      "description": "The row of Stories at the top of the home feed.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "suggested-posts",
+      "label": "Hide suggested posts",
+      "description": "The posts Instagram adds after \"You're all caught up\".",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "feed-posts",
+      "label": "Hide all posts",
+      "description": "Every post, in the feed and when you open one. Stories and the tab bar stay.",
+      "group": "content",
+      "default": false
+    }
+  ],
+  "rules": [
+    {
+      "id": "app-overlay",
+      "label": "Full-screen \"use the app\" overlay",
+      "type": "hide",
+      "option": "app-prompts",
+      "target": {
+        "css": "body:has(a[href^=\"/accounts/login\"]) div:has(> div > div > div > [role=\"dialog\"][aria-modal=\"true\"])"
+      }
+    },
+    {
+      "id": "open-app-pill",
+      "label": "Open app button in the top bar",
+      "type": "hide",
+      "option": "app-prompts",
+      "target": {
+        "css": "header:has(a[href^=\"/accounts/login\"]) a[href*=\"applink.instagram.com\"]"
+      }
+    },
+    {
+      "id": "reels-tab-direct",
+      "label": "Reels tab (direct link layout)",
+      "type": "hide",
+      "option": "reels",
+      "target": {
+        "css": "div:has(> a[href=\"/reels/\"])"
+      }
+    },
+    {
+      "id": "reels-tab-wrapped",
+      "label": "Reels tab (wrapped link layout)",
+      "type": "hide",
+      "option": "reels",
+      "target": {
+        "css": "div:has(> span > div > a[href=\"/reels/\"])"
+      }
+    },
+    {
+      "id": "reels-video-posts",
+      "label": "Posts that hold a video player",
+      "type": "hide",
+      "option": "reels",
+      "target": {
+        "css": "article:has(div[aria-label=\"Video player\"])"
+      }
+    },
+    {
+      "id": "reels-profile-tab",
+      "label": "Reels tab on profiles",
+      "type": "hide",
+      "option": "reels",
+      "target": {
+        "css": "div[role=\"tablist\"] > div:has(svg[aria-label=\"Reels\"])"
+      }
+    },
+    {
+      "id": "explore-tab-direct",
+      "label": "Explore tab (direct link layout)",
+      "type": "hide",
+      "option": "explore-tab",
+      "target": {
+        "css": "div:has(> a[href=\"/explore/\"])"
+      }
+    },
+    {
+      "id": "explore-tab-wrapped",
+      "label": "Explore tab (wrapped link layout)",
+      "type": "hide",
+      "option": "explore-tab",
+      "target": {
+        "css": "div:has(> span > div > a[href=\"/explore/\"])"
+      }
+    },
+    {
+      "id": "stories-tray",
+      "label": "Stories row",
+      "type": "hide",
+      "option": "stories",
+      "target": {
+        "css": "[aria-label=\"Stories\"], [aria-label^=\"Story by\"]"
+      }
+    },
+    {
+      "id": "suggested-marker",
+      "label": "\"You're all caught up\" marker",
+      "type": "hide",
+      "option": "suggested-posts",
+      "target": {
+        "css": "main article + div:has(img[src*=\"illo-confirm-refresh\"])"
+      }
+    },
+    {
+      "id": "suggested-after-marker",
+      "label": "Posts after the marker",
+      "type": "hide",
+      "option": "suggested-posts",
+      "target": {
+        "css": "main article + div:has(img[src*=\"illo-confirm-refresh\"]) ~ article"
+      }
+    },
+    {
+      "id": "posts",
+      "label": "Posts",
+      "type": "hide",
+      "option": "feed-posts",
+      "target": {
+        "css": "main article"
+      }
+    }
+  ],
+  "meta": {
+    "lastVerified": "2026-11-07",
+    "notes": "LIVE (logged out, iPhone UA, 390x844): app-overlay matched 1 element (the fixed overlay holding the dialog, backdrop and close button; hiding the dialog alone leaves the dimmed backdrop), open-app-pill matched 1 (unscoped a[href*=applink.instagram.com] matches 18, every grid tile), the Reels and Explore tab wrappers matched 1 each. The overlay rule needs a login link on the page, so a logged-in share sheet (also role=dialog) is never hidden. Not seen live (logged-in only, from community lists: viki53 Instagram Purified 2025-07, shraiwi Nuke Insta Slop 2026-09, Instagram Unhook): reels-video-posts, stories-tray, suggested-*, posts, wrapped tab layout. reels-profile-tab: the SVG label was seen live, the wrapper structure was not. reels-video-posts also hides ordinary video posts. posts also hides a post opened by address. Class names rotate; never use them."
+  }
+}

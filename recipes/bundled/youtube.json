@@ -1,0 +1,232 @@
+{
+  "schema": 1,
+  "id": "youtube.default",
+  "name": "YouTube",
+  "version": "1.0.0",
+  "origin": "bundled",
+  "match": ["https://*.youtube.com/*"],
+  "options": [
+    {
+      "id": "open-app",
+      "label": "Hide the Open App button",
+      "description": "The Open App button in the header of a video page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "promos",
+      "label": "Hide promo banners",
+      "description": "Premium, survey and \"get the app\" banners and pop-ups.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "ads",
+      "label": "Hide ad slots",
+      "description": "Companion and promoted ad blocks that remain after network blocking.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "shorts",
+      "label": "Hide Shorts",
+      "description": "The Shorts tab, Shorts shelves and cards in Home, search and video pages, and the Shorts tab on channels. A Shorts address can still be opened directly.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "home-feed",
+      "label": "Hide Home recommendations",
+      "description": "Empties the Home feed. The search box stays.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "home-chips",
+      "label": "Hide topic chips",
+      "description": "The All, Music, Live row on Home.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "comments",
+      "label": "Hide comments",
+      "description": "The comments entry under a video.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "related",
+      "label": "Hide up next videos",
+      "description": "The suggested videos below a video.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "playlists",
+      "label": "Hide Mixes and playlists in lists",
+      "description": "Mix and playlist cards in search and suggestions.",
+      "group": "content",
+      "default": false
+    }
+  ],
+  "rules": [
+    {
+      "id": "open-app-pill",
+      "label": "Open App button in the header",
+      "type": "hide",
+      "option": "open-app",
+      "target": {
+        "css": "ytm-mobile-topbar-renderer ytm-button-renderer:has(> a[href^=\"vnd.youtube://\"])"
+      }
+    },
+    {
+      "id": "promo-banners",
+      "label": "Promo, statement and upsell banners",
+      "type": "hide",
+      "option": "promos",
+      "target": {
+        "css": "ytm-mealbar-promo-renderer, ytm-statement-banner-renderer, ytm-upsell-dialog-renderer, ytm-brand-video-singleton-renderer"
+      }
+    },
+    {
+      "id": "companion-slot",
+      "label": "Companion ad slot",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "ytm-companion-slot"
+      }
+    },
+    {
+      "id": "promoted-tiles",
+      "label": "Promoted tiles and masthead ads",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "ytm-promoted-sparkles-web-renderer, ytm-promoted-video-renderer, ytm-ad-slot-renderer, ytm-masthead-ad-renderer"
+      }
+    },
+    {
+      "id": "shorts-tab",
+      "label": "Shorts tab in the bottom bar",
+      "type": "hide",
+      "option": "shorts",
+      "target": {
+        "css": "ytm-pivot-bar-item-renderer:has(.pivot-shorts)"
+      }
+    },
+    {
+      "id": "shorts-home-shelf",
+      "label": "Shorts shelves on Home",
+      "type": "hide",
+      "option": "shorts",
+      "target": {
+        "css": "ytm-rich-section-renderer:has(ytm-shorts-lockup-view-model)"
+      }
+    },
+    {
+      "id": "shorts-search-shelf",
+      "label": "Shorts shelves in search",
+      "type": "hide",
+      "option": "shorts",
+      "target": {
+        "css": "grid-shelf-view-model:has(ytm-shorts-lockup-view-model)"
+      }
+    },
+    {
+      "id": "shorts-search-card",
+      "label": "Single Shorts cards in search",
+      "type": "hide",
+      "option": "shorts",
+      "target": {
+        "css": "ytm-video-with-context-renderer:has(a[href^=\"/shorts/\"])"
+      }
+    },
+    {
+      "id": "shorts-related-shelf",
+      "label": "Shorts shelf under a video",
+      "type": "hide",
+      "option": "shorts",
+      "target": {
+        "css": "ytm-reel-shelf-renderer"
+      }
+    },
+    {
+      "id": "shorts-channel-tab",
+      "label": "Shorts tab on channels",
+      "type": "hide",
+      "option": "shorts",
+      "target": {
+        "css": "yt-tab-shape[tab-title=\"Shorts\"]"
+      }
+    },
+    {
+      "id": "shorts-chip",
+      "label": "Shorts chip on Home",
+      "type": "hide",
+      "option": "shorts",
+      "target": {
+        "css": "ytm-chip-cloud-chip-renderer:has([aria-label=\"Shorts\"])"
+      }
+    },
+    {
+      "id": "home-feed",
+      "label": "Home recommendations",
+      "type": "hide",
+      "option": "home-feed",
+      "target": {
+        "css": "ytm-rich-grid-renderer .rich-grid-renderer-contents"
+      }
+    },
+    {
+      "id": "home-chips",
+      "label": "Topic chips",
+      "type": "hide",
+      "option": "home-chips",
+      "target": {
+        "css": "ytm-feed-filter-chip-bar-renderer"
+      }
+    },
+    {
+      "id": "comments-entry",
+      "label": "Comments entry under a video",
+      "type": "hide",
+      "option": "comments",
+      "target": {
+        "css": "ytm-item-section-renderer:has(> lazy-list > yt-video-metadata-carousel-view-model[aria-label=\"Comments\"])"
+      }
+    },
+    {
+      "id": "related-videos",
+      "label": "Suggested videos below a video",
+      "type": "hide",
+      "option": "related",
+      "target": {
+        "css": ".related-items-container"
+      }
+    },
+    {
+      "id": "playlist-cards",
+      "label": "Playlist cards",
+      "type": "hide",
+      "option": "playlists",
+      "target": {
+        "css": "ytm-compact-playlist-renderer"
+      }
+    },
+    {
+      "id": "mix-cards",
+      "label": "Mix cards",
+      "type": "hide",
+      "option": "playlists",
+      "target": {
+        "css": "ytm-compact-radio-renderer"
+      }
+    }
+  ],
+  "meta": {
+    "lastVerified": "2026-11-07",
+    "notes": "An iPhone user agent gets m.youtube.com made only of ytm-* custom elements plus newer view-model elements; ytd-* elements never appear. LIVE (logged out): open-app-pill (1, watch pages only; the Open App entry in the More sheet has no unique attribute and cannot be hidden), shorts-tab (1; .pivot-shorts alone matches 2 nodes), shorts-home-shelf (2 of 3 sections, the community post section stays), shorts-search-shelf, shorts-search-card (only after scrolling, lazy), shorts-related-shelf, shorts-channel-tab, home-feed, home-chips, comments-entry, related-videos, companion-slot, playlist-cards and mix-cards (present only on some pages). SOURCE: shorts-chip (gijsdev/ublock-hide-yt-shorts v2026.4.29; matched nothing in the tested chip bar). INFERRED from ytd-* names, never rendered logged out: promo-banners, promoted-tiles. comments-entry, shorts-chip and shorts-channel-tab depend on English labels. Never hide ytm-browse, ytm-search, ytm-watch, a bare ytm-item-section-renderer, lazy-list, ytm-pivot-bar-renderer or #movie_player. The /shorts/ID route cannot be blocked with CSS."
+  }
+}

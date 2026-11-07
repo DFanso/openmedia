@@ -27,7 +27,8 @@
 ## Highlights
 
 - **Floating button:** tap to type an address, hold to fan out your favorites (Instagram, Facebook, Twitter, Reddit, YouTube by default, with their site icons) and settings, drag it to either edge. A thin progress ring hugs its edge while held.
-- **Favorites:** edit, reorder, and add the current page from the app.
+- **Favorites:** edit, reorder, add and remove in Settings. Nothing else changes them.
+- **Site options:** per-site switches in Settings (hide Reels, Shorts, Stories, suggested posts, app-install prompts and more) for the five default sites, and a bottom margin for pages that run under the screen edge.
 - **Pull to refresh** on the page, and **light, dark or system** theme that sites can follow.
 - **Ad and tracker blocking:** EasyList and EasyPrivacy are built into the app and compiled to WebKit content rules, so ads and trackers are blocked before they load, with no list downloads. One switch in Settings.
 - **Recipes:** bundled, validated in Rust, injected at document start so removed things never flash.

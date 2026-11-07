@@ -1,6 +1,6 @@
 # Recipe Format
 
-> **Status: Partially implemented.** A subset of schema v1 is built in `src-tauri/src/recipes/` (see [Implemented subset](#implemented-subset)). Everything else below is still the intended design; the Rust types become the source of truth and this page follows them.
+> **Status: Partially implemented.** Options (user-facing toggles) are implemented; see [Options](#options-user-facing-toggles). A subset of schema v1 is built in `src-tauri/src/recipes/` (see [Implemented subset](#implemented-subset)). Everything else below is still the intended design; the Rust types become the source of truth and this page follows them.
 
 A **recipe** is a JSON document describing how to modify one site (or a set of URL patterns). Declarative on purpose: the AI emits it, Rust validates it, the engine applies it, and users can read, toggle, edit, export, and share it.
 
@@ -53,6 +53,29 @@ A `script` rule exists as a gated escape hatch (see [Trust levels](#trust-levels
 | `match` | string[] | URL patterns (scheme + host + path glob). A recipe applies when any matches the top-level page URL. |
 | `rules` | Rule[] | Ordered. Each independently toggleable. |
 | `meta` | object | Optional: `author`, `homepage`, `lastVerified` (date), `notes`. |
+
+## Options (user-facing toggles)
+
+A recipe may list `options`: the switches Settings shows for the site. Each rule points at one with `option`; the switch turns every rule that points at it on or off together. A rule with no `option` always applies.
+
+```json
+"options": [
+  { "id": "reels", "label": "Hide Reels", "description": "The Reels tab and Reels in your feed.", "group": "content", "default": false }
+],
+"rules": [
+  { "id": "reels-tab", "label": "Reels tab", "type": "hide", "option": "reels", "target": { "css": "div:has(> a[href=\"/reels/\"])" } }
+]
+```
+
+| Field | Notes |
+|-------|-------|
+| `id` | Lowercase letters, digits and `-`. Unique in the recipe; it is the key under which the user's choice is saved, so renaming one resets that choice. |
+| `label` | At most 60 characters. Phrase it so ON means hidden ("Hide Reels"). |
+| `description` | At most 160 characters, one sentence. Say what else it hides if the selector is broader than the label. |
+| `group` | `annoyance` or `content`. Orders the switches. |
+| `default` | Whether the rules apply until the user chooses. **Policy for bundled recipes, enforced by a test: annoyances `true`, content `false`.** An annoyance is something that gets in the way (install prompts, pop-ups that block the page, scroll locks, ad slots); content is something the user may well want to see. |
+
+Validation: at most 30 options; every option has at least one rule; every `option` a rule names exists. Choices live in `library.json` (`siteOptions`: recipe id, then option id, then bool); an option with no saved choice follows the recipe's current default, so shipping a new option needs no migration. Adding `options` and `option` is additive, so `schema` stays 1.
 
 ## Targets
 
@@ -148,7 +171,10 @@ What the Rust code accepts today, validated with `deny_unknown_fields` so anythi
 - `match`: `scheme://host/path` with `http`, `https` or `*`; the host may start with `*.` (matches the apex and any subdomain depth); `*` in the path is a glob. An all-sites host (`*`) is refused unless the recipe is `bundled`.
 - Delivery: all recipes are compiled by Rust into one document-start script. The page tests its own `location` against each recipe's matcher regexes, so one script stays correct across navigations. The shell cannot open a page without it: `open_site` is the only way, and the plugin's `open` is not granted to the shell.
 - Fixtures: every bundled rule must match something in `recipes/fixtures/<site>/`; this is tested in Rust.
-- Bundled today: `reddit.no-app-nag` (hides the "Open App" button, the app banner and the blocking app modal, and keeps the page scrollable). See its `meta.notes` for what was and was not verified on the live site.
+- Options: `options[]` and a per-rule `option`, as above. The page script is compiled per open and per toggle from the bundled recipes and the saved choices (`Recipes::script`), and only enabled rules reach it.
+- Limits that matter when writing selectors: the 300-character, 19-comma and 2-`:has(` limits apply to the whole `css` string of one rule, so an option with many selectors uses several rules.
+- Bundled today: `instagram.default`, `facebook.default`, `twitter.default`, `reddit.default`, `youtube.default`, one per default favorite. [Site Playbooks](./site-playbooks.md) records what each selector matched, how it was checked, and what CSS cannot do. Each recipe's `meta.notes` carries the same evidence next to the data.
+- Fixture rules: every rule matches something in its site's fixtures, and nothing a fixture marks `data-keep` (or an ancestor of it) may be hidden by a `hide` rule. Mark the login link, the feed container, the player and similar with `data-keep` when you add a fixture.
 
 ## Inspirations
 

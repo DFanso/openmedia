@@ -1,20 +1,31 @@
 <!doctype html>
+<!-- Structure observed on www.reddit.com with an iPhone UA, logged out, 2026-11-07; text, ids and links are placeholders. data-keep marks what no rule may hide. -->
 <html lang="en-US" class="theme-dark" device="mobile">
-  <body>
-    <shreddit-app>
-      <header>
-        <a id="open-app-header-cta" href="https://reddit.onelink.me/XXXX?deep_link_value=https%3A%2F%2Fwww.reddit.com%2F">Open App</a>
-        <button aria-label="Expand user menu"></button>
-      </header>
-      <div id="xpromo-small-header"><span>Get the best Reddit experience</span><a href="https://reddit.onelink.me/XXXX">Use app</a></div>
-      <shreddit-feed>
-        <shreddit-post permalink="/r/example/comments/abc/a_post/"><a slot="full-post-link" href="/r/example/comments/abc/a_post/">A post</a></shreddit-post>
-      </shreddit-feed>
-      <configured-xpromo-modal data-xpromo-view-san="xpromo|view|page_fade_blocking" dialog-id="configured-xpromo-example" actioned="">
-        <rpl-bottom-sheet id="configured-xpromo-example" class="rpl-bottom-sheet configured-xpromo configured-xpromo-bottom-sheet">
-          <p>Continue in the app</p>
-        </rpl-bottom-sheet>
-      </configured-xpromo-modal>
+  <body class="rpl-scroll-lock">
+    <shreddit-app data-keep>
+      <reddit-header-small data-keep>
+        <div id="xpromo-small-header"><a id="open-app-header-cta" href="https://reddit.onelink.me/XXXX?deep_link_value=https%3A%2F%2Fwww.reddit.com%2F">Open App</a></div>
+        <button data-keep aria-label="Expand user menu"></button>
+      </reddit-header-small>
+      <main data-keep>
+        <shreddit-feed data-keep>
+          <article data-keep><shreddit-post post-type="image" permalink="/r/example/comments/a/a_post/"></shreddit-post></article>
+          <hr data-keep>
+          <article><shreddit-post post-type="video" permalink="/r/example/comments/b/a_video/"></shreddit-post></article>
+          <hr>
+          <shreddit-ad-post></shreddit-ad-post>
+          <hr>
+          <in-feed-community-recommendations></in-feed-community-recommendations>
+        </shreddit-feed>
+      </main>
+      <div id="configured-xpromo-mweb3x_feeds_blocking_xpromo_lo_page_fade" class="rpl-bottom-sheet configured-xpromo configured-xpromo-bottom-sheet"><p>Continue in the app</p></div>
+      <configured-xpromo-modal data-keep dialog-id="configured-xpromo-example"></configured-xpromo-modal>
+      <iframe id="credential_picker_iframe"></iframe>
+      <ul>
+        <li data-keep><a href="/settings">Settings</a></li>
+        <li><a href="https://ads.reddit.com/register">Advertise on Reddit</a></li>
+        <li><a href="/reddit-pro">Reddit Pro</a></li>
+      </ul>
     </shreddit-app>
   </body>
 </html>

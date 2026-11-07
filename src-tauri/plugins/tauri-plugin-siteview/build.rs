@@ -11,6 +11,7 @@ const COMMANDS: &[&str] = &[
     "set_color_scheme",
     "fetch_favicon",
     "set_content_rule_lists",
+    "set_document_start_script",
 ];
 
 fn main() {

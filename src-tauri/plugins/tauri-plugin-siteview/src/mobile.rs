@@ -136,6 +136,13 @@ impl<R: Runtime> Siteview<R> {
         Ok(response.data_url)
     }
 
+    pub fn set_document_start_script(&self, request: SetDocumentStartScriptRequest) -> Result<()> {
+        self.run(
+            "setDocumentStartScript",
+            serde_json::json!({ "script": request.script }),
+        )
+    }
+
     pub fn set_content_rule_lists(&self, request: SetContentRuleListsRequest) -> Result<()> {
         self.run(
             "setContentRuleLists",

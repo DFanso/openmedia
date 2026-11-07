@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-set-document-start-script"
+description = "Enables the set_document_start_script command without any pre-configured scope."
+commands.allow = ["set_document_start_script"]
+
+[[permission]]
+identifier = "deny-set-document-start-script"
+description = "Denies the set_document_start_script command without any pre-configured scope."
+commands.deny = ["set_document_start_script"]

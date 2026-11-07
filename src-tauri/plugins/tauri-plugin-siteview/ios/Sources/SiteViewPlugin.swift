@@ -5,6 +5,13 @@ import UIKit
 import WebKit
 
 private let bridgeHandlerName = "openmedia"
+/// A WKWebView's default user agent has no `Safari` token, which Google reads as an embedded
+/// browser and refuses to sign in from. Report what Mobile Safari reports (it freezes the OS
+/// version in the string and shows the real one after `Version/`).
+private let safariUserAgent: String = {
+  let major = UIDevice.current.systemVersion.split(separator: ".").first.map(String.init) ?? "18"
+  return "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/\(major).0 Mobile/15E148 Safari/604.1"
+}()
 private let allowedSchemes: Set<String> = ["http", "https"]
 
 struct RectArgs: Decodable {
@@ -57,6 +64,10 @@ class FetchFaviconArgs: Decodable {
 
 class SetContentRuleListsArgs: Decodable {
   let lists: [RuleListArgs]
+}
+
+class SetDocumentStartScriptArgs: Decodable {
+  let script: String
 }
 
 struct StateEvent: Encodable {
@@ -195,6 +206,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
           profileId: profileId, script: args.documentStartScript, ruleLists: ruleLists)
       )
       view.allowsBackForwardNavigationGestures = true
+      view.customUserAgent = safariUserAgent
       view.navigationDelegate = self
       view.uiDelegate = self
       view.overrideUserInterfaceStyle = self.colorScheme
@@ -325,6 +337,29 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
         }
       }
       if let failure { self.send(ErrorEvent(message: failure)) }
+      invoke.resolve()
+    }
+  }
+
+  /// Swaps the document-start script on every live session. The visible one reloads under it; a
+  /// hidden one reloads when it is shown again. With no session there is nothing to change; the
+  /// next `open` carries the script.
+  @objc public func setDocumentStartScript(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(SetDocumentStartScriptArgs.self)
+    DispatchQueue.main.async {
+      for session in self.sessions.values {
+        let controller = session.view.configuration.userContentController
+        controller.removeAllUserScripts()
+        if !args.script.isEmpty {
+          controller.addUserScript(
+            WKUserScript(source: args.script, injectionTime: .atDocumentStart, forMainFrameOnly: false))
+        }
+        if session.id == self.activeId {
+          session.view.reload()
+        } else {
+          session.needsReload = true
+        }
+      }
       invoke.resolve()
     }
   }
@@ -524,6 +559,9 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: profileId)
     // iPhone defaults to fullscreen-only video, which covers the shell's controls. Muted video may
     // autoplay inline; audio still needs a tap.
+    // Sign-in with Google or Apple opens a popup from script that runs after the tap; without
+    // this WebKit blocks it and the button does nothing.
+    configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
     configuration.allowsInlineMediaPlayback = true
     configuration.mediaTypesRequiringUserActionForPlayback = .audio
     let controller = WKUserContentController()

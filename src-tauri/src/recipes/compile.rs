@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 use std::fmt::Write;
 
 use serde::Serialize;
@@ -6,6 +7,10 @@ use super::matcher::Matcher;
 use super::schema::{Recipe, Rule};
 use crate::error::{Error, Result};
 
+/// The user's saved toggles: recipe id, then option id. An option with no entry keeps the
+/// recipe's own default.
+pub type OptionChoices = BTreeMap<String, BTreeMap<String, bool>>;
+
 #[derive(Serialize)]
 struct PageRecipe {
     id: String,
@@ -13,11 +18,16 @@ struct PageRecipe {
     css: String,
 }
 
-/// CSS for one recipe. Hiding is `display: none`, so the element stays in the DOM and the site's
-/// own scripts keep working.
-pub fn recipe_css(recipe: &Recipe) -> String {
+/// CSS for the rules of one recipe that currently apply. Hiding is `display: none`, so the
+/// element stays in the DOM and the site's own scripts keep working.
+pub fn recipe_css(recipe: &Recipe, choices: &OptionChoices) -> String {
+    let saved = choices.get(&recipe.id);
     let mut css = String::new();
-    for rule in &recipe.rules {
+    for rule in recipe
+        .rules
+        .iter()
+        .filter(|rule| recipe.rule_applies(rule, saved))
+    {
         let _ = match rule {
             Rule::Hide { target, .. } => writeln!(css, "{}{{display:none!important}}", target.css),
             Rule::Css {
@@ -38,7 +48,7 @@ pub fn recipe_css(recipe: &Recipe) -> String {
 
 /// One script for every recipe, run at document start in each frame. The page matches its own
 /// location against the recipes, so a single script stays correct across navigations.
-pub fn page_script(recipes: &[Recipe]) -> Result<String> {
+pub fn page_script(recipes: &[Recipe], choices: &OptionChoices) -> Result<String> {
     let page: Vec<PageRecipe> = recipes
         .iter()
         .map(|recipe| {
@@ -50,7 +60,7 @@ pub fn page_script(recipes: &[Recipe]) -> Result<String> {
             Ok(PageRecipe {
                 id: recipe.id.clone(),
                 matchers,
-                css: recipe_css(recipe),
+                css: recipe_css(recipe, choices),
             })
         })
         .collect::<Result<_>>()?;

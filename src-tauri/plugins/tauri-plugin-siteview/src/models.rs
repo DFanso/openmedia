@@ -44,6 +44,13 @@ pub struct SetContentRuleListsRequest {
     pub lists: Vec<ContentRuleList>,
 }
 
+/// Replaces the script injected at document start and reloads the open site view, so the page
+/// loads under the new script. An empty script removes it.
+#[derive(Debug, Clone, Deserialize)]
+pub struct SetDocumentStartScriptRequest {
+    pub script: String,
+}
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct SetRectRequest {
     pub rect: Rect,
