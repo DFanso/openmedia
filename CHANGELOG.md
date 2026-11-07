@@ -8,6 +8,10 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-07
 
+### docs: MPL-2.0 license and open-source community files
+
+Area: `docs`. Adds `LICENSE` (MPL-2.0), `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, issue/PR templates, Dependabot config, and license metadata in `package.json` and `Cargo.toml`.
+
 ### feat(shell): optional floating back button
 
 **Change:** Some sites have no back control. Settings gets a "Back button" switch (default off, persisted as `backButton` in `library.json`; older files load with it off). When on, a floating button appears on the edge opposite the main button whenever the page `canGoBack`, and calls the existing `go_back` siteview command. New `set_back_button` app command; no native or capability changes.
