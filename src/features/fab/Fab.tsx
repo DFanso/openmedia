@@ -47,6 +47,7 @@ export function Fab() {
   const openSheet = useApp((s) => s.openSheet);
   const openFavorite = useApp((s) => s.openFavorite);
   const onboardingOpen = useApp((s) => s.onboardingOpen);
+  const setFabEdge = useApp((s) => s.setFabEdge);
   const viewport = useViewport();
   const insets = useInsets();
 
@@ -85,6 +86,7 @@ export function Fab() {
         const stored = { edge: next.edge, yRatio: next.y / viewport.height };
         setPosition(stored);
         savePosition(stored);
+        setFabEdge(next.edge);
         break;
       }
       case "select":

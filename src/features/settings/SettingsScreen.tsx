@@ -32,6 +32,7 @@ export function SettingsScreen() {
       <div className="flex flex-1 flex-col gap-12 overflow-y-auto px-5 pt-2 pb-[calc(env(safe-area-inset-bottom)+32px)]">
         <AppearanceSection />
         <BlockingSection />
+        <BackButtonSection />
         <FavoritesSection />
         <HistorySection />
         <AiSection />
@@ -100,6 +101,42 @@ function BlockingSection() {
         className="mt-4 flex w-full items-center justify-between rounded-2xl border border-hair px-4 py-3 text-base"
       >
         <span>Block ads and trackers</span>
+        <span
+          aria-hidden="true"
+          className={`relative h-7 w-12 rounded-full transition-colors ${
+            enabled ? "bg-accent" : "bg-paper/20"
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 size-6 rounded-full transition-all ${
+              enabled ? "left-[22px] bg-on-accent" : "left-0.5 bg-paper/70"
+            }`}
+          />
+        </span>
+      </button>
+    </section>
+  );
+}
+
+function BackButtonSection() {
+  const enabled = useApp((s) => s.state?.backButton ?? false);
+  const setBackButton = useApp((s) => s.setBackButton);
+
+  return (
+    <section>
+      <h2 className="text-3xl leading-tight font-semibold">Back button</h2>
+      <p className="mt-1 text-sm text-paper/55">
+        Shows a floating button on the side opposite the main button whenever the page has somewhere
+        to go back to. For sites that have no back button of their own.
+      </p>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={enabled}
+        onClick={() => void setBackButton(!enabled)}
+        className="mt-4 flex w-full items-center justify-between rounded-2xl border border-hair px-4 py-3 text-base"
+      >
+        <span>Show floating back button</span>
         <span
           aria-hidden="true"
           className={`relative h-7 w-12 rounded-full transition-colors ${

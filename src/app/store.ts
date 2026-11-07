@@ -19,6 +19,8 @@ import {
   type SiteViewState,
   type Theme,
 } from "../shared/ipc";
+import type { Edge } from "../features/fab/geometry";
+import { loadPosition } from "../features/fab/position";
 
 export type Sheet = "none" | "assistant" | "history" | "settings";
 
@@ -36,6 +38,8 @@ interface AppStore {
   sessions: Session[];
   activeId: string | null;
   action: SessionAction | null;
+  /** Edge the floating button rests on; the back button takes the other one. */
+  fabEdge: Edge;
   load: () => Promise<void>;
   openSheet: (sheet: Sheet) => void;
   closeSheet: () => void;
@@ -60,6 +64,8 @@ interface AppStore {
   clearHistory: () => Promise<void>;
   setTheme: (theme: Theme) => Promise<void>;
   setAdBlock: (enabled: boolean) => Promise<void>;
+  setBackButton: (enabled: boolean) => Promise<void>;
+  setFabEdge: (edge: Edge) => void;
 }
 
 /** The page the user is looking at. */
@@ -114,6 +120,7 @@ export const useApp = create<AppStore>((set, get) => {
     sessions: [],
     activeId: null,
     action: null,
+    fabEdge: loadPosition().edge,
 
     load: async () => {
       try {
@@ -269,5 +276,23 @@ export const useApp = create<AppStore>((set, get) => {
         }));
       }
     },
+
+    setBackButton: async (enabled) => {
+      const previous = get().state?.backButton;
+      set((current) => ({ state: current.state && { ...current.state, backButton: enabled } }));
+      try {
+        await library.setBackButton(enabled);
+      } catch (error) {
+        set((current) => ({
+          state:
+            current.state && previous !== undefined
+              ? { ...current.state, backButton: previous }
+              : current.state,
+          error: errorMessage(error),
+        }));
+      }
+    },
+
+    setFabEdge: (fabEdge) => set({ fabEdge }),
   };
 });

@@ -25,6 +25,7 @@ export interface AppState {
   onboarded: boolean;
   theme: Theme;
   adBlock: boolean;
+  backButton: boolean;
 }
 
 export type ProviderKind = "anthropic" | "openAiCompatible";
@@ -94,6 +95,7 @@ export const library = {
   addHistory: (url: string) => invoke<string[]>("add_history", { url }),
   /** Forgets the typed addresses and the remembered last page. */
   clearHistory: () => command("clear_history"),
+  setBackButton: (enabled: boolean) => command("set_back_button", { enabled }),
 };
 
 export const ai = {

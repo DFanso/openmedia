@@ -34,6 +34,7 @@ pub fn run() {
             commands::refresh_icons,
             commands::open_site,
             commands::set_ad_block,
+            commands::set_back_button,
             commands::ai_state,
             commands::ai_save_provider,
             commands::ai_delete_provider,
