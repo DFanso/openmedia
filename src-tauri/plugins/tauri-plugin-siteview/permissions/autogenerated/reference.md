@@ -285,6 +285,32 @@ Denies the set_content_rule_lists command without any pre-configured scope.
 <tr>
 <td>
 
+`siteview:allow-set-document-start-script`
+
+</td>
+<td>
+
+Enables the set_document_start_script command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`siteview:deny-set-document-start-script`
+
+</td>
+<td>
+
+Denies the set_document_start_script command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `siteview:allow-set-interactive-regions`
 
 </td>

@@ -53,6 +53,10 @@ class SetContentRuleListsArgs: Decodable {
   let lists: [RuleListArgs]
 }
 
+class SetDocumentStartScriptArgs: Decodable {
+  let script: String
+}
+
 struct StateEvent: Encodable {
   let type = "state"
   let url: String?
@@ -257,6 +261,26 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
       controller.removeAllContentRuleLists()
       ruleLists.forEach { controller.add($0) }
       if let failure { self.send(ErrorEvent(message: failure)) }
+      view.reload()
+      invoke.resolve()
+    }
+  }
+
+  /// Swaps the document-start script on the open site view and reloads it so the page loads under
+  /// it. With no site view open there is nothing to change; the next `open` carries the script.
+  @objc public func setDocumentStartScript(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(SetDocumentStartScriptArgs.self)
+    DispatchQueue.main.async {
+      guard let view = self.siteView else {
+        invoke.resolve()
+        return
+      }
+      let controller = view.configuration.userContentController
+      controller.removeAllUserScripts()
+      if !args.script.isEmpty {
+        controller.addUserScript(
+          WKUserScript(source: args.script, injectionTime: .atDocumentStart, forMainFrameOnly: false))
+      }
       view.reload()
       invoke.resolve()
     }

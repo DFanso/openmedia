@@ -71,6 +71,14 @@ pub(crate) async fn set_content_rule_lists<R: Runtime>(
     app.siteview().set_content_rule_lists(request)
 }
 
+#[command]
+pub(crate) async fn set_document_start_script<R: Runtime>(
+    app: AppHandle<R>,
+    request: SetDocumentStartScriptRequest,
+) -> Result<()> {
+    app.siteview().set_document_start_script(request)
+}
+
 /// Fetches a small PNG for the site's icon, as a `data:` URL. Runs natively against the site
 /// itself; nothing is sent to a third-party icon service.
 #[command]
