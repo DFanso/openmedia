@@ -34,7 +34,7 @@ function SiteCard({ site }: { site: SiteSettings }) {
   const [open, setOpen] = useState(false);
   const setSiteOption = useApp((s) => s.setSiteOption);
   const setSiteBottomMargin = useApp((s) => s.setSiteBottomMargin);
-  const restoreSiteOriginal = useApp((s) => s.restoreSiteOriginal);
+  const restoreRecipeOriginal = useApp((s) => s.restoreRecipeOriginal);
   const sharedMargin = useApp((s) => s.state?.bottomMargin ?? 0);
   const hidden = site.options.filter((option) => option.enabled).length;
 
@@ -59,7 +59,7 @@ function SiteCard({ site }: { site: SiteSettings }) {
           </p>
           <button
             type="button"
-            onClick={() => void restoreSiteOriginal(site.recipeId)}
+            onClick={() => void restoreRecipeOriginal(site.recipeId)}
             className="self-start text-sm font-medium text-accent"
           >
             Restore the original

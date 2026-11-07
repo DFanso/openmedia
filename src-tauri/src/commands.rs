@@ -241,7 +241,7 @@ fn reload_script(app: &AppHandle, library: &Library, recipes: &Recipes) -> Resul
 /// assistant's or the user's change; the recipe is validated in Rust and must be a copy of a
 /// bundled recipe with origin `user` or `ai`. Async for the same reason as `open_site`.
 #[tauri::command]
-pub async fn save_site_fork(
+pub async fn save_recipe_fork(
     app: AppHandle,
     library: State<'_, Library>,
     recipes: State<'_, Recipes>,
@@ -254,7 +254,7 @@ pub async fn save_site_fork(
 /// Drops the user's changed copy so the bundled recipe applies again. Async for the same reason
 /// as `open_site`.
 #[tauri::command]
-pub async fn restore_site_original(
+pub async fn restore_recipe_original(
     app: AppHandle,
     library: State<'_, Library>,
     recipes: State<'_, Recipes>,

@@ -115,8 +115,8 @@ export const library = {
   /** Saves the toggle and reloads the open page under it; see `set_site_option` in Rust. */
   setSiteOption: (recipeId: string, optionId: string, enabled: boolean) =>
     command("set_site_option", { recipeId, optionId, enabled }),
-  /** Drops the changed copy so the bundled recipe applies again; see `restore_site_original`. */
-  restoreSiteOriginal: (recipeId: string) => command("restore_site_original", { recipeId }),
+  /** Drops the changed copy so the bundled recipe applies again; see `restore_recipe_original`. */
+  restoreRecipeOriginal: (recipeId: string) => command("restore_recipe_original", { recipeId }),
   setBottomMargin: (pixels: number) => command("set_bottom_margin", { pixels }),
   setSiteBottomMargin: (recipeId: string, pixels: number | null) =>
     command("set_site_bottom_margin", { recipeId, pixels }),
