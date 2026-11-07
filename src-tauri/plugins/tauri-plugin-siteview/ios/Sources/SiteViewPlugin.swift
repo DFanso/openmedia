@@ -1,3 +1,4 @@
+import SafariServices
 import SwiftRs
 import Tauri
 import UIKit
@@ -21,12 +22,17 @@ struct RuleListArgs: Decodable {
 }
 
 class OpenArgs: Decodable {
+  let session: String
   let profile: String
   let url: String
   let rect: RectArgs
   let documentStartScript: String?
   let contentRuleLists: [RuleListArgs]?
   let onEvent: Channel
+}
+
+class SessionArgs: Decodable {
+  let session: String
 }
 
 class SetRectArgs: Decodable {
@@ -55,11 +61,22 @@ class SetContentRuleListsArgs: Decodable {
 
 struct StateEvent: Encodable {
   let type = "state"
+  let session: String
   let url: String?
   let title: String?
   let loading: Bool
   let canGoBack: Bool
   let canGoForward: Bool
+  let scope: String
+}
+
+struct ClosedEvent: Encodable {
+  let type = "closed"
+  let session: String
+}
+
+struct MemoryWarningEvent: Encodable {
+  let type = "memoryWarning"
 }
 
 struct ErrorEvent: Encodable {
@@ -85,6 +102,25 @@ private final class WeakMessageHandler: NSObject, WKScriptMessageHandler {
   }
 }
 
+/// One open page: its native view and the domain it is pinned to.
+private final class Session {
+  let id: String
+  let view: WKWebView
+  /// The registrable domain the session may show. Fixed once the first load settles.
+  var scope: String
+  /// False until the first load finishes or fails; see `DomainScope.verdict`.
+  var settled = false
+  /// A hidden session whose content rule lists changed reloads when it is shown again.
+  var needsReload = false
+  var observations: [NSKeyValueObservation] = []
+
+  init(id: String, view: WKWebView, scope: String) {
+    self.id = id
+    self.view = view
+    self.scope = scope
+  }
+}
+
 /// Transparent view above both webviews. It never handles touches itself: it decides, per touch,
 /// whether the shell (inside an interactive region) or the site view underneath receives it.
 final class TouchRouter: UIView {
@@ -101,16 +137,23 @@ final class TouchRouter: UIView {
   }
 }
 
-/// Hosts one native WKWebView *below* the Tauri shell webview. The shell is transparent and draws
-/// the floating controls; the shell owns layout and reports the site rectangle. The site view
-/// never receives Tauri IPC, only the write-only `openmedia` bridge.
+/// Hosts native WKWebViews *below* the Tauri shell webview, one per session, only one visible. The
+/// shell is transparent and draws the floating controls; the shell owns layout and reports the
+/// site rectangle. Site views never receive Tauri IPC, only the write-only `openmedia` bridge.
+///
+/// A session never leaves its domain: a main-frame navigation outside it is cancelled and shown in
+/// a popup browser (`SFSafariViewController`, which shares nothing with the profile's data store).
+/// Which sessions to keep alive is the shell's decision; this class only opens, shows and closes.
 class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
   private var shell: WKWebView?
-  private var siteView: WKWebView?
+  private var sessions: [String: Session] = [:]
+  private var activeId: String?
   private var router: TouchRouter?
   private var events: Channel?
-  private var observations: [NSKeyValueObservation] = []
+  private var popup: SFSafariViewController?
   private var colorScheme: UIUserInterfaceStyle = .unspecified
+  /// The shell's page rectangle, in shell coordinates; every session's view fills it.
+  private var pageRect: CGRect?
   /// The shell reports regions once per layout change, possibly before the router exists (the
   /// first `open` can wait on a rule list compile), so keep them for the router to start with.
   private var interactiveRegions: [CGRect] = []
@@ -120,10 +163,14 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     webview.isOpaque = false
     webview.backgroundColor = .clear
     webview.scrollView.backgroundColor = .clear
+    NotificationCenter.default.addObserver(
+      forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: .main
+    ) { [weak self] _ in self?.send(MemoryWarningEvent()) }
   }
 
   // MARK: Commands
 
+  /// Creates the session's view, shows it, and keeps every other session alive but hidden.
   @objc public func open(_ invoke: Invoke) throws {
     let args = try invoke.parseArgs(OpenArgs.self)
     guard let profileId = UUID(uuidString: args.profile) else {
@@ -140,7 +187,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
         invoke.reject("shell webview is not ready")
         return
       }
-      self.tearDown()
+      if let existing = self.sessions[args.session] { self.dispose(existing) }
+      self.pageRect = args.rect.cgRect
       let view = WKWebView(
         frame: shell.convert(args.rect.cgRect, to: host),
         configuration: self.makeConfiguration(
@@ -151,32 +199,52 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
       view.uiDelegate = self
       view.overrideUserInterfaceStyle = self.colorScheme
       let refresh = UIRefreshControl()
-      refresh.addTarget(self, action: #selector(self.pullToRefresh(_:)), for: .valueChanged)
+      refresh.addAction(UIAction { [weak view] _ in view?.reload() }, for: .valueChanged)
       view.scrollView.refreshControl = refresh
       host.insertSubview(view, belowSubview: shell)
-      self.siteView = view
+
+      let session = Session(
+        id: args.session, view: view, scope: DomainScope.registrableDomain(of: url.host ?? ""))
+      self.sessions[session.id] = session
       self.events = args.onEvent
-      self.installRouter(in: host).siteView = view
-      self.observe(view)
+      _ = self.installRouter(in: host)
+      self.observe(session)
+      self.show(session)
       if let ruleListFailure { self.send(ErrorEvent(message: ruleListFailure)) }
       view.load(URLRequest(url: url))
       invoke.resolve()
     }
   }
 
-  @objc public func close(_ invoke: Invoke) {
+  @objc public func activate(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(SessionArgs.self)
     DispatchQueue.main.async {
-      self.tearDown()
+      guard let session = self.sessions[args.session] else {
+        invoke.reject("no such session")
+        return
+      }
+      self.show(session)
+      invoke.resolve()
+    }
+  }
+
+  @objc public func close(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(SessionArgs.self)
+    DispatchQueue.main.async {
+      if let session = self.sessions[args.session] { self.dispose(session) }
       invoke.resolve()
     }
   }
 
   @objc public func setRect(_ invoke: Invoke) throws {
     let args = try invoke.parseArgs(SetRectArgs.self)
-    onSiteView(invoke) { view in
+    DispatchQueue.main.async {
+      self.pageRect = args.rect.cgRect
       if let shell = self.shell, let host = shell.superview {
-        view.frame = shell.convert(args.rect.cgRect, to: host)
+        let frame = shell.convert(args.rect.cgRect, to: host)
+        self.sessions.values.forEach { $0.view.frame = frame }
       }
+      invoke.resolve()
     }
   }
 
@@ -195,23 +263,19 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
       invoke.reject("only http and https urls can be opened")
       return
     }
-    onSiteView(invoke) { $0.load(URLRequest(url: url)) }
+    onActiveSession(invoke) { $0.view.load(URLRequest(url: url)) }
   }
 
   @objc public func goBack(_ invoke: Invoke) {
-    onSiteView(invoke) { $0.goBack() }
+    onActiveSession(invoke) { $0.view.goBack() }
   }
 
   @objc public func goForward(_ invoke: Invoke) {
-    onSiteView(invoke) { $0.goForward() }
+    onActiveSession(invoke) { $0.view.goForward() }
   }
 
   @objc public func reload(_ invoke: Invoke) {
-    onSiteView(invoke) { $0.reload() }
-  }
-
-  @objc private func pullToRefresh(_ sender: UIRefreshControl) {
-    siteView?.reload()
+    onActiveSession(invoke) { $0.view.reload() }
   }
 
   @objc public func setColorScheme(_ invoke: Invoke) throws {
@@ -222,7 +286,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
       case "dark": self.colorScheme = .dark
       default: self.colorScheme = .unspecified
       }
-      self.siteView?.overrideUserInterfaceStyle = self.colorScheme
+      self.sessions.values.forEach { $0.view.overrideUserInterfaceStyle = self.colorScheme }
       invoke.resolve()
     }
   }
@@ -239,25 +303,28 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     }
   }
 
-  /// Swaps the rule lists on the open site view and reloads it so the page loads under them.
-  /// With no site view open there is nothing to change; the next `open` carries the lists.
+  /// Swaps the rule lists on every open session. The visible page reloads under them now; hidden
+  /// ones reload when they are next shown. With no session open there is nothing to change; the
+  /// next `open` carries the lists.
   @objc public func setContentRuleLists(_ invoke: Invoke) throws {
     let args = try invoke.parseArgs(SetContentRuleListsArgs.self)
     Task { @MainActor in
-      guard let view = self.siteView else {
+      guard !self.sessions.isEmpty else {
         invoke.resolve()
         return
       }
       let (ruleLists, failure) = await self.loadRuleLists(args.lists)
-      guard self.siteView === view else {
-        invoke.resolve()
-        return
+      for session in self.sessions.values {
+        let controller = session.view.configuration.userContentController
+        controller.removeAllContentRuleLists()
+        ruleLists.forEach { controller.add($0) }
+        if session.id == self.activeId {
+          session.view.reload()
+        } else {
+          session.needsReload = true
+        }
       }
-      let controller = view.configuration.userContentController
-      controller.removeAllContentRuleLists()
-      ruleLists.forEach { controller.add($0) }
       if let failure { self.send(ErrorEvent(message: failure)) }
-      view.reload()
       invoke.resolve()
     }
   }
@@ -281,31 +348,113 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     decidePolicyFor navigationAction: WKNavigationAction,
     decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
   ) {
-    let scheme = navigationAction.request.url?.scheme?.lowercased() ?? ""
-    decisionHandler(allowedSchemes.contains(scheme) || scheme == "about" ? .allow : .cancel)
+    guard let session = session(of: webView) else {
+      decisionHandler(.cancel)
+      return
+    }
+    let url = navigationAction.request.url
+    switch DomainScope.verdict(
+      scheme: url?.scheme, host: url?.host, scope: session.scope, settled: session.settled,
+      isMainFrame: navigationAction.targetFrame?.isMainFrame ?? true)
+    {
+    case .allow:
+      decisionHandler(.allow)
+    case .cancel:
+      decisionHandler(.cancel)
+    case .popup:
+      decisionHandler(.cancel)
+      if let url { presentPopup(url) }
+    }
+  }
+
+  /// While a session is still on its first load, a redirect may change its domain; the session
+  /// adopts wherever the first page committed.
+  func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+    guard let session = session(of: webView), !session.settled, let host = webView.url?.host else { return }
+    session.scope = DomainScope.registrableDomain(of: host)
+  }
+
+  func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    session(of: webView)?.settled = true
   }
 
   func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    session(of: webView)?.settled = true
     send(ErrorEvent(message: error.localizedDescription))
   }
 
   func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+    session(of: webView)?.settled = true
     send(ErrorEvent(message: error.localizedDescription))
   }
 
+  /// A dead web content process leaves a blank view. The visible page reloads; a hidden one is
+  /// dropped and the shell is told, so it reopens fresh when the user comes back to it.
+  func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+    guard let session = session(of: webView) else { return }
+    if session.id == activeId {
+      webView.reload()
+    } else {
+      dispose(session)
+      send(ClosedEvent(session: session.id))
+    }
+  }
+
+  /// `target=_blank` and `window.open`: inside the domain the page loads in place, outside it the
+  /// popup browser takes it. Never a second native web view.
   func webView(
     _ webView: WKWebView,
     createWebViewWith configuration: WKWebViewConfiguration,
     for navigationAction: WKNavigationAction,
     windowFeatures: WKWindowFeatures
   ) -> WKWebView? {
-    if navigationAction.targetFrame == nil, let url = navigationAction.request.url, webURL(url.absoluteString) != nil {
-      webView.load(navigationAction.request)
+    guard let session = session(of: webView), let url = navigationAction.request.url else { return nil }
+    switch DomainScope.verdict(
+      scheme: url.scheme, host: url.host, scope: session.scope, settled: session.settled,
+      isMainFrame: true)
+    {
+    case .allow: webView.load(navigationAction.request)
+    case .popup: presentPopup(url)
+    case .cancel: break
     }
     return nil
   }
 
   // MARK: Helpers
+
+  private func session(of view: WKWebView) -> Session? {
+    sessions.values.first { $0.view === view }
+  }
+
+  /// Makes `session` the one visible page. The others stay alive underneath, hidden.
+  private func show(_ session: Session) {
+    for other in sessions.values where other !== session { other.view.isHidden = true }
+    session.view.isHidden = false
+    activeId = session.id
+    if let shell, let host = shell.superview, let pageRect {
+      session.view.frame = shell.convert(pageRect, to: host)
+    }
+    router?.siteView = session.view
+    if session.needsReload {
+      session.needsReload = false
+      session.view.reload()
+    }
+    sendState(session)
+  }
+
+  /// Shows the outside page in the system's in-app browser. One at a time: a page cannot stack
+  /// popups on top of each other.
+  @MainActor
+  private func presentPopup(_ url: URL) {
+    guard popup?.presentingViewController == nil, webURL(url.absoluteString) != nil else { return }
+    var top = shell?.window?.rootViewController
+    while let presented = top?.presentedViewController { top = presented }
+    guard let top else { return }
+    let controller = SFSafariViewController(url: url)
+    controller.dismissButtonStyle = .close
+    popup = controller
+    top.present(controller, animated: true)
+  }
 
   private func installRouter(in host: UIView) -> TouchRouter {
     if let router { return router }
@@ -387,25 +536,29 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     return configuration
   }
 
-  private func observe(_ view: WKWebView) {
-    observations = [
-      view.observe(\.url, options: [.new]) { [weak self] view, _ in self?.sendState(view) },
-      view.observe(\.title, options: [.new]) { [weak self] view, _ in self?.sendState(view) },
-      view.observe(\.isLoading, options: [.new]) { [weak self] view, _ in self?.sendState(view) },
-      view.observe(\.canGoBack, options: [.new]) { [weak self] view, _ in self?.sendState(view) },
-      view.observe(\.canGoForward, options: [.new]) { [weak self] view, _ in self?.sendState(view) },
+  private func observe(_ session: Session) {
+    func watch<Value>(_ keyPath: KeyPath<WKWebView, Value>) -> NSKeyValueObservation {
+      session.view.observe(keyPath, options: [.new]) { [weak self, weak session] _, _ in
+        if let session { self?.sendState(session) }
+      }
+    }
+    session.observations = [
+      watch(\.url), watch(\.title), watch(\.isLoading), watch(\.canGoBack), watch(\.canGoForward),
     ]
   }
 
-  private func sendState(_ view: WKWebView) {
+  private func sendState(_ session: Session) {
+    let view = session.view
     if !view.isLoading { view.scrollView.refreshControl?.endRefreshing() }
     send(
       StateEvent(
+        session: session.id,
         url: view.url?.absoluteString,
         title: view.title,
         loading: view.isLoading,
         canGoBack: view.canGoBack,
-        canGoForward: view.canGoForward
+        canGoForward: view.canGoForward,
+        scope: session.scope
       )
     )
   }
@@ -414,27 +567,29 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     try? events?.send(event)
   }
 
-  private func tearDown() {
-    observations.removeAll()
-    if let view = siteView {
-      view.configuration.userContentController.removeAllUserScripts()
-      view.configuration.userContentController.removeScriptMessageHandler(forName: bridgeHandlerName)
-      view.navigationDelegate = nil
-      view.uiDelegate = nil
-      view.removeFromSuperview()
+  private func dispose(_ session: Session) {
+    session.observations.removeAll()
+    let view = session.view
+    view.stopLoading()
+    view.configuration.userContentController.removeAllUserScripts()
+    view.configuration.userContentController.removeScriptMessageHandler(forName: bridgeHandlerName)
+    view.navigationDelegate = nil
+    view.uiDelegate = nil
+    view.removeFromSuperview()
+    sessions[session.id] = nil
+    if activeId == session.id {
+      activeId = nil
+      router?.siteView = nil
     }
-    siteView = nil
-    router?.siteView = nil
-    events = nil
   }
 
-  private func onSiteView(_ invoke: Invoke, _ action: @escaping (WKWebView) -> Void) {
+  private func onActiveSession(_ invoke: Invoke, _ action: @escaping (Session) -> Void) {
     DispatchQueue.main.async {
-      guard let view = self.siteView else {
+      guard let id = self.activeId, let session = self.sessions[id] else {
         invoke.reject("no site view is open")
         return
       }
-      action(view)
+      action(session)
       invoke.resolve()
     }
   }

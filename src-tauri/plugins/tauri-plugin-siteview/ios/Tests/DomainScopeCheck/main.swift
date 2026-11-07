@@ -1,0 +1,54 @@
+import Foundation
+
+// Standalone checks for DomainScope.swift. Run with scripts/test-domain-scope.sh; no Xcode project,
+// UIKit or WebKit needed. Exits non-zero on the first run that has a failure.
+
+var failures = 0
+
+func expect<T: Equatable>(_ actual: T, _ expected: T, _ name: String) {
+  if actual != expected {
+    print("FAIL \(name): got \(actual), expected \(expected)")
+    failures += 1
+  }
+}
+
+func domain(_ host: String) -> String { DomainScope.registrableDomain(of: host) }
+func contains(_ scope: String, _ host: String) -> Bool { DomainScope.contains(scope: scope, host: host) }
+func verdict(
+  _ scheme: String?, _ host: String?, scope: String, settled: Bool = true, mainFrame: Bool = true
+) -> NavigationVerdict {
+  DomainScope.verdict(scheme: scheme, host: host, scope: scope, settled: settled, isMainFrame: mainFrame)
+}
+
+expect(domain("www.instagram.com"), "instagram.com", "www prefix")
+expect(domain("m.youtube.com"), "youtube.com", "mobile prefix")
+expect(domain("x.com"), "x.com", "apex domain")
+expect(domain("a.b.c.example.com"), "example.com", "deep subdomain")
+expect(domain("WWW.Reddit.COM"), "reddit.com", "case")
+expect(domain("news.bbc.co.uk"), "bbc.co.uk", "co.uk")
+expect(domain("bbc.co.uk"), "bbc.co.uk", "co.uk apex")
+expect(domain("shop.example.com.au"), "example.com.au", "com.au")
+expect(domain("foo.co.com"), "co.com", "three-letter tld is not a country code")
+expect(domain("localhost"), "localhost", "localhost")
+expect(domain("192.168.1.20"), "192.168.1.20", "ipv4 stays whole")
+
+expect(contains("instagram.com", "www.instagram.com"), true, "subdomain")
+expect(contains("instagram.com", "instagram.com"), true, "the scope itself")
+expect(contains("instagram.com", "notinstagram.com"), false, "lookalike")
+expect(contains("instagram.com", "instagram.com.evil.io"), false, "suffix trick")
+
+expect(verdict("https", "l.instagram.com", scope: "instagram.com"), .allow, "same domain")
+expect(verdict("https", "evil.io", scope: "instagram.com"), .popup, "outside domain")
+expect(verdict("https", "evil.io", scope: "instagram.com", mainFrame: false), .allow, "subframe")
+expect(verdict("https", "x.com", scope: "twitter.com", settled: false), .allow, "first-load redirect")
+expect(verdict("https", "x.com", scope: "twitter.com"), .popup, "redirect after the first load")
+expect(verdict("about", nil, scope: "a.com"), .allow, "about:blank")
+expect(verdict("javascript", nil, scope: "a.com"), .cancel, "javascript:")
+expect(verdict("tel", nil, scope: "a.com"), .cancel, "tel:")
+expect(verdict("https", nil, scope: "a.com"), .cancel, "no host")
+
+if failures > 0 {
+  print("\(failures) failed")
+  exit(1)
+}
+print("DomainScope: all checks passed")

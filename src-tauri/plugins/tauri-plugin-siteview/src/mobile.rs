@@ -12,6 +12,8 @@ use crate::{Error, Result};
 pub const STATE_EVENT: &str = "siteview:state";
 pub const ERROR_EVENT: &str = "siteview:error";
 pub const BRIDGE_EVENT: &str = "siteview:bridge";
+pub const CLOSED_EVENT: &str = "siteview:closed";
+pub const MEMORY_EVENT: &str = "siteview:memory";
 
 #[cfg(target_os = "android")]
 compile_error!("the Android site view is not implemented yet; see docs/wiki/platform-support.md");
@@ -41,6 +43,8 @@ fn dispatch_event<R: Runtime>(app: &AppHandle<R>, json: &str) {
     };
     let _ = match event {
         SiteViewEvent::State { .. } => app.emit(STATE_EVENT, event),
+        SiteViewEvent::Closed { session } => app.emit(CLOSED_EVENT, session),
+        SiteViewEvent::MemoryWarning => app.emit(MEMORY_EVENT, ()),
         SiteViewEvent::Error { message } => app.emit(ERROR_EVENT, message),
         SiteViewEvent::Bridge { origin, body } => match parse_bridge_body(&body) {
             Ok(body) => app.emit(BRIDGE_EVENT, BridgeMessage { origin, body }),
@@ -79,8 +83,15 @@ impl<R: Runtime> Siteview<R> {
         )
     }
 
-    pub fn close(&self) -> Result<()> {
-        self.run("close", ())
+    pub fn activate(&self, request: SessionRequest) -> Result<()> {
+        self.run(
+            "activate",
+            serde_json::json!({ "session": request.session }),
+        )
+    }
+
+    pub fn close(&self, request: SessionRequest) -> Result<()> {
+        self.run("close", serde_json::json!({ "session": request.session }))
     }
 
     pub fn set_rect(&self, request: SetRectRequest) -> Result<()> {

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   FAB_SIZE,
   FAVORITE_SIZE,
+  HISTORY_SIZE,
   SETTINGS_SIZE,
   fabCenter,
   fanLayout,
@@ -48,6 +49,7 @@ describe("fanLayout", () => {
           const items = [
             ...layout.favorites.map((center) => ({ center, size: FAVORITE_SIZE })),
             { center: layout.settings, size: SETTINGS_SIZE },
+            { center: layout.history, size: HISTORY_SIZE },
           ];
           for (const { center, size } of items) {
             expect(center.x - size / 2).toBeGreaterThanOrEqual(0);
@@ -90,6 +92,17 @@ describe("fanLayout", () => {
       expect(distance(layout.settings, favorite)).toBeGreaterThan(FAVORITE_SIZE);
     }
   });
+
+  it("stacks history directly above settings in the same column", () => {
+    for (const edge of edges) {
+      for (const y of heights) {
+        const origin = fabCenter(edge, y, phone, insets);
+        const layout = fanLayout(origin, edge, phone, insets, 4);
+        expect(layout.history.x).toBe(layout.settings.x);
+        expect(layout.history.y).toBeLessThan(layout.settings.y);
+      }
+    }
+  });
 });
 
 describe("fanTargetAt", () => {
@@ -99,6 +112,7 @@ describe("fanTargetAt", () => {
   it("finds the item under the finger", () => {
     expect(fanTargetAt(layout.favorites[2], layout)).toEqual({ kind: "favorite", index: 2 });
     expect(fanTargetAt(layout.settings, layout)).toEqual({ kind: "settings" });
+    expect(fanTargetAt(layout.history, layout)).toEqual({ kind: "history" });
   });
 
   it("returns null away from every item", () => {

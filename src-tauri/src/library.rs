@@ -12,8 +12,9 @@ use uuid::Uuid;
 use crate::ai::{AiSettings, MAX_PROVIDERS, ProviderConfig, ProviderInput};
 use crate::error::{Error, Result};
 
-const FORMAT_VERSION: u32 = 3;
+const FORMAT_VERSION: u32 = 4;
 pub const MAX_FAVORITES: usize = 6;
+const MAX_HISTORY: usize = 100;
 const MAX_FAVORITE_NAME_CHARS: usize = 20;
 const MAX_ICON_CHARS: usize = 200_000;
 const ICON_PREFIX: &str = "data:image/png;base64,";
@@ -58,6 +59,7 @@ pub struct FavoriteInput {
 pub struct AppState {
     pub profile_id: Uuid,
     pub favorites: Vec<Favorite>,
+    pub history: Vec<String>,
     pub last_url: Option<String>,
     pub onboarded: bool,
     pub theme: Theme,
@@ -81,6 +83,9 @@ struct LibraryData {
     /// Site icons by host. They come from the sites themselves and hold nothing private.
     #[serde(default)]
     icons: BTreeMap<String, String>,
+    /// Addresses the user typed, newest first.
+    #[serde(default)]
+    history: Vec<String>,
     /// Provider settings without keys; keys live in the OS secure store.
     #[serde(default)]
     ai: AiSettings,
@@ -117,6 +122,7 @@ impl Library {
         Ok(AppState {
             profile_id: data.profile_id,
             favorites: with_icons(&data),
+            history: data.history.clone(),
             last_url: data.last_url.clone(),
             onboarded: data.onboarded,
             theme: data.theme,
@@ -142,6 +148,27 @@ impl Library {
         let url = parse_web_url(url)?.to_string();
         let mut data = self.lock()?;
         data.last_url = Some(url);
+        self.save(&data)
+    }
+
+    /// Remembers an address the user typed, newest first. A repeat moves to the front rather than
+    /// listing twice; the list is capped.
+    pub fn add_history(&self, url: &str) -> Result<Vec<String>> {
+        let url = parse_web_url(url)?.to_string();
+        let mut data = self.lock()?;
+        data.history.retain(|seen| *seen != url);
+        data.history.insert(0, url);
+        data.history.truncate(MAX_HISTORY);
+        self.save(&data)?;
+        Ok(data.history.clone())
+    }
+
+    /// Forgets the searched addresses and the remembered last page, like a browser's "clear
+    /// history". Favorites, cookies and settings are untouched.
+    pub fn clear_history(&self) -> Result<()> {
+        let mut data = self.lock()?;
+        data.history.clear();
+        data.last_url = None;
         self.save(&data)
     }
 
@@ -298,11 +325,11 @@ fn parse(text: &str) -> Result<LibraryData> {
                     url: YOUTUBE_FAVORITE.1.to_owned(),
                 })?);
             }
-            data.version = FORMAT_VERSION;
         }
-        FORMAT_VERSION => {}
+        3 | FORMAT_VERSION => {}
         version => return Err(Error::UnsupportedVersion(version)),
     }
+    data.version = FORMAT_VERSION;
     Ok(data)
 }
 
@@ -324,6 +351,7 @@ fn default_data() -> LibraryData {
         theme: Theme::System,
         ad_block: true,
         icons: BTreeMap::new(),
+        history: Vec::new(),
         ai: AiSettings::default(),
     }
 }
@@ -671,5 +699,64 @@ mod tests {
             library.upsert_provider(provider("one too many")),
             Err(Error::TooManyProviders(_))
         ));
+    }
+
+    #[test]
+    fn history_lists_newest_first_and_moves_a_repeat_to_the_front() {
+        let (dir, library) = library();
+        library.add_history("https://a.example/").unwrap();
+        library.add_history("https://b.example/").unwrap();
+        let history = library.add_history("https://a.example/").unwrap();
+        assert_eq!(history, ["https://a.example/", "https://b.example/"]);
+        assert_eq!(reload(&dir).state().unwrap().history, history);
+    }
+
+    #[test]
+    fn history_is_capped_and_drops_the_oldest() {
+        let (_dir, library) = library();
+        for i in 0..=MAX_HISTORY {
+            library
+                .add_history(&format!("https://{i}.example/"))
+                .unwrap();
+        }
+        let history = library.state().unwrap().history;
+        assert_eq!(history.len(), MAX_HISTORY);
+        assert_eq!(history[0], format!("https://{MAX_HISTORY}.example/"));
+        assert!(!history.contains(&"https://0.example/".to_owned()));
+    }
+
+    #[test]
+    fn history_rejects_non_web_addresses_and_stays_unchanged() {
+        let (_dir, library) = library();
+        library.add_history("https://a.example/").unwrap();
+        assert!(library.add_history("javascript:alert(1)").is_err());
+        assert_eq!(library.state().unwrap().history, ["https://a.example/"]);
+    }
+
+    #[test]
+    fn clearing_history_forgets_the_last_page_but_keeps_favorites() {
+        let (dir, library) = library();
+        library.add_history("https://a.example/").unwrap();
+        library.set_last_url("https://a.example/").unwrap();
+        let favorites = library.state().unwrap().favorites;
+        library.clear_history().unwrap();
+        let state = reload(&dir).state().unwrap();
+        assert!(state.history.is_empty());
+        assert_eq!(state.last_url, None);
+        assert_eq!(state.favorites, favorites);
+    }
+
+    #[test]
+    fn a_version_three_library_loads_with_empty_history() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("library.json");
+        let mut saved = serde_json::to_value(default_data()).unwrap();
+        saved["version"] = 3.into();
+        saved.as_object_mut().unwrap().remove("history");
+        fs::write(&path, serde_json::to_vec(&saved).unwrap()).unwrap();
+        let library = Library::load(path.clone()).unwrap();
+        assert!(library.state().unwrap().history.is_empty());
+        let saved: LibraryData = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
+        assert_eq!(saved.version, FORMAT_VERSION);
     }
 }

@@ -72,6 +72,17 @@ Blocking uses WebKit content rule lists attached to the site view's `WKUserConte
 - The filter lists are compiled into the binary and never downloaded, so invariant 1 (no new network destinations) holds. Lists change only with an app release.
 - A blocking failure is shown to the user and the page still loads unblocked; it never silently pretends to block.
 
+## Sessions and the popup browser
+
+Each opened site is a session (a separate native web view) pinned to the registrable domain it was opened on. The plugin cancels a main-frame navigation outside that domain, and `target=_blank` / `window.open` to one, and shows the address in a system popup browser (`SFSafariViewController`) instead. This adds no path from a site to native code:
+
+- The popup is a separate process. It shares no cookies, storage, recipe script or bridge with the profile's views. Only `http` and `https` addresses open (`DomainScope.verdict`); one popup at a time.
+- The shell's `siteview:default` set gains `activate` and `close` (both take a UUID session id, validated in Rust). `open` stays ungranted; `open_site` is the only way to create a session.
+- The plugin sends the shell two new events: `siteview:closed` (a session id the native side dropped) and `siteview:memory` (the OS asked for memory). `siteview:state` now carries the session id and its domain. They flow native to shell only; a page cannot raise or read them.
+- Pinning also limits what a hostile page can do with a session: it cannot navigate the profile's logged-in view to an unrelated site after load, only offer it in a throwaway popup. It is not a sandbox: until the first load finishes, redirects may change the domain, and subframes are not restricted.
+
+History (the addresses the user typed) is stored in `library.json` on the device, like favorites, and holds no page content. "Clear history" removes it and the remembered last page.
+
 ## Privacy
 
 - The snapshot is the only page-derived data that leaves the device, only on explicit user action, only to the endpoint the user configured. See [AI Assistant](./ai-assistant.md#privacy-what-is-sent).

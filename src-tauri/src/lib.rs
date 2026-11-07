@@ -26,6 +26,8 @@ pub fn run() {
             commands::get_state,
             commands::set_favorites,
             commands::set_last_url,
+            commands::add_history,
+            commands::clear_history,
             commands::complete_onboarding,
             commands::reset_onboarding,
             commands::set_theme,

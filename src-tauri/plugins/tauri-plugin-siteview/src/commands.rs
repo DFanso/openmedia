@@ -1,11 +1,12 @@
 use tauri::{AppHandle, Runtime, command};
 
 use crate::models::*;
-use crate::validate::{parse_profile_id, parse_web_url, validate_rule_lists};
+use crate::validate::{parse_profile_id, parse_session_id, parse_web_url, validate_rule_lists};
 use crate::{Result, SiteviewExt};
 
 #[command]
 pub(crate) async fn open<R: Runtime>(app: AppHandle<R>, request: OpenRequest) -> Result<()> {
+    parse_session_id(&request.session)?;
     parse_profile_id(&request.profile)?;
     parse_web_url(&request.url)?;
     validate_rule_lists(&request.content_rule_lists)?;
@@ -13,8 +14,15 @@ pub(crate) async fn open<R: Runtime>(app: AppHandle<R>, request: OpenRequest) ->
 }
 
 #[command]
-pub(crate) async fn close<R: Runtime>(app: AppHandle<R>) -> Result<()> {
-    app.siteview().close()
+pub(crate) async fn activate<R: Runtime>(app: AppHandle<R>, request: SessionRequest) -> Result<()> {
+    parse_session_id(&request.session)?;
+    app.siteview().activate(request)
+}
+
+#[command]
+pub(crate) async fn close<R: Runtime>(app: AppHandle<R>, request: SessionRequest) -> Result<()> {
+    parse_session_id(&request.session)?;
+    app.siteview().close(request)
 }
 
 #[command]

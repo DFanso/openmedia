@@ -19,6 +19,8 @@ export interface FavoriteInput {
 export interface AppState {
   profileId: string;
   favorites: Favorite[];
+  /** Addresses the user typed, newest first. */
+  history: string[];
   lastUrl: string | null;
   onboarded: boolean;
   theme: Theme;
@@ -58,11 +60,14 @@ export interface Rect {
 }
 
 export interface SiteViewState {
+  session: string;
   url: string | null;
   title: string | null;
   loading: boolean;
   canGoBack: boolean;
   canGoForward: boolean;
+  /** The registrable domain the session is pinned to. */
+  scope: string;
 }
 
 async function command(name: string, args?: Record<string, unknown>): Promise<void> {
@@ -79,8 +84,16 @@ export const library = {
   setTheme: (theme: Theme) => command("set_theme", { theme }),
   /** Persists the choice and reloads the open page under it; see `set_ad_block` in Rust. */
   setAdBlock: (enabled: boolean) => command("set_ad_block", { enabled }),
-  /** Opens the page natively with the recipe script attached; see `open_site` in Rust. */
-  openSite: (url: string, rect: Rect) => command("open_site", { url, rect }),
+  /**
+   * Opens the page natively as a new session, with the recipe script attached, and shows it.
+   * Earlier sessions stay open; see `open_site` in Rust.
+   */
+  openSite: (session: string, url: string, rect: Rect) =>
+    command("open_site", { session, url, rect }),
+  /** Remembers a typed address and returns the history, newest first. */
+  addHistory: (url: string) => invoke<string[]>("add_history", { url }),
+  /** Forgets the typed addresses and the remembered last page. */
+  clearHistory: () => command("clear_history"),
 };
 
 export const ai = {
@@ -96,18 +109,23 @@ export const ai = {
 };
 
 export const siteView = {
-  close: () => command("plugin:siteview|close"),
+  activate: (session: string) => command("plugin:siteview|activate", { request: { session } }),
+  close: (session: string) => command("plugin:siteview|close", { request: { session } }),
   setRect: (rect: Rect) => command("plugin:siteview|set_rect", { request: { rect } }),
   setInteractiveRegions: (regions: Rect[]) =>
     command("plugin:siteview|set_interactive_regions", { request: { regions } }),
   setColorScheme: (scheme: Theme) =>
     command("plugin:siteview|set_color_scheme", { request: { scheme } }),
-  navigate: (url: string) => command("plugin:siteview|navigate", { request: { url } }),
   goBack: () => command("plugin:siteview|go_back"),
   goForward: () => command("plugin:siteview|go_forward"),
   reload: () => command("plugin:siteview|reload"),
   onState: (handler: (state: SiteViewState) => void): Promise<UnlistenFn> =>
     listen<SiteViewState>("siteview:state", (event) => handler(event.payload)),
+  /** A session the native side dropped by itself, for example after its web process died. */
+  onClosed: (handler: (session: string) => void): Promise<UnlistenFn> =>
+    listen<string>("siteview:closed", (event) => handler(event.payload)),
+  /** The OS asked the app to give memory back. */
+  onMemoryWarning: (handler: () => void): Promise<UnlistenFn> => listen("siteview:memory", handler),
   onError: (handler: (message: string) => void): Promise<UnlistenFn> =>
     listen<string>("siteview:error", (event) => handler(event.payload)),
 };
