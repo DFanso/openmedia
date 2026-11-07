@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "id": "twitch.default",
+  "name": "Twitch",
+  "version": "1.0.0",
+  "origin": "bundled",
+  "match": ["https://*.twitch.tv/*"],
+  "options": [
+    {
+      "id": "app-nags",
+      "label": "Hide Open App and Sign Up buttons",
+      "description": "The Sign Up and Open App buttons in the top bar of the home and browse pages.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "ad-overlays",
+      "label": "Hide display ad overlay on streams",
+      "description": "The display-ad slot layered over the live player. Video ads that play inside the stream itself cannot be hidden.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "suggested-rows",
+      "label": "Hide suggested categories and curated rows",
+      "description": "The 'Categories we think you'll like' row and the themed stream rows (Music, Team FPS...) on Home. Live on Twitch stays.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "stream-tags",
+      "label": "Hide stream and category tags",
+      "description": "The small tag pills (language, genre, DropsEnabled) under stream and category cards.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "chat",
+      "label": "Hide live chat",
+      "description": "The scrolling chat messages next to or under a live stream. The Send Chat box stays.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "subscribe",
+      "label": "Hide Subscribe button",
+      "description": "The Subscribe button on channel pages and profiles; Follow stays.",
+      "group": "content",
+      "default": false
+    }
+  ],
+  "rules": [
+    {
+      "id": "open-app-button",
+      "label": "Open App button",
+      "type": "hide",
+      "option": "app-nags",
+      "target": { "css": "nav a[href*=\"tt_medium=mweb\"]" }
+    },
+    {
+      "id": "sign-up-button",
+      "label": "Top bar Sign Up button",
+      "type": "hide",
+      "option": "app-nags",
+      "target": { "css": "nav > div:has(> a[href*=\"tt_medium=mweb\"]) > button" }
+    },
+    {
+      "id": "display-ad",
+      "label": "Display ad overlay",
+      "type": "hide",
+      "option": "ad-overlays",
+      "target": { "css": "[data-test-selector=\"sda-wrapper\"]" }
+    },
+    {
+      "id": "categories-row",
+      "label": "Categories we think you'll like",
+      "type": "hide",
+      "option": "suggested-rows",
+      "target": { "css": "div:has(> div > h2 > a[href=\"/directory\"])" }
+    },
+    {
+      "id": "collection-rows",
+      "label": "Curated collection rows",
+      "type": "hide",
+      "option": "suggested-rows",
+      "target": { "css": "div:has(> div > h2 > a[href^=\"/directory/collection/\"])" }
+    },
+    {
+      "id": "tag-pills",
+      "label": "Tag pills",
+      "type": "hide",
+      "option": "stream-tags",
+      "target": { "css": "[aria-label^=\"Tag, \"]" }
+    },
+    {
+      "id": "chat-messages",
+      "label": "Chat messages",
+      "type": "hide",
+      "option": "chat",
+      "target": { "css": "[data-a-target=\"chat-scroller\"]" }
+    },
+    {
+      "id": "subscribe-button",
+      "label": "Subscribe button",
+      "type": "hide",
+      "option": "subscribe",
+      "target": { "css": "button[aria-label=\"Subscribe\"]" }
+    }
+  ],
+  "meta": {
+    "lastVerified": "2026-11-08",
+    "notes": "LIVE (headless Chromium, iPhone UA 390x844, logged out, 2026-11-08): https://m.twitch.tv/ nav a[href*=tt_medium=mweb]=1 (Open App, top-bar), nav > div:has(> a[...]) > button=1 (Sign Up), 'Categories we think you'll like' row matched by div:has(> div > h2 > a[href=\"/directory\"])=1, collection rows div:has(> div > h2 > a[href^=\"/directory/collection/\"])=4 at top of Home (more rows lazy-load and the list is virtualised), [aria-label^=\"Tag, \"]=108 on Home (buttons and links; also on /directory/all and category pages). https://m.twitch.tv/pathofexile (live channel, waited ~35 s, no timed prompt seen): [data-a-target=chat-scroller]=1, button[aria-label=Subscribe]=1, [data-test-selector=sda-wrapper]=1 (the slot existed but was empty, so the overlay is not seen rendering; harmless best-effort). Subscribe=1 also on /pathofexile/videos. Video pre-roll ads in the player (VOD /videos/<id> showed 'Ad 1 of 2' with a Learn More button) run inside the player and are deliberately NOT hidden. Not found logged out: cookie banner, notification prompt, drops/Prime promo tiles, marketplace/AI modules, floating action buttons (no rules written). /activity is only an 'Open App for Activity' page and /directory/following a log-in prompt: left alone, they are the page's content. Fixtures hand-distilled from the observed DOM. NOT verified: logged-in views, other regions' consent dialogs, clips and schedule tabs, desktop www.twitch.tv layout (recipe also matches it), whether sda-wrapper ever carries a visible ad."
+  }
+}

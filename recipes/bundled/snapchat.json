@@ -1,0 +1,191 @@
+{
+  "schema": 1,
+  "id": "snapchat.default",
+  "name": "Snapchat",
+  "version": "1.0.0",
+  "origin": "bundled",
+  "match": ["https://*.snapchat.com/*"],
+  "options": [
+    {
+      "id": "app-popup",
+      "label": "Hide \"better on the app\" pop-up",
+      "description": "The bottom sheet on profiles and Stories pages (Open in Snapchat / Continue) and its dimming layer.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "app-bars",
+      "label": "Hide Open Snapchat bars",
+      "description": "The yellow Open Snapchat and Install buttons in the top bar, the Open Snapchat strip on profiles, and the Get the full app prompt after a profile grid.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "home-promo",
+      "label": "Hide home page download promo",
+      "description": "On the home page: the Download button, the looping feature videos and the closing Download block.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "comments",
+      "label": "Hide the Comment button",
+      "description": "The comment button beside a Spotlight video.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "counters",
+      "label": "Hide like, share and view counts",
+      "description": "Like, recommend and share numbers beside Spotlight videos, and view and share numbers on profile tiles.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "explore-lists",
+      "label": "Hide local and topic lists",
+      "description": "The Explore local favorites, Popular right now and funny-topic link lists at the bottom of the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "bottom-tabs",
+      "label": "Hide the bottom tab bar",
+      "description": "The Chat, Lenses, Stories and Spotlight tab bar; each tab only opens the Snapchat app or another section.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide footer links",
+      "description": "The footer bar with Privacy, Terms, Funny Videos and Explore Topics links, and the Funny Videos strip.",
+      "group": "content",
+      "default": false
+    }
+  ],
+  "rules": [
+    {
+      "id": "app-sheet",
+      "label": "Better on the app sheet",
+      "type": "hide",
+      "option": "app-popup",
+      "target": { "css": "[data-testid=\"mobileExpandedCtaBanner\"]" }
+    },
+    {
+      "id": "app-sheet-backdrop",
+      "label": "Better on the app dimming layer",
+      "type": "hide",
+      "option": "app-popup",
+      "target": { "css": "[data-testid=\"mobileExpandedCtaBanner-backdrop\"]" }
+    },
+    {
+      "id": "open-strip",
+      "label": "Open Snapchat strip",
+      "type": "hide",
+      "option": "app-bars",
+      "target": { "css": "[data-testid=\"mobileCTAHeader\"]" }
+    },
+    {
+      "id": "nav-open-button",
+      "label": "Open Snapchat button in top bar",
+      "type": "hide",
+      "option": "app-bars",
+      "target": { "css": "[data-testid=\"mobile-nav\"] a[class*=\"downloadButton\"]" }
+    },
+    {
+      "id": "nav-install-link",
+      "label": "Install link in top bar",
+      "type": "hide",
+      "option": "app-bars",
+      "target": { "css": "a[data-testid=\"home-install-link\"]" }
+    },
+    {
+      "id": "end-of-feed",
+      "label": "Get the full app prompt",
+      "type": "hide",
+      "option": "app-bars",
+      "target": { "css": "div[class*=\"EndOfFeedPrompt_inlineContainer\"]" }
+    },
+    {
+      "id": "home-download",
+      "label": "Home Download button",
+      "type": "hide",
+      "option": "home-promo",
+      "target": { "css": "a[data-testid=\"home-hero-download\"]" }
+    },
+    {
+      "id": "home-slides",
+      "label": "Home feature videos",
+      "type": "hide",
+      "option": "home-promo",
+      "target": { "css": "[data-testid=\"home-mobile\"] div[class*=\"mobileSlides\"]" }
+    },
+    {
+      "id": "home-closing",
+      "label": "Home closing Download block",
+      "type": "hide",
+      "option": "home-promo",
+      "target": { "css": "section[aria-labelledby=\"home-mobile-closing-heading\"]" }
+    },
+    {
+      "id": "comment-button",
+      "label": "Spotlight comment button",
+      "type": "hide",
+      "option": "comments",
+      "target": { "css": "[data-testid=\"spotlight-engagement-rail\"] button:nth-of-type(3)" }
+    },
+    {
+      "id": "rail-counts",
+      "label": "Spotlight like and share counts",
+      "type": "hide",
+      "option": "counters",
+      "target": { "css": "[data-testid=\"spotlight-engagement-rail\"] span[class*=\"__count\"]" }
+    },
+    {
+      "id": "tile-counts",
+      "label": "Profile tile view and share counts",
+      "type": "hide",
+      "option": "counters",
+      "target": { "css": "[data-testid=\"content-tile\"] div[class*=\"CountCard_card\"]" }
+    },
+    {
+      "id": "home-explore",
+      "label": "Home explore link lists",
+      "type": "hide",
+      "option": "explore-lists",
+      "target": { "css": "[data-testid=\"home-explore\"]" }
+    },
+    {
+      "id": "tab-bar-home",
+      "label": "Bottom tab bar (home, Spotlight)",
+      "type": "hide",
+      "option": "bottom-tabs",
+      "target": { "css": "[data-testid=\"mobile-tab-bar\"]" }
+    },
+    {
+      "id": "tab-bar-profile",
+      "label": "Bottom tab bar (profiles, Stories)",
+      "type": "hide",
+      "option": "bottom-tabs",
+      "target": { "css": "[data-testid=\"mobile-nav-bottom\"]" }
+    },
+    {
+      "id": "footer-links",
+      "label": "Footer links",
+      "type": "hide",
+      "option": "footer",
+      "target": { "css": "[data-testid=\"global-footer\"]" }
+    },
+    {
+      "id": "footer-funny",
+      "label": "Funny Videos footer strip",
+      "type": "hide",
+      "option": "footer",
+      "target": { "css": "div[class*=\"Footer_entertainmentBar\"]" }
+    }
+  ],
+  "meta": {
+    "lastVerified": "2026-11-08",
+    "notes": "LIVE (headless Chromium, iPhone 390x844 UA, logged out, 2026-11-08). www.snapchat.com/: [data-testid=mobile-nav] a[class*=downloadButton]=1 (Open Snapchat), a[data-testid=home-install-link]=1, a[data-testid=home-hero-download]=1, [data-testid=home-mobile] div[class*=mobileSlides]=1, section[aria-labelledby=home-mobile-closing-heading]=1, [data-testid=home-explore]=1, [data-testid=mobile-tab-bar]=1, [data-testid=global-footer]=1 (footer links, aria-hidden content collapsed). Still the same after 30 s; no cookie banner, no role=dialog, mobile-cta-bottom-sheet is an empty aria-hidden placeholder, so no rule targets it. /spotlight redirects to a video at /@<user>/spotlight/<id> (scaffold, player, engagement rail): [data-testid=spotlight-engagement-rail] button:nth-of-type(3)=2 (Comment; slides active+next are rendered), span[class*=__count]=7 (Like/Recommend/Share numbers), top-bar Open Snapchat=1, tab bar=1. Public profile /@<user> (/add/<user> redirects there): [data-testid=mobileExpandedCtaBanner]=1 and -backdrop=1 (fixed, 'Snapchat is better on the app' sheet with Open in Snapchat / Continue), [data-testid=mobileCTAHeader]=1, [data-testid=mobile-nav-bottom]=1, div[class*=EndOfFeedPrompt_inlineContainer]=1 ('Get the full app experience'), [data-testid=content-tile] div[class*=CountCard_card]=24 for 12 tiles, div[class*=Footer_entertainmentBar]=1. /discover (Stories) and /topic show the same CTA header, sheet and tab bar. Class-substring anchors (`downloadButton`, `mobileSlides`, `__count`, `CountCard_card`, `EndOfFeedPrompt_inlineContainer`, `Footer_entertainmentBar`) match the stable CSS-module name before the hashed suffix; Snapchat rebuilds could rename them. Fixtures are hand-distilled from these pages. Left alone: video player, tile grid, profile Add button, search, hamburger menu, login on desktop nav. NOT verified: logged-in app; desktop layout (desktop nav Download/Snapchat Ads buttons, desktop footer visibility); Stories player pages beyond landing; /@snapchat showed 'content not found' so the official profile was not seen; the Spotlight page never showed a sign-in wall or timed pop-up in 30 s."
+  }
+}

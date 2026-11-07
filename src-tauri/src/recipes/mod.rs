@@ -19,12 +19,25 @@ use url::Url;
 use crate::error::{Error, Result};
 use crate::library::write_atomically;
 
-const BUNDLED: [&str; 5] = [
+const BUNDLED: &[&str] = &[
     include_str!("../../../recipes/bundled/instagram.json"),
     include_str!("../../../recipes/bundled/facebook.json"),
     include_str!("../../../recipes/bundled/twitter.json"),
     include_str!("../../../recipes/bundled/reddit.json"),
     include_str!("../../../recipes/bundled/youtube.json"),
+    include_str!("../../../recipes/bundled/threads.json"),
+    include_str!("../../../recipes/bundled/telegram.json"),
+    include_str!("../../../recipes/bundled/douyin.json"),
+    include_str!("../../../recipes/bundled/messenger.json"),
+    include_str!("../../../recipes/bundled/discord.json"),
+    include_str!("../../../recipes/bundled/kuaishou.json"),
+    include_str!("../../../recipes/bundled/linkedin.json"),
+    include_str!("../../../recipes/bundled/whatsapp.json"),
+    include_str!("../../../recipes/bundled/snapchat.json"),
+    include_str!("../../../recipes/bundled/pinterest.json"),
+    include_str!("../../../recipes/bundled/weibo.json"),
+    include_str!("../../../recipes/bundled/tiktok.json"),
+    include_str!("../../../recipes/bundled/twitch.json"),
 ];
 
 const MAX_FORK_BYTES: usize = 256 * 1024;

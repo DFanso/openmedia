@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "id": "pinterest.default",
+  "name": "Pinterest",
+  "version": "1.0.0",
+  "origin": "bundled",
+  "match": ["https://*.pinterest.com/*"],
+  "options": [
+    {
+      "id": "signup-popup",
+      "label": "Hide the sign-up pop-up",
+      "description": "The \"More ideas, just for you\" pop-up (Get Pinterest app / Continue with email / Continue with Google) and its dark backdrop that cover pins, boards and search.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "home-promo",
+      "label": "Hide the home page promo sections",
+      "description": "The marketing blocks under the sign-up screen on the home page: skin tone search, group boards, visual search, the bottom sign-up banner and the footer links.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "related-pins",
+      "label": "Hide \"More to explore\" suggestions",
+      "description": "The pin suggestions under a pin, the \"More like this\" block under a board and the \"More to explore\" button on a pin's image.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "comments-button",
+      "label": "Hide the comments button",
+      "description": "The comment bubble in the row of buttons under a pin.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "follower-counts",
+      "label": "Hide follower counts",
+      "description": "The follower number next to a pin's author and the \"followers / following\" line on profiles.",
+      "group": "content",
+      "default": false
+    }
+  ],
+  "rules": [
+    {
+      "id": "signup-popup-dialog",
+      "label": "Mobile sign-up pop-up with its backdrop",
+      "type": "hide",
+      "option": "signup-popup",
+      "target": {
+        "css": "div[role=\"dialog\"]:has([data-test-id=\"mobile-signup-mask\"])"
+      }
+    },
+    {
+      "id": "home-promo-sections",
+      "label": "Home page feature sections",
+      "type": "hide",
+      "option": "home-promo",
+      "target": {
+        "css": "[data-test-id^=\"homepage-section-\"]"
+      }
+    },
+    {
+      "id": "home-bottom-signup",
+      "label": "Bottom sign-up banner on the home page",
+      "type": "hide",
+      "option": "home-promo",
+      "target": {
+        "css": "[data-test-id=\"bottom-signup-header\"]"
+      }
+    },
+    {
+      "id": "home-footer-links",
+      "label": "Home page footer",
+      "type": "hide",
+      "option": "home-promo",
+      "target": {
+        "css": "footer[data-test-id=\"unauth-homepage-redesign-footer\"]"
+      }
+    },
+    {
+      "id": "pin-more-to-explore",
+      "label": "Suggested pins under a pin",
+      "type": "hide",
+      "option": "related-pins",
+      "target": {
+        "css": "[data-test-id=\"related-pins-without-drawer\"]"
+      }
+    },
+    {
+      "id": "board-more-like-this",
+      "label": "\"More like this\" under a board",
+      "type": "hide",
+      "option": "related-pins",
+      "target": {
+        "css": "[data-test-id=\"more-ideas-container\"]"
+      }
+    },
+    {
+      "id": "pin-more-like-this-button",
+      "label": "\"More to explore\" button on a pin",
+      "type": "hide",
+      "option": "related-pins",
+      "target": {
+        "css": "[data-test-id=\"more-like-this-button\"]"
+      }
+    },
+    {
+      "id": "pin-comment-button",
+      "label": "Comment button under a pin",
+      "type": "hide",
+      "option": "comments-button",
+      "target": {
+        "css": "[data-test-id=\"comment-button\"]"
+      }
+    },
+    {
+      "id": "pin-author-followers",
+      "label": "Follower count next to a pin's author",
+      "type": "hide",
+      "option": "follower-counts",
+      "target": {
+        "css": "[data-test-id=\"follower-count\"]"
+      }
+    },
+    {
+      "id": "profile-follow-counts",
+      "label": "Followers and following line on a profile",
+      "type": "hide",
+      "option": "follower-counts",
+      "target": {
+        "css": "div:has(> [data-test-id=\"profile-followers-count\"])"
+      }
+    }
+  ],
+  "meta": {
+    "lastVerified": "2026-11-08",
+    "notes": "LIVE (logged out, iPhone UA 390x844, headless Chromium, 2026-11-08, www.pinterest.com): home /, pin /pin/1125968640422478/, profile /pinterest/, board /pinterest/kitchen-gamechangers-under-50/, search /search/pins/?q=test. All selectors are data-test-id/role anchors; the page is a React app with hashed classes, none used. Counts: signup-popup-dialog 1 on pin, profile, board and search (0 on home, where the sign-up screen is the page itself and must stay); with the dialog hidden the gated pin grid is fully visible and scrollable, no scroll lock, and no second pop-up appeared after 25 s of scrolling a search feed. The dialog holds the backdrop (mobile-modal-mask-overlay), the card (mobile-signup-mask), 'Get Pinterest app', email and Google buttons, so one rule removes it all. home-promo-sections 3, home-bottom-signup 1, home-footer-links 1 on / only. pin-more-to-explore 1 and pin-more-like-this-button 2 on the pin; board-more-like-this 1 on the board; pin-comment-button 1 and pin-author-followers 1 on the pin; profile-follow-counts 1 on the profile. Cards in feeds are gated-pin-rep divs without links logged out, so they were not touched. NOT SEEN on the real pages logged out: promoted/sponsored pins, shopping modules, comment sections (the comments panel is login-gated, only the button is present), notification prompts, cookie banners (none in this region), AI features; no rule was written for them. A Google One Tap iframe card showed over the search page once while the sign-up pop-up was open; it was not seen again and is not targeted. Logged-in pages were not visited. The related-pins selector will also hide the real feed under a pin, by design of that option."
+  }
+}

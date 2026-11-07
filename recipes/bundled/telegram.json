@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "id": "telegram.default",
+  "name": "Telegram",
+  "version": "1.0.0",
+  "origin": "bundled",
+  "match": ["https://*.telegram.org/*", "https://t.me/*"],
+  "options": [
+    {
+      "id": "app-nags",
+      "label": "Hide app download prompts",
+      "description": "The Join and Download buttons in the page header and the \"If you have Telegram\" blurb on t.me pages.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "link-previews",
+      "label": "Hide link preview cards",
+      "description": "The title, image and description cards that links in channel posts expand into.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "media",
+      "label": "Hide photos and videos",
+      "description": "Photo and video attachments in channel previews, leaving post text.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "view-counts",
+      "label": "Hide view counts",
+      "description": "The view counter under each channel post; the post time stays.",
+      "group": "content",
+      "default": false
+    }
+  ],
+  "rules": [
+    {
+      "id": "join-button",
+      "label": "Header Join button",
+      "type": "hide",
+      "option": "app-nags",
+      "target": { "css": ".tgme_channel_join_telegram" }
+    },
+    {
+      "id": "download-bar",
+      "label": "Download button in top bar",
+      "type": "hide",
+      "option": "app-nags",
+      "target": { "css": ".tgme_head_right_btn" }
+    },
+    {
+      "id": "have-telegram-blurb",
+      "label": "\"If you have Telegram\" blurb",
+      "type": "hide",
+      "option": "app-nags",
+      "target": { "css": ".tgme_page_additional" }
+    },
+    {
+      "id": "link-preview-cards",
+      "label": "Link preview cards",
+      "type": "hide",
+      "option": "link-previews",
+      "target": { "css": "a.tgme_widget_message_link_preview" }
+    },
+    {
+      "id": "photos",
+      "label": "Photo attachments",
+      "type": "hide",
+      "option": "media",
+      "target": { "css": "a.tgme_widget_message_photo_wrap" }
+    },
+    {
+      "id": "videos",
+      "label": "Video attachments",
+      "type": "hide",
+      "option": "media",
+      "target": { "css": "a.tgme_widget_message_video_player" }
+    },
+    {
+      "id": "views",
+      "label": "View counters",
+      "type": "hide",
+      "option": "view-counts",
+      "target": { "css": ".tgme_widget_message_views, .tgme_widget_message_info .copyonly" }
+    }
+  ],
+  "meta": {
+    "lastVerified": "2026-11-07",
+    "notes": "LIVE (iPhone 390x844 UA, logged out, 2026-11-07): https://t.me/s/telegram counts .tgme_channel_join_telegram=1, a.tgme_widget_message_link_preview=4, a.tgme_widget_message_photo_wrap=3, a.tgme_widget_message_video_player=13, .tgme_widget_message_views=20 (.copyonly is the ' views' label beside it, selector scoped to .tgme_widget_message_info). https://t.me/telegram landing: .tgme_head_right_btn=1 (Download), .tgme_page_additional=1. Fixtures distilled from both pages. Left alone on purpose: 'View in Telegram' button and 'Preview channel' link (the landing page's only navigation). NOT verified: https://web.telegram.org/a/ logged out shows only the QR/phone login (nothing hidden there, no rules target it); logged-in web app, reactions, polls, stickers, voice, documents, round videos, sponsored posts and non-English variants were not seen, so no rules exist for them."
+  }
+}

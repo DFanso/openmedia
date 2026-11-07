@@ -1,0 +1,198 @@
+{
+  "schema": 1,
+  "id": "linkedin.default",
+  "name": "LinkedIn",
+  "version": "1.0.0",
+  "origin": "bundled",
+  "match": ["https://*.linkedin.com/*"],
+  "options": [
+    {
+      "id": "app-prompts",
+      "label": "Hide \"open the app\" prompts",
+      "description": "The \"LinkedIn is better on the app\" bottom sheet on the jobs landing page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "signin-popup",
+      "label": "Hide the sign-in pop-up",
+      "description": "The \"sign in to view more\" window that opens over profiles, articles, jobs and company pages. Buttons that open a sign-in window on tap stay.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "join-banners",
+      "label": "Hide \"join LinkedIn\" banners",
+      "description": "The \"view full profile\" and \"join now\" banners, the \"explore top content\" card and the \"find a referral\" card shown to logged-out visitors.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "suggestions",
+      "label": "Hide suggestions",
+      "description": "\"Other similar profiles\", \"People also viewed\", \"Others also viewed\", \"Explore more posts\", similar and affiliated company pages, content categories.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "similar-jobs",
+      "label": "Hide similar jobs and searches",
+      "description": "The \"Similar jobs\" list, \"Similar Searches\" and the \"More searches\" link block on job pages.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "comments",
+      "label": "Hide comments and reactions bar",
+      "description": "Comments under articles and the fixed bar with reaction counts and the Like, Comment and Share buttons.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "activity",
+      "label": "Hide posts and activity",
+      "description": "The \"Activity\" posts and follower count on profiles and the \"Updates\" posts on company pages.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "promo-sections",
+      "label": "Hide promo sections and footer",
+      "description": "Marketing blocks on the home page (top content, software tools, games, directory) and the page footer.",
+      "group": "content",
+      "default": false
+    }
+  ],
+  "rules": [
+    {
+      "id": "promo-bottom-sheet",
+      "label": "\"LinkedIn is better on the app\" bottom sheet",
+      "type": "hide",
+      "option": "app-prompts",
+      "target": {
+        "css": ".promo-bottom-sheet"
+      }
+    },
+    {
+      "id": "signin-popup-on-load",
+      "label": "Sign-in pop-up that opens on page load",
+      "type": "hide",
+      "option": "signin-popup",
+      "target": {
+        "css": ".contextual-sign-in-modal[data-show-on-page-load]"
+      }
+    },
+    {
+      "id": "bottom-cta-banner",
+      "label": "\"View full profile\" banner",
+      "type": "hide",
+      "option": "join-banners",
+      "target": {
+        "css": ".bottom-cta-banner"
+      }
+    },
+    {
+      "id": "conversion-prompt",
+      "label": "\"Join now to see what you are missing\" card",
+      "type": "hide",
+      "option": "join-banners",
+      "target": {
+        "css": "[data-id=\"conversion-prompt\"]"
+      }
+    },
+    {
+      "id": "top-content-cta",
+      "label": "\"Explore top content\" card",
+      "type": "hide",
+      "option": "join-banners",
+      "target": {
+        "css": ".aside-section-container:has(.top-content-cta)"
+      }
+    },
+    {
+      "id": "find-a-referral",
+      "label": "\"Find a referral\" card",
+      "type": "hide",
+      "option": "join-banners",
+      "target": {
+        "css": ".find-a-referral"
+      }
+    },
+    {
+      "id": "similar-people-pages",
+      "label": "Similar profiles, people also viewed, similar pages",
+      "type": "hide",
+      "option": "suggestions",
+      "target": {
+        "css": ".browsemap, .people-also-viewed, [data-test-id=\"affiliated-pages\"], [data-test-id=\"similar-pages\"], [data-test-id=\"browse-jobs\"]"
+      }
+    },
+    {
+      "id": "related-content",
+      "label": "Others also viewed, more posts, content categories",
+      "type": "hide",
+      "option": "suggestions",
+      "target": {
+        "css": ".articles-content-card, .related-posts, .top-content-categories"
+      }
+    },
+    {
+      "id": "similar-jobs-list",
+      "label": "Similar jobs, similar searches, more searches",
+      "type": "hide",
+      "option": "similar-jobs",
+      "target": {
+        "css": ".similar-jobs, .similar-searches, [data-test-id=\"more-searches\"]"
+      }
+    },
+    {
+      "id": "article-comments",
+      "label": "Comments under an article",
+      "type": "hide",
+      "option": "comments",
+      "target": {
+        "css": ".comments__container"
+      }
+    },
+    {
+      "id": "article-social-bar",
+      "label": "Reactions and share bar",
+      "type": "hide",
+      "option": "comments",
+      "target": {
+        "css": ".article-social-activity"
+      }
+    },
+    {
+      "id": "activity-posts",
+      "label": "Profile activity and company updates",
+      "type": "hide",
+      "option": "activity",
+      "target": {
+        "css": "section.activities, section.updates"
+      }
+    },
+    {
+      "id": "home-promo-sections",
+      "label": "Home page marketing sections",
+      "type": "hide",
+      "option": "promo-sections",
+      "target": {
+        "css": ".explore-top-content, .top-product-categories, .game-hub-banner, section.directory"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Page footer",
+      "type": "hide",
+      "option": "promo-sections",
+      "target": {
+        "css": "footer.li-footer"
+      }
+    }
+  ],
+  "meta": {
+    "lastVerified": "2026-11-08",
+    "notes": "METHOD: the automation browser failed to start in this session (isolated JS worker module not found, Python bridge refused to start), so nothing was rendered or scrolled. Every selector comes from the server-rendered HTML that www.linkedin.com returned over plain HTTP (curl, iPhone UA, logged out, 2026-11-08, status 200) for /, /jobs/, /in/williamhgates, a /pulse/ article, /jobs/view/<id>, /jobs/search/?keywords=engineer, /company/microsoft. Counts below are element counts in that HTML ('HTML'), not in a live DOM; none is LIVE in the rendered-page sense. HTML: LinkedIn's public pages use stable BEM class names and data attributes, no hashed classes. .promo-bottom-sheet: 1 on /jobs/ (class hidden until script shows it; text 'LinkedIn is better on the app', Open App / Browser Continue). Not in the HTML of /, /in, /pulse, /company. .contextual-sign-in-modal[data-show-on-page-load]: 1 each on the profile, article, job view, job search and company pages (data-show-delay-ms 0, overlay starts opacity-0 invisible and script opens it); other .contextual-sign-in-modal wrappers (Follow, Connect, Apply, contact info) have no data-show-on-page-load and are left alone. .bottom-cta-banner 1 and .aside-section-container:has(.top-content-cta) 1 on the profile; same top-content card 1 on a job page; .find-a-referral 1 on a job page; [data-id=conversion-prompt] 1 on a company page (hidden by default, shown by script). Suggestions: .browsemap 1 and .related-posts 1 (profile), .articles-content-card 1 and .top-content-categories 1 (article), .people-also-viewed 1, .similar-jobs 1, .similar-searches 1 and [data-test-id=more-searches] 1 (job page), affiliated-pages / similar-pages / browse-jobs 1 each (company). Comments: .comments__container 1 with 5 .comment, .article-social-activity 1 (fixed bottom bar) on the article. Activity: section.activities 1 (profile), section.updates 1 (company). Promo: .explore-top-content, .top-product-categories, .game-hub-banner, section.directory 1 each on /, footer.li-footer 1 on every page. NOT VERIFIED: how the sheet, pop-up and fixed bar look when script opens them; whether the pop-up locks body scroll (no unlock rule shipped); cookie/consent banners (none in the HTML, EU only toasts use a generic #toasts template, deliberately not hidden); the logged-in app is not covered; /pub/dir and some routes answer 999 to curl. Selectors are not compared with a community filter list."
+  }
+}
