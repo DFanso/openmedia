@@ -30,15 +30,15 @@ Model name is user-selectable per provider; we ship suggested defaults but do no
 
 ### Recommended gateways (free and paid models)
 
-One key at an aggregator gives access to many models, some free. Both are `openAiCompatible` presets; the settings screen shows the same advice.
+OpenRouter and OpenCode Zen (now OpenCode Console) are `openAiCompatible` presets; Settings shows where to get a key and the free-tier limitations.
 
 | Gateway | Base URL | Free and paid | Notes |
 |---------|----------|---------------|-------|
-| OpenRouter | `https://openrouter.ai/api/v1` (preset) | Models with a `:free` suffix cost nothing but are rate limited; the rest are pay-per-token | One key, many vendors. Free models may log prompts, so check the model's data policy before sending a snapshot. |
-| OpenCode Zen | `https://opencode.ai/zen/v1` | A curated model list, some free for a limited time; the rest are pay-as-you-go | Models are tested for coding and tool use, which suits structured patches. |
-| Ollama / LM Studio | local URL | Free, runs on your device | Snapshot never leaves the machine. |
+| [OpenRouter](https://openrouter.ai) | `https://openrouter.ai/api/v1` | Models listed with a `:free` suffix have no model charge, subject to rate limits and availability; paid models are billed by usage | Check each model's supported features and data policy before sending a snapshot. |
+| [OpenCode Zen / Console](https://opencode.ai/console) | `https://opencode.ai/inference/openai/v1` | Pay-as-you-go in external clients. Free-tier chat models require OpenCode itself, not OpenMedia | Curated models; see the [external-client restrictions and base URLs](https://opencode.ai/docs/console/harnesses/). |
+| [Ollama](https://ollama.com) / [LM Studio](https://lmstudio.ai) | Your local server's OpenAI-compatible URL | No model API fees; requires suitable hardware | Pick Custom and use an address reachable from the device running OpenMedia. Page data goes to that server, not a hosted model provider. |
 
-Free tiers change often; the model picker from "Test connection" is the source of truth for what a key can use. Prefer a paid or local model for repair loops, since free models rate limit and can drop structured output.
+Free tiers and model availability change. "Test connection" lists models; it does not prove that a model is free, authorized for this client, or supports structured output. Check the provider's current pricing, restrictions and data policy.
 
 All requests go through Rust (`reqwest`). The webview never sees the key and never makes the request.
 

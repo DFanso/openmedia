@@ -28,7 +28,7 @@ export const PRESETS: Preset[] = [
     id: "opencode-zen",
     label: "OpenCode Zen",
     kind: "openAiCompatible",
-    baseUrl: "https://opencode.ai/zen/v1",
+    baseUrl: "https://opencode.ai/inference/openai/v1",
   },
   {
     id: "custom",
