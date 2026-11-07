@@ -78,4 +78,4 @@ Read [AGENTS.md](AGENTS.md) first: wiki before code, work in a git worktree, and
 
 ## License
 
-Not chosen yet.
+[MPL-2.0](LICENSE). See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
