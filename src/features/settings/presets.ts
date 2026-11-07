@@ -25,6 +25,12 @@ export const PRESETS: Preset[] = [
     baseUrl: "https://openrouter.ai/api/v1",
   },
   {
+    id: "opencode-zen",
+    label: "OpenCode Zen",
+    kind: "openAiCompatible",
+    baseUrl: "https://opencode.ai/zen/v1",
+  },
+  {
     id: "custom",
     label: "Custom (OpenAI-compatible)",
     kind: "openAiCompatible",

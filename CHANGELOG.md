@@ -8,6 +8,16 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-07
 
+### feat(settings): free and paid model recommendations for BYOK
+
+**What:** The AI assistant settings gave no hint where to get a key or which providers have free models.
+
+**Change:** Add a recommendations card (OpenRouter, OpenCode Zen, local Ollama or LM Studio) and an OpenCode Zen preset. Document the gateways in the AI assistant wiki page and README.
+
+**Verified:** `ts:check`, Prettier and the preset tests pass. **Not verified:** on-device rendering; OpenCode Zen's base URL and free-model terms are unchecked against its docs.
+
+**PR:** see PR
+
 ### fix(siteview): sign-in popups and a Safari user agent
 
 **What:** On the iPhone 17 Pro Max simulator, Reddit's Continue with Google did nothing, and Continue with Apple's popup was loaded over the page or dropped.

@@ -8,7 +8,7 @@ The user brings their own API key. The assistant turns a plain-language request 
 
 Settings has an "AI assistant" section modelled on GitNotes' provider list: several providers, one active.
 
-- A provider is a name, a kind (`anthropic` or `openAiCompatible`), a base URL and an optional model. Presets fill the form: Anthropic, OpenAI, Google Gemini (its OpenAI-compatible endpoint), OpenRouter, and a blank custom entry for Ollama, LM Studio or anything else that speaks the OpenAI API. Gemini and OpenRouter are therefore `openAiCompatible`, not separate adapters.
+- A provider is a name, a kind (`anthropic` or `openAiCompatible`), a base URL and an optional model. Presets fill the form: Anthropic, OpenAI, Google Gemini (its OpenAI-compatible endpoint), OpenRouter, OpenCode Zen, and a blank custom entry for Ollama, LM Studio or anything else that speaks the OpenAI API. Gemini, OpenRouter and OpenCode Zen are therefore `openAiCompatible`, not separate adapters.
 - The key is entered once and goes to the Keychain through Rust; see [Security: key storage](./security.md#key-storage). The shell only learns whether a key exists.
 - "Test connection" saves the provider, then asks it for its model list from Rust (`GET {base}/v1/models` with `x-api-key` for Anthropic, `GET {base}/models` with a bearer token for the rest). Success proves the key and fills a model picker; failures show a fixed message ("The provider rejected the key.", rate limit, unreachable) and never a response body.
 - Limits: 8 providers, names up to 30 characters, models up to 100.
@@ -27,6 +27,18 @@ One `Provider` trait; each adapter maps our request to the vendor's API and retu
 | OpenAI-compatible (custom base URL) | `json_schema` if supported, else JSON mode + validation | Covers Ollama / LM Studio / self-hosted. Local models mean the snapshot never leaves the machine. |
 
 Model name is user-selectable per provider; we ship suggested defaults but do not hardcode a model as the only option. Defaults are verified at implementation time, not assumed here.
+
+### Recommended gateways (free and paid models)
+
+One key at an aggregator gives access to many models, some free. Both are `openAiCompatible` presets; the settings screen shows the same advice.
+
+| Gateway | Base URL | Free and paid | Notes |
+|---------|----------|---------------|-------|
+| OpenRouter | `https://openrouter.ai/api/v1` (preset) | Models with a `:free` suffix cost nothing but are rate limited; the rest are pay-per-token | One key, many vendors. Free models may log prompts, so check the model's data policy before sending a snapshot. |
+| OpenCode Zen | `https://opencode.ai/zen/v1` | A curated model list, some free for a limited time; the rest are pay-as-you-go | Models are tested for coding and tool use, which suits structured patches. |
+| Ollama / LM Studio | local URL | Free, runs on your device | Snapshot never leaves the machine. |
+
+Free tiers change often; the model picker from "Test connection" is the source of truth for what a key can use. Prefer a paid or local model for repair loops, since free models rate limit and can drop structured output.
 
 All requests go through Rust (`reqwest`). The webview never sees the key and never makes the request.
 

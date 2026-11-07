@@ -73,6 +73,26 @@ export function AiSection() {
         and sent only to the provider you choose. The assistant itself is not connected yet; saved
         providers are used once it ships.
       </p>
+      <div className="mt-3 rounded-2xl border border-hair p-3 text-sm text-paper/70">
+        <div className="font-medium text-paper">Free and paid models, one key</div>
+        <ul className="mt-1.5 flex list-disc flex-col gap-1 pl-5">
+          <li>
+            <span className="text-paper">OpenRouter</span>: many vendors. Models ending in :free
+            cost nothing but are rate limited; the rest are pay per use.
+          </li>
+          <li>
+            <span className="text-paper">OpenCode Zen</span>: a curated list tested for coding and
+            tool use, with some free models and the rest pay as you go.
+          </li>
+          <li>
+            <span className="text-paper">Ollama or LM Studio</span>: free and on your device, so
+            page data never leaves it. Pick Custom and use your server&apos;s address.
+          </li>
+        </ul>
+        <p className="mt-1.5 text-xs text-paper/50">
+          Free models may log prompts and often drop structured output. Prefer paid or local ones.
+        </p>
+      </div>
 
       <ul className="mt-4 flex flex-col gap-2">
         {state?.providers.map((p) => (
