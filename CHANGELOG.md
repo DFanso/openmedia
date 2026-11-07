@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-07
 
+### fix(ui): reduce app icon padding
+
+**What:** The padded icon master left too much empty space around the logo.
+
+**Change:** Scale the logo in `assets/icon-source.svg` from 62% to 86% of the square and regenerate the platform icons.
+
 ### feat(ui): new logo, padded app icon, draggable back button
 
 **What:** The logo was replaced; the app icon needed more padding and the optional back button was pinned to the bottom instead of floating.
