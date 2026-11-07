@@ -47,8 +47,8 @@ One trait, two backends. Everything above it is platform-agnostic.
 
 | Operation | Purpose |
 |-----------|---------|
-| `open(profile, url, bounds)` | Create a site view with the profile's isolated data store |
-| `set_bounds(rect)` / `set_visible(bool)` | Shell tells the site view where to draw (the shell owns layout) |
+| `open(profile, url, rect)` | Create the site view with the profile's isolated data store, below the transparent shell |
+| `set_rect(rect)` / `set_interactive_regions(rects)` | The shell owns layout: where the page draws, and which regions of the screen belong to the shell rather than the page |
 | `navigate`, `back`, `forward`, `reload` | Browser controls |
 | `set_recipes(bundle)` | Push the resolved recipe bundle for this site; engine re-applies live |
 | `request_snapshot(opts)` | Ask the engine for a pruned, redacted DOM snapshot |
@@ -75,7 +75,7 @@ A self-contained script bundled to a single IIFE and injected at document start 
 
 ### Shell (React)
 
-Site list/home, tabs, address bar, customize panel (rule list with toggles, picker, AI chat), settings (providers/keys, profiles, privacy preview). Talks to Rust over Tauri IPC only.
+One full-screen page with a floating button on top ([UI Design](./ui-design.md)): tap opens the command bar (addresses now, AI chat later), hold fans out favorites and settings, settings edits the favorites. Later: customize panel (rule list with toggles, picker), provider keys, privacy preview. Talks to Rust over Tauri IPC only.
 
 ## Core data flows
 
@@ -87,8 +87,8 @@ sequenceDiagram
   participant S as Shell
   participant C as Core
   participant V as Site view
-  U->>S: open instagram.com in profile "personal"
-  S->>C: site_open(profile, url, bounds)
+  U->>S: pick Instagram from the favorites fan
+  S->>C: open(profile, url, rect)
   C->>C: resolve recipes matching URL
   C->>V: create view with isolated data store + engine + recipe bundle (init script)
   V->>V: engine applies CSS rules before first paint

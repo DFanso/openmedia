@@ -102,7 +102,11 @@ export function Fab() {
     gestureRef.current.phase === "fan" ? fanTargetAt(point, layout) : null;
 
   const onPointerDown = (event: PointerEvent<HTMLButtonElement>) => {
-    event.currentTarget.setPointerCapture(event.pointerId);
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      // capture is best-effort: the pointer may already be gone
+    }
     if (gestureRef.current.phase === "fan") {
       ignorePress.current = true;
       dispatch({ type: "dismiss" });

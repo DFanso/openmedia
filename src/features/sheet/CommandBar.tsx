@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useApp } from "../../app/store";
-import { errorMessage } from "../../shared/ipc";
-import { siteView } from "../../shared/ipc";
+import { errorMessage, siteView, type Favorite } from "../../shared/ipc";
 import {
   ArrowIcon,
   BackIcon,
@@ -15,12 +14,13 @@ import { MAX_FAVORITES } from "../settings/limits";
 
 const NOT_CONNECTED =
   "The AI assistant isn't connected yet, so only addresses work for now. Type one to open it.";
+const NO_FAVORITES: Favorite[] = [];
 
 /** Opens from the top so the keyboard never covers it. Addresses open directly. */
 export function CommandBar() {
   const open = useApp((s) => s.sheet === "assistant");
   const page = useApp((s) => s.page);
-  const favorites = useApp((s) => s.state?.favorites ?? []);
+  const favorites = useApp((s) => s.state?.favorites) ?? NO_FAVORITES;
   const closeSheet = useApp((s) => s.closeSheet);
   const goTo = useApp((s) => s.goTo);
   const saveFavorites = useApp((s) => s.saveFavorites);

@@ -1,6 +1,6 @@
 # Roadmap
 
-> **Status: Phase 1 in progress, mobile first.** Done: Tauri scaffold, siteview plugin (iOS + Android sources), profile/site persistence, shell home + browser views, CI. Not yet run on Android. Desktop is deferred. Update this page when phases start, finish, or change.
+> **Status: Phase 1 in progress, iOS first.** Done: Tauri scaffold, `tauri-plugin-siteview` (iOS), favorites persistence, the floating-button shell, CI. Android code was removed until iOS is stable; desktop is deferred. Update this page when phases start, finish, or change.
 
 ## Goal
 
@@ -59,13 +59,13 @@ Scaffold the real project and the guardrails.
 - CI (`.github/workflows/ci.yml`): `ts:check`, `lint`, `format:check`, `test`, `cargo fmt/clippy/test`. Husky/lint-staged if desired.
 - `SiteView` trait + desktop implementation + iOS/Android plugin skeletons from the spike learnings (rewritten cleanly, not copy-pasted spike code).
 - The chosen bridge, with the negative-IPC integration test as a permanent regression test.
-- Shell: home (site list), browser view (address bar, back/forward/reload, tabs), settings skeleton.
-- Profiles (create, name, isolated store), per-profile site list.
+- Shell: one full-screen page, floating draggable button (tap: command bar, hold: favorites fan and settings), settings for favorites. See [UI Design](./ui-design.md).
+- One hidden profile with its own isolated data store. Multiple profiles are deferred, not dropped.
 - Settings/recipes persistence in app data dir.
 - App icons: generate all platform icons from `assets/logo.svg` with `yarn tauri icon`. The source logo is not square and has wide margins, so first add a square, padded 1024×1024 master (e.g. `assets/icon-source.svg`) rather than editing `logo.svg`; check the result at small sizes and in the iOS rounded-mask and Android adaptive-icon safe zones.
 - Flip [Development Guide](./development-guide.md), [Architecture](./architecture.md), [Platform Support](./platform-support.md) to `Implemented` where true.
 
-**Exit:** open any URL in a profile on macOS, iOS and Android simulators/devices; navigation works; sessions persist per profile; CI green.
+**Exit:** open any URL on an iOS simulator and device; navigation works; the session persists; CI green. Android and desktop follow.
 
 ## Phase 2 — Engine and recipes
 
@@ -154,8 +154,11 @@ All without a backend.
 | 2026-11-07 | Defaults: React, Zustand, Tailwind, yarn, Vitest, Playwright | Boring; yarn matches the author's other projects | Before Phase 1 only; cheap to change until the scaffold exists |
 | 2026-11-07 | iOS and Android are first-class; desktop deferred | Mobile is the product. S1 (desktop child webview) moves out of the critical path | Mobile is blocked, or desktop demand appears |
 | 2026-11-07 | iOS 17 minimum | `WKWebsiteDataStore(forIdentifier:)` needs it; verified working on iOS 26.5 simulator | A non-isolated fallback is accepted |
-| 2026-11-07 | Android refuses to open sites without `MULTI_PROFILE` and `WEB_MESSAGE_LISTENER` | A silent shared cookie jar breaks the profile-isolation invariant | Real devices in the target range lack the feature |
+| 2026-11-07 | Android must refuse to open sites without `MULTI_PROFILE` and `WEB_MESSAGE_LISTENER` (decided; the code was removed with the Kotlin plugin) | A silent shared cookie jar breaks the profile-isolation invariant | Real devices in the target range lack the feature |
 | 2026-11-07 | Bridge B on mobile: native message handler delivers into a Rust-created `Channel` | Verified on iOS: the page has no Tauri IPC, and Rust receives the message | Android verification fails |
+| 2026-11-07 | Shell is one page with a floating button; no home screen, tabs, or address bar | User direction: the web is the product, controls stay out of the way | Users need several simultaneous tabs |
+| 2026-11-07 | Site view sits below a transparent shell, with a native touch router | A control drawn in the shell cannot float over a native view that sits above it | The router breaks page scrolling or pinch on a device |
+| 2026-11-07 | Single hidden profile for now; Android Kotlin code removed | Profile UI is out of scope for the new UI; the Android code assumed the old layering. Recover it from commit `591636a` | Multiple accounts per site are wanted; Android work starts |
 
 ## Open questions
 

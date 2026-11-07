@@ -1,6 +1,6 @@
 # Development Guide
 
-> **Status: Partially implemented.** The web and Rust checks and `yarn tauri ios dev` are verified. Android and desktop site views are not: `yarn tauri android dev` has never been run, and on desktop the shell runs but opening a site returns "site views are not implemented on desktop yet".
+> **Status: Partially implemented.** The web and Rust checks and `yarn tauri ios dev` are verified. Android is not built (the Kotlin plugin code was removed until iOS is stable), and on desktop the shell runs but opening a site returns "site views are not implemented on desktop yet".
 
 ## Prerequisites
 
@@ -9,7 +9,7 @@
 | Rust (stable, 1.90 or newer) + `cargo`, plus the `aarch64-apple-ios-sim` and `aarch64-apple-ios` targets | Core, iOS |
 | Node 22 or newer + yarn 1.x | Shell, tooling (CI uses 22; also ran on 26) |
 | Xcode (+ command line tools), CocoaPods, XcodeGen | iOS builds, iOS plugin (Swift) |
-| Android Studio + NDK, JDK | Android builds (not yet verified) |
+| Android Studio + NDK, JDK | Android builds (not built yet) |
 | WebView2 runtime / WebKitGTK dev packages | Windows / Linux builds (deferred) |
 
 ## Commands
@@ -25,7 +25,7 @@ cargo test --manifest-path src-tauri/Cargo.toml
 cargo test --manifest-path src-tauri/plugins/tauri-plugin-siteview/Cargo.toml
 ```
 
-Not yet verified: `yarn tauri android dev` (run `yarn tauri android init` first), `yarn tauri dev` (desktop).
+Not built: `yarn tauri android dev` (the Android site view does not exist yet), `yarn tauri dev` (desktop site view).
 
 ## Conventions
 
