@@ -73,6 +73,30 @@ export function AiSection() {
         and sent only to the provider you choose. The assistant itself is not connected yet; saved
         providers are used once it ships.
       </p>
+      <div className="mt-3 rounded-2xl border border-hair p-3 text-sm text-paper/70">
+        <div className="font-medium text-paper">Where to get a key</div>
+        <ul className="mt-1.5 flex list-disc flex-col gap-1 pl-5">
+          <li>
+            <span className="text-paper">OpenRouter (openrouter.ai)</span>: free variants and paid
+            models from many vendors. Models listed with :free have no model charge, subject to rate
+            limits and availability.
+          </li>
+          <li>
+            <span className="text-paper">OpenCode Zen / Console (opencode.ai/console)</span>:
+            curated models, paid by usage. Its free-tier chat models require OpenCode itself, not
+            OpenMedia.
+          </li>
+          <li>
+            <span className="text-paper">Ollama (ollama.com) or LM Studio (lmstudio.ai)</span>:
+            local models with no model API fees; requires suitable hardware. Pick Custom and enter
+            your server&apos;s address, reachable from this device.
+          </li>
+        </ul>
+        <p className="mt-1.5 text-xs text-paper/50">
+          Check current pricing, usage limits and data policies. Model lists do not guarantee free
+          access or structured output support.
+        </p>
+      </div>
 
       <ul className="mt-4 flex flex-col gap-2">
         {state?.providers.map((p) => (

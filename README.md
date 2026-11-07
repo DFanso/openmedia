@@ -35,6 +35,7 @@
 - **Profiles:** each profile has its own isolated cookie and storage store (iOS 17+).
 - **First-run guide:** four short steps, replayable from Settings.
 - **Bring your own AI key:** add providers (Anthropic, OpenAI, Gemini, OpenRouter, or a local OpenAI-compatible server) in Settings. Keys go to the iOS Keychain through Rust and never come back to the UI; "Test connection" lists the provider's models.
+  - **Where to get a key:** Settings recommends [OpenRouter](https://openrouter.ai) (free variants and paid models), [OpenCode Zen / Console](https://opencode.ai/console) (paid access from external clients; its free-tier chat models require OpenCode), and local [Ollama](https://ollama.com) / [LM Studio](https://lmstudio.ai) servers (no model API fees). See [AI Assistant](docs/wiki/ai-assistant.md).
 - **Planned:** the AI assistant itself (it writes recipes; today the saved providers are not used yet), a catalog of bundled recipes, Android, desktop. See the [roadmap](docs/wiki/roadmap.md).
 
 ## Status
