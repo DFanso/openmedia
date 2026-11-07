@@ -23,6 +23,7 @@ A Tauri v2 app for desktop and mobile that loads any website in an embedded webv
 | [Security](./security.md) | Threat model, invariants, IPC boundary, key storage, legal and store-policy risks |
 | [Platform Support](./platform-support.md) | Desktop vs iOS vs Android: what works, what needs a native plugin, open verifications |
 | [UI Design](./ui-design.md) | The floating-button interface: tone, tokens, gestures, layering, what is and is not connected |
+| [Site Playbooks](./site-playbooks.md) | Per-site options for the default favorites, what every selector matched and how it was checked, what CSS cannot do, and the selector-writing rules for the in-app assistant |
 | [Ad Blocking](./ad-blocking.md) | Bundled EasyList and EasyPrivacy as WebKit content rule lists: engine choice, caching, limits |
 | [Prior Art](./prior-art.md) | SocialLite and others: what they do, what we copy, where we differ |
 | [Roadmap](./roadmap.md) | Phased build plan with exit criteria, spikes, decision log, risks |

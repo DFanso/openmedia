@@ -152,6 +152,10 @@ All without a backend.
 | 2026-11-07 | No push notifications, parent/family plans, or accounts | Require a backend | A backend decision is made |
 | 2026-11-07 | Do not use Android Accessibility to block native apps | Policy and trust cost; out of scope | User demand |
 | 2026-11-07 | Defaults: React, Zustand, Tailwind, yarn, Vitest, Playwright | Boring; yarn matches the author's other projects | Before Phase 1 only; cheap to change until the scaffold exists |
+| 2026-11-07 | Recipes get `options`: named switches that group rules. Annoyances default on, content off. Choices are stored as overrides, keyed by recipe and option id | Users toggle "Reels" or "app prompts", not seven selectors; defaults can change in a release without a migration | A recipe needs per-rule choices |
+| 2026-11-07 | Toggling a site option recompiles the document-start script and reloads the page (`set_document_start_script`) | Same mechanism as ad blocking; no live engine yet | The engine can apply `__om.update` without a reload |
+| 2026-11-07 | Favorites change only in Settings; the command bar's "add this page" button is removed | Browsing must not alter the user's list | — |
+| 2026-11-07 | Bottom margin is native (the site view rectangle), global with a per-site override resolved in Rust | CSS padding cannot move a page's own fixed bars off the screen edge | — |
 | 2026-11-07 | iOS and Android are first-class; desktop deferred | Mobile is the product. S1 (desktop child webview) moves out of the critical path | Mobile is blocked, or desktop demand appears |
 | 2026-11-07 | iOS 17 minimum | `WKWebsiteDataStore(forIdentifier:)` needs it; verified working on iOS 26.5 simulator | A non-isolated fallback is accepted |
 | 2026-11-07 | Android must refuse to open sites without `MULTI_PROFILE` and `WEB_MESSAGE_LISTENER` (decided; the code was removed with the Kotlin plugin) | A silent shared cookie jar breaks the profile-isolation invariant | Real devices in the target range lack the feature |

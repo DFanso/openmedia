@@ -15,14 +15,16 @@ The web is the product. The screen is one full-bleed page, from under the status
 | Drag the button | Moves it; on release it snaps to the nearer left or right edge and remembers its place |
 | Pull the page down from the top | Native pull-to-refresh (`UIRefreshControl`); only where the page's own scroll view is at the top |
 
-Defaults: Instagram, Facebook, Twitter, Reddit, YouTube. Each fan item shows the site's icon on a white tile when one is known, otherwise a monogram. The command bar also has back, forward, reload, and "add this page to favorites".
+Defaults: Instagram, Facebook, Twitter, Reddit, YouTube. Each fan item shows the site's icon on a white tile when one is known, otherwise a monogram. The command bar also has back, forward and reload. Favorites change only in Settings: the command bar has no "add this page" button, so browsing never alters the list.
 
 ## Settings
 
-Five sections in one scrolling screen (the settings glyph is a sliders icon):
+Seven sections in one scrolling screen (the settings glyph is a sliders icon):
 
 - **Appearance:** System, Light or Dark. Stored in `library.json` and applied to the app and, through the native view's `overrideUserInterfaceStyle`, to sites that follow `prefers-color-scheme`.
 - **Ad blocking:** a global switch for the bundled EasyList and EasyPrivacy rules; changing it reloads the open page.
+- **Sites:** one collapsible card per bundled recipe (Instagram, Facebook, X (Twitter), Reddit, YouTube). Each card lists its options as switches, annoyances first and then content, each with a one-line description. A switch ON means the thing is hidden. Annoyances (install prompts, pop-ups that block the page, ad slots) start ON; content (Reels, Shorts, Stories, suggestions, whole feeds) starts OFF. Changing a switch saves it and reloads the open page under the recompiled recipe script. The card also holds the site's bottom margin. See [Site Playbooks](./site-playbooks.md) for what each option covers.
+- **Bottom margin:** a slider (0 to 200 px, saved when released) that keeps the bottom of every page clear, for sites whose menus slide under the screen edge. A site card can override it; "Use the shared margin" removes the override. The shell asks Rust which site the current page belongs to (`bottom_margin_for`) and shrinks the native view's rectangle from the bottom; the strip underneath shows the app background.
 - **Favorites:** edit name and address, reorder, remove, add (up to 6). Saved with its own button.
 - **AI assistant:** bring-your-own-key providers. See [AI Assistant](./ai-assistant.md#implemented-provider-settings).
 - **Guide:** "Reset onboarding" marks the first-run guide unseen and shows it again.

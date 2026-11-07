@@ -2,7 +2,7 @@ use serde::Serialize;
 use tauri::{AppHandle, Emitter, State};
 use tauri_plugin_siteview::{
     ContentRuleList, FetchFaviconRequest, OpenRequest, Rect, SetContentRuleListsRequest,
-    SiteviewExt,
+    SetDocumentStartScriptRequest, SiteviewExt,
     validate::{parse_profile_id, parse_web_url},
 };
 use uuid::Uuid;
@@ -15,8 +15,9 @@ use crate::ai::{
 };
 use crate::error::{Error, Result};
 use crate::library::{AppState, Favorite, FavoriteInput, Library, Theme};
-use crate::recipes::RecipeScript;
+use crate::recipes::Recipes;
 use crate::secrets::SecretStore;
+use crate::sites::{self, SiteSettings};
 
 /// The secret store, behind a trait so tests can swap it.
 pub struct Secrets(pub Box<dyn SecretStore>);
@@ -91,7 +92,7 @@ async fn build_rule_lists(ad_block: &AdBlock) -> Result<Vec<ContentRuleList>> {
 pub async fn open_site(
     app: AppHandle,
     library: State<'_, Library>,
-    script: State<'_, RecipeScript>,
+    recipes: State<'_, Recipes>,
     ad_block: State<'_, AdBlock>,
     url: String,
     rect: Rect,
@@ -112,7 +113,7 @@ pub async fn open_site(
         profile,
         url,
         rect,
-        document_start_script: Some(script.as_str().to_owned()),
+        document_start_script: Some(recipes.script(&library.site_options()?)?),
         content_rule_lists,
     })?;
     if let Some(message) = blocking_failure {
@@ -138,6 +139,73 @@ pub async fn set_ad_block(
     app.siteview()
         .set_content_rule_lists(SetContentRuleListsRequest { lists })?;
     library.set_ad_block(enabled)
+}
+
+#[tauri::command]
+pub fn get_sites(
+    library: State<'_, Library>,
+    recipes: State<'_, Recipes>,
+) -> Result<Vec<SiteSettings>> {
+    Ok(sites::site_settings(
+        &recipes,
+        &library.site_options()?,
+        &library.site_bottom_margins()?,
+    ))
+}
+
+/// Saves one site toggle and reloads the open page under the recompiled recipe script. Async for
+/// the same reason as `open_site`.
+#[tauri::command]
+pub async fn set_site_option(
+    app: AppHandle,
+    library: State<'_, Library>,
+    recipes: State<'_, Recipes>,
+    recipe_id: String,
+    option_id: String,
+    enabled: bool,
+) -> Result<()> {
+    recipes
+        .get(&recipe_id)
+        .and_then(|recipe| recipe.option(&option_id))
+        .ok_or(Error::UnknownOption)?;
+    library.set_site_option(&recipe_id, &option_id, enabled)?;
+    let script = recipes.script(&library.site_options()?)?;
+    app.siteview()
+        .set_document_start_script(SetDocumentStartScriptRequest { script })?;
+    Ok(())
+}
+
+#[tauri::command]
+pub fn set_bottom_margin(library: State<'_, Library>, pixels: u32) -> Result<()> {
+    library.set_bottom_margin(pixels)
+}
+
+/// `pixels: None` returns the site to the shared margin.
+#[tauri::command]
+pub fn set_site_bottom_margin(
+    library: State<'_, Library>,
+    recipes: State<'_, Recipes>,
+    recipe_id: String,
+    pixels: Option<u32>,
+) -> Result<()> {
+    recipes.get(&recipe_id).ok_or(Error::UnknownOption)?;
+    library.set_site_bottom_margin(&recipe_id, pixels)
+}
+
+/// The margin to keep under the page at `url`.
+#[tauri::command]
+pub fn bottom_margin_for(
+    library: State<'_, Library>,
+    recipes: State<'_, Recipes>,
+    url: String,
+) -> Result<u32> {
+    let url = parse_web_url(&url)?;
+    Ok(sites::bottom_margin_for(
+        &recipes,
+        &library.site_bottom_margins()?,
+        library.bottom_margin()?,
+        &url,
+    ))
 }
 
 /// A provider as the shell sees it: settings plus whether a key exists, never the key itself.

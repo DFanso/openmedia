@@ -9,6 +9,10 @@ pub enum Error {
     InvalidFavoriteName,
     #[error("at most {0} favorites are allowed")]
     TooManyFavorites(usize),
+    #[error("the bottom margin can be at most {0} pixels")]
+    InvalidMargin(u32),
+    #[error("no such site option")]
+    UnknownOption,
     #[error(transparent)]
     SiteView(#[from] tauri_plugin_siteview::Error),
     #[error("could not read or write the library: {0}")]
