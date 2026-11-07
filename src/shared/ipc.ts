@@ -45,6 +45,10 @@ export interface SiteOption {
 export interface SiteSettings {
   recipeId: string;
   name: string;
+  /** Where a favorite of this site opens; null means it cannot be favorited. */
+  homepage: string | null;
+  /** Whether any favorite opens this site. */
+  favorite: boolean;
   options: SiteOption[];
   /** The site's own bottom margin, or null to use the shared one. */
   bottomMargin: number | null;
@@ -100,6 +104,9 @@ async function command(name: string, args?: Record<string, unknown>): Promise<vo
 export const library = {
   getState: () => invoke<AppState>("get_state"),
   setFavorites: (favorites: FavoriteInput[]) => invoke<Favorite[]>("set_favorites", { favorites }),
+  /** Adds a pre-made recipe's site to the favorites, or removes the site's favorites. */
+  setSiteFavorite: (recipeId: string, favorite: boolean) =>
+    invoke<Favorite[]>("set_site_favorite", { recipeId, favorite }),
   refreshIcons: () => invoke<Favorite[]>("refresh_icons"),
   setLastUrl: (url: string) => command("set_last_url", { url }),
   completeOnboarding: () => command("complete_onboarding"),

@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
+import { PlusIcon } from "../../shared/icons";
 import { ai, errorMessage, type AiState, type Provider, type ProviderKind } from "../../shared/ipc";
 import { PRESETS } from "./presets";
-
-const field =
-  "w-full min-w-0 rounded-xl border border-hair bg-paper/[0.05] px-3 py-2.5 text-base text-paper outline-none placeholder:text-paper/35 focus:border-accent";
-const quiet = "rounded-full border border-hair px-4 py-2 text-sm font-medium text-paper/85";
+import { Group, Section, field, quietButton } from "./ui";
 
 interface Draft {
   id?: string;
@@ -66,16 +64,61 @@ export function AiSection() {
   };
 
   return (
-    <section>
-      <h2 className="text-3xl leading-tight font-semibold">AI assistant</h2>
-      <p className="mt-1 text-sm text-paper/55">
-        Bring your own key. It is stored in the iOS Keychain, read only by the app&apos;s Rust core,
-        and sent only to the provider you choose. The assistant itself is not connected yet; saved
-        providers are used once it ships.
-      </p>
-      <div className="mt-3 rounded-2xl border border-hair p-3 text-sm text-paper/70">
-        <div className="font-medium text-paper">Where to get a key</div>
-        <ul className="mt-1.5 flex list-disc flex-col gap-1 pl-5">
+    <Section
+      title="AI assistant"
+      note="Bring your own key. It is stored in the iOS Keychain, read only by the app's Rust core, and sent only to the provider you choose. The assistant itself is not connected yet; saved providers are used once it ships."
+    >
+      {state && state.providers.length > 0 && (
+        <Group>
+          {state.providers.map((p) => (
+            <div key={p.id} className="flex items-center gap-3 px-4 py-3">
+              <button
+                type="button"
+                aria-label={`Use ${p.name}`}
+                aria-pressed={state.activeId === p.id}
+                onClick={() => void makeActive(p.id)}
+                className={`grid size-5 shrink-0 place-items-center rounded-full border ${
+                  state.activeId === p.id ? "border-accent" : "border-paper/30"
+                }`}
+              >
+                {state.activeId === p.id && <span className="size-2.5 rounded-full bg-accent" />}
+              </button>
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-base font-medium">{p.name}</div>
+                <div className="truncate text-sm text-paper/55">
+                  {p.hasKey ? "Key saved" : "No key"}
+                  {p.model ? ` · ${p.model}` : ""}
+                </div>
+              </div>
+              <button type="button" className={quietButton} onClick={() => setDraft(draftOf(p))}>
+                Edit
+              </button>
+            </div>
+          ))}
+        </Group>
+      )}
+
+      {draft ? (
+        <ProviderForm
+          key={draft.id ?? "new"}
+          initial={draft}
+          onClose={() => setDraft(null)}
+          onChanged={reload}
+        />
+      ) : (
+        <button
+          type="button"
+          onClick={() => setDraft(blankDraft())}
+          className="mt-3 flex items-center gap-2 px-1 py-1 text-sm font-medium text-accent"
+        >
+          <PlusIcon /> Add provider
+        </button>
+      )}
+      {error && !draft && <p className="mt-2 px-1 text-sm text-accent">{error}</p>}
+
+      <details className="mt-4 rounded-2xl border border-hair bg-paper/[0.04] px-4 py-3 text-sm text-paper/70">
+        <summary className="cursor-pointer font-medium text-paper">Where to get a key</summary>
+        <ul className="mt-2 flex list-disc flex-col gap-1.5 pl-5">
           <li>
             <span className="text-paper">OpenRouter (openrouter.ai)</span>: free variants and paid
             models from many vendors. Models listed with :free have no model charge, subject to rate
@@ -92,58 +135,12 @@ export function AiSection() {
             your server&apos;s address, reachable from this device.
           </li>
         </ul>
-        <p className="mt-1.5 text-xs text-paper/50">
+        <p className="mt-2 text-xs text-paper/50">
           Check current pricing, usage limits and data policies. Model lists do not guarantee free
           access or structured output support.
         </p>
-      </div>
-
-      <ul className="mt-4 flex flex-col gap-2">
-        {state?.providers.map((p) => (
-          <li key={p.id} className="flex items-center gap-3 rounded-2xl border border-hair p-3">
-            <button
-              type="button"
-              aria-label={`Use ${p.name}`}
-              aria-pressed={state.activeId === p.id}
-              onClick={() => void makeActive(p.id)}
-              className={`grid size-5 shrink-0 place-items-center rounded-full border ${
-                state.activeId === p.id ? "border-accent" : "border-paper/30"
-              }`}
-            >
-              {state.activeId === p.id && <span className="size-2.5 rounded-full bg-accent" />}
-            </button>
-            <div className="min-w-0 flex-1">
-              <div className="truncate font-medium">{p.name}</div>
-              <div className="truncate text-xs text-paper/50">
-                {p.hasKey ? "Key saved" : "No key"}
-                {p.model ? ` · ${p.model}` : ""}
-              </div>
-            </div>
-            <button type="button" className={quiet} onClick={() => setDraft(draftOf(p))}>
-              Edit
-            </button>
-          </li>
-        ))}
-      </ul>
-
-      {draft ? (
-        <ProviderForm
-          key={draft.id ?? "new"}
-          initial={draft}
-          onClose={() => setDraft(null)}
-          onChanged={reload}
-        />
-      ) : (
-        <button
-          type="button"
-          onClick={() => setDraft(blankDraft())}
-          className="mt-3 text-sm font-medium text-accent"
-        >
-          + Add provider
-        </button>
-      )}
-      {error && !draft && <p className="mt-2 text-sm text-accent">{error}</p>}
-    </section>
+      </details>
+    </Section>
   );
 }
 
@@ -240,7 +237,7 @@ function ProviderForm({ initial, onClose, onChanged }: FormProps) {
   const preset = PRESETS.find((p) => p.id === draft.presetId);
 
   return (
-    <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-hair p-4">
+    <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-hair bg-paper/[0.04] p-4">
       {!initial.id && (
         <select
           aria-label="Provider"
@@ -291,7 +288,7 @@ function ProviderForm({ initial, onClose, onChanged }: FormProps) {
               setKey(e.target.value);
             }}
           />
-          <button type="button" className={quiet} onClick={() => setShowKey((v) => !v)}>
+          <button type="button" className={quietButton} onClick={() => setShowKey((v) => !v)}>
             {showKey ? "Hide" : "Show"}
           </button>
         </div>
@@ -299,12 +296,12 @@ function ProviderForm({ initial, onClose, onChanged }: FormProps) {
         <div className="flex items-center justify-between gap-2 text-sm text-paper/70">
           <span>A key is saved in the Keychain.</span>
           <span className="flex gap-2">
-            <button type="button" className={quiet} onClick={() => setReplacing(true)}>
+            <button type="button" className={quietButton} onClick={() => setReplacing(true)}>
               Replace
             </button>
             <button
               type="button"
-              className={quiet}
+              className={quietButton}
               disabled={busy}
               onClick={() => void removeKey()}
             >
@@ -343,7 +340,7 @@ function ProviderForm({ initial, onClose, onChanged }: FormProps) {
       {note && <p className="text-sm text-accent">{note}</p>}
 
       <div className="flex flex-wrap gap-2">
-        <button type="button" className={quiet} disabled={busy} onClick={() => void test()}>
+        <button type="button" className={quietButton} disabled={busy} onClick={() => void test()}>
           Test connection
         </button>
         <button
@@ -354,13 +351,13 @@ function ProviderForm({ initial, onClose, onChanged }: FormProps) {
         >
           Save
         </button>
-        <button type="button" className={quiet} onClick={onClose}>
+        <button type="button" className={quietButton} onClick={onClose}>
           Cancel
         </button>
         {draft.id && (
           <button
             type="button"
-            className={`${quiet} ml-auto text-red-400`}
+            className={`${quietButton} ml-auto text-red-400`}
             disabled={busy}
             onClick={() => void remove()}
           >

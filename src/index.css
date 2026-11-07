@@ -238,3 +238,21 @@ input {
     stroke-dashoffset: 0;
   }
 }
+
+/* Full-screen pages rise into place once; nothing else on them animates. */
+.screen {
+  animation: screen-in 260ms var(--ease-spring) both;
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen {
+    animation: none;
+  }
+}

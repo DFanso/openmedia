@@ -26,6 +26,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::get_state,
             commands::set_favorites,
+            commands::set_site_favorite,
             commands::set_last_url,
             commands::add_history,
             commands::clear_history,

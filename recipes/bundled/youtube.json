@@ -226,6 +226,7 @@
     }
   ],
   "meta": {
+    "homepage": "https://m.youtube.com/",
     "lastVerified": "2026-11-07",
     "notes": "An iPhone user agent gets m.youtube.com made only of ytm-* custom elements plus newer view-model elements; ytd-* elements never appear. LIVE (logged out): open-app-pill (1, watch pages only; the Open App entry in the More sheet has no unique attribute and cannot be hidden), shorts-tab (1; .pivot-shorts alone matches 2 nodes), shorts-home-shelf (2 of 3 sections, the community post section stays), shorts-search-shelf, shorts-search-card (only after scrolling, lazy), shorts-related-shelf, shorts-channel-tab, home-feed, home-chips, comments-entry, related-videos, companion-slot, playlist-cards and mix-cards (present only on some pages). SOURCE: shorts-chip (gijsdev/ublock-hide-yt-shorts v2026.4.29; matched nothing in the tested chip bar). INFERRED from ytd-* names, never rendered logged out: promo-banners, promoted-tiles. comments-entry, shorts-chip and shorts-channel-tab depend on English labels. Never hide ytm-browse, ytm-search, ytm-watch, a bare ytm-item-section-renderer, lazy-list, ytm-pivot-bar-renderer or #movie_player. The /shorts/ID route cannot be blocked with CSS."
   }

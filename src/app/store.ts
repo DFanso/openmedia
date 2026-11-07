@@ -15,6 +15,7 @@ import {
   library,
   siteView,
   type AppState,
+  type Favorite,
   type FavoriteInput,
   type SiteSettings,
   type SiteViewState,
@@ -63,6 +64,8 @@ interface AppStore {
   trimSessions: (pressure: Pressure) => void;
   reportError: (message: string | null) => void;
   saveFavorites: (favorites: FavoriteInput[]) => Promise<boolean>;
+  /** Adds a pre-made recipe's site to the favorites, or removes every favorite that opens it. */
+  setSiteFavorite: (recipeId: string, favorite: boolean) => Promise<void>;
   clearHistory: () => Promise<void>;
   setTheme: (theme: Theme) => Promise<void>;
   setAdBlock: (enabled: boolean) => Promise<void>;
@@ -106,6 +109,16 @@ export const useApp = create<AppStore>((set, get) => {
     } catch {
       // icons are decoration; the monogram stays
     }
+  };
+
+  /** Takes the saved favorites, fetches missing icons, and refreshes which sites are favorited. */
+  const adoptFavorites = (favorites: Favorite[]) => {
+    set((current) => ({
+      state: current.state && { ...current.state, favorites },
+      error: null,
+    }));
+    void fetchIcons();
+    void get().loadSites();
   };
 
   const markUsed = (sessions: Session[], id: string | null, now: number) =>
@@ -249,16 +262,21 @@ export const useApp = create<AppStore>((set, get) => {
 
     saveFavorites: async (favorites) => {
       try {
-        const saved = await library.setFavorites(favorites);
-        set((current) => ({
-          state: current.state && { ...current.state, favorites: saved },
-          error: null,
-        }));
-        void fetchIcons();
+        adoptFavorites(await library.setFavorites(favorites));
         return true;
       } catch (error) {
         set({ error: errorMessage(error) });
         return false;
+      }
+    },
+
+    setSiteFavorite: async (recipeId, favorite) => {
+      const before = get().sites;
+      set({ sites: updateSite(before, recipeId, (site) => ({ ...site, favorite })) });
+      try {
+        adoptFavorites(await library.setSiteFavorite(recipeId, favorite));
+      } catch (error) {
+        set({ sites: before, error: errorMessage(error) });
       }
     },
 
