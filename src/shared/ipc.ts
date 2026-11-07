@@ -135,6 +135,34 @@ export const library = {
   setBackButton: (enabled: boolean) => command("set_back_button", { enabled }),
 };
 
+export interface SectionUsage {
+  /** `/` for the site's root, `*` for anything unrecognised, else `/` and the first path segment. */
+  section: string;
+  seconds: number;
+}
+
+export interface SiteUsage {
+  host: string;
+  /** The bundled recipe's name for the site, when there is one. */
+  name: string | null;
+  seconds: number;
+  sections: SectionUsage[];
+}
+
+export interface UsageReport {
+  totalSeconds: number;
+  /** Busiest first. */
+  sites: SiteUsage[];
+}
+
+/** Time on sites, kept in `usage.json` on this device; see `usage.rs`. */
+export const usage = {
+  record: (day: string, host: string, section: string, seconds: number) =>
+    command("record_usage", { day, host, section, seconds }),
+  report: (today: string, days: number) => invoke<UsageReport>("get_usage", { today, days }),
+  clear: () => command("clear_usage"),
+};
+
 export const ai = {
   state: () => invoke<AiState>("ai_state"),
   saveProvider: (provider: ProviderInput) => invoke<Provider>("ai_save_provider", { provider }),

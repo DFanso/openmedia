@@ -23,7 +23,7 @@ import {
 import type { Edge } from "../features/fab/geometry";
 import { loadPosition } from "../features/fab/position";
 
-export type Sheet = "none" | "assistant" | "history" | "settings";
+export type Sheet = "none" | "assistant" | "history" | "stats" | "settings";
 
 /** What the web layer must do natively next; `nonce` makes a repeat of the same action distinct. */
 export type SessionAction = { nonce: number } & (
@@ -31,7 +31,7 @@ export type SessionAction = { nonce: number } & (
   | { type: "activate"; id: string }
 );
 
-interface AppStore {
+export interface AppStore {
   state: AppState | null;
   error: string | null;
   sheet: Sheet;

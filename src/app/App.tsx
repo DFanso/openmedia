@@ -5,6 +5,8 @@ import { Fab } from "../features/fab/Fab";
 import { Onboarding } from "../features/onboarding/Onboarding";
 import { CommandBar } from "../features/sheet/CommandBar";
 import { HistorySheet } from "../features/history/HistorySheet";
+import { StatsSheet } from "../features/stats/StatsSheet";
+import { startUsageTracking } from "../features/stats/tracker";
 import { SettingsScreen } from "../features/settings/SettingsScreen";
 import { WebLayer } from "../features/web/WebLayer";
 import { useApplyTheme } from "../shared/theme";
@@ -20,6 +22,8 @@ export function App() {
   useApplyTheme(theme);
   useHitRegions();
 
+  useEffect(() => startUsageTracking(), []);
+
   useEffect(() => {
     void load().finally(hideSplash);
   }, [load]);
@@ -32,6 +36,7 @@ export function App() {
       <CommandBar />
       <SettingsScreen />
       <HistorySheet />
+      <StatsSheet />
       <Onboarding />
       {error && sheet !== "settings" && (
         <button
