@@ -62,6 +62,7 @@ pub struct AppState {
     pub onboarded: bool,
     pub theme: Theme,
     pub ad_block: bool,
+    pub back_button: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -78,6 +79,9 @@ struct LibraryData {
     /// On by default; the shell can turn blocking off.
     #[serde(default = "enabled")]
     ad_block: bool,
+    /// Off by default; the shell can show a floating back button over the page.
+    #[serde(default)]
+    back_button: bool,
     /// Site icons by host. They come from the sites themselves and hold nothing private.
     #[serde(default)]
     icons: BTreeMap<String, String>,
@@ -121,6 +125,7 @@ impl Library {
             onboarded: data.onboarded,
             theme: data.theme,
             ad_block: data.ad_block,
+            back_button: data.back_button,
         })
     }
 
@@ -164,6 +169,12 @@ impl Library {
     pub fn set_ad_block(&self, enabled: bool) -> Result<()> {
         let mut data = self.lock()?;
         data.ad_block = enabled;
+        self.save(&data)
+    }
+
+    pub fn set_back_button(&self, enabled: bool) -> Result<()> {
+        let mut data = self.lock()?;
+        data.back_button = enabled;
         self.save(&data)
     }
 
@@ -323,6 +334,7 @@ fn default_data() -> LibraryData {
         onboarded: false,
         theme: Theme::System,
         ad_block: true,
+        back_button: false,
         icons: BTreeMap::new(),
         ai: AiSettings::default(),
     }
@@ -580,6 +592,14 @@ mod tests {
         fs::write(&path, saved.to_string()).unwrap();
         drop(library);
         assert!(reload(&dir).state().unwrap().ad_block);
+    }
+
+    #[test]
+    fn the_back_button_is_off_by_default_and_the_choice_persists() {
+        let (dir, library) = library();
+        assert!(!library.state().unwrap().back_button);
+        library.set_back_button(true).unwrap();
+        assert!(reload(&dir).state().unwrap().back_button);
     }
 
     #[test]
