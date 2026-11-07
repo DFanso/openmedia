@@ -1,0 +1,13 @@
+[default]
+description = "Shell-only control of the native site view. Never grant to a site webview."
+permissions = [
+  "allow-open",
+  "allow-close",
+  "allow-set-rect",
+  "allow-set-visible",
+  "allow-navigate",
+  "allow-go-back",
+  "allow-go-forward",
+  "allow-reload",
+  "allow-delete-profile-data",
+]

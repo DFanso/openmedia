@@ -1,0 +1,55 @@
+use std::marker::PhantomData;
+
+use serde::de::DeserializeOwned;
+use tauri::{AppHandle, Runtime, plugin::PluginApi};
+
+use crate::models::*;
+use crate::{Error, Result};
+
+pub fn init<R: Runtime, C: DeserializeOwned>(
+    _app: &AppHandle<R>,
+    _api: PluginApi<R, C>,
+) -> Result<Siteview<R>> {
+    Ok(Siteview(PhantomData))
+}
+
+/// Desktop site views (a Tauri child webview) are not implemented yet; mobile ships first.
+pub struct Siteview<R: Runtime>(PhantomData<fn() -> R>);
+
+impl<R: Runtime> Siteview<R> {
+    pub fn open(&self, _request: OpenRequest) -> Result<()> {
+        Err(Error::DesktopUnsupported)
+    }
+
+    pub fn close(&self) -> Result<()> {
+        Err(Error::DesktopUnsupported)
+    }
+
+    pub fn set_rect(&self, _request: SetRectRequest) -> Result<()> {
+        Err(Error::DesktopUnsupported)
+    }
+
+    pub fn set_visible(&self, _request: SetVisibleRequest) -> Result<()> {
+        Err(Error::DesktopUnsupported)
+    }
+
+    pub fn navigate(&self, _request: NavigateRequest) -> Result<()> {
+        Err(Error::DesktopUnsupported)
+    }
+
+    pub fn go_back(&self) -> Result<()> {
+        Err(Error::DesktopUnsupported)
+    }
+
+    pub fn go_forward(&self) -> Result<()> {
+        Err(Error::DesktopUnsupported)
+    }
+
+    pub fn reload(&self) -> Result<()> {
+        Err(Error::DesktopUnsupported)
+    }
+
+    pub fn delete_profile_data(&self, _request: DeleteProfileDataRequest) -> Result<()> {
+        Err(Error::DesktopUnsupported)
+    }
+}
