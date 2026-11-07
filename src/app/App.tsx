@@ -1,3 +1,4 @@
+import { hideSplash } from "./splash";
 import { useEffect } from "react";
 import { BackButton } from "../features/back/BackButton";
 import { Fab } from "../features/fab/Fab";
@@ -20,7 +21,7 @@ export function App() {
   useHitRegions();
 
   useEffect(() => {
-    void load();
+    void load().finally(hideSplash);
   }, [load]);
 
   return (

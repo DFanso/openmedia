@@ -14,6 +14,14 @@ All notable changes to OpenMedia are documented here.
 
 **Change:** Update `assets/logo.svg`, regenerate `assets/icon-source.svg` (logo at 62% of a 1024 square) and all platform icons, and use the new mark for the floating button and first-run guide. The back button is now draggable, snaps to the nearer edge and remembers its position (`om.back`).
 
+### feat(app): splash screen while the shell loads
+
+**What:** The webview showed a black screen until the JS bundle booted and app state loaded.
+
+**Change:** `index.html` paints a themed splash (logo mark on the ink background) before any script runs; `App` fades it out once `load()` settles (`src/app/splash.ts`). Honors `prefers-color-scheme` and reduced motion.
+
+**Verified:** TypeScript, ESLint, Prettier and 94 frontend tests pass. **Not verified:** on-device iOS/Android cold start.
+
 ### feat(settings): free and paid model recommendations for BYOK
 
 **What:** The AI assistant settings gave no hint where to get a key or which providers have free models.
