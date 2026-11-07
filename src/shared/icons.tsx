@@ -81,3 +81,9 @@ export const HistoryIcon = () => (
     <path d="M12 8v4.5l3 1.8" />
   </Icon>
 );
+
+export const StatsIcon = () => (
+  <Icon>
+    <path d="M5 20V12M12 20V5M19 20v-5" />
+  </Icon>
+);

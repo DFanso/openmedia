@@ -5,6 +5,7 @@ use tauri_plugin_siteview::{
     SetDocumentStartScriptRequest, SiteviewExt,
     validate::{parse_profile_id, parse_session_id, parse_web_url},
 };
+use url::Url;
 use uuid::Uuid;
 
 use crate::ad_block::AdBlock;
@@ -18,6 +19,7 @@ use crate::library::{AppState, Favorite, FavoriteInput, Library, Theme};
 use crate::recipes::Recipes;
 use crate::secrets::SecretStore;
 use crate::sites::{self, SiteSettings};
+use crate::usage::{Usage, UsageReport};
 
 /// The secret store, behind a trait so tests can swap it.
 pub struct Secrets(pub Box<dyn SecretStore>);
@@ -50,6 +52,42 @@ pub fn add_history(library: State<'_, Library>, url: String) -> Result<Vec<Strin
 #[tauri::command]
 pub fn clear_history(library: State<'_, Library>) -> Result<()> {
     library.clear_history()
+}
+
+/// Adds seconds spent in one section of a site to the local usage stats for `day` (the shell's
+/// local date). Shell-only: site webviews have no IPC.
+#[tauri::command]
+pub fn record_usage(
+    usage: State<'_, Usage>,
+    day: String,
+    host: String,
+    section: String,
+    seconds: u32,
+) -> Result<()> {
+    usage.record(&day, &host, &section, seconds)
+}
+
+/// Totals for the last `days` days ending at `today`, with bundled recipe names for known sites.
+#[tauri::command]
+pub fn get_usage(
+    usage: State<'_, Usage>,
+    recipes: State<'_, Recipes>,
+    today: String,
+    days: u32,
+) -> Result<UsageReport> {
+    let mut report = usage.report(&today, days)?;
+    for site in &mut report.sites {
+        site.name = Url::parse(&format!("https://{}/", site.host))
+            .ok()
+            .and_then(|url| recipes.for_url(&url).map(|recipe| recipe.name.clone()));
+    }
+    Ok(report)
+}
+
+/// Wipes every recorded usage second.
+#[tauri::command]
+pub fn clear_usage(usage: State<'_, Usage>) -> Result<()> {
+    usage.clear()
 }
 
 #[tauri::command]

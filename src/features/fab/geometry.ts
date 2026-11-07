@@ -20,8 +20,9 @@ export const EDGE_MARGIN = 10;
 export const FAVORITE_SIZE = 52;
 export const SETTINGS_SIZE = 44;
 export const HISTORY_SIZE = 44;
-/** Centre-to-centre distance from the settings button up to the history button. */
-const HISTORY_OFFSET = 52;
+export const STATS_SIZE = 44;
+/** Centre-to-centre distance between neighbouring buttons in the settings column. */
+const COLUMN_OFFSET = 52;
 
 const MIN_FAN_RADIUS = 108;
 const MAX_ARC_DEGREES = 120;
@@ -59,10 +60,14 @@ export interface FanLayout {
   favorites: Point[];
   settings: Point;
   history: Point;
+  stats: Point;
 }
 
 export type FanTarget =
-  { kind: "favorite"; index: number } | { kind: "history" } | { kind: "settings" };
+  | { kind: "favorite"; index: number }
+  | { kind: "stats" }
+  | { kind: "history" }
+  | { kind: "settings" };
 
 interface FanItem {
   center: Point;
@@ -107,7 +112,7 @@ function isValid(items: FanItem[], origin: Point, viewport: Size, insets: Insets
 /**
  * Favorites sit on an arc opening away from the edge, listed top to bottom. Settings is tucked
  * on the edge column above or below the button, farther out than the arc, so it never reads as
- * a favorite, and history sits directly above it in the same column. When the button is near the
+ * a favorite, history sits directly above it in the same column and stats directly above that. When the button is near the
  * top or bottom the arc rotates, the column may flip sides, and finally the arc compacts
  * (smaller steps, larger radius) until everything fits.
  */
@@ -138,13 +143,15 @@ export function fanLayout(
         polar(origin, radius, inward + direction * (shift + (i - (favoriteCount - 1) / 2) * step)),
       ),
       settings,
-      history: { x: settings.x, y: settings.y - HISTORY_OFFSET },
+      history: { x: settings.x, y: settings.y - COLUMN_OFFSET },
+      stats: { x: settings.x, y: settings.y - 2 * COLUMN_OFFSET },
     };
   };
   const items = (layout: FanLayout): FanItem[] => [
     ...layout.favorites.map((center) => ({ center, size: FAVORITE_SIZE })),
     { center: layout.settings, size: SETTINGS_SIZE },
     { center: layout.history, size: HISTORY_SIZE },
+    { center: layout.stats, size: STATS_SIZE },
   ];
 
   for (const scale of favoriteCount > 1 ? ARC_SCALES : [1]) {
@@ -166,6 +173,7 @@ export function fanTargetAt(point: Point, layout: FanLayout): FanTarget | null {
     Math.hypot(point.x - center.x, point.y - center.y) <= size / 2 + TOUCH_SLACK;
   const index = layout.favorites.findIndex((p) => near(p, FAVORITE_SIZE));
   if (index >= 0) return { kind: "favorite", index };
+  if (near(layout.stats, STATS_SIZE)) return { kind: "stats" };
   if (near(layout.history, HISTORY_SIZE)) return { kind: "history" };
   return near(layout.settings, SETTINGS_SIZE) ? { kind: "settings" } : null;
 }

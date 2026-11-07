@@ -83,6 +83,8 @@ Each opened site is a session (a separate native web view) pinned to the registr
 
 History (the addresses the user typed) is stored in `library.json` on the device, like favorites, and holds no page content. "Clear history" removes it and the remembered last page.
 
+Usage stats (seconds per site and per first path segment, per local day, 30 days) are stored in `usage.json`, separate from `library.json`. They are written only by the shell through `record_usage`, `get_usage` and `clear_usage`, which are app commands, not plugin commands: no capability reaches them from a site view. Rust validates every call (date format, lowercase host, section `/`, `*` or `/` plus 1-24 of `a-z0-9_-`, 1-3600 seconds) and caps the number of hosts and sections, because the shell is not fully trusted. The file never holds an address, query, fragment or title, and nothing leaves the device (invariant 1). "Clear stats" wipes it.
+
 ## Privacy
 
 - The snapshot is the only page-derived data that leaves the device, only on explicit user action, only to the endpoint the user configured. See [AI Assistant](./ai-assistant.md#privacy-what-is-sent).

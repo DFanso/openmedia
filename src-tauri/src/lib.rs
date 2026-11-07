@@ -6,6 +6,7 @@ mod library;
 mod recipes;
 mod secrets;
 mod sites;
+mod usage;
 
 use tauri::Manager;
 
@@ -14,8 +15,9 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_siteview::init())
         .setup(|app| {
-            let path = app.path().app_data_dir()?.join("library.json");
-            app.manage(library::Library::load(path)?);
+            let data_dir = app.path().app_data_dir()?;
+            app.manage(library::Library::load(data_dir.join("library.json"))?);
+            app.manage(usage::Usage::load(data_dir.join("usage.json"))?);
             app.manage(recipes::Recipes::bundled()?);
             app.manage(ad_block::AdBlock::bundled(
                 app.path().app_cache_dir()?.join("ad-block"),
@@ -29,6 +31,9 @@ pub fn run() {
             commands::set_last_url,
             commands::add_history,
             commands::clear_history,
+            commands::record_usage,
+            commands::get_usage,
+            commands::clear_usage,
             commands::complete_onboarding,
             commands::reset_onboarding,
             commands::set_theme,

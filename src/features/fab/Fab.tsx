@@ -6,6 +6,7 @@ import {
   FAVORITE_SIZE,
   HISTORY_SIZE,
   SETTINGS_SIZE,
+  STATS_SIZE,
   fabCenter,
   fanLayout,
   fanTargetAt,
@@ -21,7 +22,7 @@ import {
   type GestureState,
 } from "./gesture";
 import { loadPosition, savePosition, type FabPosition } from "./position";
-import { HistoryIcon, SlidersIcon } from "../../shared/icons";
+import { HistoryIcon, SlidersIcon, StatsIcon } from "../../shared/icons";
 import logoMark from "../../assets/logo-mark.svg";
 
 const idle: GestureState = { phase: "idle" };
@@ -73,6 +74,7 @@ export function Fab() {
   const select = (target: FanTarget) => {
     if (target.kind === "settings") openSheet("settings");
     else if (target.kind === "history") openSheet("history");
+    else if (target.kind === "stats") openSheet("stats");
     else if (list[target.index]) openFavorite(list[target.index].url);
   };
 
@@ -153,7 +155,7 @@ export function Fab() {
     "--dx": `${center.x - target.x}px`,
     "--dy": `${center.y - target.y}px`,
     "--i": index,
-    "--n": list.length + 1,
+    "--n": list.length + 3,
   });
 
   const hidden = sheet !== "none" || onboardingOpen;
@@ -226,6 +228,28 @@ export function Fab() {
         }`}
       >
         <HistoryIcon />
+      </button>
+
+      <button
+        type="button"
+        data-open={fanOpen}
+        aria-label="Stats"
+        tabIndex={fanOpen ? 0 : -1}
+        onClick={() => {
+          select({ kind: "stats" });
+          dispatch({ type: "dismiss" });
+        }}
+        style={{
+          ...fanStyle(layout.stats, list.length + 2),
+          width: STATS_SIZE,
+          height: STATS_SIZE,
+          margin: -STATS_SIZE / 2,
+        }}
+        className={`fan-item fab-glass fixed z-20 grid place-items-center rounded-full ${
+          hover?.kind === "stats" ? "border-accent! text-accent" : "text-white"
+        }`}
+      >
+        <StatsIcon />
       </button>
 
       <button
