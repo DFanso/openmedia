@@ -23,6 +23,7 @@ cargo fmt --manifest-path src-tauri/Cargo.toml --check
 cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
 cargo test --manifest-path src-tauri/Cargo.toml
 cargo test --manifest-path src-tauri/plugins/tauri-plugin-siteview/Cargo.toml
+scripts/test-domain-scope.sh   # iOS plugin's domain-pinning rules (needs only swiftc)
 ```
 
 Not built: `yarn tauri android dev` (the Android site view does not exist yet), `yarn tauri dev` (desktop site view).

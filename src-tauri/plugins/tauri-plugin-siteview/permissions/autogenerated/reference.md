@@ -4,6 +4,7 @@ Shell-only control of the native site view. `open` is deliberately absent: the a
 
 #### This default permission set includes the following:
 
+- `allow-activate`
 - `allow-close`
 - `allow-set-rect`
 - `allow-set-interactive-regions`
@@ -21,6 +22,32 @@ Shell-only control of the native site view. `open` is deliberately absent: the a
 <th>Description</th>
 </tr>
 
+
+<tr>
+<td>
+
+`siteview:allow-activate`
+
+</td>
+<td>
+
+Enables the activate command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`siteview:deny-activate`
+
+</td>
+<td>
+
+Denies the activate command without any pre-configured scope.
+
+</td>
+</tr>
 
 <tr>
 <td>

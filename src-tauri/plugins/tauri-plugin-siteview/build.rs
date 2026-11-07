@@ -1,5 +1,6 @@
 const COMMANDS: &[&str] = &[
     "open",
+    "activate",
     "close",
     "set_rect",
     "set_interactive_regions",

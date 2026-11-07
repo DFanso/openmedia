@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useApp } from "../../app/store";
+import { selectPage, useApp } from "../../app/store";
 import { library } from "../../shared/ipc";
 
 /**
@@ -7,7 +7,7 @@ import { library } from "../../shared/ipc";
  * Rust resolves which site a URL belongs to, so the shell never carries a second URL matcher.
  */
 export function usePageMargin(): number {
-  const url = useApp((s) => s.page?.url);
+  const url = useApp((s) => selectPage(s)?.url);
   const shared = useApp((s) => s.state?.bottomMargin ?? 0);
   const siteMargins = useApp((s) => s.sites.map((site) => site.bottomMargin ?? "-").join(","));
   const [resolved, setResolved] = useState(shared);

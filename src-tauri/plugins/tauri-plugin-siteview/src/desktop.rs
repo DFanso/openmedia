@@ -21,7 +21,11 @@ impl<R: Runtime> Siteview<R> {
         Err(Error::DesktopUnsupported)
     }
 
-    pub fn close(&self) -> Result<()> {
+    pub fn activate(&self, _request: SessionRequest) -> Result<()> {
+        Err(Error::DesktopUnsupported)
+    }
+
+    pub fn close(&self, _request: SessionRequest) -> Result<()> {
         Err(Error::DesktopUnsupported)
     }
 

@@ -16,9 +16,12 @@ pub struct ContentRuleList {
     pub path: String,
 }
 
+/// Opens a new site view as session `session` and makes it the visible one. Other sessions stay
+/// alive underneath, hidden, until closed.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OpenRequest {
+    pub session: String,
     pub profile: String,
     pub url: String,
     pub rect: Rect,
@@ -28,7 +31,14 @@ pub struct OpenRequest {
     pub content_rule_lists: Vec<ContentRuleList>,
 }
 
-/// Replaces the rule lists on the open site view and reloads it. An empty list turns blocking off.
+/// Names one open session: `activate` shows it, `close` tears it down.
+#[derive(Debug, Clone, Deserialize)]
+pub struct SessionRequest {
+    pub session: String,
+}
+
+/// Replaces the rule lists on every open site view and reloads the visible one. An empty list turns
+/// blocking off.
 #[derive(Debug, Clone, Deserialize)]
 pub struct SetContentRuleListsRequest {
     pub lists: Vec<ContentRuleList>,
@@ -68,12 +78,21 @@ pub struct NavigateRequest {
 )]
 pub enum SiteViewEvent {
     State {
+        session: String,
         url: Option<String>,
         title: Option<String>,
         loading: bool,
         can_go_back: bool,
         can_go_forward: bool,
+        /// The registrable domain this session is pinned to; see `DomainScope.swift`.
+        scope: String,
     },
+    /// The native side closed a session on its own, for example when its web content process died.
+    Closed {
+        session: String,
+    },
+    /// The OS asked the app to release memory.
+    MemoryWarning,
     Error {
         message: String,
     },

@@ -4,6 +4,7 @@ import { useInsets, useViewport } from "../../shared/viewport";
 import {
   FAB_SIZE,
   FAVORITE_SIZE,
+  HISTORY_SIZE,
   SETTINGS_SIZE,
   fabCenter,
   fanLayout,
@@ -20,7 +21,7 @@ import {
   type GestureState,
 } from "./gesture";
 import { loadPosition, savePosition, type FabPosition } from "./position";
-import { SlidersIcon } from "../../shared/icons";
+import { HistoryIcon, SlidersIcon } from "../../shared/icons";
 import logoMark from "../../assets/logo-mark.svg";
 
 const idle: GestureState = { phase: "idle" };
@@ -44,8 +45,9 @@ export function Fab() {
   const favorites = useApp((s) => s.state?.favorites);
   const sheet = useApp((s) => s.sheet);
   const openSheet = useApp((s) => s.openSheet);
-  const goTo = useApp((s) => s.goTo);
+  const openFavorite = useApp((s) => s.openFavorite);
   const onboardingOpen = useApp((s) => s.onboardingOpen);
+  const setFabEdge = useApp((s) => s.setFabEdge);
   const viewport = useViewport();
   const insets = useInsets();
 
@@ -70,7 +72,8 @@ export function Fab() {
 
   const select = (target: FanTarget) => {
     if (target.kind === "settings") openSheet("settings");
-    else if (list[target.index]) goTo(list[target.index].url);
+    else if (target.kind === "history") openSheet("history");
+    else if (list[target.index]) openFavorite(list[target.index].url);
   };
 
   const apply = (effect: GestureEffect) => {
@@ -83,6 +86,7 @@ export function Fab() {
         const stored = { edge: next.edge, yRatio: next.y / viewport.height };
         setPosition(stored);
         savePosition(stored);
+        setFabEdge(next.edge);
         break;
       }
       case "select":
@@ -149,7 +153,7 @@ export function Fab() {
     "--dx": `${center.x - target.x}px`,
     "--dy": `${center.y - target.y}px`,
     "--i": index,
-    "--n": list.length,
+    "--n": list.length + 1,
   });
 
   const hidden = sheet !== "none" || onboardingOpen;
@@ -183,7 +187,7 @@ export function Fab() {
             height: FAVORITE_SIZE,
             margin: -FAVORITE_SIZE / 2,
           }}
-          className={`fan-item glass fixed z-20 grid place-items-center rounded-full bg-white/90! text-lg font-medium text-on-accent ${
+          className={`fan-item fab-glass fixed z-20 grid place-items-center rounded-full text-lg font-medium text-white ${
             hover?.kind === "favorite" && hover.index === index ? "ring-2 ring-accent" : ""
           }`}
         >
@@ -205,6 +209,28 @@ export function Fab() {
       <button
         type="button"
         data-open={fanOpen}
+        aria-label="History"
+        tabIndex={fanOpen ? 0 : -1}
+        onClick={() => {
+          select({ kind: "history" });
+          dispatch({ type: "dismiss" });
+        }}
+        style={{
+          ...fanStyle(layout.history, list.length + 1),
+          width: HISTORY_SIZE,
+          height: HISTORY_SIZE,
+          margin: -HISTORY_SIZE / 2,
+        }}
+        className={`fan-item fab-glass fixed z-20 grid place-items-center rounded-full ${
+          hover?.kind === "history" ? "border-accent! text-accent" : "text-white"
+        }`}
+      >
+        <HistoryIcon />
+      </button>
+
+      <button
+        type="button"
+        data-open={fanOpen}
         aria-label="Settings"
         tabIndex={fanOpen ? 0 : -1}
         onClick={() => {
@@ -217,8 +243,8 @@ export function Fab() {
           height: SETTINGS_SIZE,
           margin: -SETTINGS_SIZE / 2,
         }}
-        className={`fan-item glass fixed z-20 grid place-items-center rounded-full ${
-          hover?.kind === "settings" ? "border-accent! text-accent" : "text-paper/80"
+        className={`fan-item fab-glass fixed z-20 grid place-items-center rounded-full ${
+          hover?.kind === "settings" ? "border-accent! text-accent" : "text-white"
         }`}
       >
         <SlidersIcon />

@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useApp } from "../../app/store";
+import { selectPage, useApp } from "../../app/store";
 import { errorMessage, siteView } from "../../shared/ipc";
 import { ArrowIcon, BackIcon, CloseIcon, ForwardIcon, ReloadIcon } from "../../shared/icons";
 import { normalizeWebUrl } from "../../shared/url";
@@ -10,9 +10,9 @@ const NOT_CONNECTED =
 /** Opens from the top so the keyboard never covers it. Addresses open directly. */
 export function CommandBar() {
   const open = useApp((s) => s.sheet === "assistant");
-  const page = useApp((s) => s.page);
+  const page = useApp(selectPage);
   const closeSheet = useApp((s) => s.closeSheet);
-  const goTo = useApp((s) => s.goTo);
+  const openAddress = useApp((s) => s.openAddress);
   const [text, setText] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -25,7 +25,7 @@ export function CommandBar() {
     }
     setText("");
     setNotice(null);
-    goTo(url);
+    openAddress(url);
   };
 
   const run = (action: () => Promise<void>) =>

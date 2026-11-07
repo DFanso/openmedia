@@ -37,7 +37,9 @@ export function SettingsScreen() {
         <BlockingSection />
         <SitesSection />
         <MarginSection />
+        <BackButtonSection />
         <FavoritesSection />
+        <HistorySection />
         <AiSection />
         <GuideSection />
       </div>
@@ -125,6 +127,42 @@ function MarginSection() {
           onCommit={(pixels) => void setBottomMargin(pixels)}
         />
       </div>
+    </section>
+  );
+}
+
+function BackButtonSection() {
+  const enabled = useApp((s) => s.state?.backButton ?? false);
+  const setBackButton = useApp((s) => s.setBackButton);
+
+  return (
+    <section>
+      <h2 className="text-3xl leading-tight font-semibold">Back button</h2>
+      <p className="mt-1 text-sm text-paper/55">
+        Shows a floating button on the side opposite the main button whenever the page has somewhere
+        to go back to. For sites that have no back button of their own.
+      </p>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={enabled}
+        onClick={() => void setBackButton(!enabled)}
+        className="mt-4 flex w-full items-center justify-between rounded-2xl border border-hair px-4 py-3 text-base"
+      >
+        <span>Show floating back button</span>
+        <span
+          aria-hidden="true"
+          className={`relative h-7 w-12 rounded-full transition-colors ${
+            enabled ? "bg-accent" : "bg-paper/20"
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 size-6 rounded-full transition-all ${
+              enabled ? "left-[22px] bg-on-accent" : "left-0.5 bg-paper/70"
+            }`}
+          />
+        </span>
+      </button>
     </section>
   );
 }
@@ -260,6 +298,52 @@ function FavoritesSection() {
         </button>
         {saved && <span className="text-sm text-paper/60">Saved</span>}
       </div>
+    </section>
+  );
+}
+
+function HistorySection() {
+  const count = useApp((s) => s.state?.history.length ?? 0);
+  const clearHistory = useApp((s) => s.clearHistory);
+  const [confirming, setConfirming] = useState(false);
+
+  return (
+    <section>
+      <h2 className="text-3xl leading-tight font-semibold">History</h2>
+      <p className="mt-1 text-sm text-paper/55">
+        The addresses you have searched, kept on this device only. Clearing also forgets the last
+        page, so the app starts on your first favorite. Open pages, favorites and logins stay.
+      </p>
+      {confirming ? (
+        <div className="mt-3 flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setConfirming(false);
+              void clearHistory();
+            }}
+            className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-on-accent"
+          >
+            Clear {count} {count === 1 ? "site" : "sites"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setConfirming(false)}
+            className="rounded-full border border-hair px-5 py-2.5 text-sm font-medium text-paper/85"
+          >
+            Cancel
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          disabled={count === 0}
+          onClick={() => setConfirming(true)}
+          className="mt-3 rounded-full border border-hair px-5 py-2.5 text-sm font-medium text-paper/85 disabled:opacity-30"
+        >
+          Clear history
+        </button>
+      )}
     </section>
   );
 }

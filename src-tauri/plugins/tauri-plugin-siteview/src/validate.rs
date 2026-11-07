@@ -21,6 +21,11 @@ pub fn parse_profile_id(input: &str) -> Result<Uuid> {
     Uuid::parse_str(input).map_err(|_| Error::InvalidProfile)
 }
 
+/// Session ids come from the shell; they are UUIDs so they are safe to log and to use as map keys.
+pub fn parse_session_id(input: &str) -> Result<Uuid> {
+    Uuid::parse_str(input).map_err(|_| Error::InvalidSession)
+}
+
 pub fn parse_bridge_body(body: &str) -> Result<serde_json::Value> {
     if body.len() > MAX_BRIDGE_MESSAGE_BYTES {
         return Err(Error::BridgeMessageTooLarge(MAX_BRIDGE_MESSAGE_BYTES));
@@ -93,6 +98,15 @@ mod tests {
         assert!(matches!(
             parse_profile_id("../../etc"),
             Err(Error::InvalidProfile)
+        ));
+    }
+
+    #[test]
+    fn session_ids_must_be_uuids() {
+        assert!(parse_session_id("6f1a1c1e-0000-4000-8000-00000000000a").is_ok());
+        assert!(matches!(
+            parse_session_id("main"),
+            Err(Error::InvalidSession)
         ));
     }
 
