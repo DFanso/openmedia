@@ -1,8 +1,17 @@
-const FADE_MS = 250;
+const FADE_MS = 400;
+
+function minimumVisibleMs(): number {
+  if (!import.meta.env.DEV) return 0;
+  const seconds = Number(import.meta.env.VITE_SPLASH_MIN_SECONDS);
+  return Number.isFinite(seconds) && seconds > 0 ? seconds * 1000 : 0;
+}
 
 export function hideSplash(): void {
   const splash = document.getElementById("splash");
   if (!splash) return;
-  splash.setAttribute("data-hidden", "");
-  window.setTimeout(() => splash.remove(), FADE_MS);
+  const remaining = Math.max(0, minimumVisibleMs() - performance.now());
+  window.setTimeout(() => {
+    splash.setAttribute("data-hidden", "");
+    window.setTimeout(() => splash.remove(), FADE_MS);
+  }, remaining);
 }
