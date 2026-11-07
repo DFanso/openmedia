@@ -23,6 +23,28 @@ export interface AppState {
   onboarded: boolean;
   theme: Theme;
   adBlock: boolean;
+  /** Pixels kept clear under every page that has no margin of its own. */
+  bottomMargin: number;
+}
+
+export type OptionGroup = "annoyance" | "content";
+
+/** One toggle for a site. `enabled` already reflects the user's choice or the site's default. */
+export interface SiteOption {
+  id: string;
+  label: string;
+  description: string;
+  group: OptionGroup;
+  enabled: boolean;
+  default: boolean;
+}
+
+export interface SiteSettings {
+  recipeId: string;
+  name: string;
+  options: SiteOption[];
+  /** The site's own bottom margin, or null to use the shared one. */
+  bottomMargin: number | null;
 }
 
 export type ProviderKind = "anthropic" | "openAiCompatible";
@@ -79,6 +101,15 @@ export const library = {
   setTheme: (theme: Theme) => command("set_theme", { theme }),
   /** Persists the choice and reloads the open page under it; see `set_ad_block` in Rust. */
   setAdBlock: (enabled: boolean) => command("set_ad_block", { enabled }),
+  getSites: () => invoke<SiteSettings[]>("get_sites"),
+  /** Saves the toggle and reloads the open page under it; see `set_site_option` in Rust. */
+  setSiteOption: (recipeId: string, optionId: string, enabled: boolean) =>
+    command("set_site_option", { recipeId, optionId, enabled }),
+  setBottomMargin: (pixels: number) => command("set_bottom_margin", { pixels }),
+  setSiteBottomMargin: (recipeId: string, pixels: number | null) =>
+    command("set_site_bottom_margin", { recipeId, pixels }),
+  /** The margin that applies to this page: its site's own, else the shared one. */
+  bottomMarginFor: (url: string) => invoke<number>("bottom_margin_for", { url }),
   /** Opens the page natively with the recipe script attached; see `open_site` in Rust. */
   openSite: (url: string, rect: Rect) => command("open_site", { url, rect }),
 };

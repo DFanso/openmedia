@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { errorMessage, library, siteView } from "../../shared/ipc";
 import { useApp } from "../../app/store";
+import { usePageMargin } from "./usePageMargin";
 import { readRect, useSiteViewRect } from "./useSiteViewRect";
 
 /**
@@ -14,6 +15,8 @@ export function WebLayer() {
   const request = useApp((s) => s.request);
   const setPage = useApp((s) => s.setPage);
   const reportError = useApp((s) => s.reportError);
+
+  const bottomMargin = usePageMargin();
 
   useSiteViewRect(slot);
 
@@ -63,7 +66,13 @@ export function WebLayer() {
       <div
         ref={slot}
         aria-hidden="true"
-        className="fixed inset-x-0 top-[env(safe-area-inset-top)] bottom-0"
+        style={{ bottom: bottomMargin }}
+        className="fixed inset-x-0 top-[env(safe-area-inset-top)]"
+      />
+      <div
+        aria-hidden="true"
+        style={{ height: bottomMargin }}
+        className="fixed inset-x-0 bottom-0 bg-ink"
       />
       <div className="fixed inset-x-0 top-0 h-[env(safe-area-inset-top)] bg-ink" />
     </>

@@ -4,7 +4,10 @@ import { CloseIcon, DownIcon, PlusIcon, UpIcon } from "../../shared/icons";
 import type { Theme } from "../../shared/ipc";
 import { normalizeWebUrl } from "../../shared/url";
 import { AiSection } from "./AiSection";
+import { MarginSlider } from "./MarginSlider";
 import { MAX_FAVORITE_NAME, MAX_FAVORITES } from "./presets";
+import { SitesSection } from "./SitesSection";
+import { Switch } from "./Switch";
 
 const field =
   "w-full min-w-0 rounded-xl border border-hair bg-paper/[0.05] px-3 py-2.5 text-base text-paper outline-none placeholder:text-paper/35 focus:border-accent";
@@ -32,6 +35,8 @@ export function SettingsScreen() {
       <div className="flex flex-1 flex-col gap-12 overflow-y-auto px-5 pt-2 pb-[calc(env(safe-area-inset-bottom)+32px)]">
         <AppearanceSection />
         <BlockingSection />
+        <SitesSection />
+        <MarginSection />
         <FavoritesSection />
         <AiSection />
         <GuideSection />
@@ -91,27 +96,35 @@ function BlockingSection() {
         Blocks ads and trackers before they load, using lists built into the app. If a site stops
         working, turn it off; the page reloads.
       </p>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={enabled}
-        onClick={() => void setAdBlock(!enabled)}
-        className="mt-4 flex w-full items-center justify-between rounded-2xl border border-hair px-4 py-3 text-base"
-      >
-        <span>Block ads and trackers</span>
-        <span
-          aria-hidden="true"
-          className={`relative h-7 w-12 rounded-full transition-colors ${
-            enabled ? "bg-accent" : "bg-paper/20"
-          }`}
-        >
-          <span
-            className={`absolute top-0.5 size-6 rounded-full transition-all ${
-              enabled ? "left-[22px] bg-on-accent" : "left-0.5 bg-paper/70"
-            }`}
-          />
-        </span>
-      </button>
+      <div className="mt-4">
+        <Switch
+          label="Block ads and trackers"
+          checked={enabled}
+          onChange={(on) => void setAdBlock(on)}
+        />
+      </div>
+    </section>
+  );
+}
+
+function MarginSection() {
+  const margin = useApp((s) => s.state?.bottomMargin ?? 0);
+  const setBottomMargin = useApp((s) => s.setBottomMargin);
+
+  return (
+    <section>
+      <h2 className="text-3xl leading-tight font-semibold">Bottom margin</h2>
+      <p className="mt-1 text-sm text-paper/55">
+        Keeps the bottom of every page clear, for sites whose menus slide under the screen edge. A
+        site can have its own margin under Sites.
+      </p>
+      <div className="mt-4 rounded-2xl border border-hair px-4 py-3">
+        <MarginSlider
+          label="Bottom margin for all sites"
+          value={margin}
+          onCommit={(pixels) => void setBottomMargin(pixels)}
+        />
+      </div>
     </section>
   );
 }

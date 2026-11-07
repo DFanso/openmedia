@@ -1,29 +1,18 @@
 import { useState, type FormEvent } from "react";
 import { useApp } from "../../app/store";
-import { errorMessage, siteView, type Favorite } from "../../shared/ipc";
-import {
-  ArrowIcon,
-  BackIcon,
-  CloseIcon,
-  ForwardIcon,
-  PlusIcon,
-  ReloadIcon,
-} from "../../shared/icons";
+import { errorMessage, siteView } from "../../shared/ipc";
+import { ArrowIcon, BackIcon, CloseIcon, ForwardIcon, ReloadIcon } from "../../shared/icons";
 import { normalizeWebUrl } from "../../shared/url";
-import { MAX_FAVORITES } from "../settings/presets";
 
 const NOT_CONNECTED =
   "The AI assistant isn't connected yet, so only addresses work for now. Type one to open it.";
-const NO_FAVORITES: Favorite[] = [];
 
 /** Opens from the top so the keyboard never covers it. Addresses open directly. */
 export function CommandBar() {
   const open = useApp((s) => s.sheet === "assistant");
   const page = useApp((s) => s.page);
-  const favorites = useApp((s) => s.state?.favorites) ?? NO_FAVORITES;
   const closeSheet = useApp((s) => s.closeSheet);
   const goTo = useApp((s) => s.goTo);
-  const saveFavorites = useApp((s) => s.saveFavorites);
   const [text, setText] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -41,22 +30,6 @@ export function CommandBar() {
 
   const run = (action: () => Promise<void>) =>
     void action().catch((error: unknown) => setNotice(errorMessage(error)));
-
-  const canAdd =
-    !!page?.url &&
-    favorites.length < MAX_FAVORITES &&
-    !favorites.some((favorite) => favorite.url === page.url);
-
-  const addCurrent = () => {
-    if (!page?.url) return;
-    const name = (page.title?.trim() || new URL(page.url).hostname.replace(/^www\./, "")).slice(
-      0,
-      20,
-    );
-    void saveFavorites([...favorites, { name, url: page.url }]).then((saved) => {
-      setNotice(saved ? `Added ${name} to favorites.` : null);
-    });
-  };
 
   const tool = "grid size-11 place-items-center rounded-full text-paper/80 disabled:opacity-25";
 
@@ -131,15 +104,6 @@ export function CommandBar() {
             </button>
           </div>
           <div className="flex">
-            <button
-              type="button"
-              aria-label="Add this page to favorites"
-              disabled={!canAdd}
-              className={tool}
-              onClick={addCurrent}
-            >
-              <PlusIcon />
-            </button>
             <button type="button" aria-label="Close" className={tool} onClick={closeSheet}>
               <CloseIcon />
             </button>
