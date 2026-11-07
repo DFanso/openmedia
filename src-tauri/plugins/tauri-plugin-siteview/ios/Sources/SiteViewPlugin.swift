@@ -239,6 +239,10 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
   private func makeConfiguration(profileId: UUID, script: String?) -> WKWebViewConfiguration {
     let configuration = WKWebViewConfiguration()
     configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: profileId)
+    // iPhone defaults to fullscreen-only video, which covers the shell's controls. Muted video may
+    // autoplay inline; audio still needs a tap.
+    configuration.allowsInlineMediaPlayback = true
+    configuration.mediaTypesRequiringUserActionForPlayback = .audio
     let controller = WKUserContentController()
     if let script, !script.isEmpty {
       controller.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentStart, forMainFrameOnly: false))

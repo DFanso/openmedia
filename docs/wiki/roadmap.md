@@ -75,7 +75,7 @@ The vertical slice, then breadth.
 - Recipe store + URL resolution + merged bundle.
 - Engine: CSS-first application, observer fallback, SPA navigation, `hide`/`remove`/`css`/`redirect`/`media`, reversibility, circuit breaker ([Site Runtime](./site-runtime.md)).
 - Match reporting → rule health, stale detection.
-- **First hand-written bundled recipe: Instagram without Reels**, with DOM fixtures and a fixture test.
+- **First bundled recipe.** Started with **Reddit without app prompts** because it is what the app hit first (see the decision log); it has DOM fixtures and a fixture test. Instagram without Reels is still to do. Done so far: the recipe schema subset, validation, the CSS compile and the document-start delivery, in `src-tauri/src/recipes/` (see [Recipe Format](./recipe-format.md#implemented-subset)).
 - Customize panel: rule list, toggles, delete, undo.
 - **Element picker** (no AI): tap element → proposed target → `hide` rule.
 - Engine test harness: Playwright loads fixtures with the engine, asserts hidden/remaining sets.
@@ -159,6 +159,9 @@ All without a backend.
 | 2026-11-07 | Shell is one page with a floating button; no home screen, tabs, or address bar | User direction: the web is the product, controls stay out of the way | Users need several simultaneous tabs |
 | 2026-11-07 | Site view sits below a transparent shell, with a native touch router | A control drawn in the shell cannot float over a native view that sits above it | The router breaks page scrolling or pinch on a device |
 | 2026-11-07 | Single hidden profile for now; Android Kotlin code removed | Profile UI is out of scope for the new UI; the Android code assumed the old layering. Recover it from commit `591636a` | Multiple accounts per site are wanted; Android work starts |
+| 2026-11-07 | Fix Reddit's "use the app" prompts with a bundled recipe (hide rules), not by changing the user agent | Site knowledge belongs in data; the wiki's risk register rules out UA spoofing. The web view's user agent has no `Safari` token, which sites can use to detect an embedded view; changing that is a separate, deliberate decision | Hiding is not enough for a site, or the user asks for a Safari-like user agent |
+| 2026-11-07 | The shell opens pages only through the app's `open_site` command; the plugin's `open` is not granted to it | The recipe script is attached in Rust, so the shell cannot open a page without it | A second caller needs `open` |
+| 2026-11-07 | The accent color follows the logo (cyan `#06aff8`), replacing the warm amber chosen earlier | The user asked for the logo to be used; amber clashed with it | The brand changes |
 
 ## Open questions
 

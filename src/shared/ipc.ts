@@ -16,6 +16,7 @@ export interface AppState {
   profileId: string;
   favorites: Favorite[];
   lastUrl: string | null;
+  onboarded: boolean;
 }
 
 export interface Rect {
@@ -41,11 +42,12 @@ export const library = {
   getState: () => invoke<AppState>("get_state"),
   setFavorites: (favorites: FavoriteInput[]) => invoke<Favorite[]>("set_favorites", { favorites }),
   setLastUrl: (url: string) => command("set_last_url", { url }),
+  completeOnboarding: () => command("complete_onboarding"),
+  /** Opens the page natively with the recipe script attached; see `open_site` in Rust. */
+  openSite: (url: string, rect: Rect) => command("open_site", { url, rect }),
 };
 
 export const siteView = {
-  open: (profile: string, url: string, rect: Rect) =>
-    command("plugin:siteview|open", { request: { profile, url, rect } }),
   close: () => command("plugin:siteview|close"),
   setRect: (rect: Rect) => command("plugin:siteview|set_rect", { request: { rect } }),
   setInteractiveRegions: (regions: Rect[]) =>

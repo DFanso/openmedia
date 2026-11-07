@@ -47,6 +47,7 @@ interface EditorProps {
 function Editor({ initial, serverError, onCancel, onSave }: EditorProps) {
   const [drafts, setDrafts] = useState(initial);
   const [problem, setProblem] = useState<string | null>(null);
+  const showGuide = useApp((s) => s.showGuide);
 
   const update = (key: string, patch: Partial<Draft>) => {
     setProblem(null);
@@ -162,6 +163,16 @@ function Editor({ initial, serverError, onCancel, onSave }: EditorProps) {
           Not connected yet. Customizing sites with AI needs a provider key and the page engine,
           which come next.
         </p>
+
+        <h2 className="mt-10 text-3xl leading-tight font-semibold">How it works</h2>
+        <p className="mt-1 text-sm text-paper/55">Tap, hold, and drag: a short guide.</p>
+        <button
+          type="button"
+          onClick={showGuide}
+          className="mt-3 rounded-full border border-hair px-5 py-2.5 text-sm font-medium text-paper/85"
+        >
+          Replay the guide
+        </button>
       </div>
 
       <footer className="border-t border-hair px-5 pt-3 pb-[calc(env(safe-area-inset-bottom)+12px)]">

@@ -37,5 +37,6 @@ Not built: `yarn tauri android dev` (the Android site view does not exist yet), 
 
 ## Troubleshooting
 
+- **Blank black app, no console errors.** Check for a Tauri command that is not `async` yet calls the plugin: it deadlocks the main thread. `sample <pid> 2` on the `OpenMedia` process shows the main thread inside the command. Fix by making the command `async`.
 - **Port 1420 stuck.** A leftover Vite dev server from an earlier `tauri ios dev` makes the next run fail with "Port 1420 is already in use". Kill it (`lsof -ti :1420 | xargs kill`) and retry.
 - **Plain `http://` sites on iOS.** App Transport Security is expected to block them [INFERENCE: not observed in this app; the localhost fixture was only ever loaded with the exception in place]. For local testing add a temporary `NSAllowsLocalNetworking` exception to `src-tauri/gen/apple/openmedia_iOS/Info.plist` and remove it afterwards.

@@ -1,6 +1,6 @@
 # Recipe Format
 
-> **Status: Design.** The schema below is the intended v1. The Rust types in `src-tauri/src/recipes/schema.rs` will become the source of truth; update this page when they land.
+> **Status: Partially implemented.** A subset of schema v1 is built in `src-tauri/src/recipes/` (see [Implemented subset](#implemented-subset)). Everything else below is still the intended design; the Rust types become the source of truth and this page follows them.
 
 A **recipe** is a JSON document describing how to modify one site (or a set of URL patterns). Declarative on purpose: the AI emits it, Rust validates it, the engine applies it, and users can read, toggle, edit, export, and share it.
 
@@ -136,6 +136,19 @@ stateDiagram-v2
   Stale --> Active: repair accepted / site recovers
   Active --> [*]: delete
 ```
+
+## Implemented subset
+
+What the Rust code accepts today, validated with `deny_unknown_fields` so anything else is refused rather than ignored:
+
+- Top level: `schema` (must be 1), `id`, `name`, `version`, `origin`, `match`, `rules`, optional `meta` (`author`, `lastVerified`, `notes`).
+- Rules: `hide` (`display: none !important`) and `css` (a whitelisted declarations block). Targets are a single `css` selector; `ariaLabel`, `href`, `text`, `has`, `closest`, `when`, `expect`, `redirect`, `media`, `remove` and `script` are not accepted yet.
+- Selectors: at most 300 characters, no `{ } ; \ < @`, backtick or comments, balanced brackets, at most 20 selectors in a list and 2 `:has(`.
+- `css` declarations: only `display`, `visibility`, `opacity`, `overflow`, `overflow-x`, `overflow-y`, `position`, `pointer-events`, `filter`, `height`, `min-height`, `max-height`, `touch-action`, `backdrop-filter`; values limited to letters, digits and ` .,%#()-`, no `url(`.
+- `match`: `scheme://host/path` with `http`, `https` or `*`; the host may start with `*.` (matches the apex and any subdomain depth); `*` in the path is a glob. An all-sites host (`*`) is refused unless the recipe is `bundled`.
+- Delivery: all recipes are compiled by Rust into one document-start script. The page tests its own `location` against each recipe's matcher regexes, so one script stays correct across navigations. The shell cannot open a page without it: `open_site` is the only way, and the plugin's `open` is not granted to the shell.
+- Fixtures: every bundled rule must match something in `recipes/fixtures/<site>/`; this is tested in Rust.
+- Bundled today: `reddit.no-app-nag` (hides the "Open App" button, the app banner and the blocking app modal, and keeps the page scrollable). See its `meta.notes` for what was and was not verified on the live site.
 
 ## Inspirations
 

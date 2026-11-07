@@ -41,6 +41,7 @@ pub struct AppState {
     pub profile_id: Uuid,
     pub favorites: Vec<Favorite>,
     pub last_url: Option<String>,
+    pub onboarded: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -50,6 +51,8 @@ struct LibraryData {
     profile_id: Uuid,
     favorites: Vec<Favorite>,
     last_url: Option<String>,
+    #[serde(default)]
+    onboarded: bool,
 }
 
 /// The user's favorites and last page, persisted as one JSON file. Holds no secrets and no
@@ -83,6 +86,7 @@ impl Library {
             profile_id: data.profile_id,
             favorites: data.favorites.clone(),
             last_url: data.last_url.clone(),
+            onboarded: data.onboarded,
         })
     }
 
@@ -98,6 +102,12 @@ impl Library {
         data.favorites = favorites.clone();
         self.save(&data)?;
         Ok(favorites)
+    }
+
+    pub fn set_onboarded(&self) -> Result<()> {
+        let mut data = self.lock()?;
+        data.onboarded = true;
+        self.save(&data)
     }
 
     pub fn set_last_url(&self, url: &str) -> Result<()> {
@@ -138,6 +148,7 @@ fn default_data() -> LibraryData {
             })
             .collect(),
         last_url: None,
+        onboarded: false,
     }
 }
 

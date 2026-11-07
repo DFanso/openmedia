@@ -23,7 +23,7 @@ export function WebLayer() {
     let cancelled = false;
     const action = opened.current
       ? siteView.navigate(request.url)
-      : siteView.open(profileId, request.url, readRect(element)).then(() => {
+      : library.openSite(request.url, readRect(element)).then(() => {
           if (!cancelled) opened.current = true;
         });
     action.catch((error: unknown) => reportError(errorMessage(error)));

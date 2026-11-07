@@ -21,6 +21,7 @@ import {
 } from "./gesture";
 import { loadPosition, savePosition, type FabPosition } from "./position";
 import { GearIcon } from "../../shared/icons";
+import logoMark from "../../assets/logo-mark.svg";
 
 const idle: GestureState = { phase: "idle" };
 
@@ -42,6 +43,7 @@ export function Fab() {
   const sheet = useApp((s) => s.sheet);
   const openSheet = useApp((s) => s.openSheet);
   const goTo = useApp((s) => s.goTo);
+  const onboardingOpen = useApp((s) => s.onboardingOpen);
   const viewport = useViewport();
   const insets = useInsets();
 
@@ -148,7 +150,8 @@ export function Fab() {
     "--n": list.length,
   });
 
-  const hidden = sheet !== "none";
+  const hidden = sheet !== "none" || onboardingOpen;
+  const holdState = gesture.phase === "pressing" ? "charging" : fanOpen ? "open" : "idle";
 
   return (
     <>
@@ -217,6 +220,7 @@ export function Fab() {
       <button
         type="button"
         data-hit={hidden ? undefined : ""}
+        data-hold={holdState}
         aria-label="Assistant. Hold for favorites."
         aria-expanded={fanOpen}
         onPointerDown={onPointerDown}
@@ -232,14 +236,15 @@ export function Fab() {
           transition: gesture.phase === "dragging" ? "none" : "transform 320ms var(--ease-spring)",
           touchAction: "none",
         }}
-        className={`glass fixed top-0 left-0 z-30 grid place-items-center rounded-full ${
+        className={`fab fixed top-0 left-0 z-30 grid place-items-center rounded-full ${
           hidden ? "pointer-events-none opacity-0" : ""
         }`}
       >
-        <span
-          className="block size-2.5 rounded-full bg-accent transition-transform duration-300"
-          style={{ transform: fanOpen ? "scale(1.7)" : "scale(1)" }}
-        />
+        <span className="fab-aura" />
+        <img src={logoMark} alt="" draggable={false} className="fab-logo relative size-8" />
+        <svg className="fab-ring" viewBox="0 0 62 62" aria-hidden="true">
+          <circle cx="31" cy="31" r="29" />
+        </svg>
       </button>
     </>
   );

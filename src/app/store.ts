@@ -18,11 +18,14 @@ interface AppStore {
   state: AppState | null;
   error: string | null;
   sheet: Sheet;
+  onboardingOpen: boolean;
   request: NavigationRequest | null;
   page: SiteViewState | null;
   load: () => Promise<void>;
   openSheet: (sheet: Sheet) => void;
   closeSheet: () => void;
+  showGuide: () => void;
+  finishGuide: () => Promise<void>;
   goTo: (url: string) => void;
   setPage: (page: SiteViewState) => void;
   reportError: (message: string | null) => void;
@@ -36,6 +39,7 @@ export const useApp = create<AppStore>((set) => ({
   state: null,
   error: null,
   sheet: "none",
+  onboardingOpen: false,
   request: null,
   page: null,
 
@@ -43,7 +47,7 @@ export const useApp = create<AppStore>((set) => ({
     try {
       const state = await library.getState();
       const start = state.lastUrl ?? state.favorites[0]?.url;
-      set({ state, request: start ? nextRequest(start) : null });
+      set({ state, onboardingOpen: !state.onboarded, request: start ? nextRequest(start) : null });
     } catch (error) {
       set({ error: errorMessage(error) });
     }
@@ -51,6 +55,18 @@ export const useApp = create<AppStore>((set) => ({
 
   openSheet: (sheet) => set({ sheet }),
   closeSheet: () => set({ sheet: "none" }),
+  showGuide: () => set({ onboardingOpen: true }),
+
+  finishGuide: async () => {
+    set({ onboardingOpen: false });
+    try {
+      await library.completeOnboarding();
+      set((current) => ({ state: current.state && { ...current.state, onboarded: true } }));
+    } catch (error) {
+      set({ error: errorMessage(error) });
+    }
+  },
+
   goTo: (url) => set({ request: nextRequest(url), sheet: "none" }),
   setPage: (page) => set({ page }),
   reportError: (error) => set({ error }),

@@ -1,10 +1,9 @@
 ## Default Permission
 
-Shell-only control of the native site view. Never grant to a site webview.
+Shell-only control of the native site view. `open` is deliberately absent: the app's own `open_site` command opens pages so it can attach the recipe script. Never grant to a site webview.
 
 #### This default permission set includes the following:
 
-- `allow-open`
 - `allow-close`
 - `allow-set-rect`
 - `allow-set-interactive-regions`

@@ -16,6 +16,8 @@ pub enum Error {
     Corrupt(#[from] serde_json::Error),
     #[error("the library file has unsupported version {0}")]
     UnsupportedVersion(u32),
+    #[error("invalid recipe: {0}")]
+    Recipe(String),
     #[error("library lock poisoned")]
     Poisoned,
 }

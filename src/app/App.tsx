@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Fab } from "../features/fab/Fab";
+import { Onboarding } from "../features/onboarding/Onboarding";
 import { CommandBar } from "../features/sheet/CommandBar";
 import { SettingsScreen } from "../features/settings/SettingsScreen";
 import { WebLayer } from "../features/web/WebLayer";
@@ -23,6 +24,7 @@ export function App() {
       <Fab />
       <CommandBar />
       <SettingsScreen />
+      <Onboarding />
       {error && sheet !== "settings" && (
         <button
           type="button"

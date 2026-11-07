@@ -25,7 +25,7 @@ The site view loads third-party code we do not control, and our injected engine 
 ## Invariants
 
 1. **Keys never leave Rust.** Not to the shell, not to a site view, not to logs.
-2. **Site views have no general IPC.** No capability grants a site-view webview access to Tauri core, plugins, filesystem, shell, http, or store commands.
+2. **Site views have no general IPC.** No capability grants a site-view webview access to Tauri core, plugins, filesystem, shell, http, or store commands. The shell itself is not granted the plugin's `open`; it opens pages through the app's `open_site`, which attaches the recipe script in Rust.
 3. **The bridge is write-only and low-privilege.** The only thing a site view can invoke is "deliver this message to Core", where Core treats it as untrusted data and the message set cannot trigger actions (it can't open files, read keys, or call the LLM).
 4. **AI output and imported recipes are untrusted** and validated before use ([Recipe Format](./recipe-format.md#validation-rust-before-anything-reaches-a-webview)).
 5. **No `script` rule from AI.** Script rules need explicit per-recipe user confirmation, keyed by content hash.

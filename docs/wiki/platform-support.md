@@ -45,6 +45,12 @@ Runs on the iPhone 17 Pro Max simulator (iOS 26.5). The first used a throwaway s
 | Real app: a real HTTPS site loads in the native view | Yes: the Reddit mobile site loaded (logged out) when the app restored its last page. An earlier `example.com` attempt failed; the host's own `curl` also failed at that moment, so it was likely a transient network problem, not an app fault |
 | Site view below a transparent shell: native hit test sends touches inside reported regions to the shell and everything else to the page | Yes, from a native log: the button's centre went to the shell and the screen centre to the page; with the fan, command bar or an error banner open, the corresponding regions went to the shell |
 | Gestures on the floating button (synthetic pointer events through the real components): tap opens the assistant; hold opens the fan; sliding onto a favorite and lifting selects it; lifting then tapping selects it; a drag snaps to the nearer edge and the position persists; sliding onto settings opens it; saving favorites persists to `library.json` | Yes |
+| Real app: the Reddit recipe's document-start script is injected, and the orange "Open App" button in the header is gone (compare with the same page before) | Yes, by eye on a screenshot of the live mobile site. The blocking "use the app" modal appears after about 30 seconds in a feed and could not be reproduced on demand, so hiding it and the scroll unlock are untested against the live blocking state |
+| Real app: the hold feedback (ring fills, halo pulses with a drifting hue) and the fan over a real page, with the logo on the button | Yes, by eye on a screenshot taken during a synthetic hold |
+| Real app: onboarding renders (steps 1 and 3 seen, with the animated fan demo) | Yes, by eye; steps 2 and 4 and the Skip and Start buttons were driven by the test harness but not inspected |
+| Video playing inline (`allowsInlineMediaPlayback`) | **Not verified.** Before this setting, an autoplaying Reddit video went fullscreen and covered the shell's controls; the setting is the documented fix and was not re-tested with a video |
+
+**Found while testing:** a synchronous Tauri command that calls into the plugin deadlocks the app (it blocks the main thread waiting for native code that needs the main thread). Commands that reach native code must be `async`; see `open_site`.
 
 **Decisions that follow:**
 
