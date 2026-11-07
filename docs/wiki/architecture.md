@@ -37,7 +37,7 @@ flowchart LR
 
 - **iframe:** Instagram, YouTube, X and most targets send `X-Frame-Options` / `frame-ancestors`. They refuse to render in a frame.
 - **Proxy/rewriting server:** would be a backend (rejected), and would route the user's credentials through it.
-- **Native webview loading the real site directly:** the user logs in to the real origin, cookies stay in the webview's own store, and we inject our engine into the page. This is the same mechanism SocialLite uses (see [Prior Art](./prior-art.md)).
+- **Native webview loading the real site directly:** the user logs in to the real origin, cookies stay in the webview's own store, and we inject our engine into the page. SocialLite's FAQ describes the same user-visible shape (the account opens inside its own app with a session cookie kept on device); that it is an injected webview is inferred, not stated by them (see [Prior Art](./prior-art.md)).
 
 ## Components
 

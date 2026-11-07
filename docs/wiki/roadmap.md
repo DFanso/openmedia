@@ -1,10 +1,10 @@
 # Roadmap
 
-> **Status: Design.** Current phase: **0 — Feasibility spikes** (not started). Update this page when phases start, finish, or change.
+> **Status: Phase 1 in progress, mobile first.** Done: Tauri scaffold, siteview plugin (iOS + Android sources), profile/site persistence, shell home + browser views, CI. Not yet run on Android. Desktop is deferred. Update this page when phases start, finish, or change.
 
 ## Goal
 
-A Tauri v2 app (macOS, iOS, Android first; Windows/Linux after) where the user opens any site and reshapes it. Bundled recipes cover popular sites; an AI assistant using the user's own key writes recipes for anything else. No backend.
+A Tauri v2 app (iOS and Android first; macOS, Windows, Linux after) where the user opens any site and reshapes it. Bundled recipes cover popular sites; an AI assistant using the user's own key writes recipes for anything else. No backend.
 
 ## Principles
 
@@ -37,7 +37,7 @@ Throwaway code in a `spikes/` branch/worktree (not merged to `main`); outputs ar
 | ID | Spike | Question answered | Pass criteria |
 |----|-------|-------------------|---------------|
 | S1 | Desktop site view (macOS) | Does `add_child` + `initialization_script` host Instagram and YouTube, log in, and inject at document start? | Logged-in Instagram web renders in a child webview; a hardcoded CSS rule hides the Reels nav item with no visible flash on cold load and on SPA navigation |
-| S2 | The bridge | Can the engine send messages to Core without general IPC exposure? | Engine posts a message that Core receives; **a negative test proves a site view cannot invoke any other command**. Chosen option recorded in [Security](./security.md#the-bridge-open-decision) |
+| S2 | The bridge | Can the engine send messages to Core without general IPC exposure? | Engine posts a message that Core receives; **a negative test proves a site view cannot invoke any other command**. Chosen option recorded in [Security](./security.md#the-bridge) |
 | S3 | iOS native site view | Can an in-repo plugin host a `WKWebView` above the Tauri webview, positioned by a shell-reported rect? | Rect follows layout changes, rotation, keyboard; `WKUserScript` injection works; script message handler delivers to Rust |
 | S4 | Android native site view | Same as S3 on Android; document-start injection support | Same pass criteria; document whether `addDocumentStartJavaScript` is available and what the fallback costs |
 | S5 | Profile isolation | Separate cookie jars per profile on each platform | Log in as account A in profile 1; profile 2 is logged out. Record min OS versions and fallbacks |
@@ -152,12 +152,16 @@ All without a backend.
 | 2026-11-07 | No push notifications, parent/family plans, or accounts | Require a backend | A backend decision is made |
 | 2026-11-07 | Do not use Android Accessibility to block native apps | Policy and trust cost; out of scope | User demand |
 | 2026-11-07 | Defaults: React, Zustand, Tailwind, yarn, Vitest, Playwright | Boring; yarn matches the author's other projects | Before Phase 1 only; cheap to change until the scaffold exists |
+| 2026-11-07 | iOS and Android are first-class; desktop deferred | Mobile is the product. S1 (desktop child webview) moves out of the critical path | Mobile is blocked, or desktop demand appears |
+| 2026-11-07 | iOS 17 minimum | `WKWebsiteDataStore(forIdentifier:)` needs it; verified working on iOS 26.5 simulator | A non-isolated fallback is accepted |
+| 2026-11-07 | Android refuses to open sites without `MULTI_PROFILE` and `WEB_MESSAGE_LISTENER` | A silent shared cookie jar breaks the profile-isolation invariant | Real devices in the target range lack the feature |
+| 2026-11-07 | Bridge B on mobile: native message handler delivers into a Rust-created `Channel` | Verified on iOS: the page has no Tauri IPC, and Rust receives the message | Android verification fails |
 
 ## Open questions
 
 1. **Bridge mechanism** (S2): remote-capability command vs native channel on desktop.
 2. **Secret store** (S6): adopt third-party plugin vs in-repo.
-3. **Minimum iOS version**: iOS 17 gives `WKWebsiteDataStore(forIdentifier:)`; older gives one profile.
+3. **Minimum iOS version**: decided, iOS 17. See the decision log.
 4. **Do we support multiple tabs per profile on mobile in v1?** Memory and plugin complexity; start with one active site view plus a lightweight switcher.
 5. **Licensing**: choose a license before opening to contributors (not yet decided).
 6. **Monetization**: none assumed. Not planned; no code depends on it.

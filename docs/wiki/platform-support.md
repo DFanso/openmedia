@@ -1,15 +1,15 @@
 # Platform Support
 
-> **Status: Design.** Rows marked **verify** are assumptions to be settled by the Phase 0 spikes; results get recorded here and in the roadmap decision log.
+> **Status: Partially implemented.** The iOS and Android site-view plugin exists (`src-tauri/plugins/tauri-plugin-siteview`). Only the iOS checks under [Verified results](#verified-results) were run, on one simulator; everything else marked **verify** is still unproven. Desktop is deferred.
 
 ## The core constraint
 
 Tauri's multi-webview API (`Window::add_child`) is gated behind the `unstable` Cargo feature and **desktop-only**; upstream tracks mobile support in [#11794](https://github.com/tauri-apps/tauri/issues/11794) and [#11528](https://github.com/tauri-apps/tauri/issues/11528), both open. A mobile app has one Tauri webview, and navigating it to a site would destroy the shell. So:
 
-- **Desktop:** site view = Tauri child webview.
-- **Mobile:** site view = native webview hosted by our own Tauri plugin (`tauri-plugin-siteview`, Swift + Kotlin), positioned over a rectangle the shell reports.
+- **Mobile (iOS, Android) — first-class:** site view = native webview hosted by our own Tauri plugin (`tauri-plugin-siteview`, Swift + Kotlin), positioned over a rectangle the shell reports.
+- **Desktop — deferred:** site view = Tauri child webview. The plugin's desktop build returns `DesktopUnsupported` until this is built.
 
-Both implement the same Rust `SiteView` trait ([Architecture](./architecture.md#siteview-rust-two-implementations)).
+The shell talks to one plugin API (`open`, `set_rect`, `navigate`, …); desktop will implement the same surface ([Architecture](./architecture.md#siteview-rust-two-implementations)).
 
 ## Matrix
 
@@ -22,9 +22,31 @@ Both implement the same Rust `SiteView` trait ([Architecture](./architecture.md#
 | Page → Core channel | Bridge A (**verify**) | Bridge A (**verify**) | Bridge A (**verify**) | Bridge B (script message handler) | Bridge B (web message listener) |
 | Secret store | Keychain | Credential Manager | Secret Service | Keychain | Keystore-backed |
 | Auto-update | updater plugin | updater plugin | updater plugin | App Store | Play Store |
-| Priority | **1** | 3 | 3 | **1** | **2** |
+| Priority | 3 | 4 | 4 | **1** | **1** |
 
-macOS and iOS first (same engine, fastest feedback, and the primary mobile use case). Android second. Windows/Linux after the engine and format settle; Linux WebKitGTK is the most likely to need per-site workarounds.
+iOS and Android first. macOS next (same engine as iOS, fastest desktop path), then Windows/Linux after the engine and format settle; Linux WebKitGTK is the most likely to need per-site workarounds.
+
+## Verified results
+
+Two runs on the iPhone 17 Pro Max simulator (iOS 26.5), both against a local fixture page served over `http://localhost`. The first used a throwaway spike (not kept); the second drove the real app's UI components. The sandbox had no outbound internet, so no real site (Instagram, YouTube) has been loaded. Not verified: a real device, rotation, keyboard, any real site or login, anything on Android.
+
+| Check | Result |
+|-------|--------|
+| `WKUserScript` at `.atDocumentStart` runs before `<body>` exists | Yes (`readyState: "loading"`, no body) |
+| CSS injected at document start hides an element with no flash | Yes: hidden at parse time, at first frame, and for an element inserted after a `pushState` |
+| Page → Rust via script message handler and a Rust-created `Channel` (no Tauri IPC on the page) | Works; origin is delivered with the message |
+| Site view sees Tauri objects (`__TAURI_INTERNALS__`, `__TAURI__`, `webkit.messageHandlers.ipc`) | No; fetches to `ipc://` and `tauri://` are rejected |
+| Native frame equals the rect the shell reported, and follows a resize | Yes |
+| Per-profile isolation with `WKWebsiteDataStore(forIdentifier:)` | Yes: a second profile saw no cookie or localStorage; the first kept both. The real app also creates a `WebsiteDataStore/<profile uuid>` directory |
+| Real app: add a site, open it, native title and URL reach the shell as `siteview:state` events | Yes |
+| Real app: page-initiated navigation enables Back; Back returns to the first page | Yes |
+| Real app: `navigate("javascript:alert(1)")` | Rejected in Rust: "only http and https urls can be opened" |
+| Real app: page message reaches the shell as `siteview:bridge` with origin `http://localhost`; the page sees no `__TAURI_INTERNALS__` or `ipc` handler | Yes |
+
+**Decisions that follow:**
+
+- **iOS 17 is the minimum.** `forIdentifier:` is iOS 17+, and the Tauri iOS template defaults to 15, so `tauri.conf.json` sets `bundle.iOS.minimumSystemVersion` to 17.0. This resolves the roadmap's open question on older iOS versions.
+- **Android requires `WebViewFeature.MULTI_PROFILE` and `WEB_MESSAGE_LISTENER`.** If either is missing, `open` fails with a message asking the user to update System WebView. A silent single-profile fallback would break the profile-isolation invariant.
 
 ## Layout model (mobile)
 

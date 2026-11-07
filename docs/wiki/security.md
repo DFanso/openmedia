@@ -33,9 +33,9 @@ The site view loads third-party code we do not control, and our injected engine 
 7. **No backend, no telemetry.** The app has no server to leak to; do not add one.
 8. **Redact before send; preview by default.**
 
-## The bridge (open decision)
+## The bridge
 
-How the engine's messages reach Core is the single riskiest design point and is resolved in Phase 0 (spike S2). Candidates:
+**Decided for mobile: option B.** Desktop is deferred, and its choice (A or a native channel) stays open. Candidates considered:
 
 | Option | How | Concerns |
 |--------|-----|----------|
@@ -43,9 +43,9 @@ How the engine's messages reach Core is the single riskiest design point and is 
 | **B. Native message channel (mobile plugin)** | `WKScriptMessageHandler` (iOS) and `addWebMessageListener` with origin rules / `addJavascriptInterface` (Android), owned by our plugin | Strongest control; no Tauri IPC on the page at all. Android `addJavascriptInterface` exposes to all frames unless using `addWebMessageListener` with origin allowlist. |
 | **C. Custom URI scheme / navigation interception** | Engine navigates or fetches a private scheme that Core intercepts | Page CSP (`connect-src`, `navigate-to`) can block it. Fragile. |
 
-Direction: **B on mobile (we own the plugin anyway), A on desktop**, if spike S2 confirms A can be scoped to one command with a nonce. If A cannot be made safe, desktop adopts a plugin-based native channel too. Either way, invariant 3 holds.
+Direction: **B on mobile**, implemented in `tauri-plugin-siteview`. A native message handler (`WKScriptMessageHandler` on iOS, `addWebMessageListener` on Android) hands each message to a Rust-created `Channel`; Rust parses it with a 64 KiB cap and forwards it as the `siteview:bridge` event. The site webview is a separate native webview with no Tauri IPC. Verified on the iOS simulator: the page sees no `__TAURI_INTERNALS__`, no `ipc` message handler, and fetches to `ipc://` and `tauri://` fail. Android is not yet verified. For desktop, A is only acceptable if it can be scoped to one command with a nonce; otherwise desktop adopts a native channel too. Either way, invariant 3 holds.
 
-Known relevant upstream issue class: Tauri has had an advisory where remote-origin iframes could reach IPC without being explicitly allowed (GHSA-57fm-592m-34r7, patched). Pin to a patched Tauri and treat IPC scoping as a regression-test target: an integration test must prove a site view **cannot** call a non-bridge command.
+Tauri has reportedly had an advisory where remote-origin iframes could reach IPC without being explicitly allowed (GHSA-57fm-592m-34r7) **[not verified; look it up before relying on this]**. Pin to a patched Tauri and treat IPC scoping as a regression-test target: an integration test must prove a site view **cannot** call a non-bridge command. Today that proof is the iOS simulator check above; an automated on-device test does not exist yet.
 
 ## Key storage
 

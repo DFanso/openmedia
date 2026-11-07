@@ -8,6 +8,22 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-07
 
+### feat(shell): iOS-first app foundation
+
+**What:** The repository had docs only.
+
+**Change:** Add the Tauri v2 + React/TS app, a Rust library for profiles and saved sites (`library.json`, atomic writes), the in-repo `tauri-plugin-siteview` (iOS `WKWebView` host with per-profile data stores, state events, http/https-only navigation, a write-only page bridge; Android Kotlin source included but never run), a home view and a browser view, ESLint/Prettier/Vitest/clippy tooling, and `ci.yml`. Verified on the iOS 26.5 simulator against a local fixture only. Desktop site views and Android verification are deferred; iOS 17 is the minimum.
+
+**PR:** n/a
+
+### docs(wiki): mobile-first priorities and corrections
+
+**What:** The wiki ranked macOS as a first platform, overstated the SocialLite comparison, and left the bridge decision open.
+
+**Change:** Make iOS and Android first-class and defer desktop, hedge the SocialLite mechanism claim, label unverified prior-art and advisory claims, record the iOS verification results, and settle the mobile bridge, iOS 17 minimum, and Android profile-isolation requirement.
+
+**PR:** n/a
+
 ### docs: bootstrap agent rules, changelog, wiki, and roadmap
 
 **What:** The repository had no contributor guidance, no documentation surface, and a generic Node `.gitignore`.
