@@ -14,9 +14,9 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_siteview::init())
         .setup(|app| {
-            let path = app.path().app_data_dir()?.join("library.json");
-            app.manage(library::Library::load(path)?);
-            app.manage(recipes::Recipes::bundled()?);
+            let data_dir = app.path().app_data_dir()?;
+            app.manage(library::Library::load(data_dir.join("library.json"))?);
+            app.manage(recipes::Recipes::load(data_dir.join("recipes"))?);
             app.manage(ad_block::AdBlock::bundled(
                 app.path().app_cache_dir()?.join("ad-block"),
             ));
@@ -37,6 +37,8 @@ pub fn run() {
             commands::set_ad_block,
             commands::get_sites,
             commands::set_site_option,
+            commands::save_site_fork,
+            commands::restore_site_original,
             commands::set_bottom_margin,
             commands::set_site_bottom_margin,
             commands::bottom_margin_for,

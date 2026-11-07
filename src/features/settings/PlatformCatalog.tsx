@@ -23,12 +23,7 @@ export function PlatformCatalog({ urls, full, onAdd, onRemove }: Props) {
           const added = urls.some((url) => isPlatformUrl(platform, url));
           return (
             <li key={platform.id} className="flex items-center gap-3 px-4 py-3">
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-base font-medium">{platform.name}</p>
-                <p className="truncate text-sm text-paper/55">
-                  {platform.owner} · {platform.users}
-                </p>
-              </div>
+              <p className="min-w-0 flex-1 truncate text-base font-medium">{platform.name}</p>
               <button
                 type="button"
                 aria-label={`${added ? "Remove" : "Add"} ${platform.name} ${added ? "from" : "to"} favorites`}

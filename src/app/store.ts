@@ -68,6 +68,7 @@ interface AppStore {
   setAdBlock: (enabled: boolean) => Promise<void>;
   loadSites: () => Promise<void>;
   setSiteOption: (recipeId: string, optionId: string, enabled: boolean) => Promise<void>;
+  restoreSiteOriginal: (recipeId: string) => Promise<void>;
   setBottomMargin: (pixels: number) => Promise<void>;
   /** `null` returns the site to the shared margin. */
   setSiteBottomMargin: (recipeId: string, pixels: number | null) => Promise<void>;
@@ -318,6 +319,15 @@ export const useApp = create<AppStore>((set, get) => {
         await library.setSiteOption(recipeId, optionId, enabled);
       } catch (error) {
         set({ sites: before, error: errorMessage(error) });
+      }
+    },
+
+    restoreSiteOriginal: async (recipeId) => {
+      try {
+        await library.restoreSiteOriginal(recipeId);
+        set({ sites: await library.getSites() });
+      } catch (error) {
+        set({ error: errorMessage(error) });
       }
     },
 

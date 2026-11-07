@@ -48,6 +48,10 @@ export interface SiteSettings {
   options: SiteOption[];
   /** The site's own bottom margin, or null to use the shared one. */
   bottomMargin: number | null;
+  /** The site runs on the user's own changed copy of the bundled recipe (a fork). */
+  customized: boolean;
+  /** The app now ships a different version than the one the copy was made from. */
+  originalUpdated: boolean;
 }
 
 export type ProviderKind = "anthropic" | "openAiCompatible";
@@ -111,6 +115,8 @@ export const library = {
   /** Saves the toggle and reloads the open page under it; see `set_site_option` in Rust. */
   setSiteOption: (recipeId: string, optionId: string, enabled: boolean) =>
     command("set_site_option", { recipeId, optionId, enabled }),
+  /** Drops the changed copy so the bundled recipe applies again; see `restore_site_original`. */
+  restoreSiteOriginal: (recipeId: string) => command("restore_site_original", { recipeId }),
   setBottomMargin: (pixels: number) => command("set_bottom_margin", { pixels }),
   setSiteBottomMargin: (recipeId: string, pixels: number | null) =>
     command("set_site_bottom_margin", { recipeId, pixels }),

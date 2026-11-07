@@ -34,6 +34,7 @@ function SiteCard({ site }: { site: SiteSettings }) {
   const [open, setOpen] = useState(false);
   const setSiteOption = useApp((s) => s.setSiteOption);
   const setSiteBottomMargin = useApp((s) => s.setSiteBottomMargin);
+  const restoreSiteOriginal = useApp((s) => s.restoreSiteOriginal);
   const sharedMargin = useApp((s) => s.state?.bottomMargin ?? 0);
   const hidden = site.options.filter((option) => option.enabled).length;
 
@@ -50,6 +51,21 @@ function SiteCard({ site }: { site: SiteSettings }) {
           {hidden} of {site.options.length} on
         </span>
       </button>
+      {open && site.customized && (
+        <div className="mx-3 mb-4 flex flex-col gap-2 rounded-2xl border border-hair px-4 py-3">
+          <p className="text-sm leading-snug text-paper/55">
+            This site uses your changed copy, so app updates leave it alone.
+            {site.originalUpdated && " The app's original has been updated since you changed it."}
+          </p>
+          <button
+            type="button"
+            onClick={() => void restoreSiteOriginal(site.recipeId)}
+            className="self-start text-sm font-medium text-accent"
+          >
+            Restore the original
+          </button>
+        </div>
+      )}
       {open && (
         <div className="flex flex-col gap-5 px-3 pb-4">
           {GROUPS.map(({ group, title, note }) => {

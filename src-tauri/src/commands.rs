@@ -183,13 +183,47 @@ pub async fn set_site_option(
 ) -> Result<()> {
     recipes
         .get(&recipe_id)
-        .and_then(|recipe| recipe.option(&option_id))
+        .filter(|recipe| recipe.option(&option_id).is_some())
         .ok_or(Error::UnknownOption)?;
     library.set_site_option(&recipe_id, &option_id, enabled)?;
+    reload_script(&app, &library, &recipes)
+}
+
+/// Recompiles the page script from the current recipes and choices and hands it to the open
+/// pages.
+fn reload_script(app: &AppHandle, library: &Library, recipes: &Recipes) -> Result<()> {
     let script = recipes.script(&library.site_options()?)?;
     app.siteview()
         .set_document_start_script(SetDocumentStartScriptRequest { script })?;
     Ok(())
+}
+
+/// Saves a changed copy of a bundled site's recipe (a fork) and applies it. The copy lives in the
+/// app data folder, so app updates never overwrite it. Called by the step that accepts the
+/// assistant's or the user's change; the recipe is validated in Rust and must be a copy of a
+/// bundled recipe with origin `user` or `ai`. Async for the same reason as `open_site`.
+#[tauri::command]
+pub async fn save_site_fork(
+    app: AppHandle,
+    library: State<'_, Library>,
+    recipes: State<'_, Recipes>,
+    recipe: String,
+) -> Result<()> {
+    recipes.save_fork(&recipe)?;
+    reload_script(&app, &library, &recipes)
+}
+
+/// Drops the user's changed copy so the bundled recipe applies again. Async for the same reason
+/// as `open_site`.
+#[tauri::command]
+pub async fn restore_site_original(
+    app: AppHandle,
+    library: State<'_, Library>,
+    recipes: State<'_, Recipes>,
+    recipe_id: String,
+) -> Result<()> {
+    recipes.restore_original(&recipe_id)?;
+    reload_script(&app, &library, &recipes)
 }
 
 #[tauri::command]

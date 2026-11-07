@@ -13,6 +13,8 @@ pub enum Error {
     InvalidMargin(u32),
     #[error("no such site option")]
     UnknownOption,
+    #[error("no such site")]
+    UnknownSite,
     #[error(transparent)]
     SiteView(#[from] tauri_plugin_siteview::Error),
     #[error("could not read or write the library: {0}")]
