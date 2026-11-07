@@ -1,13 +1,14 @@
 use tauri::{AppHandle, Runtime, command};
 
 use crate::models::*;
-use crate::validate::{parse_profile_id, parse_web_url};
+use crate::validate::{parse_profile_id, parse_web_url, validate_rule_lists};
 use crate::{Result, SiteviewExt};
 
 #[command]
 pub(crate) async fn open<R: Runtime>(app: AppHandle<R>, request: OpenRequest) -> Result<()> {
     parse_profile_id(&request.profile)?;
     parse_web_url(&request.url)?;
+    validate_rule_lists(&request.content_rule_lists)?;
     app.siteview().open(request)
 }
 
@@ -59,6 +60,15 @@ pub(crate) async fn set_color_scheme<R: Runtime>(
     request: SetColorSchemeRequest,
 ) -> Result<()> {
     app.siteview().set_color_scheme(request)
+}
+
+#[command]
+pub(crate) async fn set_content_rule_lists<R: Runtime>(
+    app: AppHandle<R>,
+    request: SetContentRuleListsRequest,
+) -> Result<()> {
+    validate_rule_lists(&request.lists)?;
+    app.siteview().set_content_rule_lists(request)
 }
 
 /// Fetches a small PNG for the site's icon, as a `data:` URL. Runs natively against the site

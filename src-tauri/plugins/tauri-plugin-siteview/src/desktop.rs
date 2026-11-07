@@ -58,4 +58,8 @@ impl<R: Runtime> Siteview<R> {
     pub fn fetch_favicon(&self, _request: FetchFaviconRequest) -> Result<Option<String>> {
         Err(Error::DesktopUnsupported)
     }
+
+    pub fn set_content_rule_lists(&self, _request: SetContentRuleListsRequest) -> Result<()> {
+        Err(Error::DesktopUnsupported)
+    }
 }

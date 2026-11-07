@@ -1,11 +1,13 @@
 use serde::Serialize;
-use tauri::{AppHandle, State};
+use tauri::{AppHandle, Emitter, State};
 use tauri_plugin_siteview::{
-    FetchFaviconRequest, OpenRequest, Rect, SiteviewExt,
+    ContentRuleList, FetchFaviconRequest, OpenRequest, Rect, SetContentRuleListsRequest,
+    SiteviewExt,
     validate::{parse_profile_id, parse_web_url},
 };
 use uuid::Uuid;
 
+use crate::ad_block::AdBlock;
 use crate::ai::{
     ProviderConfig, ProviderInput,
     connection::{list_models, models_request},
@@ -64,8 +66,24 @@ pub async fn refresh_icons(app: AppHandle, library: State<'_, Library>) -> Resul
     library.favorites()
 }
 
-/// Opens the page in the native site view with the recipe script attached. This is the only way
-/// the shell can open one: the plugin's own `open` is not granted to it.
+/// The site view reports its errors on this event; the shell shows them in a banner.
+const SITE_ERROR_EVENT: &str = "siteview:error";
+
+/// Builds the rule lists on a blocking thread: the first run converts the bundled lists, which
+/// parses several megabytes.
+async fn build_rule_lists(ad_block: &AdBlock) -> Result<Vec<ContentRuleList>> {
+    let ad_block = ad_block.clone();
+    tauri::async_runtime::spawn_blocking(move || ad_block.rule_lists())
+        .await
+        .map_err(|e| Error::AdBlock(e.to_string()))?
+}
+
+/// Opens the page in the native site view with the recipe script and the ad-blocking rule lists
+/// attached. This is the only way the shell can open one: the plugin's own `open` is not granted
+/// to it.
+///
+/// A failure to build the rule lists does not stop browsing; the page opens unblocked and the shell
+/// is told why.
 ///
 /// Must be `async`: a synchronous command runs on the main thread, and the plugin call waits for
 /// native code that itself needs the main thread, which deadlocks the app.
@@ -74,19 +92,52 @@ pub async fn open_site(
     app: AppHandle,
     library: State<'_, Library>,
     script: State<'_, RecipeScript>,
+    ad_block: State<'_, AdBlock>,
     url: String,
     rect: Rect,
 ) -> Result<()> {
     let profile = library.state()?.profile_id.to_string();
     parse_profile_id(&profile)?;
     parse_web_url(&url)?;
+    let mut blocking_failure = None;
+    let content_rule_lists = if library.ad_block_enabled()? {
+        build_rule_lists(&ad_block).await.unwrap_or_else(|e| {
+            blocking_failure = Some(e.to_string());
+            Vec::new()
+        })
+    } else {
+        Vec::new()
+    };
     app.siteview().open(OpenRequest {
         profile,
         url,
         rect,
         document_start_script: Some(script.as_str().to_owned()),
+        content_rule_lists,
     })?;
+    if let Some(message) = blocking_failure {
+        let _ = app.emit(SITE_ERROR_EVENT, message);
+    }
     Ok(())
+}
+
+/// Turns ad blocking on or off. An open page reloads under the new setting. Async for the same
+/// reason as `open_site`.
+#[tauri::command]
+pub async fn set_ad_block(
+    app: AppHandle,
+    library: State<'_, Library>,
+    ad_block: State<'_, AdBlock>,
+    enabled: bool,
+) -> Result<()> {
+    let lists = if enabled {
+        build_rule_lists(&ad_block).await?
+    } else {
+        Vec::new()
+    };
+    app.siteview()
+        .set_content_rule_lists(SetContentRuleListsRequest { lists })?;
+    library.set_ad_block(enabled)
 }
 
 /// A provider as the shell sees it: settings plus whether a key exists, never the key itself.

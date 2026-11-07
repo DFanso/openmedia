@@ -59,6 +59,7 @@ pub struct AppState {
     pub last_url: Option<String>,
     pub onboarded: bool,
     pub theme: Theme,
+    pub ad_block: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -72,6 +73,9 @@ struct LibraryData {
     onboarded: bool,
     #[serde(default)]
     theme: Theme,
+    /// On by default; the shell can turn blocking off.
+    #[serde(default = "enabled")]
+    ad_block: bool,
     /// Site icons by host. They come from the sites themselves and hold nothing private.
     #[serde(default)]
     icons: BTreeMap<String, String>,
@@ -114,6 +118,7 @@ impl Library {
             last_url: data.last_url.clone(),
             onboarded: data.onboarded,
             theme: data.theme,
+            ad_block: data.ad_block,
         })
     }
 
@@ -147,6 +152,16 @@ impl Library {
     pub fn set_theme(&self, theme: Theme) -> Result<()> {
         let mut data = self.lock()?;
         data.theme = theme;
+        self.save(&data)
+    }
+
+    pub fn ad_block_enabled(&self) -> Result<bool> {
+        Ok(self.lock()?.ad_block)
+    }
+
+    pub fn set_ad_block(&self, enabled: bool) -> Result<()> {
+        let mut data = self.lock()?;
+        data.ad_block = enabled;
         self.save(&data)
     }
 
@@ -244,6 +259,10 @@ impl Library {
     }
 }
 
+fn enabled() -> bool {
+    true
+}
+
 fn host_of(url: &str) -> Option<String> {
     parse_web_url(url)
         .ok()
@@ -284,6 +303,7 @@ fn default_data() -> LibraryData {
         last_url: None,
         onboarded: false,
         theme: Theme::System,
+        ad_block: true,
         icons: BTreeMap::new(),
         ai: AiSettings::default(),
     }
@@ -302,7 +322,7 @@ fn favorite_from_input(input: FavoriteInput) -> Result<Favorite> {
     })
 }
 
-fn write_atomically(path: &Path, bytes: &[u8]) -> std::io::Result<()> {
+pub(crate) fn write_atomically(path: &Path, bytes: &[u8]) -> std::io::Result<()> {
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent)?;
     }
@@ -465,6 +485,27 @@ mod tests {
         assert_eq!(library.state().unwrap().theme, Theme::System);
         library.set_theme(Theme::Dark).unwrap();
         assert_eq!(reload(&dir).state().unwrap().theme, Theme::Dark);
+    }
+
+    #[test]
+    fn ad_blocking_is_on_by_default_and_the_choice_persists() {
+        let (dir, library) = library();
+        assert!(library.state().unwrap().ad_block);
+        library.set_ad_block(false).unwrap();
+        assert!(!library.ad_block_enabled().unwrap());
+        assert!(!reload(&dir).state().unwrap().ad_block);
+    }
+
+    #[test]
+    fn a_library_saved_before_ad_blocking_existed_loads_with_it_on() {
+        let (dir, library) = library();
+        let path = dir.path().join("library.json");
+        let mut saved: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
+        assert!(saved.as_object_mut().unwrap().remove("adBlock").is_some());
+        fs::write(&path, saved.to_string()).unwrap();
+        drop(library);
+        assert!(reload(&dir).state().unwrap().ad_block);
     }
 
     #[test]

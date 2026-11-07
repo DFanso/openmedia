@@ -15,11 +15,17 @@ struct RectArgs: Decodable {
   var cgRect: CGRect { CGRect(x: x, y: y, width: width, height: height) }
 }
 
+struct RuleListArgs: Decodable {
+  let id: String
+  let path: String
+}
+
 class OpenArgs: Decodable {
   let profile: String
   let url: String
   let rect: RectArgs
   let documentStartScript: String?
+  let contentRuleLists: [RuleListArgs]?
   let onEvent: Channel
 }
 
@@ -41,6 +47,10 @@ class SetColorSchemeArgs: Decodable {
 
 class FetchFaviconArgs: Decodable {
   let url: String
+}
+
+class SetContentRuleListsArgs: Decodable {
+  let lists: [RuleListArgs]
 }
 
 struct StateEvent: Encodable {
@@ -121,7 +131,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
       invoke.reject("only http and https urls can be opened")
       return
     }
-    DispatchQueue.main.async {
+    Task { @MainActor in
+      let (ruleLists, ruleListFailure) = await self.loadRuleLists(args.contentRuleLists ?? [])
       guard let shell = self.shell, let host = shell.superview else {
         invoke.reject("shell webview is not ready")
         return
@@ -129,7 +140,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
       self.tearDown()
       let view = WKWebView(
         frame: shell.convert(args.rect.cgRect, to: host),
-        configuration: self.makeConfiguration(profileId: profileId, script: args.documentStartScript)
+        configuration: self.makeConfiguration(
+          profileId: profileId, script: args.documentStartScript, ruleLists: ruleLists)
       )
       view.allowsBackForwardNavigationGestures = true
       view.navigationDelegate = self
@@ -143,6 +155,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
       self.events = args.onEvent
       self.installRouter(in: host).siteView = view
       self.observe(view)
+      if let ruleListFailure { self.send(ErrorEvent(message: ruleListFailure)) }
       view.load(URLRequest(url: url))
       invoke.resolve()
     }
@@ -222,6 +235,29 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     }
   }
 
+  /// Swaps the rule lists on the open site view and reloads it so the page loads under them.
+  /// With no site view open there is nothing to change; the next `open` carries the lists.
+  @objc public func setContentRuleLists(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(SetContentRuleListsArgs.self)
+    Task { @MainActor in
+      guard let view = self.siteView else {
+        invoke.resolve()
+        return
+      }
+      let (ruleLists, failure) = await self.loadRuleLists(args.lists)
+      guard self.siteView === view else {
+        invoke.resolve()
+        return
+      }
+      let controller = view.configuration.userContentController
+      controller.removeAllContentRuleLists()
+      ruleLists.forEach { controller.add($0) }
+      if let failure { self.send(ErrorEvent(message: failure)) }
+      view.reload()
+      invoke.resolve()
+    }
+  }
+
   // MARK: Bridge
 
   func receiveBridgeMessage(_ message: WKScriptMessage) {
@@ -278,7 +314,58 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     return router
   }
 
-  private func makeConfiguration(profileId: UUID, script: String?) -> WKWebViewConfiguration {
+  /// Looks each list up in WebKit's persistent store and compiles it from its JSON file only on a
+  /// miss, so the slow compile runs once per list version. A list that fails is skipped and
+  /// reported: browsing without blocking beats not browsing, but the user must be told.
+  @MainActor
+  private func loadRuleLists(_ lists: [RuleListArgs]) async -> ([WKContentRuleList], String?) {
+    guard !lists.isEmpty else { return ([], nil) }
+    guard let store = WKContentRuleListStore.default() else {
+      return ([], "Ad blocking is off: the content rule store is unavailable.")
+    }
+    var loaded: [WKContentRuleList] = []
+    var failure: String?
+    for list in lists {
+      if let cached = await lookUp(list.id, in: store) {
+        loaded.append(cached)
+        continue
+      }
+      do {
+        let json = try String(contentsOfFile: list.path, encoding: .utf8)
+        if let compiled = try await store.compileContentRuleList(
+          forIdentifier: list.id, encodedContentRuleList: json)
+        {
+          loaded.append(compiled)
+        }
+      } catch {
+        failure = "Ad blocking is partly off: a filter list could not be loaded."
+      }
+    }
+    await removeStaleRuleLists(keeping: Set(lists.map(\.id)), in: store)
+    return (loaded, failure)
+  }
+
+  private func lookUp(_ id: String, in store: WKContentRuleListStore) async -> WKContentRuleList? {
+    await withCheckedContinuation { continuation in
+      store.lookUpContentRuleList(forIdentifier: id) { list, _ in continuation.resume(returning: list) }
+    }
+  }
+
+  /// Old list versions stay in WebKit's store until removed; each is several megabytes.
+  private func removeStaleRuleLists(keeping ids: Set<String>, in store: WKContentRuleListStore) async {
+    let stored: [String] = await withCheckedContinuation { continuation in
+      store.getAvailableContentRuleListIdentifiers { continuation.resume(returning: $0 ?? []) }
+    }
+    for id in stored where !ids.contains(id) {
+      await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+        store.removeContentRuleList(forIdentifier: id) { _ in continuation.resume() }
+      }
+    }
+  }
+
+  private func makeConfiguration(profileId: UUID, script: String?, ruleLists: [WKContentRuleList])
+    -> WKWebViewConfiguration
+  {
     let configuration = WKWebViewConfiguration()
     configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: profileId)
     // iPhone defaults to fullscreen-only video, which covers the shell's controls. Muted video may
@@ -289,6 +376,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     if let script, !script.isEmpty {
       controller.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentStart, forMainFrameOnly: false))
     }
+    ruleLists.forEach { controller.add($0) }
     controller.add(WeakMessageHandler(self), name: bridgeHandlerName)
     configuration.userContentController = controller
     return configuration

@@ -8,6 +8,14 @@ pub struct Rect {
     pub height: f64,
 }
 
+/// A WebKit content rule list, compiled on demand. `id` names it in WebKit's persistent store, so
+/// the JSON file at `path` is only read when the store does not already hold `id`.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ContentRuleList {
+    pub id: String,
+    pub path: String,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OpenRequest {
@@ -16,6 +24,14 @@ pub struct OpenRequest {
     pub rect: Rect,
     #[serde(default)]
     pub document_start_script: Option<String>,
+    #[serde(default)]
+    pub content_rule_lists: Vec<ContentRuleList>,
+}
+
+/// Replaces the rule lists on the open site view and reloads it. An empty list turns blocking off.
+#[derive(Debug, Clone, Deserialize)]
+pub struct SetContentRuleListsRequest {
+    pub lists: Vec<ContentRuleList>,
 }
 
 #[derive(Debug, Clone, Deserialize)]

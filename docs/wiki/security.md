@@ -63,6 +63,15 @@ Even without scripts, a recipe can mislead (hide a security warning, hide a "thi
 
 Shared community recipes (Phase 5) are static files from a GitHub repo. Integrity: pinned commit hash or signed index, shown author, and review UI before first apply. No dynamic server.
 
+## Ad blocking
+
+Blocking uses WebKit content rule lists attached to the site view's `WKUserContentController` ([Ad Blocking](./ad-blocking.md)). It adds no path from a site to native code:
+
+- The rules run inside WebKit, outside the page's JS realm; a page cannot read, list or remove them.
+- The site view gets no new message, event or capability. The plugin command that swaps the lists (`set_content_rule_lists`) is registered but absent from `siteview:default`, like `open` and `fetch-favicon`; only Rust calls it. It takes an id and an absolute `.json` path produced by Rust, and the plugin re-validates both (`validate_rule_lists`).
+- The filter lists are compiled into the binary and never downloaded, so invariant 1 (no new network destinations) holds. Lists change only with an app release.
+- A blocking failure is shown to the user and the page still loads unblocked; it never silently pretends to block.
+
 ## Privacy
 
 - The snapshot is the only page-derived data that leaves the device, only on explicit user action, only to the endpoint the user configured. See [AI Assistant](./ai-assistant.md#privacy-what-is-sent).

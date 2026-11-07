@@ -33,6 +33,8 @@ pub enum Error {
     Secret(String),
     #[error("{0}")]
     Connection(String),
+    #[error("ad blocking failed: {0}")]
+    AdBlock(String),
     #[error("library lock poisoned")]
     Poisoned,
 }

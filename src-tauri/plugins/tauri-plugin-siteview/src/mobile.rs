@@ -124,4 +124,11 @@ impl<R: Runtime> Siteview<R> {
             self.run("fetchFavicon", serde_json::json!({ "url": request.url }))?;
         Ok(response.data_url)
     }
+
+    pub fn set_content_rule_lists(&self, request: SetContentRuleListsRequest) -> Result<()> {
+        self.run(
+            "setContentRuleLists",
+            serde_json::json!({ "lists": request.lists }),
+        )
+    }
 }

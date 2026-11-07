@@ -259,6 +259,32 @@ Denies the set_color_scheme command without any pre-configured scope.
 <tr>
 <td>
 
+`siteview:allow-set-content-rule-lists`
+
+</td>
+<td>
+
+Enables the set_content_rule_lists command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`siteview:deny-set-content-rule-lists`
+
+</td>
+<td>
+
+Denies the set_content_rule_lists command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `siteview:allow-set-interactive-regions`
 
 </td>

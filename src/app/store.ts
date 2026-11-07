@@ -34,6 +34,7 @@ interface AppStore {
   reportError: (message: string | null) => void;
   saveFavorites: (favorites: FavoriteInput[]) => Promise<boolean>;
   setTheme: (theme: Theme) => Promise<void>;
+  setAdBlock: (enabled: boolean) => Promise<void>;
 }
 
 let nonce = 0;
@@ -126,6 +127,22 @@ export const useApp = create<AppStore>((set, get) => {
       } catch (error) {
         set((current) => ({
           state: current.state && previous ? { ...current.state, theme: previous } : current.state,
+          error: errorMessage(error),
+        }));
+      }
+    },
+
+    setAdBlock: async (enabled) => {
+      const previous = get().state?.adBlock;
+      set((current) => ({ state: current.state && { ...current.state, adBlock: enabled } }));
+      try {
+        await library.setAdBlock(enabled);
+      } catch (error) {
+        set((current) => ({
+          state:
+            current.state && previous !== undefined
+              ? { ...current.state, adBlock: previous }
+              : current.state,
           error: errorMessage(error),
         }));
       }

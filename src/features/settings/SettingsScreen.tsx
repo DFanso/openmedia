@@ -31,6 +31,7 @@ export function SettingsScreen() {
 
       <div className="flex flex-1 flex-col gap-12 overflow-y-auto px-5 pt-2 pb-[calc(env(safe-area-inset-bottom)+32px)]">
         <AppearanceSection />
+        <BlockingSection />
         <FavoritesSection />
         <AiSection />
         <GuideSection />
@@ -75,6 +76,42 @@ function AppearanceSection() {
           </button>
         ))}
       </div>
+    </section>
+  );
+}
+
+function BlockingSection() {
+  const enabled = useApp((s) => s.state?.adBlock ?? true);
+  const setAdBlock = useApp((s) => s.setAdBlock);
+
+  return (
+    <section>
+      <h2 className="text-3xl leading-tight font-semibold">Ad blocking</h2>
+      <p className="mt-1 text-sm text-paper/55">
+        Blocks ads and trackers before they load, using lists built into the app. If a site stops
+        working, turn it off; the page reloads.
+      </p>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={enabled}
+        onClick={() => void setAdBlock(!enabled)}
+        className="mt-4 flex w-full items-center justify-between rounded-2xl border border-hair px-4 py-3 text-base"
+      >
+        <span>Block ads and trackers</span>
+        <span
+          aria-hidden="true"
+          className={`relative h-7 w-12 rounded-full transition-colors ${
+            enabled ? "bg-accent" : "bg-paper/20"
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 size-6 rounded-full transition-all ${
+              enabled ? "left-[22px] bg-on-accent" : "left-0.5 bg-paper/70"
+            }`}
+          />
+        </span>
+      </button>
     </section>
   );
 }

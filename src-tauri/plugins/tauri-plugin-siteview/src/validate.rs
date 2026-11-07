@@ -1,9 +1,13 @@
+use std::path::Path;
+
 use url::Url;
 use uuid::Uuid;
 
-use crate::{Error, Result};
+use crate::{ContentRuleList, Error, Result};
 
 pub const MAX_BRIDGE_MESSAGE_BYTES: usize = 64 * 1024;
+pub const MAX_RULE_LISTS: usize = 8;
+const MAX_RULE_LIST_ID_CHARS: usize = 64;
 
 pub fn parse_web_url(input: &str) -> Result<Url> {
     let url = Url::parse(input).map_err(|e| Error::InvalidUrl(e.to_string()))?;
@@ -22,6 +26,29 @@ pub fn parse_bridge_body(body: &str) -> Result<serde_json::Value> {
         return Err(Error::BridgeMessageTooLarge(MAX_BRIDGE_MESSAGE_BYTES));
     }
     serde_json::from_str(body).map_err(|_| Error::BridgeMessageInvalid)
+}
+
+/// Rule lists come from Rust, never from a page, but the native side reads `path` and hands it to
+/// WebKit, so the shape is checked here anyway: a short id from a safe alphabet and an absolute
+/// path to a `.json` file.
+pub fn validate_rule_lists(lists: &[ContentRuleList]) -> Result<()> {
+    if lists.len() > MAX_RULE_LISTS {
+        return Err(Error::InvalidRuleList);
+    }
+    for list in lists {
+        let id_ok = !list.id.is_empty()
+            && list.id.len() <= MAX_RULE_LIST_ID_CHARS
+            && list
+                .id
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_' || b == b'.');
+        let path = Path::new(&list.path);
+        let path_ok = path.is_absolute() && path.extension().is_some_and(|e| e == "json");
+        if !id_ok || !path_ok {
+            return Err(Error::InvalidRuleList);
+        }
+    }
+    Ok(())
 }
 
 #[cfg(test)]
@@ -66,6 +93,48 @@ mod tests {
         assert!(matches!(
             parse_profile_id("../../etc"),
             Err(Error::InvalidProfile)
+        ));
+    }
+
+    fn list(id: &str, path: &str) -> ContentRuleList {
+        ContentRuleList {
+            id: id.to_owned(),
+            path: path.to_owned(),
+        }
+    }
+
+    #[test]
+    fn rule_lists_need_a_safe_id_and_an_absolute_json_path() {
+        assert!(
+            validate_rule_lists(&[list("openmedia-easylist-1a2b", "/data/x/easylist.json")])
+                .is_ok()
+        );
+        assert!(validate_rule_lists(&[]).is_ok());
+        for bad in [
+            list("", "/data/x.json"),
+            list("has space", "/data/x.json"),
+            list("../escape", "/data/x.json"),
+            list(&"a".repeat(65), "/data/x.json"),
+            list("ok", "relative/x.json"),
+            list("ok", "/data/x.txt"),
+            list("ok", "/data/x"),
+        ] {
+            assert!(
+                matches!(
+                    validate_rule_lists(std::slice::from_ref(&bad)),
+                    Err(Error::InvalidRuleList)
+                ),
+                "{bad:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn rule_lists_are_capped() {
+        let many = vec![list("ok", "/data/x.json"); MAX_RULE_LISTS + 1];
+        assert!(matches!(
+            validate_rule_lists(&many),
+            Err(Error::InvalidRuleList)
         ));
     }
 
