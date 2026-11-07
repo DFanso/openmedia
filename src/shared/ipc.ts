@@ -1,10 +1,14 @@
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 
+export type Theme = "system" | "light" | "dark";
+
 export interface Favorite {
   id: string;
   name: string;
   url: string;
+  /** A small PNG data URL fetched from the site itself, when known. */
+  icon?: string;
 }
 
 export interface FavoriteInput {
@@ -17,6 +21,32 @@ export interface AppState {
   favorites: Favorite[];
   lastUrl: string | null;
   onboarded: boolean;
+  theme: Theme;
+}
+
+export type ProviderKind = "anthropic" | "openAiCompatible";
+
+/** A provider as the shell sees it. There is no key field: keys never come back from Rust. */
+export interface Provider {
+  id: string;
+  name: string;
+  kind: ProviderKind;
+  baseUrl: string;
+  model: string | null;
+  hasKey: boolean;
+}
+
+export interface ProviderInput {
+  id?: string;
+  name: string;
+  kind: ProviderKind;
+  baseUrl: string;
+  model?: string | null;
+}
+
+export interface AiState {
+  providers: Provider[];
+  activeId: string | null;
 }
 
 export interface Rect {
@@ -41,10 +71,25 @@ async function command(name: string, args?: Record<string, unknown>): Promise<vo
 export const library = {
   getState: () => invoke<AppState>("get_state"),
   setFavorites: (favorites: FavoriteInput[]) => invoke<Favorite[]>("set_favorites", { favorites }),
+  refreshIcons: () => invoke<Favorite[]>("refresh_icons"),
   setLastUrl: (url: string) => command("set_last_url", { url }),
   completeOnboarding: () => command("complete_onboarding"),
+  resetOnboarding: () => command("reset_onboarding"),
+  setTheme: (theme: Theme) => command("set_theme", { theme }),
   /** Opens the page natively with the recipe script attached; see `open_site` in Rust. */
   openSite: (url: string, rect: Rect) => command("open_site", { url, rect }),
+};
+
+export const ai = {
+  state: () => invoke<AiState>("ai_state"),
+  saveProvider: (provider: ProviderInput) => invoke<Provider>("ai_save_provider", { provider }),
+  deleteProvider: (id: string) => command("ai_delete_provider", { id }),
+  /** The only place a key leaves the shell: straight to Rust and the Keychain, once. */
+  setKey: (id: string, key: string) => command("ai_set_key", { id, key }),
+  removeKey: (id: string) => command("ai_remove_key", { id }),
+  setActive: (id: string | null) => command("ai_set_active", { id }),
+  /** Asks the provider for its models; proves the key works. */
+  test: (id: string) => invoke<string[]>("ai_test", { id }),
 };
 
 export const siteView = {
@@ -52,6 +97,8 @@ export const siteView = {
   setRect: (rect: Rect) => command("plugin:siteview|set_rect", { request: { rect } }),
   setInteractiveRegions: (regions: Rect[]) =>
     command("plugin:siteview|set_interactive_regions", { request: { regions } }),
+  setColorScheme: (scheme: Theme) =>
+    command("plugin:siteview|set_color_scheme", { request: { scheme } }),
   navigate: (url: string) => command("plugin:siteview|navigate", { request: { url } }),
   goBack: () => command("plugin:siteview|go_back"),
   goForward: () => command("plugin:siteview|go_forward"),

@@ -1,6 +1,6 @@
 ## Default Permission
 
-Shell-only control of the native site view. `open` is deliberately absent: the app's own `open_site` command opens pages so it can attach the recipe script. Never grant to a site webview.
+Shell-only control of the native site view. `open` is deliberately absent: the app's own `open_site` command opens pages so it can attach the recipe script. `fetch-favicon` is also absent: only Rust calls it, so the shell cannot make arbitrary native fetches. Never grant to a site webview.
 
 #### This default permission set includes the following:
 
@@ -11,6 +11,7 @@ Shell-only control of the native site view. `open` is deliberately absent: the a
 - `allow-go-back`
 - `allow-go-forward`
 - `allow-reload`
+- `allow-set-color-scheme`
 
 ## Permission Table
 
@@ -69,6 +70,32 @@ Enables the delete_profile_data command without any pre-configured scope.
 <td>
 
 Denies the delete_profile_data command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`siteview:allow-fetch-favicon`
+
+</td>
+<td>
+
+Enables the fetch_favicon command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`siteview:deny-fetch-favicon`
+
+</td>
+<td>
+
+Denies the fetch_favicon command without any pre-configured scope.
 
 </td>
 </tr>
@@ -199,6 +226,32 @@ Enables the reload command without any pre-configured scope.
 <td>
 
 Denies the reload command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`siteview:allow-set-color-scheme`
+
+</td>
+<td>
+
+Enables the set_color_scheme command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`siteview:deny-set-color-scheme`
+
+</td>
+<td>
+
+Denies the set_color_scheme command without any pre-configured scope.
 
 </td>
 </tr>

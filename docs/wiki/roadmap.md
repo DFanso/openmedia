@@ -1,6 +1,6 @@
 # Roadmap
 
-> **Status: Phase 1 in progress, iOS first.** Done: Tauri scaffold, `tauri-plugin-siteview` (iOS), favorites persistence, the floating-button shell, CI. Android code was removed until iOS is stable; desktop is deferred. Update this page when phases start, finish, or change.
+> **Status: Phase 1 in progress, iOS first; Phase 3 groundwork started.** Done: Tauri scaffold, `tauri-plugin-siteview` (iOS), favorites, the floating-button shell, themes, onboarding, a first recipe slice, CI, and the BYOK groundwork (Keychain-backed key storage, provider settings, connection test). Android code was removed until iOS is stable; desktop is deferred. Update this page when phases start, finish, or change.
 
 ## Goal
 
@@ -84,7 +84,7 @@ The vertical slice, then breadth.
 
 ## Phase 3 — BYOK AI assistant
 
-- `SecretStore` implementation per S6; key management UI (add, test, delete).
+- ~~`SecretStore` implementation per S6; key management UI (add, test, delete).~~ Done for iOS: trait plus `keyring` (v3, `apple-native`), a settings section to add, test and delete providers and keys. See [AI Assistant](./ai-assistant.md#implemented-provider-settings).
 - Provider trait + adapters: Anthropic, OpenAI, Gemini, OpenRouter, OpenAI-compatible custom base URL ([AI Assistant](./ai-assistant.md)).
 - Snapshot + two-pass redaction + preview-before-send UI.
 - Prompt contract v1, patch schema, validation, retry-once.
@@ -162,11 +162,17 @@ All without a backend.
 | 2026-11-07 | Fix Reddit's "use the app" prompts with a bundled recipe (hide rules), not by changing the user agent | Site knowledge belongs in data; the wiki's risk register rules out UA spoofing. The web view's user agent has no `Safari` token, which sites can use to detect an embedded view; changing that is a separate, deliberate decision | Hiding is not enough for a site, or the user asks for a Safari-like user agent |
 | 2026-11-07 | The shell opens pages only through the app's `open_site` command; the plugin's `open` is not granted to it | The recipe script is attached in Rust, so the shell cannot open a page without it | A second caller needs `open` |
 | 2026-11-07 | The accent color follows the logo (cyan `#06aff8`), replacing the warm amber chosen earlier | The user asked for the logo to be used; amber clashed with it | The brand changes |
+| 2026-11-07 | Provider keys live in the Keychain via `keyring` v3 (`apple-native`), behind an in-repo `SecretStore` trait; the shell never receives a key or a masked tail | Invariant 2; the third-party Tauri plugins are young. Verified on the simulator: save, `hasKey`, remove | Desktop or Android needs a different backing |
+| 2026-11-07 | Providers are `anthropic` or `openAiCompatible`; Gemini and OpenRouter are presets of the latter | One adapter covers hosted and local (Ollama, LM Studio) models, as in GitNotes | A vendor's structured output needs its native API |
+| 2026-11-07 | Provider calls use `reqwest` with rustls, no redirects, HTTPS-only base URLs (HTTP only to this device) | A redirect can carry a custom auth header to another host; keys must never sit in a URL | |
+| 2026-11-07 | Favicons are fetched natively from the site itself, not from an icon service | No third-party requests | Many sites return no usable icon and a fallback source is wanted |
+| 2026-11-07 | The theme setting also sets the native site view's `overrideUserInterfaceStyle` | Sites that honor `prefers-color-scheme` follow the app's choice | Users want the app and sites to differ |
+| 2026-11-07 | Dev builds use `debug = "line-tables-only"` | A full debug build of the iOS target filled a laptop disk | Full debuginfo is needed for a native debugger session |
 
 ## Open questions
 
 1. **Bridge mechanism** (S2): remote-capability command vs native channel on desktop.
-2. **Secret store** (S6): adopt third-party plugin vs in-repo.
+2. **Secret store** (S6): decided for iOS (in-repo trait over the `keyring` crate, Keychain). Desktop and Android are open.
 3. **Minimum iOS version**: decided, iOS 17. See the decision log.
 4. **Do we support multiple tabs per profile on mobile in v1?** Memory and plugin complexity; start with one active site view plus a lightweight switcher.
 5. **Licensing**: choose a license before opening to contributors (not yet decided).

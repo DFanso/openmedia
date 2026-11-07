@@ -52,3 +52,22 @@ pub(crate) async fn go_forward<R: Runtime>(app: AppHandle<R>) -> Result<()> {
 pub(crate) async fn reload<R: Runtime>(app: AppHandle<R>) -> Result<()> {
     app.siteview().reload()
 }
+
+#[command]
+pub(crate) async fn set_color_scheme<R: Runtime>(
+    app: AppHandle<R>,
+    request: SetColorSchemeRequest,
+) -> Result<()> {
+    app.siteview().set_color_scheme(request)
+}
+
+/// Fetches a small PNG for the site's icon, as a `data:` URL. Runs natively against the site
+/// itself; nothing is sent to a third-party icon service.
+#[command]
+pub(crate) async fn fetch_favicon<R: Runtime>(
+    app: AppHandle<R>,
+    request: FetchFaviconRequest,
+) -> Result<Option<String>> {
+    parse_web_url(&request.url)?;
+    app.siteview().fetch_favicon(request)
+}

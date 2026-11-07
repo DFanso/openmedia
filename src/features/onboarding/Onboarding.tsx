@@ -1,7 +1,7 @@
 import { useState, type CSSProperties, type ReactNode } from "react";
 import { useApp } from "../../app/store";
 import logoMark from "../../assets/logo-mark.svg";
-import { GearIcon } from "../../shared/icons";
+import { SlidersIcon } from "../../shared/icons";
 
 interface DemoItemStyle extends CSSProperties {
   "--i": number;
@@ -11,9 +11,11 @@ interface DemoItemStyle extends CSSProperties {
 
 function MiniButton({ pulsing }: { pulsing?: boolean }) {
   return (
-    <span className="fab relative grid size-14 place-items-center rounded-full">
-      {pulsing && <span className="fab-aura demo-halo" />}
-      <img src={logoMark} alt="" className="relative size-8" />
+    <span className="fab relative grid size-16 place-items-center rounded-full">
+      {pulsing && (
+        <span className="demo-ring absolute inset-0 rounded-full border-2 border-accent" />
+      )}
+      <img src={logoMark} alt="" className="relative size-10" />
     </span>
   );
 }
@@ -71,7 +73,7 @@ function HoldVisual() {
         </span>
       ))}
       <span className="glass absolute top-[calc(50%+104px)] left-[26px] grid size-10 place-items-center rounded-full text-paper/70">
-        <GearIcon />
+        <SlidersIcon />
       </span>
     </div>
   );
@@ -179,7 +181,7 @@ export function Onboarding() {
           <button
             type="button"
             onClick={() => (last ? void finishGuide() : setIndex(index + 1))}
-            className="rounded-full bg-accent px-6 py-3 text-base font-semibold text-ink"
+            className="rounded-full bg-accent px-6 py-3 text-base font-semibold text-on-accent"
           >
             {last ? "Start browsing" : "Next"}
           </button>

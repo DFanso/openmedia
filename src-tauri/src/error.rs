@@ -2,6 +2,7 @@ use serde::{Serialize, Serializer};
 
 pub type Result<T> = std::result::Result<T, Error>;
 
+/// Messages here reach the UI, so none of them may contain a key, a header, or a response body.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("a favorite needs a name of 1-20 characters")]
@@ -18,6 +19,20 @@ pub enum Error {
     UnsupportedVersion(u32),
     #[error("invalid recipe: {0}")]
     Recipe(String),
+    #[error("invalid provider: {0}")]
+    InvalidProvider(String),
+    #[error("provider not found")]
+    ProviderNotFound,
+    #[error("at most {0} providers are allowed")]
+    TooManyProviders(usize),
+    #[error("invalid api key: {0}")]
+    InvalidKey(&'static str),
+    #[error("no api key is saved for this provider")]
+    NoKey,
+    #[error("secure storage failed: {0}")]
+    Secret(String),
+    #[error("{0}")]
+    Connection(String),
     #[error("library lock poisoned")]
     Poisoned,
 }

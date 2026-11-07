@@ -4,6 +4,7 @@ import { Onboarding } from "../features/onboarding/Onboarding";
 import { CommandBar } from "../features/sheet/CommandBar";
 import { SettingsScreen } from "../features/settings/SettingsScreen";
 import { WebLayer } from "../features/web/WebLayer";
+import { useApplyTheme } from "../shared/theme";
 import { useApp } from "./store";
 import { useHitRegions } from "./useHitRegions";
 
@@ -12,6 +13,8 @@ export function App() {
   const error = useApp((s) => s.error);
   const sheet = useApp((s) => s.sheet);
   const reportError = useApp((s) => s.reportError);
+  const theme = useApp((s) => s.state?.theme ?? "system");
+  useApplyTheme(theme);
   useHitRegions();
 
   useEffect(() => {

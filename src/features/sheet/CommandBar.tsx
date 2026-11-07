@@ -10,7 +10,7 @@ import {
   ReloadIcon,
 } from "../../shared/icons";
 import { normalizeWebUrl } from "../../shared/url";
-import { MAX_FAVORITES } from "../settings/limits";
+import { MAX_FAVORITES } from "../settings/presets";
 
 const NOT_CONNECTED =
   "The AI assistant isn't connected yet, so only addresses work for now. Type one to open it.";
@@ -91,7 +91,7 @@ export function CommandBar() {
           <button
             type="submit"
             aria-label="Go"
-            className="grid size-11 place-items-center rounded-full bg-accent text-ink"
+            className="grid size-11 place-items-center rounded-full bg-accent text-on-accent"
           >
             <ArrowIcon />
           </button>

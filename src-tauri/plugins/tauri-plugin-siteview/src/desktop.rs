@@ -49,3 +49,13 @@ impl<R: Runtime> Siteview<R> {
         Err(Error::DesktopUnsupported)
     }
 }
+
+impl<R: Runtime> Siteview<R> {
+    pub fn set_color_scheme(&self, _request: SetColorSchemeRequest) -> Result<()> {
+        Err(Error::DesktopUnsupported)
+    }
+
+    pub fn fetch_favicon(&self, _request: FetchFaviconRequest) -> Result<Option<String>> {
+        Err(Error::DesktopUnsupported)
+    }
+}

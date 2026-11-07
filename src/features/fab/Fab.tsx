@@ -20,10 +20,14 @@ import {
   type GestureState,
 } from "./gesture";
 import { loadPosition, savePosition, type FabPosition } from "./position";
-import { GearIcon } from "../../shared/icons";
+import { SlidersIcon } from "../../shared/icons";
 import logoMark from "../../assets/logo-mark.svg";
 
 const idle: GestureState = { phase: "idle" };
+
+/** The button grows while held so a thumb does not hide the ring; the ring box is 100 px wide. */
+const HOLD_SCALE = 1.3;
+const HOLD_REACH = 50 * HOLD_SCALE + 6;
 
 const monogram = (name: string) => name.trim().charAt(0).toUpperCase() || "·";
 
@@ -152,6 +156,11 @@ export function Fab() {
 
   const hidden = sheet !== "none" || onboardingOpen;
   const holdState = gesture.phase === "pressing" ? "charging" : fanOpen ? "open" : "idle";
+  const enlarged = gesture.phase === "pressing" || fanOpen;
+  // While enlarged the ring reaches past the screen edge; slide the button inward to keep it whole.
+  const edgeGap = position.edge === "left" ? center.x : viewport.width - center.x;
+  const inwardShift = enlarged ? Math.max(0, HOLD_REACH - edgeGap) : 0;
+  const shiftX = position.edge === "left" ? inwardShift : -inwardShift;
 
   return (
     <>
@@ -180,13 +189,17 @@ export function Fab() {
             height: FAVORITE_SIZE,
             margin: -FAVORITE_SIZE / 2,
           }}
-          className={`fan-item glass fixed z-20 grid place-items-center rounded-full text-lg font-medium ${
-            hover?.kind === "favorite" && hover.index === index ? "border-accent! text-accent" : ""
+          className={`fan-item glass fixed z-20 grid place-items-center rounded-full bg-white/90! text-lg font-medium text-on-accent ${
+            hover?.kind === "favorite" && hover.index === index ? "ring-2 ring-accent" : ""
           }`}
         >
-          {monogram(favorite.name)}
+          {favorite.icon ? (
+            <img src={favorite.icon} alt="" draggable={false} className="size-7 rounded-md" />
+          ) : (
+            monogram(favorite.name)
+          )}
           <span
-            className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-[11px] font-medium tracking-[0.14em] whitespace-nowrap text-paper uppercase ${
+            className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-[11px] font-medium tracking-[0.14em] whitespace-nowrap text-white uppercase [text-shadow:0_1px_6px_rgb(0_0_0/0.7)] ${
               position.edge === "left" ? "left-full ml-3" : "right-full mr-3 text-right"
             }`}
           >
@@ -214,7 +227,7 @@ export function Fab() {
           hover?.kind === "settings" ? "border-accent! text-accent" : "text-paper/80"
         }`}
       >
-        <GearIcon />
+        <SlidersIcon />
       </button>
 
       <button
@@ -230,8 +243,8 @@ export function Fab() {
         style={{
           width: FAB_SIZE,
           height: FAB_SIZE,
-          transform: `translate(${center.x - FAB_SIZE / 2}px, ${center.y - FAB_SIZE / 2}px)${
-            gesture.phase === "pressing" ? " scale(0.94)" : ""
+          transform: `translate(${center.x + shiftX - FAB_SIZE / 2}px, ${center.y - FAB_SIZE / 2}px)${
+            enlarged ? ` scale(${HOLD_SCALE})` : ""
           }`,
           transition: gesture.phase === "dragging" ? "none" : "transform 320ms var(--ease-spring)",
           touchAction: "none",
@@ -240,10 +253,9 @@ export function Fab() {
           hidden ? "pointer-events-none opacity-0" : ""
         }`}
       >
-        <span className="fab-aura" />
-        <img src={logoMark} alt="" draggable={false} className="fab-logo relative size-8" />
-        <svg className="fab-ring" viewBox="0 0 62 62" aria-hidden="true">
-          <circle cx="31" cy="31" r="29" />
+        <img src={logoMark} alt="" draggable={false} className="fab-logo relative size-10" />
+        <svg className="fab-ring" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="50" r="47" />
         </svg>
       </button>
     </>

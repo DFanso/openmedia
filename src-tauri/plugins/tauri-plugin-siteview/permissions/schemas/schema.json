@@ -319,6 +319,18 @@
           "markdownDescription": "Denies the delete_profile_data command without any pre-configured scope."
         },
         {
+          "description": "Enables the fetch_favicon command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-fetch-favicon",
+          "markdownDescription": "Enables the fetch_favicon command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the fetch_favicon command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-fetch-favicon",
+          "markdownDescription": "Denies the fetch_favicon command without any pre-configured scope."
+        },
+        {
           "description": "Enables the go_back command without any pre-configured scope.",
           "type": "string",
           "const": "allow-go-back",
@@ -379,6 +391,18 @@
           "markdownDescription": "Denies the reload command without any pre-configured scope."
         },
         {
+          "description": "Enables the set_color_scheme command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-set-color-scheme",
+          "markdownDescription": "Enables the set_color_scheme command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the set_color_scheme command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-set-color-scheme",
+          "markdownDescription": "Denies the set_color_scheme command without any pre-configured scope."
+        },
+        {
           "description": "Enables the set_interactive_regions command without any pre-configured scope.",
           "type": "string",
           "const": "allow-set-interactive-regions",
@@ -415,10 +439,10 @@
           "markdownDescription": "Denies the set_visible command without any pre-configured scope."
         },
         {
-          "description": "Shell-only control of the native site view. `open` is deliberately absent: the app's own `open_site` command opens pages so it can attach the recipe script. Never grant to a site webview.\n#### This default permission set includes:\n\n- `allow-close`\n- `allow-set-rect`\n- `allow-set-interactive-regions`\n- `allow-navigate`\n- `allow-go-back`\n- `allow-go-forward`\n- `allow-reload`",
+          "description": "Shell-only control of the native site view. `open` is deliberately absent: the app's own `open_site` command opens pages so it can attach the recipe script. `fetch-favicon` is also absent: only Rust calls it, so the shell cannot make arbitrary native fetches. Never grant to a site webview.\n#### This default permission set includes:\n\n- `allow-close`\n- `allow-set-rect`\n- `allow-set-interactive-regions`\n- `allow-navigate`\n- `allow-go-back`\n- `allow-go-forward`\n- `allow-reload`\n- `allow-set-color-scheme`",
           "type": "string",
           "const": "default",
-          "markdownDescription": "Shell-only control of the native site view. `open` is deliberately absent: the app's own `open_site` command opens pages so it can attach the recipe script. Never grant to a site webview.\n#### This default permission set includes:\n\n- `allow-close`\n- `allow-set-rect`\n- `allow-set-interactive-regions`\n- `allow-navigate`\n- `allow-go-back`\n- `allow-go-forward`\n- `allow-reload`"
+          "markdownDescription": "Shell-only control of the native site view. `open` is deliberately absent: the app's own `open_site` command opens pages so it can attach the recipe script. `fetch-favicon` is also absent: only Rust calls it, so the shell cannot make arbitrary native fetches. Never grant to a site webview.\n#### This default permission set includes:\n\n- `allow-close`\n- `allow-set-rect`\n- `allow-set-interactive-regions`\n- `allow-navigate`\n- `allow-go-back`\n- `allow-go-forward`\n- `allow-reload`\n- `allow-set-color-scheme`"
         }
       ]
     }

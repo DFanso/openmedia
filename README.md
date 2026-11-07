@@ -26,16 +26,18 @@
 
 ## Highlights
 
-- **Floating button:** tap to type an address, hold to fan out your favorites (Instagram, Facebook, Twitter, Reddit by default) with settings set apart, drag it to either edge.
+- **Floating button:** tap to type an address, hold to fan out your favorites (Instagram, Facebook, Twitter, Reddit by default, with their site icons) and settings, drag it to either edge. It grows while held so a thumb does not hide the ring.
 - **Favorites:** edit, reorder, and add the current page from the app.
+- **Pull to refresh** on the page, and **light, dark or system** theme that sites can follow.
 - **Recipes:** bundled, validated in Rust, injected at document start so removed things never flash.
 - **Profiles:** each profile has its own isolated cookie and storage store (iOS 17+).
 - **First-run guide:** four short steps, replayable from Settings.
-- **Planned:** an AI assistant that writes recipes with your own API key, a catalog of bundled recipes, Android, desktop. See the [roadmap](docs/wiki/roadmap.md).
+- **Bring your own AI key:** add providers (Anthropic, OpenAI, Gemini, OpenRouter, or a local OpenAI-compatible server) in Settings. Keys go to the iOS Keychain through Rust and never come back to the UI; "Test connection" lists the provider's models.
+- **Planned:** the AI assistant itself (it writes recipes; today the saved providers are not used yet), a catalog of bundled recipes, Android, desktop. See the [roadmap](docs/wiki/roadmap.md).
 
 ## Status
 
-Early. It runs on the **iOS simulator**. Not built yet: Android, desktop site views, and the AI assistant (the prompt box accepts addresses only). Nothing has been tested on a physical device. What was and was not verified is listed in [Platform Support](docs/wiki/platform-support.md#verified-results).
+Early. It runs on the **iOS simulator**. Not built yet: Android, desktop site views, and the AI assistant itself (the prompt box accepts addresses only). Nothing has been tested on a physical device, and no key has been tested against a real provider. What was and was not verified is listed in [Platform Support](docs/wiki/platform-support.md#verified-results).
 
 ## Run it
 

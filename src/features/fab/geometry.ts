@@ -15,7 +15,7 @@ export interface Insets {
 
 export type Edge = "left" | "right";
 
-export const FAB_SIZE = 56;
+export const FAB_SIZE = 64;
 export const EDGE_MARGIN = 10;
 export const FAVORITE_SIZE = 52;
 export const SETTINGS_SIZE = 44;

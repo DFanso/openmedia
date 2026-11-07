@@ -6,9 +6,26 @@
   --color-ink: #070b14;
   --color-paper: #eef3fa;
   --color-accent: #06aff8;
+  --color-on-accent: #04101f;
   --color-navy: #021669;
   --color-hair: rgb(190 220 255 / 0.16);
   --ease-spring: cubic-bezier(0.22, 1.5, 0.36, 1);
+}
+
+:root {
+  --glass: rgb(9 14 26 / 0.64);
+  --glass-shadow: rgb(0 0 0 / 0.35);
+  color-scheme: dark;
+}
+
+/* The light theme swaps the same tokens, so no component needs to know which is active. */
+:root[data-theme="light"] {
+  --color-ink: #f4f7fc;
+  --color-paper: #0b1220;
+  --color-hair: rgb(11 18 32 / 0.14);
+  --glass: rgb(255 255 255 / 0.74);
+  --glass-shadow: rgb(11 18 32 / 0.18);
+  color-scheme: light;
 }
 
 html,
@@ -29,25 +46,25 @@ body,
 input {
   -webkit-user-select: text;
   user-select: text;
-  font-variant-numeric: tabular-nums;
+  font-variant-ligatures: none;
 }
 
 .glass {
-  background: rgb(9 14 26 / 0.64);
+  background: var(--glass);
   -webkit-backdrop-filter: blur(18px) saturate(1.3);
   backdrop-filter: blur(18px) saturate(1.3);
   border: 1px solid var(--color-hair);
-  box-shadow: 0 8px 32px rgb(0 0 0 / 0.35);
+  box-shadow: 0 8px 32px var(--glass-shadow);
 }
 
-/* The floating button is light so the blue logo reads over any page. */
+/* Translucent so the page shows through; the logo stays readable over light and dark pages. */
 .fab {
-  background: rgb(255 255 255 / 0.92);
-  -webkit-backdrop-filter: blur(14px) saturate(1.4);
-  backdrop-filter: blur(14px) saturate(1.4);
-  border: 1px solid rgb(255 255 255 / 0.6);
+  background: rgb(255 255 255 / 0.55);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  backdrop-filter: blur(16px) saturate(1.5);
+  border: 1px solid rgb(255 255 255 / 0.55);
   box-shadow:
-    0 6px 22px rgb(0 0 0 / 0.35),
+    0 6px 22px rgb(0 0 0 / 0.28),
     0 0 0 1px rgb(2 22 105 / 0.08);
 }
 
@@ -55,56 +72,30 @@ input {
   pointer-events: none;
 }
 
-.fab-aura {
-  position: absolute;
-  inset: -12px;
-  border-radius: 9999px;
-  pointer-events: none;
-  opacity: 0;
-  background: radial-gradient(
-    circle,
-    rgb(6 175 248 / 0.8) 0%,
-    rgb(6 175 248 / 0.34) 45%,
-    transparent 70%
-  );
-  filter: blur(6px);
-}
-
+/* The ring sits well outside the button: a thumb covers the button, not the ring. */
 .fab-ring {
   position: absolute;
-  inset: -3px;
-  width: 62px;
-  height: 62px;
+  inset: -18px;
+  width: 100px;
+  height: 100px;
   pointer-events: none;
 }
 
 .fab-ring circle {
   fill: none;
   stroke: var(--color-accent);
-  stroke-width: 2.5;
+  stroke-width: 3;
   stroke-linecap: round;
-  stroke-dasharray: 182.2;
-  stroke-dashoffset: 182.2;
+  stroke-dasharray: 295.3;
+  stroke-dashoffset: 295.3;
   transform: rotate(-90deg);
   transform-origin: center;
   opacity: 0;
 }
 
-/* Holding: a ring fills over the hold time while a halo pulses and its hue drifts. */
-.fab[data-hold="charging"] .fab-aura {
-  animation:
-    aura-in 380ms ease-out 80ms forwards,
-    aura-pulse 760ms ease-in-out 80ms infinite;
-}
-
 .fab[data-hold="charging"] .fab-ring circle {
   opacity: 1;
-  animation: ring-fill 380ms linear 80ms forwards;
-}
-
-.fab[data-hold="open"] .fab-aura {
-  opacity: 0.9;
-  animation: aura-pulse 1400ms ease-in-out infinite;
+  animation: ring-fill 380ms linear forwards;
 }
 
 .fab[data-hold="open"] .fab-ring circle {
@@ -112,45 +103,9 @@ input {
   stroke-dashoffset: 0;
 }
 
-.fab[data-hold="charging"] .fab-logo,
-.fab[data-hold="open"] .fab-logo {
-  animation: logo-hue 1000ms ease-in-out infinite;
-}
-
-@keyframes aura-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 0.9;
-  }
-}
-
-@keyframes aura-pulse {
-  0%,
-  100% {
-    filter: blur(6px) hue-rotate(0deg);
-    transform: scale(1);
-  }
-  50% {
-    filter: blur(9px) hue-rotate(80deg);
-    transform: scale(1.22);
-  }
-}
-
 @keyframes ring-fill {
   to {
     stroke-dashoffset: 0;
-  }
-}
-
-@keyframes logo-hue {
-  0%,
-  100% {
-    filter: hue-rotate(0deg);
-  }
-  50% {
-    filter: hue-rotate(35deg) saturate(1.2);
   }
 }
 
@@ -195,8 +150,8 @@ input {
   opacity: 0;
 }
 
-.demo-halo {
-  animation: aura-pulse 1400ms ease-in-out infinite;
+.demo-ring {
+  animation: demo-ring 1800ms ease-out infinite;
 }
 
 .demo-tap {
@@ -222,6 +177,18 @@ input {
   100% {
     opacity: 0;
     transform: translate(var(--from-x), var(--from-y)) scale(0.3);
+  }
+}
+
+@keyframes demo-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.9;
+  }
+  80%,
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
   }
 }
 
@@ -255,19 +222,15 @@ input {
     transition-delay: 0s;
   }
 
-  .fab[data-hold] .fab-aura,
-  .fab[data-hold] .fab-logo,
   .demo-fan-item,
-  .demo-halo,
+  .demo-ring,
   .demo-tap,
   .demo-slide {
     animation: none;
   }
 
-  .fab[data-hold="charging"] .fab-aura,
-  .fab[data-hold="open"] .fab-aura,
   .demo-fan-item {
-    opacity: 0.9;
+    opacity: 1;
   }
 
   .fab[data-hold="charging"] .fab-ring circle {

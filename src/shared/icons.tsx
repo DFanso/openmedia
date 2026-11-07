@@ -66,9 +66,11 @@ export const DownIcon = () => (
   </Icon>
 );
 
-export const GearIcon = () => (
+export const SlidersIcon = () => (
   <Icon>
-    <circle cx="12" cy="12" r="3" />
-    <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" />
+    <path d="M4 7h9M17 7h3M4 12h3M11 12h9M4 17h11M19 17h1" />
+    <circle cx="15" cy="7" r="2" />
+    <circle cx="9" cy="12" r="2" />
+    <circle cx="17" cy="17" r="2" />
   </Icon>
 );

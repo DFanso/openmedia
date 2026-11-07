@@ -42,6 +42,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             commands::go_back,
             commands::go_forward,
             commands::reload,
+            commands::set_color_scheme,
+            commands::fetch_favicon,
         ])
         .setup(|app, api| {
             #[cfg(mobile)]
