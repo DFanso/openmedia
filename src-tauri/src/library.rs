@@ -12,17 +12,19 @@ use uuid::Uuid;
 use crate::ai::{AiSettings, MAX_PROVIDERS, ProviderConfig, ProviderInput};
 use crate::error::{Error, Result};
 
-const FORMAT_VERSION: u32 = 2;
+const FORMAT_VERSION: u32 = 3;
 pub const MAX_FAVORITES: usize = 6;
 const MAX_FAVORITE_NAME_CHARS: usize = 20;
 const MAX_ICON_CHARS: usize = 200_000;
 const ICON_PREFIX: &str = "data:image/png;base64,";
 
-const DEFAULT_FAVORITES: [(&str, &str); 4] = [
+const YOUTUBE_FAVORITE: (&str, &str) = ("YouTube", "https://m.youtube.com/");
+const DEFAULT_FAVORITES: [(&str, &str); 5] = [
     ("Instagram", "https://www.instagram.com/"),
     ("Facebook", "https://www.facebook.com/"),
     ("Twitter", "https://twitter.com/"),
     ("Reddit", "https://www.reddit.com/"),
+    YOUTUBE_FAVORITE,
 ];
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -280,9 +282,26 @@ fn with_icons(data: &LibraryData) -> Vec<Favorite> {
 }
 
 fn parse(text: &str) -> Result<LibraryData> {
-    let data: LibraryData = serde_json::from_str(text)?;
-    if data.version != FORMAT_VERSION {
-        return Err(Error::UnsupportedVersion(data.version));
+    let mut data: LibraryData = serde_json::from_str(text)?;
+    match data.version {
+        2 => {
+            let previous_defaults = &DEFAULT_FAVORITES[..4];
+            if data.favorites.len() == previous_defaults.len()
+                && data
+                    .favorites
+                    .iter()
+                    .zip(previous_defaults)
+                    .all(|(favorite, (name, url))| favorite.name == *name && favorite.url == *url)
+            {
+                data.favorites.push(favorite_from_input(FavoriteInput {
+                    name: YOUTUBE_FAVORITE.0.to_owned(),
+                    url: YOUTUBE_FAVORITE.1.to_owned(),
+                })?);
+            }
+            data.version = FORMAT_VERSION;
+        }
+        FORMAT_VERSION => {}
+        version => return Err(Error::UnsupportedVersion(version)),
     }
     Ok(data)
 }
@@ -364,16 +383,71 @@ mod tests {
     }
 
     #[test]
-    fn first_run_has_the_four_default_favorites_in_order() {
+    fn youtube_is_available_as_a_favorite_on_first_run() {
         let (_dir, library) = library();
-        let names: Vec<_> = library
+        let youtube = library
             .state()
             .unwrap()
             .favorites
             .into_iter()
-            .map(|f| f.name)
+            .find(|favorite| favorite.url == "https://m.youtube.com/")
+            .expect("YouTube favorite");
+        assert_eq!(youtube.name, "YouTube");
+    }
+
+    #[test]
+    fn upgrading_original_favorites_adds_youtube_without_replacing_their_ids() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("library.json");
+        let mut saved = default_data();
+        saved.version = 2;
+        saved.favorites.pop();
+        let originals = saved.favorites.clone();
+        let profile = saved.profile_id;
+        fs::write(&path, serde_json::to_vec(&saved).unwrap()).unwrap();
+
+        let state = Library::load(path.clone()).unwrap().state().unwrap();
+        assert_eq!(state.profile_id, profile);
+        assert_eq!(&state.favorites[..4], originals);
+        assert_eq!(state.favorites[4].url, "https://m.youtube.com/");
+        let saved: LibraryData = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
+        assert_eq!(saved.version, FORMAT_VERSION);
+    }
+
+    #[test]
+    fn upgrading_does_not_change_custom_or_empty_favorites() {
+        let original = default_data().favorites[..4].to_vec();
+        let mut reordered = original.clone();
+        reordered.swap(0, 1);
+        let mut renamed = original.clone();
+        renamed[0].name = "Photos".into();
+        for favorites in [vec![], original[..3].to_vec(), reordered, renamed] {
+            let dir = tempfile::tempdir().unwrap();
+            let path = dir.path().join("library.json");
+            let mut saved = default_data();
+            saved.version = 2;
+            saved.favorites = favorites.clone();
+            fs::write(&path, serde_json::to_vec(&saved).unwrap()).unwrap();
+            assert_eq!(
+                Library::load(path).unwrap().state().unwrap().favorites,
+                favorites
+            );
+        }
+    }
+
+    #[test]
+    fn removing_youtube_is_respected_on_later_launches() {
+        let (dir, library) = library();
+        let favorites = library
+            .state()
+            .unwrap()
+            .favorites
+            .into_iter()
+            .filter(|favorite| favorite.name != "YouTube")
+            .map(|favorite| input(&favorite.name, &favorite.url))
             .collect();
-        assert_eq!(names, ["Instagram", "Facebook", "Twitter", "Reddit"]);
+        let saved = library.set_favorites(favorites).unwrap();
+        assert_eq!(reload(&dir).state().unwrap().favorites, saved);
     }
 
     #[test]
@@ -511,7 +585,13 @@ mod tests {
     #[test]
     fn icons_are_cached_by_host_and_shown_on_matching_favorites() {
         let (dir, library) = library();
-        assert_eq!(library.favorites_missing_icons().unwrap().len(), 4);
+        assert!(
+            library
+                .favorites_missing_icons()
+                .unwrap()
+                .iter()
+                .any(|(host, _)| host == "www.reddit.com")
+        );
         library
             .set_icon("www.reddit.com", "data:image/png;base64,AAAA")
             .unwrap();
@@ -522,12 +602,19 @@ mod tests {
             .find(|f| f.name == "Reddit")
             .unwrap();
         assert_eq!(reddit.icon.as_deref(), Some("data:image/png;base64,AAAA"));
-        assert_eq!(library.favorites_missing_icons().unwrap().len(), 3);
+        assert!(
+            library
+                .favorites_missing_icons()
+                .unwrap()
+                .iter()
+                .all(|(host, _)| host != "www.reddit.com")
+        );
     }
 
     #[test]
     fn only_small_png_data_urls_are_accepted_as_icons() {
         let (_dir, library) = library();
+        let before = library.favorites_missing_icons().unwrap();
         library
             .set_icon("www.reddit.com", "https://evil.example/x.png")
             .unwrap();
@@ -537,7 +624,7 @@ mod tests {
                 &format!("{ICON_PREFIX}{}", "A".repeat(MAX_ICON_CHARS)),
             )
             .unwrap();
-        assert_eq!(library.favorites_missing_icons().unwrap().len(), 4);
+        assert_eq!(library.favorites_missing_icons().unwrap(), before);
     }
 
     #[test]

@@ -43,10 +43,11 @@ function TapVisual() {
 }
 
 const DEMO_ITEMS = [
-  { label: "I", x: 70, y: -78 },
-  { label: "F", x: 104, y: -26 },
-  { label: "T", x: 104, y: 26 },
-  { label: "R", x: 70, y: 78 },
+  { label: "I", x: 70, y: -100 },
+  { label: "F", x: 114, y: -50 },
+  { label: "T", x: 128, y: 0 },
+  { label: "R", x: 114, y: 50 },
+  { label: "Y", x: 70, y: 100 },
 ];
 
 function HoldVisual() {
