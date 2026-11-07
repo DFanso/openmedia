@@ -10,6 +10,8 @@ pub enum Error {
     UnsupportedScheme,
     #[error("invalid profile id")]
     InvalidProfile,
+    #[error("invalid content rule list")]
+    InvalidRuleList,
     #[error("bridge message is larger than {0} bytes")]
     BridgeMessageTooLarge(usize),
     #[error("bridge message is not valid json")]

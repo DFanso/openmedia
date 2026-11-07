@@ -34,6 +34,7 @@ Not built: `yarn tauri android dev` (the Android site view does not exist yet), 
 - Recipe schema is defined in Rust; regenerate TS types and JSON Schema after any schema change (`yarn gen:schema`, added with the schema).
 - Bundled recipe changes require fixture updates in `recipes/fixtures/<site>/`.
 - Fixtures are scrubbed of personal data before commit; raw captures go in the gitignored `captures/`.
+- Bundled filter lists in `blocklists/` are refreshed only with `scripts/update-blocklists.sh` and shipped with a release; the app never downloads them. Run `cargo test ad_block` after a refresh ([Ad Blocking](./ad-blocking.md#updating-the-lists)).
 
 ## Troubleshooting
 

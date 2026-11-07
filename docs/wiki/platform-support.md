@@ -21,6 +21,7 @@ The shell talks to one plugin API (`open`, `set_rect`, `navigate`, …); desktop
 | Isolated profiles | `data_store_identifier` (**verify** min OS) | `data_directory` | `data_directory` | `WKWebsiteDataStore(forIdentifier:)` (iOS 17+; **verify** fallback for older) | One global `CookieManager` per app; per-profile needs androidx.webkit multi-profile (feature-gated, **verify**) |
 | Page → Core channel | Bridge A (**verify**) | Bridge A (**verify**) | Bridge A (**verify**) | Bridge B (script message handler) | Bridge B (web message listener) |
 | Secret store | Keychain | Credential Manager | Secret Service | Keychain | Keystore-backed |
+| Ad and tracker blocking | Not built (deferred with desktop) | Not built | Not built | `WKContentRuleList` from bundled lists ([Ad Blocking](./ad-blocking.md)) | Not built; Android WebView has no rule-list API, so it needs request interception (`shouldInterceptRequest`) with the `adblock` engine |
 | Auto-update | updater plugin | updater plugin | updater plugin | App Store | Play Store |
 | Priority | 3 | 4 | 4 | **1** | **1** |
 

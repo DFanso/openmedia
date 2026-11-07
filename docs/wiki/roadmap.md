@@ -1,6 +1,6 @@
 # Roadmap
 
-> **Status: Phase 1 in progress, iOS first; Phase 3 groundwork started.** Done: Tauri scaffold, `tauri-plugin-siteview` (iOS), favorites, the floating-button shell, themes, onboarding, a first recipe slice, CI, and the BYOK groundwork (Keychain-backed key storage, provider settings, connection test). Android code was removed until iOS is stable; desktop is deferred. Update this page when phases start, finish, or change.
+> **Status: Phase 1 in progress, iOS first; Phase 3 groundwork started.** Done: Tauri scaffold, `tauri-plugin-siteview` (iOS), favorites, the floating-button shell, themes, onboarding, a first recipe slice, CI, the BYOK groundwork (Keychain-backed key storage, provider settings, connection test), and ad and tracker blocking on iOS. Android code was removed until iOS is stable; desktop is deferred. Update this page when phases start, finish, or change.
 
 ## Goal
 
@@ -168,6 +168,9 @@ All without a backend.
 | 2026-11-07 | Favicons are fetched natively from the site itself, not from an icon service | No third-party requests | Many sites return no usable icon and a fallback source is wanted |
 | 2026-11-07 | The theme setting also sets the native site view's `overrideUserInterfaceStyle` | Sites that honor `prefers-color-scheme` follow the app's choice | Users want the app and sites to differ |
 | 2026-11-07 | Dev builds use `debug = "line-tables-only"` | A full debug build of the iOS target filled a laptop disk | Full debuginfo is needed for a native debugger session |
+| 2026-11-07 | Block ads and trackers with Brave's `adblock` crate (MPL-2.0) converting bundled EasyList and EasyPrivacy to WebKit content rule lists | Maintained (0.13.5 on 2026-10-28, ~1.4M downloads), Rust like the core, has a Safari content-blocking converter, blocks before a request leaves the device and before paint, no page JS. Lists are bundled so there is no new network destination | Android needs request interception instead; a list outgrows WebKit's 150,000-rule cap; a runtime list update is wanted (would need an invariant 1 change) |
+| 2026-11-07 | One WebKit rule list per filter list (EasyList, EasyPrivacy), cached on disk by content hash and in WebKit's store by id | Each stays far below the cap (74,981 and 56,385 rules at the bundled versions); the multi-second compile runs once per list version | |
+| 2026-11-07 | The converter's bare `if-domain`/`unless-domain` entries get a `*` prefix | Verified on macOS WebKit: a bare domain matches only that exact host, so `example.org##.ad` would not hide on `www.example.org` | The `adblock` crate emits the prefix itself |
 
 ## Open questions
 

@@ -1,3 +1,4 @@
+mod ad_block;
 mod ai;
 mod commands;
 mod error;
@@ -15,6 +16,9 @@ pub fn run() {
             let path = app.path().app_data_dir()?.join("library.json");
             app.manage(library::Library::load(path)?);
             app.manage(recipes::RecipeScript::bundled()?);
+            app.manage(ad_block::AdBlock::bundled(
+                app.path().app_cache_dir()?.join("ad-block"),
+            ));
             app.manage(commands::Secrets(Box::new(secrets::KeychainStore)));
             Ok(())
         })
@@ -27,6 +31,7 @@ pub fn run() {
             commands::set_theme,
             commands::refresh_icons,
             commands::open_site,
+            commands::set_ad_block,
             commands::ai_state,
             commands::ai_save_provider,
             commands::ai_delete_provider,

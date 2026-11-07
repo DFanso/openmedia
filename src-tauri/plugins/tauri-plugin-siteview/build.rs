@@ -9,6 +9,7 @@ const COMMANDS: &[&str] = &[
     "reload",
     "set_color_scheme",
     "fetch_favicon",
+    "set_content_rule_lists",
 ];
 
 fn main() {

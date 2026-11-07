@@ -162,12 +162,14 @@ engine/                    Injected page script (TS) -> src-tauri/resources/engi
 src-tauri/
   src/
     site_view/{mod,desktop,mobile}.rs
+    ad_block.rs              Bundled lists -> WebKit content rule list JSON
     recipes/{schema,store,resolve,validate}.rs
     ai/{mod,provider,anthropic,openai,gemini,openai_compat}.rs
     secrets/mod.rs
     bridge.rs
   plugins/tauri-plugin-siteview/   Swift (iOS) + Kotlin (Android) native webview host
   capabilities/
+blocklists/                  Bundled EasyList + EasyPrivacy (updated by scripts/update-blocklists.sh)
 recipes/
   bundled/<site>.json
   fixtures/<site>/           Scrubbed DOM fixtures for tests
