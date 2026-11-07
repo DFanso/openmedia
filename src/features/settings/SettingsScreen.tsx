@@ -6,6 +6,8 @@ import { normalizeWebUrl } from "../../shared/url";
 import { AiSection } from "./AiSection";
 import { MarginSlider } from "./MarginSlider";
 import { MAX_FAVORITE_NAME, MAX_FAVORITES } from "./presets";
+import { PlatformCatalog } from "./PlatformCatalog";
+import { isPlatformUrl } from "./platforms";
 import { SitesSection } from "./SitesSection";
 import { Switch } from "./Switch";
 
@@ -298,6 +300,20 @@ function FavoritesSection() {
         </button>
         {saved && <span className="text-sm text-paper/60">Saved</span>}
       </div>
+
+      <PlatformCatalog
+        urls={drafts.map((d) => d.url)}
+        full={drafts.length >= MAX_FAVORITES}
+        onAdd={(platform) => {
+          setProblem(null);
+          setSaved(false);
+          setDrafts((l) => [...l, { key: newKey(), name: platform.name, url: platform.url }]);
+        }}
+        onRemove={(platform) => {
+          setSaved(false);
+          setDrafts((l) => l.filter((d) => !isPlatformUrl(platform, d.url)));
+        }}
+      />
     </section>
   );
 }

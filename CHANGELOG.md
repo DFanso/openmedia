@@ -38,6 +38,16 @@ All notable changes to OpenMedia are documented here.
 
 **PR:** [#13](https://github.com/skepjandi/openmedia/pull/13)
 
+### feat(settings): a catalog of the 20 largest platforms, addable to favorites
+
+**What:** Only five sites were one tap away, and any other platform meant typing its address.
+
+**Change:** Settings > Favorites gains "Popular platforms": Facebook, Instagram, WhatsApp, YouTube, TikTok, WeChat, Messenger, Telegram, Snapchat, Reddit, Kuaishou, Douyin, QQ, X, Pinterest, Weibo, Threads, LinkedIn, Discord and Twitch, with owner and approximate users, each with an Add/Added toggle that edits the favorites list (up to 6) before the existing Save. Matching is by domain, so an old `twitter.com` favorite shows X as added. Addresses were probed with a mobile Safari user agent: Threads moved to `threads.com`, and the rest settle on their own registrable domain, which domain pinning requires. No Rust, schema or IPC change.
+
+**Verified:** unit tests for the catalog (every address saves unchanged, names fit the limit, no address matches two platforms, subdomain and lookalike matching); the toggle markup rendered server-side with `twitter.com` and `reddit.com` favorites showing X and Reddit as added. **Not verified:** the screen on a simulator or device; that each page loads and is usable in the app's web view (Kuaishou did not answer from this network; WhatsApp redirects to `/mobile/`, Weibo through `visitor.passport.weibo.cn`; WeChat and QQ web clients may refuse sign-in). Bundled recipes exist only for Instagram, Facebook, X, Reddit and YouTube.
+
+**PR:** n/a
+
 ### fix(siteview): sign-in popups and a Safari user agent
 
 **What:** On the iPhone 17 Pro Max simulator, Reddit's Continue with Google did nothing, and Continue with Apple's popup was loaded over the page or dropped.
