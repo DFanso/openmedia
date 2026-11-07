@@ -1,8 +1,18 @@
 # AI Assistant (BYOK)
 
-> **Status: Design.** Module: `src-tauri/src/ai/`.
+> **Status: Partially implemented.** Built: provider settings, key storage and a connection test (see [Implemented: provider settings](#implemented-provider-settings)). Not built: the provider adapters, the prompt, snapshots, and everything from "Privacy: what is sent" on. Module: `src-tauri/src/ai/`.
 
 The user brings their own API key. The assistant turns a plain-language request ("remove the Reels tab and suggested posts, keep stories") into a validated recipe patch for the page they are looking at. With no key configured, everything else (bundled recipes, picker, manual editing) still works.
+
+## Implemented: provider settings
+
+Settings has an "AI assistant" section modelled on GitNotes' provider list: several providers, one active.
+
+- A provider is a name, a kind (`anthropic` or `openAiCompatible`), a base URL and an optional model. Presets fill the form: Anthropic, OpenAI, Google Gemini (its OpenAI-compatible endpoint), OpenRouter, and a blank custom entry for Ollama, LM Studio or anything else that speaks the OpenAI API. Gemini and OpenRouter are therefore `openAiCompatible`, not separate adapters.
+- The key is entered once and goes to the Keychain through Rust; see [Security: key storage](./security.md#key-storage). The shell only learns whether a key exists.
+- "Test connection" saves the provider, then asks it for its model list from Rust (`GET {base}/v1/models` with `x-api-key` for Anthropic, `GET {base}/models` with a bearer token for the rest). Success proves the key and fills a model picker; failures show a fixed message ("The provider rejected the key.", rate limit, unreachable) and never a response body.
+- Limits: 8 providers, names up to 30 characters, models up to 100.
+- The saved providers are not used yet: the command bar still accepts addresses only.
 
 ## Providers
 

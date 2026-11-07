@@ -7,6 +7,8 @@ const COMMANDS: &[&str] = &[
     "go_back",
     "go_forward",
     "reload",
+    "set_color_scheme",
+    "fetch_favicon",
 ];
 
 fn main() {

@@ -63,10 +63,9 @@ export function WebLayer() {
       <div
         ref={slot}
         aria-hidden="true"
-        className="fixed inset-x-0 top-[env(safe-area-inset-top)] bottom-[env(safe-area-inset-bottom)]"
+        className="fixed inset-x-0 top-[env(safe-area-inset-top)] bottom-0"
       />
       <div className="fixed inset-x-0 top-0 h-[env(safe-area-inset-top)] bg-ink" />
-      <div className="fixed inset-x-0 bottom-0 h-[env(safe-area-inset-bottom)] bg-ink" />
     </>
   );
 }

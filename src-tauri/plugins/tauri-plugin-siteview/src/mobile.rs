@@ -110,3 +110,18 @@ impl<R: Runtime> Siteview<R> {
         self.run("reload", ())
     }
 }
+
+impl<R: Runtime> Siteview<R> {
+    pub fn set_color_scheme(&self, request: SetColorSchemeRequest) -> Result<()> {
+        self.run(
+            "setColorScheme",
+            serde_json::json!({ "scheme": request.scheme }),
+        )
+    }
+
+    pub fn fetch_favicon(&self, request: FetchFaviconRequest) -> Result<Option<String>> {
+        let response: FaviconResponse =
+            self.run("fetchFavicon", serde_json::json!({ "url": request.url }))?;
+        Ok(response.data_url)
+    }
+}

@@ -1,5 +1,5 @@
 [default]
-description = "Shell-only control of the native site view. `open` is deliberately absent: the app's own `open_site` command opens pages so it can attach the recipe script. Never grant to a site webview."
+description = "Shell-only control of the native site view. `open` is deliberately absent: the app's own `open_site` command opens pages so it can attach the recipe script. `fetch-favicon` is also absent: only Rust calls it, so the shell cannot make arbitrary native fetches. Never grant to a site webview."
 permissions = [
   "allow-close",
   "allow-set-rect",
@@ -8,4 +8,5 @@ permissions = [
   "allow-go-back",
   "allow-go-forward",
   "allow-reload",
+  "allow-set-color-scheme",
 ]

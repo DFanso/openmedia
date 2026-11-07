@@ -49,11 +49,12 @@ Tauri has reportedly had an advisory where remote-origin iframes could reach IPC
 
 ## Key storage
 
-- Behind an in-repo `SecretStore` trait so the backing implementation can change.
-- Desktop: OS credential store (Keychain / Credential Manager / Secret Service), e.g. via the `keyring` crate.
-- iOS: Keychain. Android: Keystore-backed encryption of the stored value.
-- Third-party Tauri plugins for this exist (`tauri-plugin-keyring`, `tauri-plugin-keystore`, `tauri-plugin-secure-keystore`, others) but are small and young. Phase 0 spike S4 decides: vet one against the invariants, or write a thin in-repo plugin. Do not adopt on download count.
-- Optional biometric gate to *reveal/replace* the key (not required for use).
+- **Built (iOS):** an in-repo `SecretStore` trait (`src-tauri/src/secrets.rs`) with a `KeychainStore` on the `keyring` crate (v3, `apple-native`) and an in-memory store for tests. Items use service `dev.openmedia.app` and account `ai-provider:<provider id>`.
+- **How a key moves:** the shell sends it once to the `ai_set_key` command, which validates it and writes it straight to the store. No command returns it; the shell only learns `hasKey`. Provider settings (name, kind, base URL, model) are in `library.json`, which never contains a key (tested). Deleting a provider deletes its key.
+- **Where it is read:** only in the `ai_test` command today, to call the provider's `/models` endpoint from Rust. The request disables redirects (a redirect could carry a custom auth header to another host), builds no URL containing the key, and maps failures to fixed messages that never include a header or body. Base URLs must be HTTPS, or HTTP to this device for local models, with no credentials, query or fragment.
+- **Known gap:** the shell never receives a masked tail of the key (the design page proposed one). Showing a tail would mean reading the key for display, so the UI shows "Key saved" only. The request spec holds the key as a plain `String` for the duration of one call; the stored copy is zeroized after use.
+- Desktop (Keychain / Credential Manager / Secret Service) and Android (Keystore-backed) are not built. The third-party Tauri plugins for this (`tauri-plugin-keyring` and others) were not adopted; the in-repo trait keeps that choice open.
+- Optional biometric gate to *reveal/replace* the key (not required for use). Not built.
 - Backups: ensure the secure-store item is excluded from cloud backup where the platform allows.
 
 ## Recipes as an attack surface

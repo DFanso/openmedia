@@ -65,3 +65,27 @@ pub struct BridgeMessage {
     pub origin: String,
     pub body: serde_json::Value,
 }
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub enum ColorScheme {
+    System,
+    Light,
+    Dark,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct SetColorSchemeRequest {
+    pub scheme: ColorScheme,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct FetchFaviconRequest {
+    pub url: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FaviconResponse {
+    pub data_url: Option<String>,
+}

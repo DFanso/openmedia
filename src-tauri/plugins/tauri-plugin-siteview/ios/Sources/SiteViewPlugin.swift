@@ -35,6 +35,14 @@ class NavigateArgs: Decodable {
   let url: String
 }
 
+class SetColorSchemeArgs: Decodable {
+  let scheme: String
+}
+
+class FetchFaviconArgs: Decodable {
+  let url: String
+}
+
 struct StateEvent: Encodable {
   let type = "state"
   let url: String?
@@ -92,6 +100,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
   private var router: TouchRouter?
   private var events: Channel?
   private var observations: [NSKeyValueObservation] = []
+  private var colorScheme: UIUserInterfaceStyle = .unspecified
 
   override func load(webview: WKWebView) {
     shell = webview
@@ -125,6 +134,10 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
       view.allowsBackForwardNavigationGestures = true
       view.navigationDelegate = self
       view.uiDelegate = self
+      view.overrideUserInterfaceStyle = self.colorScheme
+      let refresh = UIRefreshControl()
+      refresh.addTarget(self, action: #selector(self.pullToRefresh(_:)), for: .valueChanged)
+      view.scrollView.refreshControl = refresh
       host.insertSubview(view, belowSubview: shell)
       self.siteView = view
       self.events = args.onEvent
@@ -178,6 +191,35 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
 
   @objc public func reload(_ invoke: Invoke) {
     onSiteView(invoke) { $0.reload() }
+  }
+
+  @objc private func pullToRefresh(_ sender: UIRefreshControl) {
+    siteView?.reload()
+  }
+
+  @objc public func setColorScheme(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(SetColorSchemeArgs.self)
+    DispatchQueue.main.async {
+      switch args.scheme {
+      case "light": self.colorScheme = .light
+      case "dark": self.colorScheme = .dark
+      default: self.colorScheme = .unspecified
+      }
+      self.siteView?.overrideUserInterfaceStyle = self.colorScheme
+      invoke.resolve()
+    }
+  }
+
+  @objc public func fetchFavicon(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(FetchFaviconArgs.self)
+    guard let page = webURL(args.url) else {
+      invoke.reject("only http and https urls can be opened")
+      return
+    }
+    Task {
+      let icon = await FaviconFetcher.fetch(for: page)
+      invoke.resolve(["dataUrl": icon])
+    }
   }
 
   // MARK: Bridge
@@ -263,6 +305,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
   }
 
   private func sendState(_ view: WKWebView) {
+    if !view.isLoading { view.scrollView.refreshControl?.endRefreshing() }
     send(
       StateEvent(
         url: view.url?.absoluteString,
