@@ -1,3 +1,4 @@
+import { quickAccess } from "../../shared/favorites";
 import type { SiteViewState } from "../../shared/ipc";
 
 /** Where a session came from: tapped from favorites, typed or picked from history, or restored. */
@@ -21,9 +22,9 @@ export interface Session {
   lastUsed: number;
 }
 
-/** Live pages, counting the visible one. Each is a native web view with its own process. */
+/** Usual total session budget; expands only for quick-access pages plus the visible page. */
 export const MAX_SESSIONS = 5;
-/** A hidden page nobody has looked at for this long is closed. */
+/** Unprotected hidden pages idle longer than this are closed. */
 export const IDLE_LIMIT_MS = 20 * 60_000;
 
 export function newSession(id: string, source: SessionSource, url: string, now: number): Session {
@@ -108,27 +109,36 @@ export type Pressure = "routine" | "memory";
  * Which hidden sessions to close. The visible one is never listed.
  *
  * - `memory`: the OS asked for memory back, so every hidden session goes.
- * - `routine`: hidden sessions idle past `IDLE_LIMIT_MS` go; then, while more than `MAX_SESSIONS`
- *   are alive, the least valuable go. Typed pages are cheaper to lose than favorites, and older
- *   goes before newer.
+ * - `routine`: keep the session each quick-access favorite would activate. Other hidden pages
+ *   expire after `IDLE_LIMIT_MS`, then the oldest non-favorites go first to meet the usual cap.
+ *   The cap grows only enough for the retained sessions plus the visible page.
  */
 export function sessionsToClose(
   sessions: Session[],
   activeId: string | null,
   now: number,
   pressure: Pressure,
+  favorites: readonly { url: string }[],
 ): string[] {
   const hidden = sessions.filter((s) => s.id !== activeId);
   if (pressure === "memory") return hidden.map((s) => s.id);
 
-  const idle = hidden.filter((s) => now - s.lastUsed > IDLE_LIMIT_MS);
-  const survivors = hidden
+  const retained = new Set<string>();
+  for (const { url } of quickAccess(favorites)) {
+    const session = findFavoriteSession(sessions, url);
+    if (session) retained.add(session.id);
+  }
+  const unprotected = hidden.filter((s) => !retained.has(s.id));
+  const idle = unprotected.filter((s) => now - s.lastUsed > IDLE_LIMIT_MS);
+  const survivors = unprotected
     .filter((s) => !idle.includes(s))
     .sort(
       (a, b) =>
         Number(a.source === "favorite") - Number(b.source === "favorite") ||
         a.lastUsed - b.lastUsed,
     );
-  const excess = Math.max(0, sessions.length - idle.length - MAX_SESSIONS);
+  const required = retained.size + Number(activeId !== null && !retained.has(activeId));
+  const limit = Math.max(MAX_SESSIONS, required);
+  const excess = Math.max(0, sessions.length - idle.length - limit);
   return [...idle, ...survivors.slice(0, excess)].map((s) => s.id);
 }

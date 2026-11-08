@@ -71,7 +71,7 @@ describe("sessionsToClose", () => {
     Array.from({ length: count }, (_, i) => session(`s${i}`, source, { lastUsed: NOW - i }));
 
   it("keeps everything while under the cap and fresh", () => {
-    expect(sessionsToClose(many(MAX_SESSIONS), "s0", NOW, "routine")).toEqual([]);
+    expect(sessionsToClose(many(MAX_SESSIONS), "s0", NOW, "routine", [])).toEqual([]);
   });
 
   it("closes hidden sessions idle past the limit, never the visible one", () => {
@@ -81,7 +81,7 @@ describe("sessionsToClose", () => {
       session("old", "favorite", { lastUsed: stale }),
       session("fresh", "typed"),
     ];
-    expect(sessionsToClose(sessions, "visible", NOW, "routine")).toEqual(["old"]);
+    expect(sessionsToClose(sessions, "visible", NOW, "routine", [])).toEqual(["old"]);
   });
 
   it("closes the oldest typed sessions first when over the cap, sparing favorites", () => {
@@ -93,9 +93,12 @@ describe("sessionsToClose", () => {
       session("visible", "typed", { lastUsed: NOW }),
       session("typed-mid", "typed", { lastUsed: NOW - 30 }),
     ];
-    expect(sessionsToClose(sessions, "visible", NOW, "routine")).toEqual(["typed-old"]);
+    expect(sessionsToClose(sessions, "visible", NOW, "routine", [])).toEqual(["typed-old"]);
     const more = [...sessions, session("extra", "typed", { lastUsed: NOW - 1 })];
-    expect(sessionsToClose(more, "visible", NOW, "routine")).toEqual(["typed-old", "typed-mid"]);
+    expect(sessionsToClose(more, "visible", NOW, "routine", [])).toEqual([
+      "typed-old",
+      "typed-mid",
+    ]);
   });
 
   it("does not double count sessions that are already idle against the cap", () => {
@@ -105,16 +108,107 @@ describe("sessionsToClose", () => {
       session("idle-a", "typed", { lastUsed: stale }),
       session("idle-b", "typed", { lastUsed: stale }),
     ];
-    expect(sessionsToClose(sessions, "s0", NOW, "routine").sort()).toEqual(["idle-a", "idle-b"]);
+    expect(sessionsToClose(sessions, "s0", NOW, "routine", []).sort()).toEqual([
+      "idle-a",
+      "idle-b",
+    ]);
+  });
+
+  it("keeps all six quick-access pages past the idle limit alongside a typed page", () => {
+    const favorites = many(6, "favorite").map((page) => ({
+      ...page,
+      lastUsed: NOW - IDLE_LIMIT_MS - 1,
+    }));
+    const sessions = [...favorites, session("visible", "typed")];
+    const urls = favorites.map((page) => ({ url: page.openedUrl }));
+    expect(sessionsToClose(sessions, "visible", NOW, "routine", urls)).toEqual([]);
+  });
+
+  it("bounds extra browsing without evicting the six quick-access pages", () => {
+    const favorites = many(6, "favorite");
+    const sessions = [
+      ...favorites,
+      session("older", "typed", { lastUsed: NOW - 100 }),
+      session("newer", "restored", { lastUsed: NOW - 50 }),
+      session("visible", "typed"),
+    ];
+    const urls = favorites.map((page) => ({ url: page.openedUrl }));
+    expect(sessionsToClose(sessions, "visible", NOW, "routine", urls)).toEqual(["older", "newer"]);
+  });
+
+  it("does not expand the budget for duplicate or unopened favorites", () => {
+    const sessions = [
+      session("chosen", "typed", { scope: "video.example", lastUsed: NOW - 100 }),
+      ...many(6),
+      session("visible", "typed"),
+    ];
+    const favorites = [
+      { url: "https://video.example/" },
+      { url: "https://m.video.example/" },
+      { url: "https://unopened1.example/" },
+      { url: "https://unopened2.example/" },
+      { url: "https://unopened3.example/" },
+      { url: "https://unopened4.example/" },
+    ];
+    expect(sessionsToClose(sessions, "visible", NOW, "routine", favorites)).toEqual([
+      "s5",
+      "s4",
+      "s3",
+    ]);
+  });
+
+  it("retains reusable typed and restored pages but not a lookalike domain", () => {
+    const stale = NOW - IDLE_LIMIT_MS - 1;
+    const sessions = [
+      session("typed", "typed", { scope: "video.example", lastUsed: stale }),
+      session("restored", "restored", { scope: "social.example", lastUsed: stale }),
+      session("lookalike", "favorite", { scope: "notvideo.example", lastUsed: stale }),
+      session("visible", "typed"),
+    ];
+    const favorites = [{ url: "https://m.video.example/" }, { url: "https://social.example/" }];
+    expect(sessionsToClose(sessions, "visible", NOW, "routine", favorites)).toEqual(["lookalike"]);
+  });
+
+  it("retains only the favorite-tap target when quick-access entries share a site", () => {
+    const stale = NOW - IDLE_LIMIT_MS - 1;
+    const sessions = [
+      session("typed", "typed", { scope: "video.example", lastUsed: stale }),
+      session("older", "favorite", { scope: "video.example", lastUsed: stale - 10 }),
+      session("chosen", "favorite", { scope: "video.example", lastUsed: stale }),
+      session("visible", "typed"),
+    ];
+    const favorites = [{ url: "https://m.video.example/" }, { url: "https://www.video.example/" }];
+    expect(sessionsToClose(sessions, "visible", NOW, "routine", favorites)).toEqual([
+      "typed",
+      "older",
+    ]);
+  });
+
+  it("follows the current first six when favorites are reordered or removed", () => {
+    const favorites = many(7, "favorite").map((page) => ({
+      ...page,
+      lastUsed: NOW - IDLE_LIMIT_MS - 1,
+    }));
+    const sessions = [...favorites, session("visible", "typed")];
+    const urls = favorites.map((page) => ({ url: page.openedUrl }));
+    expect(sessionsToClose(sessions, "visible", NOW, "routine", urls)).toEqual(["s6"]);
+    expect(sessionsToClose(sessions, "visible", NOW, "routine", urls.slice(1))).toEqual(["s0"]);
+    expect(sessionsToClose(sessions, "visible", NOW, "routine", [])).toEqual(
+      favorites.map((page) => page.id),
+    );
   });
 
   it("closes every hidden session on a memory warning and keeps the visible one", () => {
-    const sessions = many(4, "favorite");
-    expect(sessionsToClose(sessions, "s2", NOW, "memory").sort()).toEqual(["s0", "s1", "s3"]);
+    const favorites = many(6, "favorite");
+    const sessions = [...favorites, session("visible", "typed")];
+    const urls = favorites.map((page) => ({ url: page.openedUrl }));
+    expect(sessionsToClose(sessions, "visible", NOW, "memory", urls)).toEqual(
+      favorites.map((page) => page.id),
+    );
   });
 
   it("closes nothing visible when nothing is active", () => {
-    expect(sessionsToClose(many(2), null, NOW, "memory")).toHaveLength(2);
+    expect(sessionsToClose(many(2), null, NOW, "memory", [])).toEqual(["s0", "s1"]);
   });
 });
 

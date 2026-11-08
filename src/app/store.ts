@@ -169,6 +169,7 @@ export const useApp = create<AppStore>((set, get) => {
       state: current.state && { ...current.state, favorites },
       error: null,
     }));
+    get().trimSessions("routine");
     applyIcons();
     void fetchIcons(
       favorites.filter((favorite) => !previous.has(favorite.url)).map((favorite) => favorite.url),
@@ -358,8 +359,14 @@ export const useApp = create<AppStore>((set, get) => {
       })),
 
     trimSessions: (pressure) => {
-      const { sessions, activeId } = get();
-      const doomed = sessionsToClose(sessions, activeId, Date.now(), pressure);
+      const { sessions, activeId, state } = get();
+      const doomed = sessionsToClose(
+        sessions,
+        activeId,
+        Date.now(),
+        pressure,
+        state?.favorites ?? [],
+      );
       if (doomed.length === 0) return;
       doomed.forEach((id) => void siteView.close(id).catch(() => {}));
       get().forgetSessions(doomed);
