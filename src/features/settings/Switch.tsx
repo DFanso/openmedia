@@ -5,7 +5,7 @@ interface SwitchProps {
   onChange: (checked: boolean) => void;
 }
 
-/** A full-width row with a label on the left and a switch on the right. */
+/** A full-width row with a label on the left and a switch on the right; sits inside a `Group`. */
 export function Switch({ label, description, checked, onChange }: SwitchProps) {
   return (
     <button
@@ -13,10 +13,10 @@ export function Switch({ label, description, checked, onChange }: SwitchProps) {
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className="flex w-full items-center justify-between gap-4 rounded-2xl border border-hair px-4 py-3 text-left text-base"
+      className="flex w-full items-center justify-between gap-4 px-4 py-3.5 text-left active:bg-paper/[0.05]"
     >
       <span className="min-w-0">
-        <span className="block">{label}</span>
+        <span className="block text-base">{label}</span>
         {description && (
           <span className="mt-0.5 block text-sm leading-snug text-paper/55">{description}</span>
         )}

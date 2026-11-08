@@ -37,6 +37,18 @@ pub fn set_favorites(
     library.set_favorites(favorites)
 }
 
+/// Adds a pre-made recipe's site to the favorites, or removes it; returns the new list.
+#[tauri::command]
+pub fn set_site_favorite(
+    library: State<'_, Library>,
+    recipes: State<'_, Recipes>,
+    recipe_id: String,
+    favorite: bool,
+) -> Result<Vec<Favorite>> {
+    let inputs = sites::with_site_favorite(&recipes, &library.favorites()?, &recipe_id, favorite)?;
+    library.set_favorites(inputs)
+}
+
 #[tauri::command]
 pub fn set_last_url(library: State<'_, Library>, url: String) -> Result<()> {
     library.set_last_url(&url)
@@ -205,6 +217,7 @@ pub fn get_sites(
         &recipes,
         &library.site_options()?,
         &library.site_bottom_margins()?,
+        &library.favorites()?,
     ))
 }
 

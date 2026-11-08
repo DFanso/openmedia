@@ -52,7 +52,7 @@ A `script` rule exists as a gated escape hatch (see [Trust levels](#trust-levels
 | `origin` | `bundled` \| `user` \| `ai` \| `imported` | Drives [trust level](#trust-levels). |
 | `match` | string[] | URL patterns (scheme + host + path glob). A recipe applies when any matches the top-level page URL. |
 | `rules` | Rule[] | Ordered. Each independently toggleable. |
-| `meta` | object | Optional: `author`, `homepage`, `lastVerified` (date), `notes`. |
+| `meta` | object | Optional: `author`, `homepage`, `lastVerified` (date), `notes`. `homepage` must be an `http(s)` address; Settings uses it as the page a favorite of the recipe opens, and hides the star on a recipe without one. Every bundled recipe sets it, and it must itself match the recipe's `match` patterns (tested). |
 | `forkedFrom` | string | Only on a [fork](#forks): the bundled `version` the copy was made from. Rust sets it on save and refuses it on `bundled` recipes. |
 
 ## Options (user-facing toggles)
@@ -152,7 +152,7 @@ Each rule may declare `expect`: `"match"` (should match ≥1 element on pages sa
 When the user or the in-app assistant changes a bundled recipe, the result is saved as a **fork**, never as an edit of the bundled one. A fork is a recipe file `<app_data>/recipes/<id>.json` with the **same id** as the bundled recipe, `origin` `user` or `ai`, and `forkedFrom` set to the bundled version it was copied from.
 
 - **Updates cannot break it.** The bundled recipes are replaced by app updates; the files in `<app_data>/recipes/` are never touched. While a fork exists it replaces the bundled recipe of that id, and the user's switches and per-site margin (keyed by id) carry over.
-- **The user can see and undo it.** Settings > Sites marks a site that runs on a changed copy, says when the app's original has a different version than the one the copy started from, and offers "Restore the original" (`restore_recipe_original`), which deletes the file.
+- **The user can see and undo it.** Settings > Pre-made recipes marks a recipe that runs on a changed copy, says when the app's original has a different version than the one the copy started from, and offers "Restore the original" (`restore_recipe_original`), which deletes the file.
 - **Saving.** `save_recipe_fork` takes the recipe JSON, validates it like any recipe, requires the id of a bundled recipe and an origin of `user` or `ai`, stamps `forkedFrom`, writes the file atomically, and recompiles the page script. It has no caller in the shell yet: the assistant's accept step will use it.
 - **Damaged files.** A fork file that is unreadable, invalid, not a fork, or for a recipe that is no longer bundled is ignored at startup; the bundled recipe applies.
 - **Not built yet:** merging a newer bundled recipe into a fork. For now the user is told and chooses to keep the copy or restore the original.

@@ -1,6 +1,7 @@
 use std::collections::{BTreeMap, HashSet};
 
 use serde::{Deserialize, Serialize};
+use url::Url;
 
 use super::matcher::Matcher;
 use super::selector::{validate_declarations, validate_selector};
@@ -25,6 +26,8 @@ pub enum Origin {
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct Meta {
     pub author: Option<String>,
+    /// Where "add to favorites" sends the user; also what a favorite of this site opens.
+    pub homepage: Option<String>,
     pub last_verified: Option<String>,
     pub notes: Option<String>,
 }
@@ -124,6 +127,10 @@ impl Recipe {
         Ok(recipe)
     }
 
+    pub fn homepage(&self) -> Option<&str> {
+        self.meta.as_ref()?.homepage.as_deref()
+    }
+
     pub fn option(&self, id: &str) -> Option<&SiteOption> {
         self.options.iter().find(|option| option.id == id)
     }
@@ -176,6 +183,7 @@ impl Recipe {
             }
         }
         self.validate_options()?;
+        self.validate_homepage()?;
         let mut seen = HashSet::new();
         for rule in &self.rules {
             if !seen.insert(rule.id()) {
@@ -202,6 +210,21 @@ impl Recipe {
             }
         }
         Ok(())
+    }
+
+    fn validate_homepage(&self) -> Result<()> {
+        let Some(homepage) = self.homepage() else {
+            return Ok(());
+        };
+        match Url::parse(homepage) {
+            Ok(url) if matches!(url.scheme(), "http" | "https") && url.host_str().is_some() => {
+                Ok(())
+            }
+            _ => Err(Error::Recipe(format!(
+                "recipe {} has an invalid homepage",
+                self.id
+            ))),
+        }
     }
 
     fn validate_options(&self) -> Result<()> {

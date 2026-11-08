@@ -7,16 +7,14 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub enum Error {
     #[error("a favorite needs a name of 1-20 characters")]
     InvalidFavoriteName,
-    #[error("at most {0} favorites are allowed")]
-    TooManyFavorites(usize),
+    #[error("no such site to favorite")]
+    UnknownSite,
     #[error("the bottom margin can be at most {0} pixels")]
     InvalidMargin(u32),
     #[error("invalid usage record: {0}")]
     InvalidUsage(&'static str),
     #[error("no such site option")]
     UnknownOption,
-    #[error("no such site")]
-    UnknownSite,
     #[error(transparent)]
     SiteView(#[from] tauri_plugin_siteview::Error),
     #[error("could not read or write the library: {0}")]

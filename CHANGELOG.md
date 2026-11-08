@@ -19,6 +19,13 @@ All notable changes to OpenMedia are documented here.
 **What:** Cold start, opening a page and the first launch after an install showed a blank white or black screen, up to 7 s.
 
 **Change:** Themed launch screen and a themed backdrop under every page; a new page is shown only after it paints (fade-in); `open` no longer waits for content rule lists to compile (they attach later without a reload) and Rust converts them at launch; the splash waits for the first page. On the simulator, unthemed frames went from 1.5-8 s to none (before/after table in [Platform Support](docs/wiki/platform-support.md#verified-results)), and scroll, inertia, pull-to-refresh, long-press, keyboard, button drag and sheet scrolling were checked there; pinch, hold-slide-lift and edge-swipe back were not.
+### feat(settings): rework Settings and History, unlimited favorites, star pre-made recipes
+
+**What:** Settings and History looked flat and crowded, favorites were capped at six, and pre-made sites could not be added to favorites.
+
+**Change:** Both pages share a new frame (large title, grouped rows with hairlines, site tiles). Settings is regrouped into Appearance, Browsing, Pre-made recipes, Favorites, AI assistant and Data and help; the Sites section is now Pre-made recipes, and each recipe has a star that adds or removes its site (`set_site_favorite`, `meta.homepage` on bundled recipes). Favorites no longer have a limit: the first six are the quick-access menu in the fan, the rest list under More favorites, and every edit saves at once. `TooManyFavorites` is removed.
+
+**PR:** n/a
 
 ## 2026-11-07
 
@@ -52,13 +59,13 @@ All notable changes to OpenMedia are documented here.
 
 **PR:** [#13](https://github.com/skepjandi/openmedia/pull/13)
 
-### feat(recipes): options for 13 more platforms, update-safe forks, and a catalog of the 20 largest platforms
+### feat(recipes): pre-made recipes for 13 more platforms and update-safe forks
 
-**What:** Only five sites had switches in Settings, a changed recipe would have been overwritten by the next app update, and any other platform meant typing its address.
+**What:** Only five sites had pre-made recipes, and a changed recipe would have been overwritten by the next app update.
 
-**Change:** (1) Settings > Favorites gains "Popular platforms": the 20 largest social platforms, name only, each with an Add/Added toggle that edits the favorites list (up to 6) before the existing Save; matching is by domain, so an old `twitter.com` favorite shows X as added. Addresses were probed with a mobile Safari user agent (Threads moved to `threads.com`). (2) New bundled recipes with plain-English switches under Settings > Sites for Threads, Telegram, Douyin, Messenger, Discord, Kuaishou, LinkedIn, WhatsApp, Snapchat, Pinterest, Weibo, TikTok and Twitch (annoyances such as install sheets, sign-in pop-ups and cookie bars default ON; suggestions, comments, counters and similar default OFF). WeChat and QQ have none: their logged-out pages offer nothing to hide. (3) Forks: a changed copy of a bundled recipe is saved in `<app_data>/recipes/<id>.json` with the same id and `forkedFrom`, replaces the bundled one while it exists, and survives app updates; Settings marks it and offers "Restore the original". New Rust commands `save_recipe_fork` (validated, origin user/ai) and `restore_recipe_original`; the recipe store is now `Recipes::load(dir)`.
+**Change:** (1) New bundled recipes, each with a `meta.homepage` so the star in Settings > Pre-made recipes adds the site to favorites, for Threads, Telegram, Douyin, Messenger, Discord, Kuaishou, LinkedIn, WhatsApp, Snapchat, Pinterest, Weibo, TikTok and Twitch (annoyances such as install sheets, sign-in pop-ups and cookie bars default ON; suggestions, comments, counters and similar default OFF). WeChat and QQ have none: their logged-out pages offer nothing to hide. (2) Forks: a changed copy of a bundled recipe is saved in `<app_data>/recipes/<id>.json` with the same id and `forkedFrom`, replaces the bundled one while it exists, and survives app updates; the recipe card says so and offers "Restore the original". New Rust commands `save_recipe_fork` (validated, origin user/ai) and `restore_recipe_original`; the recipe store is now `Recipes::load(dir)`.
 
-**Verified:** Rust tests for fork save, replace, reload after restart, restore, refusals (bundled/imported origin, unknown id, invalid selector, oversize writes nothing), damaged fork files ignored, and the site listing flags (`customized`, `originalUpdated`); every new rule matches its DOM fixtures and no `hide` rule touches a `data-keep` element (existing fixture tests); catalog unit tests. Selectors were counted on the real logged-out pages in headless Chromium with an iPhone user agent, except LinkedIn, whose counts come from the server-rendered HTML fetched with curl. **Not verified:** any logged-in selector; WebKit rendering and the switches on a simulator or device; `save_recipe_fork` has no UI caller yet (the assistant's accept step will call it); Kuaishou and Douyin were reached only from a non-China network; TikTok's cookie rule, Twitch's ad slot and Discord's recipe are thin or best-effort.
+**Verified:** Rust tests for fork save, replace, reload after restart, restore, refusals (bundled/imported origin, unknown id, invalid selector, oversize writes nothing), damaged fork files ignored, and the listing flags (`customized`, `originalUpdated`); every new rule matches its DOM fixtures, no `hide` rule touches a `data-keep` element, and every homepage belongs to its own recipe (existing tests). Selectors were counted on the real logged-out pages in headless Chromium with an iPhone user agent, except LinkedIn, whose counts come from server-rendered HTML fetched with curl. **Not verified:** any logged-in selector; WebKit rendering and the switches on a simulator or device; `save_recipe_fork` has no UI caller yet (the assistant's accept step will call it); the Restore button was not rendered; Kuaishou and Douyin were reached only from a non-China network; TikTok's cookie rule, Twitch's ad slot and Discord's recipe are thin or best-effort.
 
 **PR:** n/a
 

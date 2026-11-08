@@ -14,7 +14,6 @@ use crate::error::{Error, Result};
 use crate::recipes::OptionChoices;
 
 const FORMAT_VERSION: u32 = 4;
-pub const MAX_FAVORITES: usize = 6;
 const MAX_HISTORY: usize = 100;
 const MAX_FAVORITE_NAME_CHARS: usize = 20;
 const MAX_ICON_CHARS: usize = 200_000;
@@ -151,9 +150,6 @@ impl Library {
     }
 
     pub fn set_favorites(&self, inputs: Vec<FavoriteInput>) -> Result<Vec<Favorite>> {
-        if inputs.len() > MAX_FAVORITES {
-            return Err(Error::TooManyFavorites(MAX_FAVORITES));
-        }
         let favorites = inputs
             .into_iter()
             .map(favorite_from_input)
@@ -610,15 +606,15 @@ mod tests {
     }
 
     #[test]
-    fn the_favorite_count_is_capped() {
-        let (_dir, library) = library();
-        let seven: Vec<_> = (0..=MAX_FAVORITES)
-            .map(|i| input(&format!("s{i}"), "https://a.com"))
+    fn favorites_have_no_count_limit_and_keep_their_order() {
+        let (dir, library) = library();
+        let many: Vec<_> = (0..40)
+            .map(|i| input(&format!("s{i}"), &format!("https://a{i}.com")))
             .collect();
-        assert!(matches!(
-            library.set_favorites(seven),
-            Err(Error::TooManyFavorites(_))
-        ));
+        assert_eq!(library.set_favorites(many).unwrap().len(), 40);
+        let saved = reload(&dir).state().unwrap().favorites;
+        assert_eq!(saved.len(), 40);
+        assert_eq!(saved[39].name, "s39");
     }
 
     #[test]

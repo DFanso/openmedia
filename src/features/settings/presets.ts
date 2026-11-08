@@ -39,7 +39,6 @@ export const PRESETS: Preset[] = [
   },
 ];
 
-export const MAX_FAVORITES = 6;
 export const MAX_FAVORITE_NAME = 20;
 /** Mirrors `MAX_BOTTOM_MARGIN` in `library.rs`, which is what enforces it. */
 export const MAX_BOTTOM_MARGIN = 200;

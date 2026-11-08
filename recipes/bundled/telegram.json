@@ -41,52 +41,67 @@
       "label": "Header Join button",
       "type": "hide",
       "option": "app-nags",
-      "target": { "css": ".tgme_channel_join_telegram" }
+      "target": {
+        "css": ".tgme_channel_join_telegram"
+      }
     },
     {
       "id": "download-bar",
       "label": "Download button in top bar",
       "type": "hide",
       "option": "app-nags",
-      "target": { "css": ".tgme_head_right_btn" }
+      "target": {
+        "css": ".tgme_head_right_btn"
+      }
     },
     {
       "id": "have-telegram-blurb",
       "label": "\"If you have Telegram\" blurb",
       "type": "hide",
       "option": "app-nags",
-      "target": { "css": ".tgme_page_additional" }
+      "target": {
+        "css": ".tgme_page_additional"
+      }
     },
     {
       "id": "link-preview-cards",
       "label": "Link preview cards",
       "type": "hide",
       "option": "link-previews",
-      "target": { "css": "a.tgme_widget_message_link_preview" }
+      "target": {
+        "css": "a.tgme_widget_message_link_preview"
+      }
     },
     {
       "id": "photos",
       "label": "Photo attachments",
       "type": "hide",
       "option": "media",
-      "target": { "css": "a.tgme_widget_message_photo_wrap" }
+      "target": {
+        "css": "a.tgme_widget_message_photo_wrap"
+      }
     },
     {
       "id": "videos",
       "label": "Video attachments",
       "type": "hide",
       "option": "media",
-      "target": { "css": "a.tgme_widget_message_video_player" }
+      "target": {
+        "css": "a.tgme_widget_message_video_player"
+      }
     },
     {
       "id": "views",
       "label": "View counters",
       "type": "hide",
       "option": "view-counts",
-      "target": { "css": ".tgme_widget_message_views, .tgme_widget_message_info .copyonly" }
+      "target": {
+        "css": ".tgme_widget_message_views, .tgme_widget_message_info .copyonly"
+      }
     }
   ],
   "meta": {
+    "homepage": "https://web.telegram.org/a/",
     "lastVerified": "2026-11-07",
     "notes": "LIVE (iPhone 390x844 UA, logged out, 2026-11-07): https://t.me/s/telegram counts .tgme_channel_join_telegram=1, a.tgme_widget_message_link_preview=4, a.tgme_widget_message_photo_wrap=3, a.tgme_widget_message_video_player=13, .tgme_widget_message_views=20 (.copyonly is the ' views' label beside it, selector scoped to .tgme_widget_message_info). https://t.me/telegram landing: .tgme_head_right_btn=1 (Download), .tgme_page_additional=1. Fixtures distilled from both pages. Left alone on purpose: 'View in Telegram' button and 'Preview channel' link (the landing page's only navigation). NOT verified: https://web.telegram.org/a/ logged out shows only the QR/phone login (nothing hidden there, no rules target it); logged-in web app, reactions, polls, stickers, voice, documents, round videos, sponsored posts and non-English variants were not seen, so no rules exist for them."
   }
