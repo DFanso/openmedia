@@ -44,30 +44,6 @@
 
 Early, iOS first. Android and desktop site views are not built. Physical-device interaction and authenticated requests to a real AI provider remain unverified. Shell flows use in-memory IPC fixtures for smoke checks; native Swift compilation and Rust tests cover the implementation boundaries. See [Platform Support](docs/wiki/platform-support.md#verified-results).
 
-## Run it
-
-Needs a Mac with Xcode, [Rust](https://rustup.rs) 1.90+, Node 22+ and yarn 1.x, CocoaPods and XcodeGen.
-
-```bash
-rustup target add aarch64-apple-ios-sim aarch64-apple-ios
-yarn install
-APPLE_DEVELOPMENT_TEAM=<your team id> yarn tauri ios dev "iPhone 17 Pro Max"
-```
-
-Use any installed simulator name. Your team ID is in Xcode under Settings, Accounts. If the run fails with "Port 1420 is already in use", kill the old dev server with `lsof -ti :1420 | xargs kill`.
-
-Checks, the same set CI runs:
-
-```bash
-yarn ts:check && yarn lint && yarn format:check && yarn test
-cargo fmt --manifest-path src-tauri/Cargo.toml --check
-cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
-cargo test --manifest-path src-tauri/Cargo.toml
-cargo test --manifest-path src-tauri/plugins/tauri-plugin-siteview/Cargo.toml
-```
-
-More in the [development guide](docs/wiki/development-guide.md).
-
 ## Stack
 
 Tauri v2 · Rust · React 19 · TypeScript (strict) · Vite · Tailwind CSS v4 · Zustand · Vitest · a native `WKWebView` host written as an in-repo Tauri plugin (`src-tauri/plugins/tauri-plugin-siteview`).
