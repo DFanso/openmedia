@@ -49,7 +49,7 @@ Tauri has reportedly had an advisory where remote-origin iframes could reach IPC
 
 ## Key storage
 
-- **Built (iOS):** an in-repo `SecretStore` trait (`src-tauri/src/secrets.rs`) with a `KeychainStore` on the `keyring` crate (v3, `apple-native`) and an in-memory store for tests. Items use service `dev.openmedia.app` and account `ai-provider:<provider id>`.
+- **Built (iOS):** an in-repo `SecretStore` trait (`src-tauri/src/secrets.rs`) with a `KeychainStore` on the `keyring` crate (v3, `apple-native`) and an in-memory store for tests. Items use service `surf.openmedia` and account `ai-provider:<provider id>`.
 - **How a key moves:** the shell sends it once to the `ai_set_key` command, which validates it and writes it straight to the store. No command returns it; the shell only learns `hasKey`. Provider settings (name, kind, base URL, model) are in `library.json`, which never contains a key (tested). Deleting a provider deletes its key.
 - **Where it is read:** only in the `ai_test` command today, to call the provider's `/models` endpoint from Rust. The request disables redirects (a redirect could carry a custom auth header to another host), builds no URL containing the key, and maps failures to fixed messages that never include a header or body. Base URLs must be HTTPS, or HTTP to this device for local models, with no credentials, query or fragment.
 - **Known gap:** the shell never receives a masked tail of the key (the design page proposed one). Showing a tail would mean reading the key for display, so the UI shows "Key saved" only. The request spec holds the key as a plain `String` for the duration of one call; the stored copy is zeroized after use.

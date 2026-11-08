@@ -3,7 +3,7 @@ use zeroize::Zeroizing;
 
 use crate::error::{Error, Result};
 
-const SERVICE: &str = "dev.openmedia.app";
+const SERVICE: &str = "surf.openmedia";
 
 /// Where API keys live. Keys go in and come out only through this trait, and only Rust code
 /// calls it: no command returns a key to the shell.
