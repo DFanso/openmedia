@@ -128,6 +128,7 @@ describe("applyState", () => {
       loading: false,
       canGoBack: true,
       canGoForward: false,
+      painted: true,
       scope: "x.com",
     });
     expect(next).toMatchObject({

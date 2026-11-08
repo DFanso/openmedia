@@ -9,14 +9,29 @@ private let bridgeHandlerName = "openmedia"
 /// or black a new web view draws. The page reports its first frames through this native-only
 /// handler (it reaches no Tauri IPC and nothing else); a page that fakes it only shows itself.
 private let paintHandlerName = "openmediaPaint"
+/// Reports the page's first contentful paint, so the page is shown when it has something to show
+/// rather than when the document merely exists. A WebKit without paint timing reports after two
+/// animation frames instead.
 private let firstPaintScript = """
   (function () {
-    var frames = 0;
-    function tick() {
-      if (++frames < 2) { requestAnimationFrame(tick); return; }
+    var sent = false;
+    function report() {
+      if (sent) return;
+      sent = true;
       window.webkit.messageHandlers.\(paintHandlerName).postMessage(0);
     }
-    requestAnimationFrame(tick);
+    function afterFrames(count) {
+      requestAnimationFrame(function () { if (count > 1) afterFrames(count - 1); else report(); });
+    }
+    try {
+      new PerformanceObserver(function (list, observer) {
+        if (list.getEntriesByName('first-contentful-paint').length === 0) return;
+        observer.disconnect();
+        report();
+      }).observe({ type: 'paint', buffered: true });
+    } catch (error) {
+      afterFrames(2);
+    }
   })();
   """
 /// A page that commits but never reports a frame is shown after this long.
@@ -56,7 +71,7 @@ class OpenArgs: Decodable {
   let session: String
   let profile: String
   let url: String
-  let rect: RectArgs
+  let rect: RectArgs?
   let documentStartScript: String?
   let contentRuleLists: [RuleListArgs]?
   let onEvent: Channel
@@ -102,6 +117,7 @@ struct StateEvent: Encodable {
   let loading: Bool
   let canGoBack: Bool
   let canGoForward: Bool
+  let painted: Bool
   let scope: String
 }
 
@@ -158,6 +174,10 @@ private final class Session {
   var scope: String
   /// False until the first load finishes or fails; see `DomainScope.verdict`.
   var settled = false
+  /// True once the first load has committed; before that a timeout must not reveal a blank page.
+  var committed = false
+  /// True once the page has been shown. Until then the shell's splash stays up.
+  var painted = false
   /// A hidden session whose content rule lists changed reloads when it is shown again.
   var needsReload = false
   /// Ids of the content rule lists attached to this view, so a late compile attaches each once.
@@ -210,6 +230,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
   /// Full-screen view under every page: the app's own background shows wherever a page has not
   /// painted yet, instead of the window's white or black.
   private var backdrop: UIView?
+  private var launchLogo: UIImageView?
   /// Rule lists WebKit is still compiling; a list is compiled once however many pages open.
   private var compilingRuleListIds: Set<String> = []
   /// Bumped when the shell replaces the rule lists, so a late compile cannot undo that.
@@ -223,12 +244,14 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     NotificationCenter.default.addObserver(
       forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: .main
     ) { [weak self] _ in self?.send(MemoryWarningEvent()) }
-    DispatchQueue.main.async { self.installBackdrop() }
+    DispatchQueue.main.async { self.attachShell() }
   }
 
   // MARK: Commands
 
-  /// Creates the session's view, shows it, and keeps every other session alive but hidden.
+  /// Creates the session's view, shows it, and keeps every other session alive but hidden. The
+  /// view starts loading at once, even before the shell's own view is in the window (the first page
+  /// opens at launch, in parallel with the shell); it is mounted as soon as there is a window.
   @objc public func open(_ invoke: Invoke) throws {
     let args = try invoke.parseArgs(OpenArgs.self)
     guard let profileId = UUID(uuidString: args.profile) else {
@@ -242,15 +265,10 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     Task { @MainActor in
       let lists = args.contentRuleLists ?? []
       let (cached, missing) = await self.lookUpRuleLists(lists)
-      guard let shell = self.shell, let host = shell.superview else {
-        invoke.reject("shell webview is not ready")
-        return
-      }
       if let existing = self.sessions[args.session] { self.dispose(existing) }
-      self.pageRect = args.rect.cgRect
-      self.installBackdrop()
+      if let rect = args.rect { self.pageRect = rect.cgRect }
       let view = WKWebView(
-        frame: shell.convert(args.rect.cgRect, to: host),
+        frame: self.shell?.superview.map { self.pageFrame(in: $0) } ?? self.screenBounds,
         configuration: self.makeConfiguration(
           profileId: profileId, script: args.documentStartScript, ruleLists: cached)
       )
@@ -263,16 +281,15 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
       let refresh = UIRefreshControl()
       refresh.addAction(UIAction { [weak view] _ in view?.reload() }, for: .valueChanged)
       view.scrollView.refreshControl = refresh
-      host.insertSubview(view, belowSubview: shell)
 
       let session = Session(
         id: args.session, view: view, scope: DomainScope.registrableDomain(of: url.host ?? ""))
       session.ruleListIds = Set(cached.map(\.identifier))
       self.sessions[session.id] = session
+      self.activeId = session.id
       self.events = args.onEvent
-      _ = self.installRouter(in: host)
       self.observe(session)
-      self.show(session)
+      self.mount(session)
       view.load(URLRequest(url: url))
       invoke.resolve()
       self.compileInBackground(missing, keeping: lists)
@@ -455,6 +472,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
   /// While a session is still on its first load, a redirect may change its domain; the session
   /// adopts wherever the first page committed.
   func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+    session(of: webView)?.committed = true
     scheduleReveal(webView)
     guard let session = session(of: webView), !session.settled, let host = webView.url?.host else { return }
     session.scope = DomainScope.registrableDomain(of: host)
@@ -482,6 +500,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     guard let session = session(of: webView) else { return }
     if session.id == activeId {
       webView.alpha = 0
+      session.painted = false
       webView.reload()
     } else {
       dispose(session)
@@ -520,15 +539,50 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     for other in sessions.values where other !== session { other.view.isHidden = true }
     session.view.isHidden = false
     activeId = session.id
-    if let shell, let host = shell.superview, let pageRect {
-      session.view.frame = shell.convert(pageRect, to: host)
-    }
+    if let host = shell?.superview { session.view.frame = pageFrame(in: host) }
     router?.siteView = session.view
     if session.needsReload {
       session.needsReload = false
       session.view.reload()
     }
     sendState(session)
+  }
+
+  /// Where a page's view goes inside `host`: the shell's reported rectangle, or until the shell
+  /// reports one, the screen below the top safe area.
+  private func pageFrame(in host: UIView) -> CGRect {
+    if let shell, let pageRect { return shell.convert(pageRect, to: host) }
+    let top = host.window?.safeAreaInsets.top ?? host.safeAreaInsets.top
+    return CGRect(x: 0, y: top, width: host.bounds.width, height: max(0, host.bounds.height - top))
+  }
+
+  /// The screen's size, for a view that exists before there is a window to measure.
+  private var screenBounds: CGRect {
+    UIApplication.shared.connectedScenes
+      .compactMap { ($0 as? UIWindowScene)?.screen.bounds }.first ?? .zero
+  }
+
+  /// Puts the session's view in the window, under the shell, and shows it if it is the active
+  /// one. Without a window yet it does nothing; `attachShell` mounts it later.
+  private func mount(_ session: Session) {
+    guard session.view.superview == nil, let shell, let host = shell.superview else { return }
+    session.view.frame = pageFrame(in: host)
+    host.insertSubview(session.view, belowSubview: shell)
+    _ = installRouter(in: host)
+    if session.id == activeId { show(session) }
+    if session.committed { scheduleReveal(session.view) }
+  }
+
+  /// The shell's view joins the window shortly after the plugin loads. Waits for it, then puts the
+  /// backdrop and any page opened in the meantime in place.
+  private func attachShell(attempt: Int = 0) {
+    guard shell?.superview != nil else {
+      guard attempt < 150 else { return }
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) { self.attachShell(attempt: attempt + 1) }
+      return
+    }
+    installBackdrop()
+    for session in sessions.values { mount(session) }
   }
 
   /// Shows the outside page in the system's in-app browser. One at a time: a page cannot stack
@@ -545,13 +599,20 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     top.present(controller, animated: true)
   }
 
-  /// Fades the page in. A new web view draws one blank frame before its first, and a fade keeps
-  /// that frame down to a few percent over the backdrop.
+  /// Fades the page in and tells the shell, whose splash is waiting for it. A new web view draws
+  /// one blank frame before its first, and a fade keeps that frame down to a few percent over the
+  /// backdrop. Does nothing until the view is in the window: a view that is not drawing has not
+  /// painted.
   func reveal(_ view: WKWebView) {
-    guard view.alpha == 0 else { return }
+    guard view.alpha == 0, view.superview != nil else { return }
+    launchLogo?.removeFromSuperview()
+    launchLogo = nil
     UIView.animate(withDuration: revealDuration, delay: 0, options: [.beginFromCurrentState, .allowUserInteraction]) {
       view.alpha = 1
     }
+    guard let session = session(of: view) else { return }
+    session.painted = true
+    sendState(session)
   }
 
   private func scheduleReveal(_ view: WKWebView) {
@@ -578,6 +639,28 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     view.overrideUserInterfaceStyle = colorScheme
     host.insertSubview(view, at: 0)
     backdrop = view
+    installLaunchLogo(in: view)
+  }
+
+  /// The launch screen's logo, kept on screen from the moment the launch screen goes until the
+  /// splash in the shell (same logo, same place) has painted, so the first seconds never show an
+  /// empty screen. Gone once the first page shows.
+  private func installLaunchLogo(in backdrop: UIView) {
+    guard let image = UIImage(named: "LaunchLogo") else { return }
+    let logo = UIImageView(image: image)
+    logo.contentMode = .scaleAspectFit
+    logo.translatesAutoresizingMaskIntoConstraints = false
+    backdrop.addSubview(logo)
+    let proportional = logo.widthAnchor.constraint(equalTo: backdrop.widthAnchor, multiplier: 0.52)
+    proportional.priority = .defaultHigh
+    NSLayoutConstraint.activate([
+      logo.centerXAnchor.constraint(equalTo: backdrop.centerXAnchor),
+      logo.centerYAnchor.constraint(equalTo: backdrop.centerYAnchor),
+      proportional,
+      logo.widthAnchor.constraint(lessThanOrEqualToConstant: 240),
+      logo.heightAnchor.constraint(equalTo: logo.widthAnchor),
+    ])
+    launchLogo = logo
   }
 
   private func installRouter(in host: UIView) -> TouchRouter {
@@ -734,6 +817,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
         loading: view.isLoading,
         canGoBack: view.canGoBack,
         canGoForward: view.canGoForward,
+        painted: session.painted,
         scope: session.scope
       )
     )

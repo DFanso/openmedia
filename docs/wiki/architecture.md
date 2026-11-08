@@ -47,7 +47,7 @@ One trait, two backends. Everything above it is platform-agnostic.
 
 | Operation | Purpose |
 |-----------|---------|
-| `open(session, profile, url, rect)` | Create a site view for a new session with the profile's isolated data store, below the transparent shell, and show it. Earlier sessions stay alive, hidden |
+| `open(session, profile, url, rect?)` | Create a site view for a new session with the profile's isolated data store, below the transparent shell, and show it. Earlier sessions stay alive, hidden. Without a `rect` the view fills the screen under the top safe area until the shell reports one; this is how Core opens the start page before the shell has loaded ([Launch](#launch)) |
 | `activate(session)` / `close(session)` | Show a live session without reloading it / tear one down. The shell decides which to close |
 | `set_rect(rect)` / `set_interactive_regions(rects)` | The shell owns layout: where the page draws, and which regions of the screen belong to the shell rather than the page |
 | `navigate`, `back`, `forward`, `reload` | Browser controls on the visible session |
@@ -96,6 +96,29 @@ sequenceDiagram
   V-->>C: match report (rule -> count)
   C-->>S: events (loaded, rule health)
 ```
+
+### Launch
+
+The page does not wait for the shell. Core opens the start page (the last page, else the first favorite) from its own `setup`, in parallel with the shell's boot; the shell adopts it once it can listen for its events.
+
+```mermaid
+sequenceDiagram
+  participant C as Core
+  participant V as Site view
+  participant S as Shell
+  Note over C,S: launch screen (logo) is up
+  C->>V: open(boot session, no rect) at setup
+  V->>V: create view, start loading, mount when the window exists
+  S->>S: HTML splash paints (same logo), JS boots
+  S->>C: get_state (prefetched before React renders)
+  C-->>S: state + boot session id
+  S->>C: adopt_boot_session(id, rect) once its event listeners exist
+  C->>V: set_rect, activate (re-announces state)
+  V-->>S: state { painted: true } after the page's first contentful paint
+  S->>S: splash fades into the page
+```
+
+If the start page could not be opened, `adopt_boot_session` opens the address as `open_site` would. Details and measurements: [Platform Support](./platform-support.md#startup).
 
 ### Ask the AI to customize
 

@@ -1,6 +1,22 @@
-const FADE_MS = 400;
+const FADE_MS = 250;
 /** The splash never outlasts this, however slow the first page is. */
 const MAX_WAIT_MS = 4000;
+
+/** What the splash needs to know about the page under it. */
+export interface PageProgress {
+  painted: boolean;
+  loading: boolean;
+  url: string | null;
+}
+
+/**
+ * True once uncovering the screen shows something: no page to wait for, the page has drawn its
+ * first content, or it stopped loading with an address (a finished or failed load). A page that
+ * has not reported an address is only just being opened, and is still ahead of its first paint.
+ */
+export function pageShowing(page: PageProgress | null): boolean {
+  return page === null || page.painted || (!page.loading && page.url !== null);
+}
 
 function minimumVisibleMs(): number {
   if (!import.meta.env.DEV) return 0;
@@ -8,14 +24,20 @@ function minimumVisibleMs(): number {
   return Number.isFinite(seconds) && seconds > 0 ? seconds * 1000 : 0;
 }
 
-export function hideSplash(): void {
+/** Fades the splash out and removes it. Resolves once it is gone. */
+export function hideSplash(): Promise<void> {
   const splash = document.getElementById("splash");
-  if (!splash) return;
+  if (!splash) return Promise.resolve();
   const remaining = Math.max(0, minimumVisibleMs() - performance.now());
-  window.setTimeout(() => {
-    splash.setAttribute("data-hidden", "");
-    window.setTimeout(() => splash.remove(), FADE_MS);
-  }, remaining);
+  return new Promise((resolve) => {
+    window.setTimeout(() => {
+      splash.setAttribute("data-hidden", "");
+      window.setTimeout(() => {
+        splash.remove();
+        resolve();
+      }, FADE_MS);
+    }, remaining);
+  });
 }
 
 /**
@@ -25,18 +47,17 @@ export function hideSplash(): void {
 export function hideSplashWhen(
   isReady: () => boolean,
   subscribe: (listener: () => void) => () => void,
-): void {
-  if (isReady()) {
-    hideSplash();
-    return;
-  }
-  const finish = () => {
-    window.clearTimeout(giveUp);
-    unsubscribe();
-    hideSplash();
-  };
-  const unsubscribe = subscribe(() => {
-    if (isReady()) finish();
+): Promise<void> {
+  if (isReady()) return hideSplash();
+  return new Promise((resolve) => {
+    const finish = () => {
+      window.clearTimeout(giveUp);
+      unsubscribe();
+      void hideSplash().then(resolve);
+    };
+    const unsubscribe = subscribe(() => {
+      if (isReady()) finish();
+    });
+    const giveUp = window.setTimeout(finish, MAX_WAIT_MS);
   });
-  const giveUp = window.setTimeout(finish, MAX_WAIT_MS);
 }

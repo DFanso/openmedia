@@ -15,6 +15,8 @@ export interface Session {
   loading: boolean;
   canGoBack: boolean;
   canGoForward: boolean;
+  /** The page has drawn its first content and is showing. */
+  painted: boolean;
   /** When the session was last visible or opened, in ms. */
   lastUsed: number;
 }
@@ -35,6 +37,7 @@ export function newSession(id: string, source: SessionSource, url: string, now: 
     loading: true,
     canGoBack: false,
     canGoForward: false,
+    painted: false,
     lastUsed: now,
   };
 }
@@ -48,6 +51,7 @@ export function applyState(session: Session, state: SiteViewState): Session {
     loading: state.loading,
     canGoBack: state.canGoBack,
     canGoForward: state.canGoForward,
+    painted: state.painted,
   };
 }
 

@@ -1,9 +1,9 @@
 use serde::Serialize;
-use tauri::{AppHandle, Emitter, State};
+use tauri::{AppHandle, Emitter, Manager, State};
 use tauri_plugin_siteview::{
-    ContentRuleList, FetchFaviconRequest, OpenRequest, Rect, SetContentRuleListsRequest,
-    SetDocumentStartScriptRequest, SiteviewExt,
-    validate::{parse_profile_id, parse_session_id, parse_web_url},
+    ContentRuleList, FetchFaviconRequest, OpenRequest, Rect, SessionRequest,
+    SetContentRuleListsRequest, SetDocumentStartScriptRequest, SetRectRequest, SiteviewExt,
+    validate::{parse_session_id, parse_web_url},
 };
 use url::Url;
 use uuid::Uuid;
@@ -14,8 +14,9 @@ use crate::ai::{
     connection::{list_models, models_request},
     validate_key,
 };
+use crate::boot::{Boot, Startup};
 use crate::error::{Error, Result};
-use crate::library::{AppState, Favorite, FavoriteInput, Library, Theme};
+use crate::library::{Favorite, FavoriteInput, Library, Theme};
 use crate::recipes::Recipes;
 use crate::secrets::SecretStore;
 use crate::sites::{self, SiteSettings};
@@ -24,9 +25,13 @@ use crate::usage::{Usage, UsageReport};
 /// The secret store, behind a trait so tests can swap it.
 pub struct Secrets(pub Box<dyn SecretStore>);
 
+/// Async so it runs off the main thread: at launch that thread is busy creating web views.
 #[tauri::command]
-pub fn get_state(library: State<'_, Library>) -> Result<AppState> {
-    library.state()
+pub async fn get_state(library: State<'_, Library>, boot: State<'_, Boot>) -> Result<Startup> {
+    Ok(Startup {
+        state: library.state()?,
+        boot_session: boot.session(),
+    })
 }
 
 #[tauri::command]
@@ -49,13 +54,13 @@ pub fn set_site_favorite(
     library.set_favorites(inputs)
 }
 
-#[tauri::command]
+#[tauri::command(async)]
 pub fn set_last_url(library: State<'_, Library>, url: String) -> Result<()> {
     library.set_last_url(&url)
 }
 
 /// Records an address the user typed; returns the history, newest first.
-#[tauri::command]
+#[tauri::command(async)]
 pub fn add_history(library: State<'_, Library>, url: String) -> Result<Vec<String>> {
     library.add_history(&url)
 }
@@ -68,7 +73,7 @@ pub fn clear_history(library: State<'_, Library>) -> Result<()> {
 
 /// Adds seconds spent in one section of a site to the local usage stats for `day` (the shell's
 /// local date). Shell-only: site webviews have no IPC.
-#[tauri::command]
+#[tauri::command(async)]
 pub fn record_usage(
     usage: State<'_, Usage>,
     day: String,
@@ -142,50 +147,81 @@ async fn build_rule_lists(ad_block: &AdBlock) -> Result<Vec<ContentRuleList>> {
 }
 
 /// Opens the page in the native site view with the recipe script and the ad-blocking rule lists
-/// attached. This is the only way the shell can open one: the plugin's own `open` is not granted
-/// to it.
+/// attached. Every page the shell shows is opened through here: the plugin's own `open` is not
+/// granted to it.
 ///
-/// A failure to build the rule lists does not stop browsing; the page opens unblocked and the shell
-/// is told why.
+/// A failure to build the rule lists does not stop browsing; the page opens unblocked and the
+/// reason comes back as the `Ok` value, for the caller to tell the shell.
 ///
-/// `session` names the new site view; earlier sessions stay open underneath it.
-///
-/// Must be `async`: a synchronous command runs on the main thread, and the plugin call waits for
-/// native code that itself needs the main thread, which deadlocks the app.
-#[tauri::command]
-pub async fn open_site(
-    app: AppHandle,
-    library: State<'_, Library>,
-    recipes: State<'_, Recipes>,
-    ad_block: State<'_, AdBlock>,
+/// Plugin calls wait for native code that needs the main thread, so this must never run there.
+pub(crate) async fn open_session(
+    app: &AppHandle,
     session: String,
     url: String,
-    rect: Rect,
-) -> Result<()> {
-    let profile = library.state()?.profile_id.to_string();
-    parse_profile_id(&profile)?;
+    rect: Option<Rect>,
+) -> Result<Option<String>> {
+    let library = app.state::<Library>();
+    let recipes = app.state::<Recipes>();
     parse_session_id(&session)?;
     parse_web_url(&url)?;
     let mut blocking_failure = None;
     let content_rule_lists = if library.ad_block_enabled()? {
-        build_rule_lists(&ad_block).await.unwrap_or_else(|e| {
-            blocking_failure = Some(e.to_string());
-            Vec::new()
-        })
+        build_rule_lists(&app.state::<AdBlock>())
+            .await
+            .unwrap_or_else(|e| {
+                blocking_failure = Some(e.to_string());
+                Vec::new()
+            })
     } else {
         Vec::new()
     };
     app.siteview().open(OpenRequest {
         session,
-        profile,
+        profile: library.profile_id()?.to_string(),
         url,
         rect,
         document_start_script: Some(recipes.script(&library.site_options()?)?),
         content_rule_lists,
     })?;
-    if let Some(message) = blocking_failure {
+    Ok(blocking_failure)
+}
+
+fn report_site_error(app: &AppHandle, message: Option<String>) {
+    if let Some(message) = message {
         let _ = app.emit(SITE_ERROR_EVENT, message);
     }
+}
+
+/// Opens a page as a new session; earlier sessions stay open underneath it. Async for the reason
+/// given at `open_session`: a synchronous command runs on the main thread and would deadlock.
+#[tauri::command]
+pub async fn open_site(app: AppHandle, session: String, url: String, rect: Rect) -> Result<()> {
+    let warning = open_session(&app, session, url, Some(rect)).await?;
+    report_site_error(&app, warning);
+    Ok(())
+}
+
+/// Takes over the page opened at launch (`boot.rs`): waits for its open to finish, gives it the
+/// shell's real rectangle and re-announces its state, which the shell was not yet listening for.
+/// If there is no such page, or opening it failed, opens `url` as `open_site` would.
+#[tauri::command]
+pub async fn adopt_boot_session(
+    app: AppHandle,
+    boot: State<'_, Boot>,
+    session: String,
+    url: String,
+    rect: Rect,
+) -> Result<()> {
+    let warning = match boot.adopt(&session).await {
+        Some(warning) => {
+            let plugin = app.siteview();
+            plugin.set_rect(SetRectRequest { rect })?;
+            plugin.activate(SessionRequest { session })?;
+            warning
+        }
+        None => open_session(&app, session, url, Some(rect)).await?,
+    };
+    report_site_error(&app, warning);
     Ok(())
 }
 
@@ -208,7 +244,7 @@ pub async fn set_ad_block(
     library.set_ad_block(enabled)
 }
 
-#[tauri::command]
+#[tauri::command(async)]
 pub fn get_sites(
     library: State<'_, Library>,
     recipes: State<'_, Recipes>,
@@ -295,7 +331,7 @@ pub fn set_site_bottom_margin(
 }
 
 /// The margin to keep under the page at `url`.
-#[tauri::command]
+#[tauri::command(async)]
 pub fn bottom_margin_for(
     library: State<'_, Library>,
     recipes: State<'_, Recipes>,

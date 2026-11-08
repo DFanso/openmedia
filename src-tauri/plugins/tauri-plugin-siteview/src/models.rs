@@ -17,14 +17,16 @@ pub struct ContentRuleList {
 }
 
 /// Opens a new site view as session `session` and makes it the visible one. Other sessions stay
-/// alive underneath, hidden, until closed.
+/// alive underneath, hidden, until closed. Without a `rect` the view fills the screen below the
+/// top safe area until the shell reports the real page rectangle.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OpenRequest {
     pub session: String,
     pub profile: String,
     pub url: String,
-    pub rect: Rect,
+    #[serde(default)]
+    pub rect: Option<Rect>,
     #[serde(default)]
     pub document_start_script: Option<String>,
     #[serde(default)]
@@ -84,6 +86,8 @@ pub enum SiteViewEvent {
         loading: bool,
         can_go_back: bool,
         can_go_forward: bool,
+        /// The page has drawn its first content and is showing; until then it is covered.
+        painted: bool,
         /// The registrable domain this session is pinned to; see `DomainScope.swift`.
         scope: String,
     },

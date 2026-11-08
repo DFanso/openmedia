@@ -92,7 +92,7 @@ A single black or white frame at the moment a new page is revealed remained afte
 
 **Causes found.** The launch storyboard used the system background (white or black). A new `WKWebView` draws its own white or black until its first frame, and `open` also awaited the WebKit compile of the content rule lists (seconds on the first run) and, in Rust, the list conversion, before the view existed. The shell is transparent, so the window showed through. The splash faded out when state loaded, not when a page existed.
 
-**Fixes.** `SiteViewPlugin` puts a themed backdrop view under every page and keeps a new page at alpha 0 until its first frames are reported (native-only `openmediaPaint` handler, `didFinish`, or 1.5 s after commit), then fades it in. `open` looks lists up in WebKit's store and loads at once; missing lists compile in the background and attach to open pages without a reload (so the very first page after an install or list update is not blocked; its next navigation is). Rust converts the lists at launch. The launch storyboard uses a `LaunchBackground` color (ink / paper). The splash waits for the first page address, at most 4 s.
+**Fixes.** `SiteViewPlugin` puts a themed backdrop view under every page and keeps a new page at alpha 0 until its first frames are reported (native-only `openmediaPaint` handler, `didFinish`, or 1.5 s after commit), then fades it in. `open` looks lists up in WebKit's store and loads at once; missing lists compile in the background and attach to open pages without a reload (so the very first page after an install or list update is not blocked; its next navigation is). Rust converts the lists at launch. The launch storyboard uses a `LaunchBackground` color (ink / paper). The splash waited for the first page address, at most 4 s; see [Startup](#startup) for what replaced that.
 
 **Not pursued.** Pre-warming a `WKWebView`: a second open took the same 470 ms to commit as the first, so there is no process start to hide. Launch-screen color follows the system appearance, not the in-app theme override.
 
@@ -102,6 +102,37 @@ A single black or white frame at the moment a new page is revealed remained afte
 
 - **iOS 17 is the minimum.** `forIdentifier:` is iOS 17+, and the Tauri iOS template defaults to 15, so `tauri.conf.json` sets `bundle.iOS.minimumSystemVersion` to 17.0. This resolves the roadmap's open question on older iOS versions.
 - **Android must require `WebViewFeature.MULTI_PROFILE` and `WEB_MESSAGE_LISTENER`** (decided, not built). If either is missing, `open` should fail with a message asking the user to update System WebView. A silent single-profile fallback would break the profile-isolation invariant.
+
+## Startup
+
+Cold start used to show an empty screen (launch screen), then the splash, then an empty screen again until a heavy page painted. Measured and fixed in `perf/startup-handoff`.
+
+**Causes.** (1) The launch screen was a plain colour and the splash's logo arrived a request later, so the first second showed nothing. (2) The splash left when the page reported an address, which is at commit; a page that commits long before it paints (a script-rendered site) was then hidden at alpha 0 over an empty backdrop. (3) The page was opened only after the shell had booted, rendered, called `get_state`, rendered again and called `open_site`; the page's web process, DNS lookup and request all queued behind that. (4) The first-paint signal fired after two animation frames at document start, which is before any content exists.
+
+**What changed.**
+
+| Area | Change |
+|------|--------|
+| Launch screen | `LaunchScreen.storyboard` shows the logo (`LaunchLogo` image set, 52% of the width, at most 240 pt: the splash's size and place). `SiteViewPlugin.installBackdrop` keeps the same logo under the shell until the first page is revealed, so the gap between the launch screen and the shell's first paint is not empty either |
+| Splash | The logo and the stylesheet are inlined into `index.html` by a Vite plugin (`inlineFirstPaint`), so the splash paints with the first HTML, not after two more requests. It starts at the launch screen's state (solid colour and the logo at full size; the radial glow fades in) and no longer animates the logo in from nothing. Fade-out is 250 ms |
+| Splash to page | The splash stays until the page has painted. Native sends `painted` in `siteview:state` when it reveals the view; `pageShowing` in `splash.ts` lets the splash go on `painted`, on a finished load, on an error, or after 4 s |
+| First paint | The injected script reports the page's first contentful paint (`PerformanceObserver`, two frames as a fallback) instead of two frames at document start. A view that is not in the window yet never reveals |
+| Page opens at launch | `boot.rs`: in `setup`, Core opens the start page (`Library::start_url`: the last page, else the first valid favorite) with `open_session`, before the shell has loaded, and resolves its host so the DNS answer is cached. `get_state` returns the session id (`bootSession`); the shell calls `adopt_boot_session` once its event listeners exist, which sets the real rectangle and re-announces the state it could not hear. If the start page failed to open, the same call opens it as `open_site` would. The native `open` takes an optional rect and may run before the shell's view is in the window: it creates the view and starts loading, then mounts it (`attachShell`) |
+| Shell boot | `get_state` is requested before React renders (`prefetchStartup`); `get_state` and the hot commands (`set_last_url`, `add_history`, `record_usage`, `get_sites`, `bottom_margin_for`) run off the main thread; Settings and Stats are separate chunks fetched after the splash is gone, and the guide only when it opens; site options and favicons are fetched after the first page shows. The library file is rewritten at launch only when it was migrated |
+| Build | Vite targets Safari 17 and drops the modulepreload polyfill |
+
+**Measured.** iPhone 17 simulator (iOS 26.5), release build, loopback fixture whose response takes 0.3 s and whose content is drawn by script 1.5 s after commit (a stand-in for a script-rendered site). Video from `simctl io recordVideo`, 60 fps; "empty" is a frame whose centre is one flat colour. Baseline (`origin/main`) and this change installed fresh and alternated, three rounds. Another process was filling the disk during the runs, which made the simulator's process starts slow and uneven.
+
+| Metric | Before (3 runs) | After (3 runs) |
+|--------|-----------------|----------------|
+| Empty frames after the app appears | 2867 / 2033 / 1433 ms | 0 / 0 / 0 ms |
+| App appears to page visible | 5.37 / 4.47 / 3.87 s | 2.57 / 4.38 / 3.17 s |
+
+The empty-frame result is clear. The time-to-page spread is wide (one "after" round was slowed by a late app start), so the three-run medians, 4.47 s to 3.17 s, show a direction and no more. What the logs show directly (release build, simulator, ad blocking on): Rust `setup` takes 15 ms; the page view is created and loading 0.17 s after the shell's view exists, where before it waited for the shell's JavaScript, two renders and two commands; the page's first request then leaves 0.6 to 0.9 s later, the same moment the shell's own JavaScript starts, because the simulator needs that long to start each web process (this floor is the simulator's; a device is expected to be shorter, not measured). One run with ad blocking off did not shorten that wait (0.87 s), so the rule lists are not what it is.
+
+**Not measured.** A real device, real sites, dark mode (the launch screen colour follows the system appearance), iPad, and the first launch after an install (Rust still converts the filter lists before the start page opens; unchanged). DNS warm-up is a design effect, not a measured one.
+
+**Not pursued.** Inlining the module script (one request; the cost is parsing, not the fetch); replacing React with a smaller runtime (about 190 KB of the 256 KB main chunk, a rewrite risk for this change); caching the compiled page script and rule-list handles in memory (not on the measured path).
 
 ## Layout model (mobile)
 
