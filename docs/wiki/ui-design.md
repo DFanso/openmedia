@@ -17,6 +17,8 @@ The web is the product. The screen is one full-bleed page, from under the status
 
 Defaults: Instagram, Facebook, Twitter, Reddit, YouTube. Each fan item shows the site's icon when one is known, otherwise a monogram, on clear glass. The command bar also has back, forward and reload. Favorites change only in Settings: the command bar has no "add this page" button, so browsing never alters the list. The list has no length limit, but the fan shows only the first six (`QUICK_ACCESS_LIMIT` in `shared/favorites.ts`): the quick-access menu. Order decides membership; moving a favorite up in Settings puts it there.
 
+**Opening a site:** a small accent spinner sits in the page area until the active session first paints or finishes loading. It uses the existing native page state, stays out of the touch router, and stops on errors; switching to a ready session shows no loader. Reduced-motion mode keeps the ring still. The startup splash still covers the first load.
+
 ## Settings
 
 Six sections in one scrolling screen (the settings glyph is a sliders icon). Settings and History share one page frame (`shared/Screen.tsx`): a large title, a hairline under the header, and a scrolling body of rounded groups whose rows are separated by hairlines. Site icons come from the favorites' cached icons, with a monogram tile otherwise (`shared/SiteTile.tsx`).

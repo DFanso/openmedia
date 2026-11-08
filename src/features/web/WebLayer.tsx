@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { errorMessage, library, siteView } from "../../shared/ipc";
-import { useApp } from "../../app/store";
+import { selectPage, useApp } from "../../app/store";
+import { pageShowing } from "../../app/splash";
 import { usePageMargin } from "./usePageMargin";
 import { readRect, useSiteViewRect } from "./useSiteViewRect";
 
@@ -17,6 +18,7 @@ export function WebLayer() {
   const profileId = useApp((s) => s.state?.profileId);
   const action = useApp((s) => s.action);
   const hasSession = useApp((s) => s.activeId !== null);
+  const opening = useApp((s) => s.error === null && !pageShowing(selectPage(s)));
   const setSessionState = useApp((s) => s.setSessionState);
   const sessionOpenFailed = useApp((s) => s.sessionOpenFailed);
   const forgetSessions = useApp((s) => s.forgetSessions);
@@ -82,10 +84,19 @@ export function WebLayer() {
       )}
       <div
         ref={slot}
-        aria-hidden="true"
+        className="pointer-events-none fixed inset-x-0 top-[env(safe-area-inset-top)]"
         style={{ bottom: bottomMargin }}
-        className="fixed inset-x-0 top-[env(safe-area-inset-top)]"
-      />
+      >
+        {opening && (
+          <div role="status" className="absolute inset-0 grid place-items-center">
+            <span
+              aria-hidden="true"
+              className="size-7 rounded-full border-2 border-paper/15 border-t-accent motion-safe:animate-spin"
+            />
+            <span className="sr-only">Loading site…</span>
+          </div>
+        )}
+      </div>
       <div
         aria-hidden="true"
         style={{ height: bottomMargin }}

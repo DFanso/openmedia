@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-08
 
+### feat(web): simple loader while a site opens
+
+**Change:** Show a small accent spinner in the page area until the active session paints or finishes loading; errors dismiss it and ready sessions switch without it. Uses existing page events, follows the app theme, and respects reduced motion.
+
+**Verified:** Browser smoke with the real `WebLayer` and simulated native state: opening, first paint, hidden-session events, ready-session switching, errors and open-failure recovery; light/dark themes and reduced motion. Native/on-device rendering was not checked.
+
 ### perf(startup): no empty screens, page opens at launch
 
 **What:** Launching showed an empty screen, then the splash, then an empty screen again (about 0.5 s or more on script-rendered sites) before the page.
