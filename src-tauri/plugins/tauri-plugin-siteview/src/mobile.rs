@@ -219,17 +219,17 @@ pub struct AndroidSecretStore;
 #[cfg(target_os = "android")]
 impl AndroidSecretStore {
     /// Stores a secret under `id`.
-    pub fn set(id: &str, secret: &str) -> Result<(), String> {
+    pub fn set(id: &str, secret: &str) -> std::result::Result<(), String> {
         android_secrets::call("set", id, secret).map(|_| ())
     }
 
     /// Reads the secret stored under `id`, if there is one.
-    pub fn get(id: &str) -> Result<Option<String>, String> {
+    pub fn get(id: &str) -> std::result::Result<Option<String>, String> {
         android_secrets::call("get", id, "")
     }
 
     /// Forgets the secret stored under `id`.
-    pub fn delete(id: &str) -> Result<(), String> {
+    pub fn delete(id: &str) -> std::result::Result<(), String> {
         android_secrets::call("delete", id, "").map(|_| ())
     }
 }

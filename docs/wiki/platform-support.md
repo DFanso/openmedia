@@ -167,7 +167,7 @@ Fallback if the native-plugin approach fails: navigate the main webview to the s
 - **Notifications.** A local notification for a hidden session, with the session id in the intent; the tap is reported back as `siteview:notification-tap`. `POST_NOTIFICATIONS` is requested the first time one is due.
 - **Secrets.** Android has no `keyring` backend, so the plugin's Kotlin side keeps a key in the Android Keystore (AES-GCM) and writes only the ciphertext to the app's preferences, which the app's backup rules exclude. Rust reaches it through a Rust-only plugin command, so no webview can ask for a key.
 
-**Not verified.** Nothing here has been run: the machine's disk was full for the whole session, so the Android project could not be compiled, let alone launched. The Kotlin and the Rust changes are unbuilt; see the pull request for the commands to build and run it.
+**Build verification.** `yarn tauri android build --aab --ci` produced `src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab` (25 MB), with release Rust libraries for all four Android ABIs and compiled Kotlin plugins. The AAB is unsigned because no upload key was configured; `jarsigner -verify` reported it unsigned. Release signing reads the ignored `src-tauri/gen/android/keystore.properties` (`keyAlias`, `password`, `storeFile`) when present. The app has not been installed or run on an Android device or emulator. Never commit the keystore properties file.
 
 ## Known platform constraints
 
