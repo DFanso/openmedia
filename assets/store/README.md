@@ -1,0 +1,55 @@
+# Store assets
+
+App Store and Google Play artwork, built from real iOS Simulator captures. Upload the PNGs as they are.
+
+## Sizes
+
+All files are sRGB PNG with no alpha channel (both stores reject transparency). Sizes were checked
+against Apple's [screenshot specifications](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/)
+and Google's [preview assets help](https://support.google.com/googleplay/android-developer/answer/9866151) in November 2026.
+
+| Folder                | Store slot                      | Size (px)   | Count | Store rule                                                                                        |
+| --------------------- | ------------------------------- | ----------- | ----- | ------------------------------------------------------------------------------------------------- |
+| `ios/iphone-6.9/`     | iPhone, 6.9" (required)         | 1320 × 2868 | 8     | Apple also accepts 1290 × 2796 and 1260 × 2736; 1 to 10 per slot. Smaller iPhone slots scale down |
+| `ios/ipad-13/`        | iPad, 13" (required for iPad)   | 2064 × 2752 | 8     | Apple also accepts 2048 × 2732; 1 to 10 per slot                                                  |
+| `android/phone/`      | Phone                           | 1080 × 1920 | 8     | 9:16 or 16:9, 320 to 3840 px a side, 2 to 8 shots. 1080 px or more keeps the listing promotable   |
+| `android/tablet/`     | 7" and 10" tablet (same files)  | 1440 × 2560 | 8     | 9:16 or 16:9, 1080 to 7680 px a side, up to 8 each                                                |
+| `android/feature-graphic.png` | Feature graphic         | 1024 × 500  | 1     | Required to publish; PNG or JPEG, no alpha                                                        |
+
+Each set tells the same story in the same order: `01-browse`, `02-fan`, `03-recipes`, `04-browsing`, `05-usage`,
+`06-limits`, `07-byok`, `08-dark`.
+
+## Captures
+
+`captures/` holds the unedited Simulator screenshots the artwork is made from, and the landing page reuses them.
+
+| Folder                 | Device                       | Native size |
+| ---------------------- | ---------------------------- | ----------- |
+| `iphone-17-pro-max/`   | iPhone 17 Pro Max, iOS 26.5  | 1320 × 2868 |
+| `ipad-pro-13-m5/`      | iPad Pro 13-inch (M5), iOS 26.5 | 2064 × 2752 |
+
+- Debug build of `main` (`yarn tauri ios build --debug --target aarch64-sim`), fresh install, onboarding skipped.
+- Status bar fixed with `xcrun simctl status_bar <udid> override --time 9:41 --batteryState charged --batteryLevel 100`.
+- The iPad was set to Full-Screen Apps (Settings > Multitasking & Gestures) so iPadOS 26's window resize handle stays out of the frame.
+- Browsing shots show a live public page (`reddit.com/r/EarthPorn`). It carries third-party photos and Reddit usernames; swap the page and recapture if that is a concern.
+- Usage and Limits show **sample data**: a week of synthetic seconds per site and three sample limits written to the app's `usage.json` before launch. They are not real browsing history.
+- The AI provider form is empty; no key was entered.
+- `01-browse`, `02-fan` and `08-dark` are JPEG (quality 96, 4:4:4) because their photographic content makes lossless PNG 3 to 5 MB each. The rest are the original PNGs.
+
+## Android caveat
+
+OpenMedia has no Android build yet ([README status](../../README.md#status)), so the Android sets reuse the iOS captures in a neutral device frame. Google Play expects screenshots of the Android app: replace `android/` with Android captures before submitting.
+
+## Regenerating
+
+`scripts/render-store-assets.mjs` composes the artwork from `captures/`: a themed background, one headline per screen and a device frame drawn in CSS (no Apple bezel assets).
+
+Needs Node, Google Chrome and ImageMagick (`magick`). Fonts come from `node_modules` (`yarn install` first).
+
+```bash
+node scripts/render-store-assets.mjs                    # everything
+node scripts/render-store-assets.mjs ios/ipad-13        # one folder
+node scripts/render-store-assets.mjs android/feature-graphic
+```
+
+Set `CHROME_BIN` to use a Chrome or Chromium binary other than the macOS default. Headlines and themes are in the `slides` array; set sizes and device placement are in `sets`.
