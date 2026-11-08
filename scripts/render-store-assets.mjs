@@ -79,6 +79,15 @@ const sets = [
     top: 21,
   },
   {
+    dir: "ios/iphone-6.1",
+    width: 1179,
+    height: 2556,
+    capture: "iphone-17-pro-max",
+    kind: "phone",
+    deviceWidth: 78,
+    top: 21,
+  },
+  {
     dir: "ios/iphone-6.9",
     width: 1320,
     height: 2868,

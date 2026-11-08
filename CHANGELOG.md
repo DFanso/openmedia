@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+## 2026-11-09
+
+### fix(store): add iPhone 6.1-inch screenshots
+
+**Change:** Render the eight existing App Store screens at 1179 × 2556, accepted for iPhone 6.1-inch uploads. The screenshots use the existing simulator captures and are reproducible with `scripts/render-store-assets.mjs`.
+
+**Verified:** Rendered the 6.1-inch set and checked pixel dimensions and PNG alpha channels.
+
+**PR:** [#36](https://github.com/skepjandi/openmedia/pull/36)
+
 ## 2026-11-08
 
 ### feat(paywall): add anonymous RevenueCat entitlements for iOS and Android
