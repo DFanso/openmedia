@@ -1,0 +1,1 @@
+-keep class surf.openmedia.billing.** { *; }

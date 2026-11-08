@@ -6,6 +6,7 @@ vi.mock("@tauri-apps/api/event", () => ({ listen: vi.fn() }));
 
 import { selectQuickFavorites, useApp } from "./store";
 import type { AppState, Favorite } from "../shared/ipc";
+import { useEntitlementStore } from "../features/paywall/store";
 
 const favorite = (name: string, url: string): Favorite => ({ id: name, name, url });
 const normal = [favorite("Reddit", "https://www.reddit.com/")];
@@ -30,6 +31,7 @@ beforeEach(() => {
     incognitoSites: [],
     error: null,
   });
+  useEntitlementStore.setState({ status: "pro", configured: true, snapshot: null });
 });
 
 const names = (favorites: readonly Favorite[]) => favorites.map((entry) => entry.name);
@@ -68,6 +70,14 @@ describe("incognito mode", () => {
     await Promise.all([useApp.getState().enterIncognito(), useApp.getState().enterIncognito()]);
     expect(calls("enter_incognito")).toHaveLength(1);
     expect(useApp.getState().incognito.active).toBe(true);
+  });
+
+  it("opens the paywall instead of requesting biometric access for a free user", async () => {
+    useEntitlementStore.setState({ status: "free", configured: true, snapshot: null });
+    await useApp.getState().enterIncognito();
+    expect(calls("enter_incognito")).toHaveLength(0);
+    expect(useApp.getState().sheet).toBe("paywall");
+    expect(useApp.getState().incognito.active).toBe(false);
   });
 
   it("keeps the incognito favorites while it is on, but forgets an unlocked section's copy otherwise", () => {

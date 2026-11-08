@@ -1,0 +1,3 @@
+[default]
+description = "The billing plugin registers no commands: only Rust calls it, so no webview can start a purchase or a restore."
+permissions = []

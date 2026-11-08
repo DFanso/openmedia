@@ -21,6 +21,7 @@ A Tauri v2 app for desktop and mobile that loads any website in an embedded webv
 | [Site Runtime](./site-runtime.md) | The injected page script: injection timing, SPA navigation, picker, snapshot, health reporting |
 | [AI Assistant](./ai-assistant.md) | BYOK providers, snapshot redaction, structured generation, repair loop |
 | [Security](./security.md) | Threat model, invariants, IPC boundary, key storage, legal and store-policy risks |
+| [Paywall](./paywall.md) | Pro entitlement via RevenueCat: what is paid, plans, Rust-side gate, no-login restore, store setup |
 | [Platform Support](./platform-support.md) | Desktop vs iOS vs Android: what works, what needs a native plugin, open verifications |
 | [UI Design](./ui-design.md) | The floating-button interface: tone, tokens, gestures, layering, what is and is not connected |
 | [Site Playbooks](./site-playbooks.md) | Per-site options for the default favorites, what every selector matched and how it was checked, what CSS cannot do, and the selector-writing rules for the in-app assistant |

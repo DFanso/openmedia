@@ -19,17 +19,24 @@ pub const CLOSED_EVENT: &str = "siteview:closed";
 pub const MEMORY_EVENT: &str = "siteview:memory";
 pub const NOTIFICATION_TAP_EVENT: &str = "siteview:notification-tap";
 
-#[cfg(target_os = "android")]
-compile_error!("the Android site view is not implemented yet; see docs/wiki/platform-support.md");
-
 #[cfg(target_os = "ios")]
 tauri::ios_plugin_binding!(init_plugin_siteview);
+
+/// The Kotlin class the Android side loads: `surf.openmedia.siteview.SiteViewPlugin`.
+#[cfg(target_os = "android")]
+const ANDROID_PLUGIN: &str = "surf.openmedia.siteview";
 
 pub fn init<R: Runtime, C: DeserializeOwned>(
     app: &AppHandle<R>,
     api: PluginApi<R, C>,
 ) -> Result<Siteview<R>> {
+    #[cfg(target_os = "ios")]
     let handle = api.register_ios_plugin(init_plugin_siteview)?;
+    #[cfg(target_os = "android")]
+    let handle = api.register_android_plugin(ANDROID_PLUGIN, "SiteViewPlugin")?;
+
+    #[cfg(target_os = "android")]
+    android_secrets::install(handle.clone());
 
     let app = app.clone();
     let events = Channel::new(move |body| {
@@ -197,5 +204,72 @@ impl<R: Runtime> Siteview<R> {
         let response: EvaluateResponse =
             self.run("evaluate", serde_json::json!({ "script": script }))?;
         check_evaluate_result(response.json)
+    }
+}
+
+/// The Android secret store: the Keystore-backed store the Kotlin side keeps. Android has no
+/// keyring backend in `keyring`, so the plugin's Android side holds the key in the Android
+/// Keystore and the ciphertext in the app's own preferences.
+///
+/// Rust-only: the plugin registers no command for it that a webview could reach, and the app's
+/// own `SecretStore` implementation is the only caller.
+#[cfg(target_os = "android")]
+pub struct AndroidSecretStore;
+
+#[cfg(target_os = "android")]
+impl AndroidSecretStore {
+    /// Stores a secret under `id`.
+    pub fn set(id: &str, secret: &str) -> Result<(), String> {
+        android_secrets::call("set", id, secret).map(|_| ())
+    }
+
+    /// Reads the secret stored under `id`, if there is one.
+    pub fn get(id: &str) -> Result<Option<String>, String> {
+        android_secrets::call("get", id, "")
+    }
+
+    /// Forgets the secret stored under `id`.
+    pub fn delete(id: &str) -> Result<(), String> {
+        android_secrets::call("delete", id, "").map(|_| ())
+    }
+}
+
+/// The bridge to the Kotlin secret store. The operations are held in one place so the app's own
+/// store can reach them without carrying a plugin handle around.
+#[cfg(target_os = "android")]
+mod android_secrets {
+    use std::sync::{Arc, OnceLock};
+
+    use serde::Deserialize;
+    use tauri::plugin::PluginHandle;
+    use tauri::Runtime;
+
+    /// `op` is one of `set`, `get` or `delete`; the answer is the stored value, if any.
+    pub type Ops = Arc<dyn Fn(&str, &str, &str) -> Result<Option<String>, String> + Send + Sync>;
+
+    static OPS: OnceLock<Ops> = OnceLock::new();
+
+    #[derive(Deserialize)]
+    struct Response {
+        value: Option<String>,
+    }
+
+    pub fn install<R: Runtime>(handle: PluginHandle<R>) {
+        let _ = OPS.set(Arc::new(move |op: &str, id: &str, value: &str| {
+            let response: Response = handle
+                .run_mobile_plugin(
+                    "secretOp",
+                    serde_json::json!({ "op": op, "id": id, "value": value }),
+                )
+                .map_err(|e| e.to_string())?;
+            Ok(response.value)
+        }));
+    }
+
+    pub fn call(op: &str, id: &str, value: &str) -> Result<Option<String>, String> {
+        let ops = OPS
+            .get()
+            .ok_or_else(|| "the secret store is not ready".to_string())?;
+        ops(op, id, value)
     }
 }

@@ -8,6 +8,7 @@ import { useApp } from "./store";
 import { initialAssistant } from "../features/ai/flow";
 import { prepared, proposal } from "../features/ai/fixtures";
 import type { AppState } from "../shared/ipc";
+import { useEntitlementStore } from "../features/paywall/store";
 
 const appState = (aiPreview: boolean) =>
   ({ aiPreview, theme: "system", favorites: [], history: [] }) as unknown as AppState;
@@ -38,6 +39,7 @@ beforeEach(() => {
     sheet: "assistant",
     sites: [],
   });
+  useEntitlementStore.setState({ status: "pro", configured: true, snapshot: null });
 });
 
 describe("assistant wiring", () => {
@@ -60,6 +62,27 @@ describe("assistant wiring", () => {
     await useApp.getState().submitRequest("hide stories");
     expect(calls("ai_send")).toHaveLength(1);
     expect(useApp.getState().assistant.status).toBe("proposal");
+  });
+
+  it("routes a rejected AI request to the paywall without leaving a retry error", async () => {
+    useEntitlementStore.setState({ status: "free", configured: true, snapshot: null });
+    mockCommands({ ai_prepare: () => Promise.reject("pro-required") });
+    await useApp.getState().submitRequest("hide stories");
+    expect(calls("ai_prepare")).toHaveLength(1);
+    expect(useApp.getState().sheet).toBe("paywall");
+    expect(useApp.getState().assistant.status).toBe("idle");
+  });
+
+  it("keeps link navigation free while AI and Usage sheets open the paywall", () => {
+    mockCommands({ add_history: () => [] });
+    useEntitlementStore.setState({ status: "free", configured: true, snapshot: null });
+    useApp.getState().openSheet("assistant");
+    expect(useApp.getState().sheet).toBe("paywall");
+    useApp.getState().openSheet("stats");
+    expect(useApp.getState().sheet).toBe("paywall");
+    useApp.getState().openAddress("https://example.com/");
+    expect(useApp.getState().action).toMatchObject({ type: "open", url: "https://example.com/" });
+    expect(useApp.getState().sheet).toBe("none");
   });
 
   it("accepting saves, reloads the sites and confirms", async () => {

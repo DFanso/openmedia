@@ -1,6 +1,6 @@
 # Ad Blocking
 
-> **Status: Implemented on iOS.** Bundled EasyList and EasyPrivacy, converted to WebKit content rule lists and attached to the site view. Not built for Android or desktop. See [Verified results](#verified-results) for what was and was not run.
+> **Status: Implemented on iOS and Android.** Bundled EasyList and EasyPrivacy, converted to WebKit content rule lists. iOS hands them to WebKit; Android has no rule-list API, so the same JSON is matched request by request in `shouldInterceptRequest`. Not built for desktop. See [Verified results](#verified-results) for what was and was not run.
 
 ## What it does
 
@@ -35,6 +35,7 @@ flowchart LR
 - **Compilation runs once per version too.** The plugin asks `WKContentRuleListStore` for the id first and reads the JSON file only on a miss. Compiled lists persist in WebKit's store, so later launches skip both; the plugin removes stored lists whose id is no longer current. Compiling both lists took about 4 s on macOS WebKit, so the first page after an install or a list update would have waited that long. It does not: `open` loads at once, the lists compile in the background and attach to open pages without a reload, so that first page is unblocked and its next navigation is blocked. Rust converts the lists at launch (`lib.rs`) so the conversion is not on the open path either.
 - **Subdomains.** The converter emits bare domains for element-hiding rules (`example.org##.ad`). WebKit matches a bare `if-domain` only against that exact host, so `include_subdomains` prefixes `*`; without it most domain-specific hiding rules would be inert on `www.` hosts. Checked on macOS WebKit (see roadmap decision log).
 - **The setting.** `adBlock` in `library.json`, on by default; files saved before it existed load as on. `set_ad_block(enabled)` swaps the lists on the open site view and reloads it (`set_content_rule_lists` in the plugin; with no site view open it does nothing and the next `open_site` carries the lists). The Settings screen has the switch.
+- **Android.** The same converted JSON is read by the plugin's `BlockingRules` (`android/src/main/java/surf/openmedia/siteview/BlockingRules.kt`) and matched in `shouldInterceptRequest`. WebKit's `url-filter` is an unanchored regular expression, so each rule is a `java.util.regex.Pattern`; the `action` is `block` or `ignore-previous-rules`, and the converter puts every exception after every block, so an exception cancels a block. `if-domain`/`unless-domain`, `resource-type` and `load-type` are honoured the way WebKit honours them, and the request's resource type is guessed from the URL (there is no type on the Android side). Host-anchored filters are indexed by host and looked up by the request host's dot-suffixes, so only the rules that can match a host are tested; the rest are kept in one list with a literal pre-check. Element-hiding rules (`css-display-none`) have no Android equivalent and are skipped.
 - **Failure.** If the lists cannot be built or WebKit rejects one, the page still opens unblocked and the shell shows a banner through the usual `siteview:error` event. A failed `set_ad_block` leaves the stored setting unchanged and the switch reverts.
 
 ## What it cannot do
@@ -57,7 +58,7 @@ Lists change only with an app release. A runtime update would add a network dest
 ## Not built
 
 - Per-site allowlist ("off on this site"). The only control is the global switch.
-- Android (needs `shouldInterceptRequest` with the `adblock` `Engine`) and desktop.
+- Desktop (needs a child webview and the `adblock` `Engine`).
 - Counting blocked requests. WebKit does not report matches for content rule lists.
 - Optional extra lists (cookie banners, annoyances).
 

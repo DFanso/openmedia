@@ -13,6 +13,8 @@ import { selectLocale, selectPage, useApp } from "./store";
 import { useHitRegions } from "./useHitRegions";
 import { localeInfo } from "../i18n/locales";
 import { useT } from "../i18n/useT";
+import { PaywallSheet } from "../features/paywall/PaywallSheet";
+import { useEntitlementStore } from "../features/paywall/store";
 
 /** Heavy screens load after the first page shows; most launches never open them. */
 const loadSettings = () => import("../features/settings/SettingsScreen");
@@ -43,6 +45,13 @@ export function App() {
   const [idle, setIdle] = useState(false);
   useApplyTheme(theme);
   useHitRegions();
+  useEffect(() => {
+    void useEntitlementStore.getState().initialize();
+    return useEntitlementStore.subscribe((state, previous) => {
+      if (previous.status === "pro" && state.status !== "pro" && useApp.getState().incognito.active)
+        void useApp.getState().exitIncognito();
+    });
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -79,6 +88,7 @@ export function App() {
         {(idle || sheet === "settings") && <SettingsScreen />}
         {(idle || sheet === "stats") && <StatsSheet />}
         {onboardingOpen && <Onboarding />}
+        {sheet === "paywall" && <PaywallSheet />}
       </Suspense>
       {error && sheet !== "settings" && (
         <button

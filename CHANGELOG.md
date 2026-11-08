@@ -8,6 +8,16 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-08
 
+### feat(paywall): add anonymous RevenueCat entitlements for iOS and Android
+
+**What:** AI features, Incognito and Usage are Pro; opening sites remains free. Plans are lifetime ($18.99), yearly ($10) and monthly ($2, with a 14-day trial).
+
+**Change:** Native StoreKit / Google Play Billing adapters feed one RevenueCat `pro` entitlement; Restore Purchases supports the same store account on another device. Rust gates paid commands, desktop remains unchanged, and live HTTPS Terms and Privacy pages are required before purchases activate. Debug builds can set `EXPO_PUBLIC_FORCE_ENABLE_PRO_ON_SIMULATOR=true`; native code grants Pro only after confirming an iOS Simulator or Android Emulator.
+
+**Verified:** `yarn ts:check`, `yarn lint`, `yarn format:check`, `yarn test` (260/260), and `cargo fmt --check`. Rust host tests/check passed earlier but were not rerun after final Rust edits because of disk pressure. **Not verified:** native iOS/Android builds, simulator override on device/emulator, store transactions, restore on another device, Android site-view build/runtime. Billing keys, store products, trial and legal URLs remain release prerequisites.
+
+**PR:** n/a
+
 ### chore(store): App Store and Google Play artwork from simulator captures
 
 **What:** The store listings needed screenshots and a feature graphic at the sizes Apple and Google accept.

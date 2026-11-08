@@ -1,3 +1,4 @@
+import { useEntitlementStore } from "../paywall/store";
 import { appError, useApp, selectPage, type AppStore } from "../../app/store";
 import { usage } from "../../shared/ipc";
 import { advance, createAccumulator, drain, type UsageEntry } from "./accumulator";
@@ -35,9 +36,10 @@ export function startUsageTracking(): () => void {
       ? currentTarget(useApp.getState(), document.visibilityState === "visible")
       : null;
   const fail = (error: unknown) => useApp.getState().reportError(appError(error));
+  const isPro = () => useEntitlementStore.getState().status === "pro";
 
   const load = async () => {
-    if (loading) return;
+    if (!isPro() || loading) return;
     loading = true;
     const requestedDay = day;
     try {
@@ -46,7 +48,7 @@ export function startUsageTracking(): () => void {
         usagePolicies.get(),
         usage.report(requestedDay, 1),
       ]);
-      if (stopped || requestedDay !== day) return;
+      if (stopped || requestedDay !== day || !isPro()) return;
       useUsageControl.setState({
         day,
         policies,
@@ -54,7 +56,7 @@ export function startUsageTracking(): () => void {
         ready: true,
       });
     } catch (error) {
-      fail(error);
+      if (isPro()) fail(error);
     } finally {
       loading = false;
     }
@@ -106,7 +108,7 @@ export function startUsageTracking(): () => void {
     if (flushAlways || pending.reduce((sum, entry) => sum + entry.seconds, 0) >= FLUSH_SECONDS)
       flush();
     stepping = false;
-    if (!useUsageControl.getState().ready) void load();
+    if (isPro() && !useUsageControl.getState().ready) void load();
   };
 
   const onLeave = () => step(true);
@@ -115,12 +117,20 @@ export function startUsageTracking(): () => void {
   const unsubscribePolicies = useUsageControl.subscribe((next, previous) => {
     if (next.ready !== previous.ready || next.policies !== previous.policies) step(true);
   });
+  const unsubscribeEntitlement = useEntitlementStore.subscribe((next, previous) => {
+    if (next.status === previous.status) return;
+    if (next.status === "pro") {
+      void load();
+    } else {
+      useUsageControl.setState({ policies: {}, seconds: {}, warning: null, ready: false });
+    }
+  });
   flushPending = onLeave;
   document.addEventListener("visibilitychange", onLeave);
   window.addEventListener("pagehide", onLeave);
   window.addEventListener("blur", onLeave);
   window.addEventListener("focus", onLeave);
-  void load();
+  if (isPro()) void load();
 
   return () => {
     step(true);
@@ -128,6 +138,7 @@ export function startUsageTracking(): () => void {
     flushPending = undefined;
     window.clearInterval(timer);
     unsubscribe();
+    unsubscribeEntitlement();
     unsubscribePolicies();
     document.removeEventListener("visibilitychange", onLeave);
     window.removeEventListener("pagehide", onLeave);

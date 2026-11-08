@@ -8,12 +8,17 @@
 use tauri::{AppHandle, State};
 use tauri_plugin_siteview::{SetBlockedRequest, SiteviewExt, validate::parse_session_id};
 
+use crate::entitlement::Entitlement;
 use crate::error::Result;
 use crate::usage::{Usage, UsagePolicies, UsagePolicy};
 
 /// The daily warning and limit of every site the user set one for, keyed by host.
 #[tauri::command]
-pub fn get_usage_policies(usage: State<'_, Usage>) -> Result<UsagePolicies> {
+pub fn get_usage_policies(
+    usage: State<'_, Usage>,
+    entitlement: State<'_, Entitlement>,
+) -> Result<UsagePolicies> {
+    entitlement.require_pro()?;
     usage.policies()
 }
 
@@ -22,9 +27,11 @@ pub fn get_usage_policies(usage: State<'_, Usage>) -> Result<UsagePolicies> {
 #[tauri::command]
 pub fn set_usage_policy(
     usage: State<'_, Usage>,
+    entitlement: State<'_, Entitlement>,
     host: String,
     policy: UsagePolicy,
 ) -> Result<UsagePolicies> {
+    entitlement.require_pro()?;
     usage.set_policy(&host, policy)
 }
 
@@ -36,7 +43,15 @@ pub fn set_usage_policy(
 /// Async because the plugin waits for native code that needs the main thread: a synchronous
 /// command would deadlock the app.
 #[tauri::command]
-pub async fn set_usage_blocked(app: AppHandle, session: String, blocked: bool) -> Result<()> {
+pub async fn set_usage_blocked(
+    app: AppHandle,
+    entitlement: State<'_, Entitlement>,
+    session: String,
+    blocked: bool,
+) -> Result<()> {
+    if blocked {
+        entitlement.require_pro()?;
+    }
     parse_session_id(&session)?;
     app.siteview()
         .set_blocked(SetBlockedRequest { session, blocked })?;

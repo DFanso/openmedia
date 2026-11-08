@@ -2,6 +2,7 @@ mod ad_block;
 mod ai;
 mod boot;
 mod commands;
+mod entitlement;
 mod error;
 mod incognito;
 mod library;
@@ -17,6 +18,7 @@ use tauri::Manager;
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_siteview::init())
+        .plugin(tauri_plugin_billing::init())
         .setup(|app| {
             let data_dir = app.path().app_data_dir()?;
             let library = library::Library::load(data_dir.join("library.json"))?;
@@ -37,9 +39,16 @@ pub fn run() {
             app.manage(usage::Usage::load(data_dir.join("usage.json"))?);
             app.manage(ai::agent::Agent::default());
             app.manage(commands::Secrets(Box::new(secrets::KeychainStore)));
+            app.manage(entitlement::Entitlement::from_build());
+            entitlement::start(app.handle());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            entitlement::get_entitlement,
+            entitlement::refresh_entitlement,
+            entitlement::get_offerings,
+            entitlement::purchase_package,
+            entitlement::restore_purchases,
             commands::get_state,
             commands::set_favorites,
             commands::set_site_favorite,

@@ -325,4 +325,34 @@ export const de: Messages = {
   "ai.note":
     "Bring deinen eigenen Schlüssel mit. Er wird im iOS-Schlüsselbund gespeichert, nur vom Rust-Kern der App gelesen und nur an den Anbieter gesendet, den du wählst. Wähle einen als aktiv und beschreibe dann eine Änderung in der Befehlsleiste. Die Struktur der Seite (nicht deine Cookies, Passwörter oder eingegebenen Texte) geht nur an diesen Anbieter, wenn du auf Senden tippst.",
   "notify.newActivity": "Neue Aktivität",
+
+  "paywall.title": "OpenMedia Pro",
+  "paywall.subtitle": "Freischalten: KI-Assistent, Inkognito-Modus und Nutzungslimits.",
+  "paywall.close": "Bezahlwand schließen",
+  "paywall.locked": "Pro-Funktion",
+  "paywall.lockedHint": "Das braucht OpenMedia Pro. Tippe für die Pläne.",
+  "paywall.lifetime": "Lebenslang",
+  "paywall.yearly": "Jährlich",
+  "paywall.monthly": "Monatlich",
+  "paywall.priceLifetime": "{price} einmalig",
+  "paywall.priceYearly": "{price} pro Jahr",
+  "paywall.priceMonthly": "{price} pro Monat",
+  "paywall.trialDays": "{days} Tage gratis",
+  "paywall.buy": "Kaufen",
+  "paywall.purchasing": "Kauf läuft…",
+  "paywall.restore": "Käufe wiederherstellen",
+  "paywall.restoring": "Wird wiederhergestellt…",
+  "paywall.nothingToRestore":
+    "Nichts wiederherzustellen. Für dieses Konto gibt es keinen aktiven Kauf.",
+  "paywall.pending": "Warten auf die Freigabe des Kaufs durch den Store.",
+  "paywall.loading": "Pläne werden geladen…",
+  "paywall.empty": "Gerade sind keine Pläne verfügbar.",
+  "paywall.error": "Etwas ist schiefgelaufen. Versuche es erneut.",
+  "paywall.unavailable": "Käufe sind in dieser Version nicht verfügbar.",
+  "paywall.legalUnavailable":
+    "Käufe sind erst verfügbar, wenn Datenschutz- und Bedingungsseiten hinterlegt sind.",
+  "paywall.disclosure":
+    "Abonnements verlängern sich automatisch, bis du sie mindestens 24 Stunden vor Ende des Zeitraums in den Store-Einstellungen deines Geräts kündigst. Jeder Plan zeigt den lokalen Preis des Stores und eine kostenlose Testphase, falls vorhanden.",
+  "paywall.privacy": "Datenschutz",
+  "paywall.terms": "Nutzungsbedingungen",
 };

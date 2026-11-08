@@ -3,6 +3,8 @@ use serde::{Serialize, Serializer};
 pub type Result<T> = std::result::Result<T, Error>;
 
 /// Messages here reach the UI, so none of them may contain a key, a header, or a response body.
+/// `ProRequired` serializes as the stable code `pro-required`, which the shell matches to open
+/// the paywall.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("a favorite needs a name of 1-20 characters")]
@@ -15,6 +17,12 @@ pub enum Error {
     InvalidUsage(&'static str),
     #[error("no such site option")]
     UnknownOption,
+    #[error(transparent)]
+    Billing(#[from] tauri_plugin_billing::Error),
+    #[error("pro-required")]
+    ProRequired,
+    #[error("Purchases are not available in this build.")]
+    BillingNotConfigured,
     #[error(transparent)]
     SiteView(#[from] tauri_plugin_siteview::Error),
     #[error("could not read or write the library: {0}")]

@@ -31,6 +31,7 @@ import type { Session } from "../web/sessions";
 import { settleUsageWrites, startUsageTracking } from "./tracker";
 import { localDay } from "./format";
 import { usagePolicies, useUsageControl } from "./policy";
+import { useEntitlementStore } from "../paywall/store";
 
 const policies = {
   "example.com": { warnSeconds: 2, limitSeconds: 3 },
@@ -88,6 +89,7 @@ beforeEach(() => {
     ready: false,
     warning: null,
   });
+  useEntitlementStore.setState({ status: "pro", configured: true, snapshot: null });
 });
 
 afterEach(async () => {
@@ -109,6 +111,17 @@ async function tick(seconds: number) {
 }
 
 describe("usage tracking", () => {
+  it("does not request or expose Usage for a free user", async () => {
+    report.mockClear();
+    useEntitlementStore.setState({ status: "free", configured: true, snapshot: null });
+    await start();
+    await tick(3);
+    expect(usagePolicies.get).not.toHaveBeenCalled();
+    expect(report).not.toHaveBeenCalled();
+    expect(useUsageControl.getState().ready).toBe(false);
+    expect(useApp.getState().sheet).toBe("none");
+  });
+
   it("stops at a site's limit and resumes counting on an unrelated site", async () => {
     await start();
     await tick(4);
