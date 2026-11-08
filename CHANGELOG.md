@@ -14,6 +14,8 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** Rendered the 6.1-inch set and checked pixel dimensions and PNG alpha channels.
 
+**PR:** [#36](https://github.com/skepjandi/openmedia/pull/36)
+
 ## 2026-11-08
 
 ### feat(paywall): add anonymous RevenueCat entitlements for iOS and Android
