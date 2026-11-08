@@ -105,7 +105,7 @@ const STEPS: Step[] = [
   },
   {
     title: "One button.",
-    body: "Tap it to type an address and go. Soon you will be able to ask the AI assistant to change a site for you.",
+    body: "Tap to open an address, or ask for a change to the current site. Connect your own AI provider in Settings; you can preview what is sent before sending it.",
     visual: <TapVisual />,
   },
   {

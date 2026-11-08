@@ -45,6 +45,15 @@ private let safariUserAgent: String = {
   return "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/\(major).0 Mobile/15E148 Safari/604.1"
 }()
 private let allowedSchemes: Set<String> = ["http", "https"]
+/// `evaluate` gives up after this long; a hung page must not hang the caller.
+private let evaluateTimeout: TimeInterval = 5
+/// `evaluate` refuses a result larger than this many UTF-8 bytes.
+private let evaluateMaxBytes = 200_000
+/// What the native shield says when the app has closed a site for the day.
+private let shieldMessage = "This site is closed for today. It opens again tomorrow."
+/// How many closed sessions are remembered. A closed session stays closed, so it cannot be
+/// reopened and walked past the limit; the oldest entries are forgotten first.
+private let maxRememberedBlocked = 32
 /// The shell's own background (`--color-ink` in `index.css`, the splash in `index.html`): light
 /// `#f4f7fc`, dark `#070b14`. It follows the view's interface style, which the shell's theme sets.
 private let backdropColor = UIColor { traits in
@@ -109,6 +118,15 @@ class SetDocumentStartScriptArgs: Decodable {
   let script: String
 }
 
+class SetBlockedArgs: Decodable {
+  let session: String
+  let blocked: Bool
+}
+
+class EvaluateArgs: Decodable {
+  let script: String
+}
+
 struct StateEvent: Encodable {
   let type = "state"
   let session: String
@@ -170,6 +188,7 @@ private final class WeakPaintHandler: NSObject, WKScriptMessageHandler {
 private final class Session {
   let id: String
   let view: WKWebView
+  let initialURL: URL
   /// The registrable domain the session may show. Fixed once the first load settles.
   var scope: String
   /// False until the first load finishes or fails; see `DomainScope.verdict`.
@@ -182,12 +201,18 @@ private final class Session {
   var needsReload = false
   /// Ids of the content rule lists attached to this view, so a late compile attaches each once.
   var ruleListIds: Set<String> = []
+  /// True while the app has closed this site. The block lives in the native layer: the page
+  /// cannot lift it, and switching to another session does not clear it.
+  var blocked = false
+  /// The native shield over a closed page. It covers the page and takes every touch.
+  var shield: UIView?
   var observations: [NSKeyValueObservation] = []
 
-  init(id: String, view: WKWebView, scope: String) {
+  init(id: String, view: WKWebView, scope: String, initialURL: URL) {
     self.id = id
     self.view = view
     self.scope = scope
+    self.initialURL = initialURL
   }
 }
 
@@ -235,6 +260,9 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
   private var compilingRuleListIds: Set<String> = []
   /// Bumped when the shell replaces the rule lists, so a late compile cannot undo that.
   private var ruleListGeneration = 0
+  /// Sessions the app has closed, oldest first. A closed session stays closed until the app opens
+  /// it again, so it cannot be reopened and walked past the limit.
+  private var blockedSessions: [String] = []
 
   override func load(webview: WKWebView) {
     shell = webview
@@ -283,14 +311,19 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
       view.scrollView.refreshControl = refresh
 
       let session = Session(
-        id: args.session, view: view, scope: DomainScope.registrableDomain(of: url.host ?? ""))
+        id: args.session, view: view, scope: DomainScope.registrableDomain(of: url.host ?? ""), initialURL: url)
       session.ruleListIds = Set(cached.map(\.identifier))
       self.sessions[session.id] = session
       self.activeId = session.id
       self.events = args.onEvent
       self.observe(session)
       self.mount(session)
-      view.load(URLRequest(url: url))
+      if self.isBlocked(args.session) {
+        // The site is closed for the day: the page never loads and the shield goes up.
+        self.applyBlocked(true, to: session)
+      } else {
+        view.load(URLRequest(url: url))
+      }
       invoke.resolve()
       self.compileInBackground(missing, keeping: lists)
     }
@@ -401,7 +434,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
         controller.removeAllContentRuleLists()
         ruleLists.forEach { controller.add($0) }
         session.ruleListIds = Set(ruleLists.map(\.identifier))
-        if session.id == self.activeId {
+        if session.id == self.activeId && !session.blocked {
           session.view.reload()
         } else {
           session.needsReload = true
@@ -421,13 +454,79 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
       for session in self.sessions.values {
         let controller = session.view.configuration.userContentController
         self.installUserScripts(on: controller, recipe: args.script)
-        if session.id == self.activeId {
+        if session.id == self.activeId && !session.blocked {
           session.view.reload()
         } else {
           session.needsReload = true
         }
       }
       invoke.resolve()
+    }
+  }
+
+  /// Closes one site for the day, or opens it again. Rust-only: the plugin registers no command
+  /// for it, so neither the shell nor a site view can reach it. The block is native: a shield
+  /// covers the page, the load stops, the media pauses and every navigation is refused, so the
+  /// page cannot work around it.
+  @objc public func setBlocked(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(SetBlockedArgs.self)
+    DispatchQueue.main.async {
+      guard let session = self.sessions[args.session] else {
+        if args.blocked {
+          self.rememberBlocked(args.session)
+        } else {
+          self.forgetBlocked(args.session)
+        }
+        invoke.resolve()
+        return
+      }
+      self.applyBlocked(args.blocked, to: session)
+      invoke.resolve()
+    }
+  }
+
+  /// Runs a Rust-supplied script in the active session's main frame and resolves with its JSON
+  /// text. Rust-only: the Rust plugin handle calls this by name; no Tauri command or permission
+  /// exposes it, so neither the shell nor a site view can reach it. The script runs in
+  /// `WKContentWorld.defaultClient`: it sees the page's DOM but not the page's JS globals, so a
+  /// hostile page cannot replace `JSON` or `Element.prototype.querySelectorAll` under it. The
+  /// result is page-derived data and the caller must treat it as hostile.
+  @objc public func evaluate(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(EvaluateArgs.self)
+    DispatchQueue.main.async {
+      guard let id = self.activeId, let session = self.sessions[id] else {
+        invoke.reject("no site view is open")
+        return
+      }
+      var finished = false
+      func finish(_ run: () -> Void) {
+        guard !finished else { return }
+        finished = true
+        run()
+      }
+      DispatchQueue.main.asyncAfter(deadline: .now() + evaluateTimeout) {
+        finish { invoke.reject("the page did not answer in time") }
+      }
+      session.view.evaluateJavaScript(args.script, in: nil, in: .defaultClient) { result in
+        DispatchQueue.main.async {
+          finish {
+            switch result {
+            case .failure:
+              invoke.reject("the script failed in the page")
+            case .success(let value):
+              guard let json = value as? String else {
+                invoke.reject("the script returned no value")
+                return
+              }
+              guard json.utf8.count <= evaluateMaxBytes else {
+                invoke.reject("the script result is too large")
+                return
+              }
+              invoke.resolve(["json": json])
+            }
+          }
+        }
+      }
     }
   }
 
@@ -451,6 +550,11 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
   ) {
     guard let session = session(of: webView) else {
+      decisionHandler(.cancel)
+      return
+    }
+    if session.blocked {
+      // A closed page does not navigate: the limit is on the site, not on this view.
       decisionHandler(.cancel)
       return
     }
@@ -499,6 +603,12 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
   func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
     guard let session = session(of: webView) else { return }
     if session.id == activeId {
+      if session.blocked {
+        // A closed page is not brought back: it stays closed until the app opens it.
+        dispose(session)
+        send(ClosedEvent(session: session.id))
+        return
+      }
       webView.alpha = 0
       session.painted = false
       webView.reload()
@@ -517,6 +627,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     windowFeatures: WKWindowFeatures
   ) -> WKWebView? {
     guard let session = session(of: webView), let url = navigationAction.request.url else { return nil }
+    if session.blocked { return nil }
     switch DomainScope.verdict(
       scheme: url.scheme, host: url.host, scope: session.scope, settled: session.settled,
       isMainFrame: true)
@@ -534,6 +645,94 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     sessions.values.first { $0.view === view }
   }
 
+  // MARK: Blocking
+
+  /// Closes or opens one session. Closing is native: the page is covered by a shield, its load
+  /// stops, its media pauses and every navigation it asks for is refused. The session itself
+  /// lives on, so opening it again brings the page back as it was.
+  private func applyBlocked(_ blocked: Bool, to session: Session) {
+    if blocked {
+      rememberBlocked(session.id)
+      session.blocked = true
+      session.view.stopLoading()
+      session.view.setAllMediaPlaybackSuspended(true)
+      installShield(on: session)
+      reveal(session.view)
+    } else {
+      forgetBlocked(session.id)
+      session.blocked = false
+      removeShield(from: session)
+      session.view.setAllMediaPlaybackSuspended(false)
+      if session.view.url == nil { session.needsReload = true }
+      if session.id == activeId && session.needsReload { show(session) }
+    }
+  }
+
+  /// Covers a closed page with a native blur that takes every touch and says why the site is
+  /// closed. The shield is a native view: the page cannot see it, so it cannot remove it.
+  private func installShield(on session: Session) {
+    guard session.shield == nil else { return }
+    let shield = makeShield()
+    session.shield = shield
+    shield.translatesAutoresizingMaskIntoConstraints = false
+    session.view.addSubview(shield)
+    NSLayoutConstraint.activate([
+      shield.topAnchor.constraint(equalTo: session.view.topAnchor),
+      shield.bottomAnchor.constraint(equalTo: session.view.bottomAnchor),
+      shield.leadingAnchor.constraint(equalTo: session.view.leadingAnchor),
+      shield.trailingAnchor.constraint(equalTo: session.view.trailingAnchor),
+    ])
+  }
+
+  private func removeShield(from session: Session) {
+    session.shield?.removeFromSuperview()
+    session.shield = nil
+  }
+
+  /// The shield's look: a blur over the page with the reason on it.
+  private func makeShield() -> UIView {
+    let shield = UIView()
+    shield.backgroundColor = .clear
+    shield.isUserInteractionEnabled = true
+    let blur = UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))
+    blur.translatesAutoresizingMaskIntoConstraints = false
+    shield.addSubview(blur)
+    let label = UILabel()
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.text = shieldMessage
+    label.numberOfLines = 0
+    label.textAlignment = .center
+    label.font = .preferredFont(forTextStyle: .body)
+    label.adjustsFontForContentSizeCategory = true
+    label.textColor = .label
+    shield.addSubview(label)
+    NSLayoutConstraint.activate([
+      blur.topAnchor.constraint(equalTo: shield.topAnchor),
+      blur.bottomAnchor.constraint(equalTo: shield.bottomAnchor),
+      blur.leadingAnchor.constraint(equalTo: shield.leadingAnchor),
+      blur.trailingAnchor.constraint(equalTo: shield.trailingAnchor),
+      label.centerXAnchor.constraint(equalTo: shield.centerXAnchor),
+      label.centerYAnchor.constraint(equalTo: shield.centerYAnchor),
+      label.widthAnchor.constraint(lessThanOrEqualTo: shield.widthAnchor, multiplier: 0.8),
+    ])
+    return shield
+  }
+
+  private func rememberBlocked(_ id: String) {
+    if !blockedSessions.contains(id) { blockedSessions.append(id) }
+    if blockedSessions.count > maxRememberedBlocked {
+      blockedSessions.removeFirst(blockedSessions.count - maxRememberedBlocked)
+    }
+  }
+
+  private func forgetBlocked(_ id: String) {
+    blockedSessions.removeAll { $0 == id }
+  }
+
+  private func isBlocked(_ id: String) -> Bool {
+    blockedSessions.contains(id)
+  }
+
   /// Makes `session` the one visible page. The others stay alive underneath, hidden.
   private func show(_ session: Session) {
     for other in sessions.values where other !== session { other.view.isHidden = true }
@@ -541,9 +740,13 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     activeId = session.id
     if let host = shell?.superview { session.view.frame = pageFrame(in: host) }
     router?.siteView = session.view
-    if session.needsReload {
+    if session.needsReload && !session.blocked {
       session.needsReload = false
-      session.view.reload()
+      if session.view.url == nil {
+        session.view.load(URLRequest(url: session.initialURL))
+      } else {
+        session.view.reload()
+      }
     }
     sendState(session)
   }
@@ -829,6 +1032,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
 
   private func dispose(_ session: Session) {
     session.observations.removeAll()
+    removeShield(from: session)
     let view = session.view
     view.stopLoading()
     view.configuration.userContentController.removeAllUserScripts()
@@ -848,6 +1052,11 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     DispatchQueue.main.async {
       guard let id = self.activeId, let session = self.sessions[id] else {
         invoke.reject("no site view is open")
+        return
+      }
+      if session.blocked {
+        // A closed page is frozen: the request is answered, but the page does not move.
+        invoke.resolve()
         return
       }
       action(session)

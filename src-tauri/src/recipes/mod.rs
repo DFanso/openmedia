@@ -4,7 +4,8 @@ mod schema;
 mod selector;
 
 pub use compile::{OptionChoices, page_script};
-pub use schema::{OptionGroup, Recipe};
+pub use schema::{Meta, OptionGroup, Origin, Recipe, Rule, SiteOption, Target};
+pub(crate) use selector::validate_selector;
 
 use std::{
     collections::BTreeMap,
@@ -13,7 +14,6 @@ use std::{
     sync::{PoisonError, RwLock},
 };
 
-use schema::Origin;
 use url::Url;
 
 use crate::error::{Error, Result};
@@ -63,15 +63,20 @@ pub struct Recipes {
     bundled: Vec<Recipe>,
     dir: PathBuf,
     forks: RwLock<BTreeMap<String, Recipe>>,
+    custom: RwLock<BTreeMap<String, Recipe>>,
 }
 
+/// Ids of recipes the user or the assistant made for a site the app ships no recipe for.
+const CUSTOM_PREFIX: &str = "custom.";
+
 impl Recipes {
-    /// Loads the bundled recipes and every valid fork in `dir`. A fork file that is unreadable,
-    /// invalid, or for a recipe that is no longer bundled is skipped, so a damaged file can never
-    /// stop the app from starting; the bundled recipe applies instead.
+    /// Loads the bundled recipes and every valid fork or custom recipe in `dir`. A file that is
+    /// unreadable, invalid, or neither a fork of a bundled recipe nor a `custom.` recipe is skipped,
+    /// so a damaged file can never stop the app from starting; the bundled recipe applies instead.
     pub fn load(dir: PathBuf) -> Result<Self> {
         let bundled = bundled()?;
         let mut forks = BTreeMap::new();
+        let mut custom = BTreeMap::new();
         for entry in fs::read_dir(&dir).into_iter().flatten().flatten() {
             let path = entry.path();
             if path.extension().is_none_or(|extension| extension != "json") {
@@ -82,20 +87,25 @@ impl Recipes {
             };
             if let Ok(fork) = parse_fork(&bundled, &text) {
                 forks.insert(fork.id.clone(), fork);
+            } else if let Ok(recipe) = parse_custom(&text) {
+                custom.insert(recipe.id.clone(), recipe);
             }
         }
         Ok(Self {
             bundled,
             dir,
             forks: RwLock::new(forks),
+            custom: RwLock::new(custom),
         })
     }
 
     pub fn all(&self) -> Vec<Recipe> {
         let forks = self.forks.read().unwrap_or_else(PoisonError::into_inner);
+        let custom = self.custom.read().unwrap_or_else(PoisonError::into_inner);
         self.bundled
             .iter()
             .map(|recipe| forks.get(&recipe.id).unwrap_or(recipe).clone())
+            .chain(custom.values().cloned())
             .collect()
     }
 
@@ -170,6 +180,26 @@ impl Recipes {
             .remove(id);
         Ok(())
     }
+
+    /// Saves a recipe the assistant (or the user) made: a changed copy of a bundled recipe if the
+    /// id is a bundled one, otherwise a `custom.` recipe for a site the app ships none for. It is
+    /// validated again here, whatever produced it.
+    pub fn save_made(&self, recipe: &Recipe) -> Result<Recipe> {
+        let json = serde_json::to_string(recipe)?;
+        if self.bundled_version(&recipe.id).is_some() {
+            return self.save_fork(&json);
+        }
+        let saved = parse_custom(&json)?;
+        write_atomically(
+            &self.dir.join(format!("{}.json", saved.id)),
+            &serde_json::to_vec_pretty(&saved)?,
+        )?;
+        self.custom
+            .write()
+            .unwrap_or_else(PoisonError::into_inner)
+            .insert(saved.id.clone(), saved.clone());
+        Ok(saved)
+    }
 }
 
 fn parse_fork(bundled: &[Recipe], text: &str) -> Result<Recipe> {
@@ -179,6 +209,28 @@ fn parse_fork(bundled: &[Recipe], text: &str) -> Result<Recipe> {
         && bundled.iter().any(|recipe| recipe.id == fork.id);
     if is_fork {
         Ok(fork)
+    } else {
+        Err(Error::UnknownSite)
+    }
+}
+
+fn parse_custom(text: &str) -> Result<Recipe> {
+    if text.len() > MAX_FORK_BYTES {
+        return Err(Error::Recipe("the recipe is too large".into()));
+    }
+    let recipe = Recipe::parse(text)?;
+    let id_is_safe = recipe.id.len() <= 80
+        && recipe.id.strip_prefix(CUSTOM_PREFIX).is_some_and(|rest| {
+            !rest.is_empty()
+                && rest
+                    .chars()
+                    .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '.' || c == '-')
+        });
+    if id_is_safe
+        && matches!(recipe.origin, Origin::User | Origin::Ai)
+        && recipe.forked_from.is_none()
+    {
+        Ok(recipe)
     } else {
         Err(Error::UnknownSite)
     }
@@ -513,5 +565,54 @@ mod tests {
         assert!(
             Recipe::parse(&base(&hide("a")).replace("https://a.com/*", "https://*/*")).is_err()
         );
+    }
+
+    fn custom_recipe(id: &str, origin: &str) -> Recipe {
+        Recipe::parse(&format!(
+            r#"{{"schema":1,"id":"{id}","name":"example.org","version":"1.0.0","origin":"{origin}","match":["https://*.example.org/*"],
+              "options":[{{"id":"mine","label":"Mine","description":"d","group":"content","default":true}}],
+              "rules":[{{"id":"r","label":"l","type":"hide","option":"mine","target":{{"css":".x"}}}}]}}"#
+        ))
+        .unwrap()
+    }
+
+    #[test]
+    fn a_made_recipe_for_an_unbundled_site_is_listed_applied_and_survives_a_restart() {
+        let dir = tempfile::tempdir().unwrap();
+        let folder = dir.path().join("recipes");
+        let recipes = Recipes::load(folder.clone()).unwrap();
+        let saved = recipes
+            .save_made(&custom_recipe("custom.example.org", "ai"))
+            .unwrap();
+        assert_eq!(recipes.all().len(), bundled().unwrap().len() + 1);
+        let page = Url::parse("https://www.example.org/a").unwrap();
+        assert_eq!(recipes.for_url(&page).map(|r| r.id), Some(saved.id.clone()));
+        assert!(
+            recipes
+                .script(&OptionChoices::new())
+                .unwrap()
+                .contains(".x{display:none!important}")
+        );
+        let restarted = Recipes::load(folder).unwrap();
+        assert_eq!(restarted.get("custom.example.org"), Some(saved));
+    }
+
+    #[test]
+    fn a_made_recipe_for_a_bundled_site_becomes_a_fork_and_bad_ids_or_origins_are_refused() {
+        let dir = tempfile::tempdir().unwrap();
+        let recipes = Recipes::load(dir.path().join("recipes")).unwrap();
+        let fork = recipes
+            .save_made(&custom_recipe("reddit.default", "ai"))
+            .unwrap();
+        assert!(fork.forked_from.is_some());
+        for bad in [
+            custom_recipe("other.example.org", "ai"),
+            custom_recipe("custom.Example/../x", "ai"),
+            custom_recipe("custom.example.org", "bundled"),
+            custom_recipe("custom.example.org", "imported"),
+        ] {
+            assert!(recipes.save_made(&bad).is_err(), "{}", bad.id);
+        }
+        assert_eq!(recipes.all().len(), bundled().unwrap().len());
     }
 }

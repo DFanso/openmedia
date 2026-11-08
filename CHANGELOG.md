@@ -8,6 +8,18 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-08
 
+### feat(browsing): favorites, connected assistant, site icons and daily usage controls
+
+**Change:** Favorite stars on the current page and History, offline icons for all 18 bundled recipes, shared cached icons for custom sites/history, and collapsed-by-default Settings sections. The command bar now uses the active BYOK provider through redacted preview, validated proposals and explicit accept/reject instead of always reporting it disconnected.
+
+**Usage:** The fan's Usage button sits above History. Configure warnings and daily limits for any site; top notices warn, while native iOS blur shields stop exhausted sessions' interaction, navigation, loads and media. Other sites remain usable; midnight and policy changes re-evaluate blocks.
+
+**Verified:** TypeScript, ESLint, Prettier, 172 frontend tests, 172 app Rust tests plus 10 plugin tests, Clippy, production build, iOS Swift compilation and domain checks. Production-shell smoke with in-memory IPC exercised favorite stars, History icons, provider preview/send/accept, collapsed Settings, warning display, per-site blocking and policy removal. All 18 PNGs decoded at 96×96 and match their recorded hashes; the icon pipeline reuses its cache offline and a mocked redirect smoke confirmed icon services are rejected before contact.
+
+**Unverified:** Physical-device interactions and authenticated calls to a real provider. Native media suspension and shields compiled but were not exercised on a device. Limits do not suspend arbitrary page JavaScript.
+
+**PR:** [#23](https://github.com/skepjandi/openmedia/pull/23)
+
 ### feat(web): simple loader while a site opens
 
 **Change:** Show a small accent spinner in the page area until the active session paints or finishes loading; errors dismiss it and ready sessions switch without it. Uses existing page events, follows the app theme, and respects reduced motion.

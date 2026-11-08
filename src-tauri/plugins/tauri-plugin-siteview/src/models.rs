@@ -130,8 +130,29 @@ pub struct FetchFaviconRequest {
     pub url: String,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FaviconResponse {
     pub data_url: Option<String>,
+}
+
+/// Blocks or unblocks one session natively: the page is covered by a native shield, takes no
+/// touches, stops loading and stops playing media. Rust-only: it is deliberately not a Tauri
+/// command and has no permission, so no webview can call it.
+#[derive(Debug, Clone, Deserialize)]
+pub struct SetBlockedRequest {
+    pub session: String,
+    pub blocked: bool,
+}
+
+/// A script for the active page. Rust-only: not a Tauri command, never reachable from a webview.
+#[derive(Debug, Clone, Deserialize)]
+pub struct EvaluateRequest {
+    /// A JavaScript expression whose value is JSON-serializable.
+    pub script: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct EvaluateResponse {
+    pub json: String,
 }

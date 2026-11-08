@@ -98,6 +98,8 @@ A single black or white frame at the moment a new page is revealed remained afte
 
 **Found while testing:** a synchronous Tauri command that calls into the plugin deadlocks the app (it blocks the main thread waiting for native code that needs the main thread). Commands that reach native code must be `async`; see `open_site`.
 
+**Usage controls (iOS):** daily blocking is a native blur shield attached to each affected session. It stops loading, persistently suspends media playback, blocks navigation and touch interaction, and preserves deferred recipe reloads until the session is unblocked. The Rust-only plugin method adds no webview capability. Native Swift compilation and standalone domain checks are automated; physical-device behavior remains unverified.
+
 **Decisions that follow:**
 
 - **iOS 17 is the minimum.** `forIdentifier:` is iOS 17+, and the Tauri iOS template defaults to 15, so `tauri.conf.json` sets `bundle.iOS.minimumSystemVersion` to 17.0. This resolves the roadmap's open question on older iOS versions.

@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useApp } from "../../app/store";
-import { iconsByHost } from "../../shared/favorites";
+import { useIconForUrl } from "../../shared/siteIcons";
 import { DownIcon, StarIcon } from "../../shared/icons";
 import type { OptionGroup, SiteSettings } from "../../shared/ipc";
 import { SiteTile } from "../../shared/SiteTile";
@@ -35,10 +35,7 @@ function SiteCard({ site }: { site: SiteSettings }) {
   const [open, setOpen] = useState(false);
   const favorites = useApp((s) => s.state?.favorites);
   const setSiteFavorite = useApp((s) => s.setSiteFavorite);
-  const icon = useMemo(() => {
-    if (!site.homepage) return undefined;
-    return iconsByHost(favorites ?? []).get(new URL(site.homepage).host);
-  }, [favorites, site.homepage]);
+  const icon = useIconForUrl(site.homepage ?? "", favorites ?? []);
   const hidden = site.options.filter((option) => option.enabled).length;
 
   return (

@@ -70,4 +70,12 @@ impl<R: Runtime> Siteview<R> {
     pub fn set_content_rule_lists(&self, _request: SetContentRuleListsRequest) -> Result<()> {
         Err(Error::DesktopUnsupported)
     }
+
+    pub fn set_blocked(&self, _request: SetBlockedRequest) -> Result<()> {
+        Err(Error::DesktopUnsupported)
+    }
+
+    pub fn evaluate(&self, _request: EvaluateRequest) -> Result<String> {
+        Err(Error::DesktopUnsupported)
+    }
 }

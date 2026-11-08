@@ -18,6 +18,10 @@ pub enum Error {
     BridgeMessageTooLarge(usize),
     #[error("bridge message is not valid json")]
     BridgeMessageInvalid,
+    #[error("the script is empty or larger than {0} bytes")]
+    InvalidScript(usize),
+    #[error("the script result is larger than {0} bytes")]
+    EvaluateResultTooLarge(usize),
     #[cfg(mobile)]
     #[error(transparent)]
     PluginInvoke(#[from] tauri::plugin::mobile::PluginInvokeError),

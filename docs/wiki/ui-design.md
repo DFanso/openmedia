@@ -8,20 +8,20 @@ The web is the product. The screen is one full-bleed page, from under the status
 
 | Gesture | Result |
 |---------|--------|
-| Tap the button | Command bar slides in from the top. Type an address to open it. The AI prompt lives here too, but is **not connected yet** (see below) |
-| Hold the button (about 380 ms) | The button grows about 30% and a thin progress ring fills along its edge; then the favorites fan out on an arc, with stats, history and settings tucked apart in the edge column above or below (settings at the bottom of the stack, history directly above it, stats directly above history) |
-| Hold, slide onto an item, lift | Opens that favorite, stats, history, or settings |
+| Tap the button | Command bar slides in from the top. Addresses open directly; requests use the active AI provider with a redacted payload preview before sending |
+| Hold the button (about 380 ms) | The favorites fan out with Usage, History and Settings in the edge column: Usage directly above History, Settings below |
+| Hold, slide onto an item, lift | Opens that favorite, Usage, History, or Settings |
 | Hold, lift, then tap an item | Same, in two steps |
 | Drag the button | Moves it; on release it snaps to the nearer left or right edge and remembers its place |
 | Pull the page down from the top | Native pull-to-refresh (`UIRefreshControl`); only where the page's own scroll view is at the top |
 
-Defaults: Instagram, Facebook, Twitter, Reddit, YouTube. Each fan item shows the site's icon when one is known, otherwise a monogram, on clear glass. The command bar also has back, forward and reload. Favorites change only in Settings: the command bar has no "add this page" button, so browsing never alters the list. The list has no length limit, but the fan shows only the first six (`QUICK_ACCESS_LIMIT` in `shared/favorites.ts`): the quick-access menu. Order decides membership; moving a favorite up in Settings puts it there.
+Defaults: Instagram, Facebook, Twitter, Reddit, YouTube. Each fan item shows the site's icon when known, otherwise a monogram. The command bar has back, forward, reload and a favorite star for the current page; History rows also have independent favorite stars. Browsing alone never changes favorites. The first six favorites (`QUICK_ACCESS_LIMIT`) form the quick-access menu; Settings can reorder an unlimited list.
 
 **Opening a site:** a small accent spinner sits in the page area until the active session first paints or finishes loading. It uses the existing native page state, stays out of the touch router, and stops on errors; switching to a ready session shows no loader. Reduced-motion mode keeps the ring still. The startup splash still covers the first load.
 
 ## Settings
 
-Six sections in one scrolling screen (the settings glyph is a sliders icon). Settings and History share one page frame (`shared/Screen.tsx`): a large title, a hairline under the header, and a scrolling body of rounded groups whose rows are separated by hairlines. Site icons come from the favorites' cached icons, with a monogram tile otherwise (`shared/SiteTile.tsx`).
+Six collapsed-by-default disclosure sections in one scrolling screen. Settings and History share the `shared/Screen.tsx` page frame. Expand a section by tapping its heading or using the keyboard. Closing and reopening Settings restores the compact default.
 
 - **Appearance:** System, Light or Dark. Stored in `library.json` and applied to the app and, through the native view's `overrideUserInterfaceStyle`, to sites that follow `prefers-color-scheme`.
 - **Browsing:** the global ad-blocking switch for the bundled EasyList and EasyPrivacy rules (changing it reloads the open pages); the floating back button switch; and the shared bottom margin, a slider (0 to 200 px, saved when released) that keeps the bottom of every page clear, for sites whose menus slide under the screen edge. A recipe can override the margin; "Use the shared margin" removes the override. The shell asks Rust which site the current page belongs to (`bottom_margin_for`) and shrinks the native view's rectangle from the bottom; the strip underneath shows the app background.
@@ -30,25 +30,26 @@ Six sections in one scrolling screen (the settings glyph is a sliders icon). Set
 - **AI assistant:** bring-your-own-key providers. See [AI Assistant](./ai-assistant.md#implemented-provider-settings).
 - **Data and help:** "Clear history" (with a confirm step) empties the searched addresses and forgets the last page, like a browser; favorites, open sessions and logins are untouched. "Replay" marks the first-run guide unseen and shows it again.
 
-## Stats
+## Usage
 
-The stats button (bars icon) sits at the top of the edge column, directly above history. It opens a full-screen sheet with a Today / 7 days / 30 days switch (7 days by default), the total time on sites for the period, and one row per site, busiest first, with a bar. Tapping a site expands the parts of it that were used, again busiest first, each with a bar. A site's name comes from the bundled recipe that covers it, else from a favorite on that domain, else it is the host (for example `youtube.com`).
+The Usage button (bars icon) sits directly above History. The sheet combines daily warning and limit settings with the existing Today / 7 days / 30 days reports (7 days by default), per-site totals and expandable section breakdowns.
 
-- **What counts.** Seconds while the app is in the foreground (`document.visibilityState`), a site page is the active page, and no sheet or the guide is in front of it. The shell ticks every 5 s and on every page, sheet, hide or focus change; each step is credited at most 10 s, so a suspended app never banks its sleep. Seconds are written to Rust in batches (about every 30 s, and whenever the user leaves a page). The logic is pure and unit-tested (`features/stats/accumulator.ts`).
+- **Daily controls.** Configure any site address, including sites that are not favorites. Warning and limit thresholds are optional whole minutes, up to one day; when both are set the warning must precede the limit. A warning slides in at the top once per site, local day and threshold. At the limit, a native blur shield covers every live session for that site, stops loading, suspends media playback and prevents interaction/navigation. Other sites remain usable. Editing/removing the limit or reaching local midnight re-evaluates the block. This is not a JavaScript-process suspension or a parental-control lock.
+- **What counts.** Foreground seconds on an active site with no sheet or guide in front. The shell checks every second, caps a delayed tick at 10 seconds, keeps fractional seconds and flushes about every 30 seconds or on leaving. Blocked sites accrue no further time. An ordinary midnight tick is split between the two dates.
 - **Sites** are keyed by the session's registrable domain (`scope`), so `m.youtube.com` and `www.youtube.com` are one row.
 - **Sections** come from the first path segment of the page address only, generic for every site: `/watch`, `/shorts`, `/reels`, `/explore`, `/messages` show as Watch, Shorts, Reels, Explore, Messages. A segment is kept only when it is 1-24 characters of `a-z 0-9 _ -` (lowercased) and not all digits; an empty path is **Home**, and anything else (a `@handle`, an id, non-Latin text) is **Other**. Rust validates the same rule again.
 - **Privacy statement** (shown on the sheet): this information stays on this phone and is never sent anywhere; OpenMedia has no server and keeps no copy; only site names, section names and seconds are stored, never full addresses, searches or page titles. **Clear stats** (with a confirm step) wipes it.
 
 ## History
 
-The history button sits in the fan directly above settings, and the stats button directly above it. It opens a full-screen list of the addresses the user typed, newest first, up to 100: a site tile, the host, and a faint second line for the path. A repeat moves to the top. Tapping an entry follows the [session](#sessions) rules above.
+The History button sits above Settings and below Usage. It lists up to 100 typed addresses, newest first, with cached/bundled site icons and an independent favorite star. Repeated addresses move to the top. Tapping an entry follows the session rules below.
 
 ## Onboarding
 
 A four-step full-screen guide shows on first launch. Whether it has been seen is stored in `library.json` (`onboarded`). Each step has a looping illustration and a short line:
 
 1. **The web, minus the noise.** What the app is, and that it hides things like app prompts.
-2. **One button.** Tap to go to an address; the AI assistant is described as "soon".
+2. **One button.** Tap to open an address or request a change; connect a provider in Settings and preview the redacted payload before sending.
 3. **Hold for favorites.** An animated fan pops out of a pulsing button; settings sits apart.
 4. **Make it yours.** Drag to either edge; change favorites in Settings.
 
@@ -75,7 +76,9 @@ Tokens are in `src/index.css` (`@theme`).
 
 ## Favicons
 
-Each favorite's icon is fetched natively from the site itself, never from an icon service: the page's `<link rel="…icon">` tags (touch icons first), then `/apple-touch-icon.png` and `/favicon.ico`. Only a decodable image under 400 KB is accepted, and it is re-rendered as a 96 px PNG. Rust caches the result by host in `library.json` as a `data:` URL, and only accepts PNG data URLs under 200,000 characters. The fetch runs when the app starts and after favorites change.
+`yarn build` first runs `yarn icons:fetch`: missing catalog icons are downloaded and converted to compact PNGs, while the committed cache lets ordinary builds run offline. The 18 bundled icons live under `src/assets/site-icons/`; the generated domain map comes from the recipes, and `manifest.json` records source URLs and hashes. Refreshing assets requires macOS `sips` or ImageMagick. Catalog icons make no runtime network requests.
+
+Other sites are fetched natively when added as favorites or entered/opened from History, never on every startup. The downloader uses the site's icon links, then touch-icon/favicon defaults, restricts links and redirects to the site's domain, accepts at most 400 KB and renders a 96 px PNG. Rust caches by host with domain fallback in `library.json`; History and favorites share it. Startup reads only the local cache; missing icons use monograms.
 
 ## Sessions
 
@@ -102,11 +105,10 @@ A hidden session whose web content process dies is dropped natively and the shel
 
 - **Layering.** The native site view is *below* the transparent shell, so the button draws over the page. A native `TouchRouter` sends a touch to the shell inside the rectangles the shell reports (`[data-hit]` elements), and to the page everywhere else. Details: [Platform Support](./platform-support.md#layout-model-mobile).
 - **Gesture logic** is a pure state machine (`features/fab/gesture.ts`) and the layout math is pure (`features/fab/geometry.ts`), both unit-tested. The fan layout searches rotations, side flips and a compacting arc until every item fits on screen, for 0 to 6 favorites at any height; the edge column holds settings, history and stats.
-- **Persistence.** Favorites, history, the last page, theme, icons, provider settings and the onboarding flag are in `library.json` (Rust). Library format v4 adds `history` and reads v2 and v3 files; v2 files also get YouTube appended, but only if the saved favorites still exactly match the original four defaults. Customized lists are unchanged, and removing YouTube after the upgrade is respected. Time on sites is in a separate `usage.json` next to it (see [Stats](#stats)): local `YYYY-MM-DD` -> host -> section -> seconds, written atomically, pruned to the last 30 days and capped (200 hosts per day, 60 sections per host, 3600 s per write); a corrupt file starts empty. Commands `record_usage`, `get_usage` and `clear_usage` are shell-only. The button position is a UI preference in `localStorage`, as a fraction of height so rotation keeps its place.
+- **Persistence.** Favorites, history, theme, cached icons, provider settings, AI preview preference and onboarding remain in `library.json` (format v4, preserving v2/v3 upgrades). Local usage is separate in `usage.json`: date -> host -> section -> seconds, plus optional daily policies. Totals retain 30 days; clearing totals preserves policies. All usage commands are shell-only. Day changes reload that date's persisted totals before enforcement resumes. Button position and warning-dismissal bookkeeping are local UI preferences.
 
 ## Not connected yet
 
-- **AI assistant.** The prompt box accepts addresses only. Typing a request shows "isn't connected yet". Providers can be saved and tested; using them needs the page engine and the provider adapters.
 - **Multiple profiles.** One hidden profile owns the site's cookies. Profile management is deferred.
 - **Android and desktop.** iOS first.
 
@@ -117,5 +119,5 @@ A hidden session whose web content process dies is dropped natively and the shel
 - With no bottom bar the page runs under the home indicator; a site's own bottom controls may sit close to it.
 - The fan has no sound or haptics.
 - Closing sessions for memory is by count, idle time and the OS memory warning, not by measured memory or CPU: WebKit has no public per-page CPU or memory figure that this app could read [INFERENCE: not exhaustively checked]. See [Sessions](#sessions).
-- Stats count foreground time on a site page. Time while a sheet is open, in the background, or on a page that is still loading its first address is not counted, and a page that runs audio or video in the background is not counted either. Midnight is the shell's local date at the time of each write, so up to about 30 s around it may land on the neighbouring day. Per-page areas use the first path segment only, so sites that keep everything under one path (or in a single-page app that never changes the address) show as one area.
-- History keeps the typed address only: no page title, icon or time, and no per-entry delete (only Clear history).
+- Usage counts foreground time only, not background audio/video. Generic path segments define sections; sites that never change their path show as one area. Native blocking prevents interaction, navigation, loads and media playback, but does not suspend arbitrary page JavaScript.
+- History stores typed addresses only, without page titles or timestamps; icons are cached separately by host. Per-entry delete is not implemented.

@@ -1,18 +1,25 @@
+use std::collections::BTreeMap;
+
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager, State};
 use tauri_plugin_siteview::{
-    ContentRuleList, FetchFaviconRequest, OpenRequest, Rect, SessionRequest,
+    ContentRuleList, EvaluateRequest, FetchFaviconRequest, OpenRequest, Rect, SessionRequest,
     SetContentRuleListsRequest, SetDocumentStartScriptRequest, SetRectRequest, SiteviewExt,
     validate::{parse_session_id, parse_web_url},
 };
 use url::Url;
 use uuid::Uuid;
+use zeroize::Zeroizing;
 
 use crate::ad_block::AdBlock;
 use crate::ai::{
     ProviderConfig, ProviderInput,
+    agent::{
+        self, Accepted, Agent, Model, Page, PrepareInput, PreparedRequest, Proposal, RecipeContext,
+    },
     connection::{list_models, models_request},
-    validate_key,
+    prompt::Prompt,
+    provider, validate_key,
 };
 use crate::boot::{Boot, Startup};
 use crate::error::{Error, Result};
@@ -122,16 +129,25 @@ pub fn set_theme(library: State<'_, Library>, theme: Theme) -> Result<()> {
     library.set_theme(theme)
 }
 
-/// Fetches icons for favorites that have none, from the sites themselves. Async because it calls
-/// native code (see `open_site`).
+/// Reads the local favicon cache without making a network request.
 #[tauri::command]
-pub async fn refresh_icons(app: AppHandle, library: State<'_, Library>) -> Result<Vec<Favorite>> {
-    for (host, url) in library.favorites_missing_icons()? {
+pub fn get_icons(library: State<'_, Library>) -> Result<BTreeMap<String, String>> {
+    library.icons()
+}
+
+/// Fetches missing icons only when sites are added or entered in history.
+#[tauri::command]
+pub async fn refresh_icons(
+    app: AppHandle,
+    library: State<'_, Library>,
+    urls: Vec<String>,
+) -> Result<BTreeMap<String, String>> {
+    for (host, url) in library.missing_icons(&urls)? {
         if let Ok(Some(icon)) = app.siteview().fetch_favicon(FetchFaviconRequest { url }) {
             library.set_icon(&host, &icon)?;
         }
     }
-    library.favorites()
+    library.icons_for(&urls)
 }
 
 /// The site view reports its errors on this event; the shell shows them in a banner.
@@ -352,6 +368,12 @@ pub fn set_back_button(library: State<'_, Library>, enabled: bool) -> Result<()>
     library.set_back_button(enabled)
 }
 
+/// Turns the "show what will be sent" step of the AI assistant on or off.
+#[tauri::command]
+pub fn set_ai_preview(library: State<'_, Library>, enabled: bool) -> Result<()> {
+    library.set_ai_preview(enabled)
+}
+
 /// A provider as the shell sees it: settings plus whether a key exists, never the key itself.
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -452,6 +474,123 @@ pub async fn ai_test(
     let provider = library.provider(id)?;
     let key = secrets.0.get(id)?.ok_or(Error::NoKey)?;
     list_models(models_request(provider.kind, &provider.base_url, &key)).await
+}
+
+/// The page the user is looking at, as the assistant reads and previews it. The plugin's
+/// `evaluate` is Rust-only: no webview can call it.
+struct LivePage<'a>(&'a AppHandle);
+
+impl Page for LivePage<'_> {
+    fn evaluate(&self, script: String) -> Result<String> {
+        Ok(self.0.siteview().evaluate(EvaluateRequest { script })?)
+    }
+}
+
+/// The user's active provider. The key is read here, in Rust, and never leaves this struct except
+/// inside the provider request.
+struct LiveModel {
+    config: ProviderConfig,
+    key: Zeroizing<String>,
+}
+
+impl Model for LiveModel {
+    async fn complete(&self, prompt: &Prompt, schema: &serde_json::Value) -> Result<String> {
+        provider::complete(&self.config, &self.key, prompt, schema).await
+    }
+}
+
+fn active_provider(
+    library: &Library,
+    secrets: &Secrets,
+) -> Result<(ProviderConfig, Zeroizing<String>)> {
+    let settings = library.ai_settings()?;
+    let config = settings
+        .active_id
+        .and_then(|id| settings.providers.into_iter().find(|p| p.id == id))
+        .ok_or_else(|| Error::Connection("Choose an AI provider in Settings first.".to_owned()))?;
+    let key = secrets.0.get(config.id)?.ok_or(Error::NoKey)?;
+    Ok((config, key))
+}
+
+/// Reads the page and builds what would be sent; nothing leaves the device. Async for the same
+/// reason as `open_site`.
+#[tauri::command]
+pub async fn ai_prepare(
+    app: AppHandle,
+    library: State<'_, Library>,
+    recipes: State<'_, Recipes>,
+    secrets: State<'_, Secrets>,
+    agent: State<'_, Agent>,
+    request: String,
+) -> Result<PreparedRequest> {
+    let (provider, _key) = active_provider(&library, &secrets)?;
+    let choices = library.site_options()?;
+    agent::prepare(
+        &agent,
+        &LivePage(&app),
+        PrepareInput {
+            request,
+            provider,
+            context: |host: &str, path: &str| {
+                let base = Url::parse(&format!("https://{host}{path}"))
+                    .ok()
+                    .and_then(|url| recipes.for_url(&url));
+                RecipeContext {
+                    base_is_bundled: base
+                        .as_ref()
+                        .is_some_and(|recipe| recipes.bundled_version(&recipe.id).is_some()),
+                    option_states: base
+                        .as_ref()
+                        .and_then(|recipe| choices.get(&recipe.id).cloned())
+                        .unwrap_or_default(),
+                    base,
+                }
+            },
+        },
+    )
+}
+
+/// Sends the prepared request to the user's provider, previews the answer on the page and
+/// returns what it would change.
+#[tauri::command]
+pub async fn ai_send(
+    app: AppHandle,
+    library: State<'_, Library>,
+    secrets: State<'_, Secrets>,
+    agent: State<'_, Agent>,
+    id: Uuid,
+) -> Result<Proposal> {
+    let (config, key) = active_provider(&library, &secrets)?;
+    agent::send(&agent, &LivePage(&app), &LiveModel { config, key }, id).await
+}
+
+/// Saves the previewed change: a new switch in a changed copy of the site's recipe, or a new
+/// recipe for a site the app has none for. Then the page reloads under it.
+#[tauri::command]
+pub async fn ai_accept(
+    app: AppHandle,
+    library: State<'_, Library>,
+    recipes: State<'_, Recipes>,
+    agent: State<'_, Agent>,
+    id: Uuid,
+) -> Result<()> {
+    match agent::accept(&agent, &LivePage(&app), id)? {
+        Accepted::EnableOption {
+            recipe_id,
+            option_id,
+        } => library.set_site_option(&recipe_id, &option_id, true)?,
+        Accepted::SaveRecipe(recipe) => {
+            recipes.save_made(&recipe)?;
+        }
+    }
+    reload_script(&app, &library, &recipes)
+}
+
+/// Takes the preview off the page and forgets the request.
+#[tauri::command]
+pub async fn ai_reject(app: AppHandle, agent: State<'_, Agent>, id: Uuid) -> Result<()> {
+    agent::reject(&agent, &LivePage(&app), id);
+    Ok(())
 }
 
 #[cfg(test)]

@@ -31,6 +31,8 @@ expect(domain("shop.example.com.au"), "example.com.au", "com.au")
 expect(domain("foo.co.com"), "co.com", "three-letter tld is not a country code")
 expect(domain("localhost"), "localhost", "localhost")
 expect(domain("192.168.1.20"), "192.168.1.20", "ipv4 stays whole")
+expect(domain("example.com."), "example.com", "DNS terminal dot")
+expect(contains("example.com", "example.com."), true, "terminal dot within scope")
 
 expect(contains("instagram.com", "www.instagram.com"), true, "subdomain")
 expect(contains("instagram.com", "instagram.com"), true, "the scope itself")

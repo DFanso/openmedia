@@ -83,7 +83,11 @@ Each opened site is a session (a separate native web view) pinned to the registr
 
 History (the addresses the user typed) is stored in `library.json` on the device, like favorites, and holds no page content. "Clear history" removes it and the remembered last page.
 
-Usage stats (seconds per site and per first path segment, per local day, 30 days) are stored in `usage.json`, separate from `library.json`. They are written only by the shell through `record_usage`, `get_usage` and `clear_usage`, which are app commands, not plugin commands: no capability reaches them from a site view. Rust validates every call (date format, lowercase host, section `/`, `*` or `/` plus 1-24 of `a-z0-9_-`, 1-3600 seconds) and caps the number of hosts and sections, because the shell is not fully trusted. The file never holds an address, query, fragment or title, and nothing leaves the device (invariant 1). "Clear stats" wipes it.
+Usage stats (seconds per site and first path segment, per local day, 30 days) and daily policies are stored locally in `usage.json`. Shell-only app commands `record_usage`, `get_usage`, `clear_usage`, `get_usage_policies` and `set_usage_policy` validate dates, hosts, sections, seconds and policy bounds (1–86400 seconds, warning below limit, at most 200 policies). Clearing stats preserves policy settings. No full address, query, title or page content is stored or sent.
+
+The shell requests `set_usage_blocked` for a validated session UUID. It calls a Rust-only plugin method with no Tauri command, permission or capability of its own. iOS adds a native blur shield, stops loads, suspends media playback and refuses navigation/interaction; a website cannot remove the shield or lift its own block. Other sessions remain usable. Limits are user-editable self-management controls, not tamper-proof parental controls, and they do not suspend arbitrary page JavaScript.
+
+Custom/history favicons are fetched with an ephemeral, cookie-free native URLSession. Icon links and redirects must remain on the page's registrable domain; responses are capped at 400 KB, images at 4096 px per dimension and output at 96 px PNG. Bundled recipe icons are packaged assets, with no runtime icon-service requests.
 
 ## Privacy
 

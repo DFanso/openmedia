@@ -6,7 +6,7 @@ use tauri::{
 };
 
 use crate::models::*;
-use crate::validate::parse_bridge_body;
+use crate::validate::{check_evaluate_result, parse_bridge_body, wrap_evaluate_script};
 use crate::{Error, Result};
 
 pub const STATE_EVENT: &str = "siteview:state";
@@ -148,5 +148,25 @@ impl<R: Runtime> Siteview<R> {
             "setContentRuleLists",
             serde_json::json!({ "lists": request.lists }),
         )
+    }
+
+    /// Covers one session with a native shield and stops it: no touches, no loading, no media,
+    /// no navigation. Rust-only: the plugin registers no command for it, so neither the shell
+    /// nor a site view can reach it.
+    pub fn set_blocked(&self, request: SetBlockedRequest) -> Result<()> {
+        self.run(
+            "setBlocked",
+            serde_json::json!({ "session": request.session, "blocked": request.blocked }),
+        )
+    }
+
+    /// Evaluates `request.script` (an expression) in the active session's main frame and returns
+    /// its value as JSON text. Rust-only: it is deliberately not a Tauri command and has no
+    /// permission, so no webview can call it. The result is hostile page data.
+    pub fn evaluate(&self, request: EvaluateRequest) -> Result<String> {
+        let script = wrap_evaluate_script(&request.script)?;
+        let response: EvaluateResponse =
+            self.run("evaluate", serde_json::json!({ "script": script }))?;
+        check_evaluate_result(response.json)
     }
 }

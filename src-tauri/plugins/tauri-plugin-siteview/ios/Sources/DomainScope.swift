@@ -21,7 +21,7 @@ enum DomainScope {
   /// `www.instagram.com` and `m.instagram.com` both give `instagram.com`; `news.bbc.co.uk` gives
   /// `bbc.co.uk`. Hosts without a registrable part (IP addresses, `localhost`) are kept whole.
   static func registrableDomain(of host: String) -> String {
-    let host = host.lowercased()
+    let host = (host.hasSuffix(".") ? String(host.dropLast()) : host).lowercased()
     let labels = host.split(separator: ".", omittingEmptySubsequences: true).map(String.init)
     guard labels.count > 2, !labels.allSatisfy({ Int($0) != nil }) else { return host }
     let tld = labels[labels.count - 1]
@@ -33,7 +33,8 @@ enum DomainScope {
   /// True for the scope itself and any subdomain of it, never for a lookalike such as
   /// `notinstagram.com`.
   static func contains(scope: String, host: String) -> Bool {
-    let host = host.lowercased()
+    let host = (host.hasSuffix(".") ? String(host.dropLast()) : host).lowercased()
+    let scope = (scope.hasSuffix(".") ? String(scope.dropLast()) : scope).lowercased()
     return host == scope || host.hasSuffix("." + scope)
   }
 

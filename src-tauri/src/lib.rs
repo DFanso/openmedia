@@ -8,6 +8,7 @@ mod recipes;
 mod secrets;
 mod sites;
 mod usage;
+mod usage_commands;
 
 use tauri::Manager;
 
@@ -32,6 +33,7 @@ pub fn run() {
                 tauri::async_runtime::spawn_blocking(move || ad_block.rule_lists());
             }
             app.manage(usage::Usage::load(data_dir.join("usage.json"))?);
+            app.manage(ai::agent::Agent::default());
             app.manage(commands::Secrets(Box::new(secrets::KeychainStore)));
             Ok(())
         })
@@ -45,10 +47,14 @@ pub fn run() {
             commands::record_usage,
             commands::get_usage,
             commands::clear_usage,
+            usage_commands::get_usage_policies,
+            usage_commands::set_usage_policy,
+            usage_commands::set_usage_blocked,
             commands::complete_onboarding,
             commands::reset_onboarding,
             commands::set_theme,
             commands::refresh_icons,
+            commands::get_icons,
             commands::open_site,
             commands::adopt_boot_session,
             commands::set_ad_block,
@@ -67,6 +73,11 @@ pub fn run() {
             commands::ai_remove_key,
             commands::ai_set_active,
             commands::ai_test,
+            commands::set_ai_preview,
+            commands::ai_prepare,
+            commands::ai_send,
+            commands::ai_accept,
+            commands::ai_reject,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

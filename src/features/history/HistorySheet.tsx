@@ -1,7 +1,8 @@
-import { useMemo } from "react";
 import { useApp } from "../../app/store";
-import { iconsByHost } from "../../shared/favorites";
-import { ArrowIcon, HistoryIcon } from "../../shared/icons";
+import { displayHost, isFavoriteSite, toggleSiteFavorite } from "../../shared/favorites";
+import { ArrowIcon, HistoryIcon, StarIcon } from "../../shared/icons";
+import { useIconForUrl } from "../../shared/siteIcons";
+import type { Favorite } from "../../shared/ipc";
 import { Screen } from "../../shared/Screen";
 import { SiteTile } from "../../shared/SiteTile";
 import { describeAddress } from "./address";
@@ -15,7 +16,8 @@ export function HistorySheet() {
   const favorites = useApp((s) => s.state?.favorites);
   const closeSheet = useApp((s) => s.closeSheet);
   const openHistory = useApp((s) => s.openHistory);
-  const icons = useMemo(() => iconsByHost(favorites ?? []), [favorites]);
+  const saveFavorites = useApp((s) => s.saveFavorites);
+  const favoriteList = favorites ?? [];
   if (!open) return null;
 
   return (
@@ -40,33 +42,65 @@ export function HistorySheet() {
         </div>
       ) : (
         <ul className="divide-y divide-hair overflow-hidden rounded-2xl border border-hair bg-paper/[0.04]">
-          {history.map((url) => {
-            const { host, rest } = describeAddress(url);
-            return (
-              <li key={url}>
-                <button
-                  type="button"
-                  onClick={() => openHistory(url)}
-                  className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-paper/[0.06]"
-                >
-                  <SiteTile name={host} icon={icons.get(new URL(url).host)} />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-base font-medium">{host}</span>
-                    {rest && (
-                      <span className="mt-0.5 block truncate text-sm text-paper/50 tabular-nums">
-                        {rest}
-                      </span>
-                    )}
-                  </span>
-                  <span className="shrink-0 text-paper/35">
-                    <ArrowIcon />
-                  </span>
-                </button>
-              </li>
-            );
-          })}
+          {history.map((url) => (
+            <HistoryRow
+              key={url}
+              url={url}
+              favorites={favoriteList}
+              onOpen={() => openHistory(url)}
+              onToggle={() => void saveFavorites(toggleSiteFavorite(favoriteList, url))}
+            />
+          ))}
         </ul>
       )}
     </Screen>
+  );
+}
+
+interface RowProps {
+  url: string;
+  favorites: Favorite[];
+  onOpen: () => void;
+  onToggle: () => void;
+}
+
+/** One address: the row opens it, and the star beside it is a button of its own. */
+function HistoryRow({ url, favorites, onOpen, onToggle }: RowProps) {
+  const { host, rest } = describeAddress(url);
+  const site = displayHost(url);
+  const favorited = isFavoriteSite(favorites, url);
+  const starLabel = favorited ? `Remove ${site} from favorites` : `Add ${site} to favorites`;
+  const icon = useIconForUrl(url, favorites);
+
+  return (
+    <li className="flex items-center">
+      <button
+        type="button"
+        onClick={onOpen}
+        className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3 text-left active:bg-paper/[0.06]"
+      >
+        <SiteTile name={host} icon={icon} />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-base font-medium">{host}</span>
+          {rest && (
+            <span className="mt-0.5 block truncate text-sm text-paper/50 tabular-nums">{rest}</span>
+          )}
+        </span>
+        <span className="shrink-0 text-paper/35">
+          <ArrowIcon />
+        </span>
+      </button>
+      <button
+        type="button"
+        aria-pressed={favorited}
+        aria-label={starLabel}
+        onClick={onToggle}
+        className={`grid size-12 shrink-0 place-items-center active:bg-paper/[0.06] ${
+          favorited ? "text-accent" : "text-paper/45"
+        }`}
+      >
+        <StarIcon filled={favorited} />
+      </button>
+    </li>
   );
 }
