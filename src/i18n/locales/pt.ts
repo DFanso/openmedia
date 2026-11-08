@@ -199,6 +199,20 @@ export const pt: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Um favorito precisa de nome e endereço válido.",
 
+  "fab.incognito": "Anônimo",
+  "fab.leaveIncognito": "Sair do modo anônimo",
+  "fab.leaveIncognitoHint": "Anônimo · toque para sair",
+  "incognito.authReason": "Mudar para favoritos anônimos",
+  "incognito.unlockReason": "Mostrar suas configurações anônimas",
+  "incognito.favoritesTitle": "Favoritos anônimos",
+  "incognito.favoritesNote":
+    "Mostrados no lugar dos seus favoritos enquanto o modo anônimo está ativo. Os primeiros {limit} formam o menu de acesso rápido. Abrir esta seção pede Face ID, Touch ID ou seu código a cada vez.",
+  "incognito.favoritesEmpty": "Nada aqui ainda. Adicione um favorito abaixo.",
+  "incognito.recipesTitle": "Receitas anônimas",
+  "incognito.recipesNote":
+    "Estes interruptores só valem com o modo anônimo ativo. Eles partem dos padrões de cada receita e nunca alteram suas receitas normais.",
+  "incognito.locked": "Bloqueado. Toque para desbloquear com Face ID, Touch ID ou seu código.",
+
   "recipes.title": "Receitas",
   "recipes.note":
     "Receitas para sites populares. Os prompts de instalação e os pop-ups que bloqueiam a página ficam ocultos por padrão; Reels, Shorts e as sugestões aparecem até você ocultá-los. A página é recarregada quando você muda um interruptor. Marque uma receita com uma estrela para adicionar o site aos seus favoritos.",

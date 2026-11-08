@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 
-function Icon({ children }: { children: ReactNode }) {
+function Icon({ children, size = 20 }: { children: ReactNode; size?: number }) {
   return (
     <svg
-      width="20"
-      height="20"
+      width={size}
+      height={size}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -94,5 +94,22 @@ export const StarIcon = ({ filled = false }: { filled?: boolean }) => (
 export const StatsIcon = () => (
   <Icon>
     <path d="M5 20V12M12 20V5M19 20v-5" />
+  </Icon>
+);
+
+/** A hat and glasses. Active fills the lenses, so the on state reads without color. */
+export const IncognitoIcon = ({ active = false, size }: { active?: boolean; size?: number }) => (
+  <Icon size={size}>
+    <path d="M3 11h18M6 11l1.6-5.3a1 1 0 0 1 1-.7h6.8a1 1 0 0 1 1 .7L18 11" />
+    <circle cx="8" cy="16.5" r="2.5" fill={active ? "currentColor" : "none"} />
+    <circle cx="16" cy="16.5" r="2.5" fill={active ? "currentColor" : "none"} />
+    <path d="M10.5 16.5h3" />
+  </Icon>
+);
+
+export const LockIcon = () => (
+  <Icon>
+    <rect x="5" y="11" width="14" height="9" rx="2" />
+    <path d="M8 11V8a4 4 0 0 1 8 0v3" />
   </Icon>
 );

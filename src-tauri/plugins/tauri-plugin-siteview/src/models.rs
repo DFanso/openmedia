@@ -169,3 +169,18 @@ pub struct EvaluateRequest {
 pub struct EvaluateResponse {
     pub json: String,
 }
+
+/// Asks the device owner to prove they are present: Face ID or Touch ID, with the device
+/// passcode as the system's own fallback. Rust-only: it is deliberately not a Tauri command and
+/// has no permission, so no webview can call it.
+#[derive(Debug, Clone, Deserialize)]
+pub struct AuthenticateRequest {
+    /// Why the app asks, shown by the system in its prompt.
+    pub reason: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AuthenticateResponse {
+    /// False when the person cancelled or failed the check; an unavailable check is an error.
+    pub authenticated: bool,
+}

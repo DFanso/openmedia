@@ -3,6 +3,7 @@ mod ai;
 mod boot;
 mod commands;
 mod error;
+mod incognito;
 mod library;
 mod recipes;
 mod secrets;
@@ -21,6 +22,7 @@ pub fn run() {
             let library = library::Library::load(data_dir.join("library.json"))?;
             let ad_block_enabled = library.ad_block_enabled()?;
             app.manage(library);
+            app.manage(incognito::Incognito::default());
             app.manage(recipes::Recipes::load(data_dir.join("recipes"))?);
             let ad_block = ad_block::AdBlock::bundled(app.path().app_cache_dir()?.join("ad-block"));
             app.manage(ad_block.clone());
@@ -50,6 +52,11 @@ pub fn run() {
             usage_commands::get_usage_policies,
             usage_commands::set_usage_policy,
             usage_commands::set_usage_blocked,
+            incognito::unlock_incognito,
+            incognito::enter_incognito,
+            incognito::exit_incognito,
+            incognito::get_incognito_favorites,
+            incognito::set_incognito_favorites,
             commands::complete_onboarding,
             commands::reset_onboarding,
             commands::set_theme,

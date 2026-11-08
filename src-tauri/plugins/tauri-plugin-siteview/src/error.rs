@@ -24,6 +24,8 @@ pub enum Error {
     InvalidScript(usize),
     #[error("the script result is larger than {0} bytes")]
     EvaluateResultTooLarge(usize),
+    #[error("the reason for the check must be 1-{0} characters without control characters")]
+    InvalidAuthReason(usize),
     #[cfg(mobile)]
     #[error(transparent)]
     PluginInvoke(#[from] tauri::plugin::mobile::PluginInvokeError),

@@ -38,6 +38,7 @@ export function App() {
   const reportError = useApp((s) => s.reportError);
   const theme = useApp((s) => s.state?.theme ?? "system");
   const locale = useApp(selectLocale);
+  const incognito = useApp((s) => s.incognito.active);
   const t = useT();
   const [idle, setIdle] = useState(false);
   useApplyTheme(theme);
@@ -48,6 +49,10 @@ export function App() {
     root.lang = locale;
     root.dir = localeInfo(locale).dir;
   }, [locale]);
+
+  useEffect(() => {
+    document.documentElement.dataset.incognito = String(incognito);
+  }, [incognito]);
 
   useEffect(() => startUsageTracking(), []);
 

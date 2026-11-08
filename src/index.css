@@ -138,6 +138,23 @@ input {
   opacity: 1;
 }
 
+/* Incognito is on: its toggle turns solid, so it reads as pressed on any page behind it. */
+.fab-glass[data-active="true"] {
+  background: rgb(255 255 255 / 0.94);
+  color: #0b1220;
+}
+
+/* Incognito turns every icon in the app gray. Pages live in native views and are untouched. */
+img,
+svg {
+  transition: filter 200ms ease;
+}
+
+:root[data-incognito="true"] img,
+:root[data-incognito="true"] svg {
+  filter: grayscale(1);
+}
+
 .command-bar {
   transition:
     transform 320ms var(--ease-spring),

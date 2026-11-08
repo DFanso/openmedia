@@ -7,6 +7,7 @@ import { Screen } from "../../shared/Screen";
 import type { Theme } from "../../shared/ipc";
 import { AiSection } from "./AiSection";
 import { FavoritesSection } from "./FavoritesSection";
+import { IncognitoFavoritesSection, IncognitoRecipesSection } from "./IncognitoSections";
 import { MarginSlider } from "./MarginSlider";
 import { RecipesSection } from "./RecipesSection";
 import { Switch } from "./Switch";
@@ -26,6 +27,8 @@ export function SettingsScreen() {
         <BrowsingSection />
         <RecipesSection />
         <FavoritesSection />
+        <IncognitoFavoritesSection />
+        <IncognitoRecipesSection />
         <AiSection />
         <DataSection />
       </div>

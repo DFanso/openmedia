@@ -23,7 +23,8 @@ use crate::ai::{
 };
 use crate::boot::{Boot, Startup};
 use crate::error::{Error, Result};
-use crate::library::{Favorite, FavoriteInput, Library, Theme};
+use crate::incognito::Incognito;
+use crate::library::{Favorite, FavoriteInput, Library, Mode, Theme};
 use crate::recipes::Recipes;
 use crate::secrets::SecretStore;
 use crate::sites::{self, SiteSettings};
@@ -61,14 +62,31 @@ pub fn set_site_favorite(
     library.set_favorites(inputs)
 }
 
+/// Remembers the page for the next launch, except while incognito: a restart is always back in
+/// the normal set, so an incognito page must never be what it reopens.
 #[tauri::command(async)]
-pub fn set_last_url(library: State<'_, Library>, url: String) -> Result<()> {
+pub fn set_last_url(
+    library: State<'_, Library>,
+    incognito: State<'_, Incognito>,
+    url: String,
+) -> Result<()> {
+    if incognito.is_active() {
+        return Ok(());
+    }
     library.set_last_url(&url)
 }
 
-/// Records an address the user typed; returns the history, newest first.
+/// Records an address the user typed; returns the history, newest first. Nothing is recorded
+/// while incognito.
 #[tauri::command(async)]
-pub fn add_history(library: State<'_, Library>, url: String) -> Result<Vec<String>> {
+pub fn add_history(
+    library: State<'_, Library>,
+    incognito: State<'_, Incognito>,
+    url: String,
+) -> Result<Vec<String>> {
+    if incognito.is_active() {
+        return library.history();
+    }
     library.add_history(&url)
 }
 
@@ -202,7 +220,7 @@ pub(crate) async fn open_session(
         profile: library.profile_id()?.to_string(),
         url,
         rect,
-        document_start_script: Some(recipes.script(&library.site_options()?)?),
+        document_start_script: Some(current_script(app, &library, &recipes)?),
         content_rule_lists,
     })?;
     Ok(blocking_failure)
@@ -270,17 +288,24 @@ pub async fn set_ad_block(
 pub fn get_sites(
     library: State<'_, Library>,
     recipes: State<'_, Recipes>,
+    incognito: bool,
 ) -> Result<Vec<SiteSettings>> {
+    let mode = Mode::from(incognito);
+    let favorites = match mode {
+        Mode::Normal => library.favorites()?,
+        Mode::Incognito => library.incognito_favorites()?,
+    };
     Ok(sites::site_settings(
         &recipes,
-        &library.site_options()?,
+        &library.site_options(mode)?,
         &library.site_bottom_margins()?,
-        &library.favorites()?,
+        &favorites,
     ))
 }
 
-/// Saves one site toggle and reloads the open page under the recompiled recipe script. Async for
-/// the same reason as `open_site`.
+/// Saves one site toggle in the normal or the incognito set. The open page reloads under the
+/// recompiled recipe script only when that set is the one in play. Async for the same reason as
+/// `open_site`.
 #[tauri::command]
 pub async fn set_site_option(
     app: AppHandle,
@@ -289,19 +314,33 @@ pub async fn set_site_option(
     recipe_id: String,
     option_id: String,
     enabled: bool,
+    incognito: bool,
 ) -> Result<()> {
     recipes
         .get(&recipe_id)
         .filter(|recipe| recipe.option(&option_id).is_some())
         .ok_or(Error::UnknownOption)?;
-    library.set_site_option(&recipe_id, &option_id, enabled)?;
-    reload_script(&app, &library, &recipes)
+    let mode = Mode::from(incognito);
+    library.set_site_option(mode, &recipe_id, &option_id, enabled)?;
+    if mode == app.state::<Incognito>().mode() {
+        reload_script(&app, &library, &recipes)?;
+    }
+    Ok(())
+}
+
+/// The recipe script for the set in play: the normal choices, or the incognito ones.
+pub(crate) fn current_script(
+    app: &AppHandle,
+    library: &Library,
+    recipes: &Recipes,
+) -> Result<String> {
+    recipes.script(&library.site_options(app.state::<Incognito>().mode())?)
 }
 
 /// Recompiles the page script from the current recipes and choices and hands it to the open
 /// pages.
 fn reload_script(app: &AppHandle, library: &Library, recipes: &Recipes) -> Result<()> {
-    let script = recipes.script(&library.site_options()?)?;
+    let script = current_script(app, library, recipes)?;
     app.siteview()
         .set_document_start_script(SetDocumentStartScriptRequest { script })?;
     Ok(())
@@ -530,7 +569,7 @@ pub async fn ai_prepare(
     request: String,
 ) -> Result<PreparedRequest> {
     let (provider, _key) = active_provider(&library, &secrets)?;
-    let choices = library.site_options()?;
+    let choices = library.site_options(app.state::<Incognito>().mode())?;
     agent::prepare(
         &agent,
         &LivePage(&app),
@@ -584,7 +623,12 @@ pub async fn ai_accept(
         Accepted::EnableOption {
             recipe_id,
             option_id,
-        } => library.set_site_option(&recipe_id, &option_id, true)?,
+        } => library.set_site_option(
+            app.state::<Incognito>().mode(),
+            &recipe_id,
+            &option_id,
+            true,
+        )?,
         Accepted::SaveRecipe(recipe) => {
             recipes.save_made(&recipe)?;
         }

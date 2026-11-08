@@ -192,6 +192,20 @@ export const de: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Ein Favorit benötigt einen Namen und eine gültige Adresse.",
 
+  "fab.incognito": "Inkognito",
+  "fab.leaveIncognito": "Inkognito verlassen",
+  "fab.leaveIncognitoHint": "Inkognito · zum Verlassen tippen",
+  "incognito.authReason": "Zu Inkognito-Favoriten wechseln",
+  "incognito.unlockReason": "Deine Inkognito-Einstellungen anzeigen",
+  "incognito.favoritesTitle": "Inkognito-Favoriten",
+  "incognito.favoritesNote":
+    "Werden statt deiner Favoriten angezeigt, solange Inkognito aktiv ist. Die ersten {limit} bilden das Schnellzugriffsmenü. Beim Öffnen dieses Bereichs wird jedes Mal Face ID, Touch ID oder dein Code verlangt.",
+  "incognito.favoritesEmpty": "Noch nichts hier. Füge unten einen Favoriten hinzu.",
+  "incognito.recipesTitle": "Inkognito-Rezepte",
+  "incognito.recipesNote":
+    "Diese Schalter gelten nur, solange Inkognito aktiv ist. Sie beginnen mit den Standardwerten jedes Rezepts und ändern nie deine normalen Rezepte.",
+  "incognito.locked": "Gesperrt. Tippe zum Entsperren mit Face ID, Touch ID oder deinem Code.",
+
   "recipes.title": "Rezepte",
   "recipes.note":
     "Fertige Rezepte für beliebte Websites. Installationshinweise und Pop-ups, die die Seite blockieren, werden standardmäßig ausgeblendet; Reels, Shorts und Vorschläge werden angezeigt, bis du sie ausblendest. Die Seite wird neu geladen, wenn du einen Schalter änderst. Markiere ein Rezept mit einem Stern, um die Website deinen Favoriten hinzuzufügen.",

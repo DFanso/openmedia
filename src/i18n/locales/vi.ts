@@ -193,6 +193,20 @@ export const vi: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Một mục yêu thích cần có tên và địa chỉ hợp lệ.",
 
+  "fab.incognito": "Ẩn danh",
+  "fab.leaveIncognito": "Thoát chế độ ẩn danh",
+  "fab.leaveIncognitoHint": "Ẩn danh · chạm để thoát",
+  "incognito.authReason": "Chuyển sang mục yêu thích ẩn danh",
+  "incognito.unlockReason": "Hiện cài đặt ẩn danh",
+  "incognito.favoritesTitle": "Mục yêu thích ẩn danh",
+  "incognito.favoritesNote":
+    "Hiển thị thay cho mục yêu thích của bạn khi chế độ ẩn danh đang bật. {limit} mục đầu tiên tạo thành menu truy cập nhanh. Mỗi lần mở phần này đều cần Face ID, Touch ID hoặc mật mã.",
+  "incognito.favoritesEmpty": "Chưa có gì. Hãy thêm một mục yêu thích bên dưới.",
+  "incognito.recipesTitle": "Công thức ẩn danh",
+  "incognito.recipesNote":
+    "Các công tắc này chỉ áp dụng khi chế độ ẩn danh đang bật. Chúng bắt đầu từ mặc định của từng công thức và không bao giờ thay đổi công thức thường của bạn.",
+  "incognito.locked": "Đã khóa. Chạm để mở khóa bằng Face ID, Touch ID hoặc mật mã.",
+
   "recipes.title": "Công thức",
   "recipes.note":
     "Công thức cho các trang phổ biến. Các bảng nhắc cài ứng dụng và pop-up chặn trang mặc định bị ẩn; Reels, Shorts và gợi ý vẫn hiện cho tới khi bạn ẩn chúng. Trang tải lại khi bạn đổi công tắc. Đánh dấu sao một công thức để thêm trang đó vào yêu thích.",

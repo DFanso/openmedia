@@ -197,6 +197,20 @@ export const ro: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Un favorit are nevoie de un nume și de o adresă validă.",
 
+  "fab.incognito": "Incognito",
+  "fab.leaveIncognito": "Ieși din incognito",
+  "fab.leaveIncognitoHint": "Incognito · atinge pentru a ieși",
+  "incognito.authReason": "Treci la favoritele incognito",
+  "incognito.unlockReason": "Arată setările incognito",
+  "incognito.favoritesTitle": "Favorite incognito",
+  "incognito.favoritesNote":
+    "Sunt afișate în locul favoritelor tale cât timp incognito este activ. Primele {limit} formează meniul de acces rapid. Deschiderea acestei secțiuni cere de fiecare dată Face ID, Touch ID sau codul.",
+  "incognito.favoritesEmpty": "Nimic aici încă. Adaugă o favorită mai jos.",
+  "incognito.recipesTitle": "Rețete incognito",
+  "incognito.recipesNote":
+    "Aceste comutatoare se aplică doar cât timp incognito este activ. Pornesc de la valorile implicite ale fiecărei rețete și nu schimbă niciodată rețetele obișnuite.",
+  "incognito.locked": "Blocat. Atinge pentru a debloca cu Face ID, Touch ID sau codul.",
+
   "recipes.title": "Rețete",
   "recipes.note":
     "Rețete gata făcute pentru site-uri populare. Mesajele de instalare și ferestrele pop-up care blochează pagina sunt ascunse implicit; Reels, Shorts și sugestiile sunt afișate până când le ascunzi. Pagina se reîncarcă atunci când schimbi un comutator. Marchează o rețetă cu stea pentru a adăuga site-ul ei la favorite.",

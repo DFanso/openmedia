@@ -45,6 +45,7 @@ targets:
       path: openmedia_iOS/Info.plist
       properties:
         LSRequiresIPhoneOS: true
+        NSFaceIDUsageDescription: OpenMedia asks for Face ID before it opens or shows your incognito favorites and recipes.
         UILaunchStoryboardName: LaunchScreen
         UIRequiredDeviceCapabilities: [arm64, metal]
         UISupportedInterfaceOrientations:

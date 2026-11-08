@@ -195,6 +195,20 @@ export const sv: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "En favorit behöver ett namn och en giltig adress.",
 
+  "fab.incognito": "Inkognito",
+  "fab.leaveIncognito": "Lämna inkognito",
+  "fab.leaveIncognitoHint": "Inkognito · tryck för att lämna",
+  "incognito.authReason": "Byt till inkognitofavoriter",
+  "incognito.unlockReason": "Visa dina inkognitoinställningar",
+  "incognito.favoritesTitle": "Inkognitofavoriter",
+  "incognito.favoritesNote":
+    "Visas i stället för dina favoriter medan inkognito är på. De första {limit} utgör snabbmenyn. När du öppnar den här delen krävs Face ID, Touch ID eller din kod varje gång.",
+  "incognito.favoritesEmpty": "Inget här än. Lägg till en favorit nedan.",
+  "incognito.recipesTitle": "Inkognitorecept",
+  "incognito.recipesNote":
+    "De här reglagen gäller bara när inkognito är på. De utgår från standardvärdena för varje recept och ändrar aldrig dina vanliga recept.",
+  "incognito.locked": "Låst. Tryck för att låsa upp med Face ID, Touch ID eller din kod.",
+
   "recipes.title": "Recept",
   "recipes.note":
     "Recept för populära webbplatser. Installationsuppmaningar och popup-fönster som blockerar sidan döljs som standard; Reels, Shorts och förslag visas tills du döljer dem. Sidan laddas om när du ändrar en omkopplare. Stjärnmärk ett recept för att lägga till dess webbplats bland dina favoriter.",

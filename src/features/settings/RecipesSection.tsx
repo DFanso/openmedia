@@ -31,7 +31,8 @@ export function RecipesSection() {
   );
 }
 
-function SiteCard({ site }: { site: SiteSettings }) {
+/** One recipe's card. In incognito mode it edits the incognito choices and has no star or margin. */
+export function SiteCard({ site, incognito = false }: { site: SiteSettings; incognito?: boolean }) {
   const [open, setOpen] = useState(false);
   const favorites = useApp((s) => s.state?.favorites);
   const setSiteFavorite = useApp((s) => s.setSiteFavorite);
@@ -64,7 +65,7 @@ function SiteCard({ site }: { site: SiteSettings }) {
             <DownIcon />
           </span>
         </button>
-        {site.homepage && (
+        {!incognito && site.homepage && (
           <button
             type="button"
             aria-pressed={site.favorite}
@@ -80,7 +81,7 @@ function SiteCard({ site }: { site: SiteSettings }) {
           </button>
         )}
       </div>
-      {open && <SiteOptions site={site} />}
+      {open && (incognito ? <IncognitoSiteOptions site={site} /> : <SiteOptions site={site} />)}
     </div>
   );
 }
@@ -109,26 +110,10 @@ function SiteOptions({ site }: { site: SiteSettings }) {
           </button>
         </div>
       )}
-      {GROUPS.map(({ group, title }) => {
-        const options = site.options.filter((option) => option.group === group);
-        if (options.length === 0) return null;
-        return (
-          <div key={group}>
-            <GroupLabel>{t(title)}</GroupLabel>
-            <Group>
-              {options.map((option) => (
-                <Switch
-                  key={option.id}
-                  label={option.label}
-                  description={option.description}
-                  checked={option.enabled}
-                  onChange={(enabled) => void setSiteOption(site.recipeId, option.id, enabled)}
-                />
-              ))}
-            </Group>
-          </div>
-        );
-      })}
+      <OptionGroups
+        site={site}
+        onToggle={(optionId, enabled) => void setSiteOption(site.recipeId, optionId, enabled)}
+      />
       <div>
         <GroupLabel>{t("recipes.bottomMargin")}</GroupLabel>
         <Group>
@@ -155,4 +140,51 @@ function SiteOptions({ site }: { site: SiteSettings }) {
       </div>
     </div>
   );
+}
+
+function IncognitoSiteOptions({ site }: { site: SiteSettings }) {
+  const setIncognitoSiteOption = useApp((s) => s.setIncognitoSiteOption);
+
+  return (
+    <div className="flex flex-col gap-5 border-t border-hair px-3 py-4">
+      <OptionGroups
+        site={site}
+        onToggle={(optionId, enabled) =>
+          void setIncognitoSiteOption(site.recipeId, optionId, enabled)
+        }
+      />
+    </div>
+  );
+}
+
+/** The site's switches, annoyances first and then content. */
+function OptionGroups({
+  site,
+  onToggle,
+}: {
+  site: SiteSettings;
+  onToggle: (optionId: string, enabled: boolean) => void;
+}) {
+  const t = useT();
+
+  return GROUPS.map(({ group, title }) => {
+    const options = site.options.filter((option) => option.group === group);
+    if (options.length === 0) return null;
+    return (
+      <div key={group}>
+        <GroupLabel>{t(title)}</GroupLabel>
+        <Group>
+          {options.map((option) => (
+            <Switch
+              key={option.id}
+              label={option.label}
+              description={option.description}
+              checked={option.enabled}
+              onChange={(enabled) => onToggle(option.id, enabled)}
+            />
+          ))}
+        </Group>
+      </div>
+    );
+  });
 }

@@ -7,7 +7,8 @@ use tauri::{
 
 use crate::models::*;
 use crate::validate::{
-    check_evaluate_result, parse_bridge_body, parse_session_id, wrap_evaluate_script,
+    check_auth_reason, check_evaluate_result, parse_bridge_body, parse_session_id,
+    wrap_evaluate_script,
 };
 use crate::{Error, Result};
 
@@ -48,12 +49,10 @@ fn dispatch_event<R: Runtime>(app: &AppHandle<R>, json: &str) {
         SiteViewEvent::State { .. } => app.emit(STATE_EVENT, event),
         SiteViewEvent::Closed { session } => app.emit(CLOSED_EVENT, session),
         SiteViewEvent::MemoryWarning => app.emit(MEMORY_EVENT, ()),
-        SiteViewEvent::NotificationTapped { session } => {
-            match parse_session_id(&session) {
-                Ok(_) => app.emit(NOTIFICATION_TAP_EVENT, session),
-                Err(_) => Ok(()),
-            }
-        }
+        SiteViewEvent::NotificationTapped { session } => match parse_session_id(&session) {
+            Ok(_) => app.emit(NOTIFICATION_TAP_EVENT, session),
+            Err(_) => Ok(()),
+        },
         SiteViewEvent::Error { message } => app.emit(ERROR_EVENT, message),
         SiteViewEvent::Bridge { origin, body } => match parse_bridge_body(&body) {
             Ok(body) => app.emit(BRIDGE_EVENT, BridgeMessage { origin, body }),
@@ -178,6 +177,16 @@ impl<R: Runtime> Siteview<R> {
             "setBlocked",
             serde_json::json!({ "session": request.session, "blocked": request.blocked }),
         )
+    }
+
+    /// Asks the device owner for Face ID, Touch ID or the device passcode and says whether they
+    /// passed. Rust-only: the plugin registers no command for it, so neither the shell nor a site
+    /// view can raise or answer the prompt.
+    pub fn authenticate(&self, request: AuthenticateRequest) -> Result<bool> {
+        let reason = check_auth_reason(&request.reason)?;
+        let response: AuthenticateResponse =
+            self.run("authenticate", serde_json::json!({ "reason": reason }))?;
+        Ok(response.authenticated)
     }
 
     /// Evaluates `request.script` (an expression) in the active session's main frame and returns

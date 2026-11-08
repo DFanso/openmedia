@@ -42,6 +42,24 @@ pub enum Theme {
     Dark,
 }
 
+/// Which set of favorites and recipe choices is in play. Incognito is the second, separate set
+/// the user switches to; nothing in it shows in the normal one, or the other way round.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Mode {
+    Normal,
+    Incognito,
+}
+
+impl From<bool> for Mode {
+    fn from(incognito: bool) -> Self {
+        if incognito {
+            Self::Incognito
+        } else {
+            Self::Normal
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Favorite {
     pub id: Uuid,
@@ -96,6 +114,14 @@ struct LibraryData {
     /// recipe's default, so shipping a recipe with a new option needs no migration.
     #[serde(default)]
     site_options: OptionChoices,
+    /// Recipe toggles for incognito mode, kept apart from `site_options`. Stored on the device
+    /// like every other setting: the biometric check is a screen lock, not encryption.
+    #[serde(default)]
+    incognito_site_options: OptionChoices,
+    /// The quick-access set shown while incognito. Never in `AppState`; the shell asks for it
+    /// after a biometric check.
+    #[serde(default)]
+    incognito_favorites: Vec<Favorite>,
     #[serde(default)]
     bottom_margin: u32,
     /// Per-site bottom margins by recipe id; a site without an entry uses `bottom_margin`.
@@ -168,7 +194,7 @@ impl Library {
         let data = self.lock()?;
         Ok(AppState {
             profile_id: data.profile_id,
-            favorites: with_icons(&data),
+            favorites: with_icons(&data, &data.favorites),
             history: data.history.clone(),
             last_url: data.last_url.clone(),
             onboarded: data.onboarded,
@@ -196,7 +222,24 @@ impl Library {
         let mut data = self.lock()?;
         data.favorites = favorites;
         self.save(&data)?;
-        Ok(with_icons(&data))
+        Ok(with_icons(&data, &data.favorites))
+    }
+
+    /// The incognito quick-access set, icons filled in. Handed out only after a biometric check.
+    pub fn incognito_favorites(&self) -> Result<Vec<Favorite>> {
+        let data = self.lock()?;
+        Ok(with_icons(&data, &data.incognito_favorites))
+    }
+
+    pub fn set_incognito_favorites(&self, inputs: Vec<FavoriteInput>) -> Result<Vec<Favorite>> {
+        let favorites = inputs
+            .into_iter()
+            .map(favorite_from_input)
+            .collect::<Result<Vec<_>>>()?;
+        let mut data = self.lock()?;
+        data.incognito_favorites = favorites;
+        self.save(&data)?;
+        Ok(with_icons(&data, &data.incognito_favorites))
     }
 
     pub fn set_last_url(&self, url: &str) -> Result<()> {
@@ -204,6 +247,11 @@ impl Library {
         let mut data = self.lock()?;
         data.last_url = Some(url);
         self.save(&data)
+    }
+
+    /// The addresses the user typed, newest first.
+    pub fn history(&self) -> Result<Vec<String>> {
+        Ok(self.lock()?.history.clone())
     }
 
     /// Remembers an address the user typed, newest first. A repeat moves to the front rather than
@@ -250,14 +298,29 @@ impl Library {
         self.save(&data)
     }
 
-    pub fn site_options(&self) -> Result<OptionChoices> {
-        Ok(self.lock()?.site_options.clone())
+    pub fn site_options(&self, mode: Mode) -> Result<OptionChoices> {
+        let data = self.lock()?;
+        Ok(match mode {
+            Mode::Normal => data.site_options.clone(),
+            Mode::Incognito => data.incognito_site_options.clone(),
+        })
     }
 
-    /// Records one toggle. The caller has already checked that the recipe and option exist.
-    pub fn set_site_option(&self, recipe: &str, option: &str, enabled: bool) -> Result<()> {
+    /// Records one toggle in the given mode's choices. The caller has already checked that the
+    /// recipe and option exist.
+    pub fn set_site_option(
+        &self,
+        mode: Mode,
+        recipe: &str,
+        option: &str,
+        enabled: bool,
+    ) -> Result<()> {
         let mut data = self.lock()?;
-        data.site_options
+        let choices = match mode {
+            Mode::Normal => &mut data.site_options,
+            Mode::Incognito => &mut data.incognito_site_options,
+        };
+        choices
             .entry(recipe.to_owned())
             .or_default()
             .insert(option.to_owned(), enabled);
@@ -351,7 +414,7 @@ impl Library {
 
     pub fn favorites(&self) -> Result<Vec<Favorite>> {
         let data = self.lock()?;
-        Ok(with_icons(&data))
+        Ok(with_icons(&data, &data.favorites))
     }
 
     pub fn ai_settings(&self) -> Result<AiSettings> {
@@ -475,11 +538,12 @@ fn icon_for_host(data: &LibraryData, host: &str) -> Option<String> {
 }
 
 /// Drops the icons of sites the user no longer has anywhere, and keeps the cache bounded: the
-/// oldest visited sites go first, a favorite's icon never does.
+/// oldest visited sites go first, a favorite's icon (normal or incognito) never does.
 fn prune_icons(data: &mut LibraryData) {
     let favorites: Vec<String> = data
         .favorites
         .iter()
+        .chain(&data.incognito_favorites)
         .filter_map(|favorite| host_of(&favorite.url))
         .collect();
     let history: Vec<String> = data.history.iter().filter_map(|url| host_of(url)).collect();
@@ -498,8 +562,8 @@ fn prune_icons(data: &mut LibraryData) {
     }
 }
 
-fn with_icons(data: &LibraryData) -> Vec<Favorite> {
-    data.favorites
+fn with_icons(data: &LibraryData, favorites: &[Favorite]) -> Vec<Favorite> {
+    favorites
         .iter()
         .map(|favorite| Favorite {
             icon: host_of(&favorite.url).and_then(|host| icon_for_host(data, &host)),
@@ -561,6 +625,8 @@ fn default_data() -> LibraryData {
         history: Vec::new(),
         ai: AiSettings::default(),
         locale: None,
+        incognito_site_options: OptionChoices::new(),
+        incognito_favorites: Vec::new(),
     }
 }
 
@@ -1030,14 +1096,78 @@ mod tests {
     #[test]
     fn site_toggles_persist_per_site_and_leave_other_options_alone() {
         let (dir, library) = library();
-        assert!(library.site_options().unwrap().is_empty());
-        library.set_site_option("a.default", "x", true).unwrap();
-        library.set_site_option("a.default", "y", false).unwrap();
-        library.set_site_option("b.default", "x", false).unwrap();
-        let choices = reload(&dir).site_options().unwrap();
+        assert!(library.site_options(Mode::Normal).unwrap().is_empty());
+        library
+            .set_site_option(Mode::Normal, "a.default", "x", true)
+            .unwrap();
+        library
+            .set_site_option(Mode::Normal, "a.default", "y", false)
+            .unwrap();
+        library
+            .set_site_option(Mode::Normal, "b.default", "x", false)
+            .unwrap();
+        let choices = reload(&dir).site_options(Mode::Normal).unwrap();
         assert!(choices["a.default"]["x"]);
         assert!(!choices["a.default"]["y"]);
         assert!(!choices["b.default"]["x"]);
+    }
+
+    #[test]
+    fn incognito_toggles_are_a_separate_set_that_persists() {
+        let (dir, library) = library();
+        library
+            .set_site_option(Mode::Normal, "a.default", "x", true)
+            .unwrap();
+        library
+            .set_site_option(Mode::Incognito, "a.default", "x", false)
+            .unwrap();
+        library
+            .set_site_option(Mode::Incognito, "b.default", "y", true)
+            .unwrap();
+        let reloaded = reload(&dir);
+        let normal = reloaded.site_options(Mode::Normal).unwrap();
+        let incognito = reloaded.site_options(Mode::Incognito).unwrap();
+        assert!(normal["a.default"]["x"]);
+        assert!(!normal.contains_key("b.default"));
+        assert!(!incognito["a.default"]["x"]);
+        assert!(incognito["b.default"]["y"]);
+    }
+
+    #[test]
+    fn incognito_favorites_are_validated_kept_apart_and_never_in_the_startup_state() {
+        let (dir, library) = library();
+        let normal = library.state().unwrap().favorites;
+        let saved = library
+            .set_incognito_favorites(vec![input(" Secret ", "https://secret.example")])
+            .unwrap();
+        assert_eq!(saved.len(), 1);
+        assert_eq!(saved[0].name, "Secret");
+        assert_eq!(saved[0].url, "https://secret.example/");
+        assert_eq!(library.state().unwrap().favorites, normal);
+        assert_eq!(reload(&dir).incognito_favorites().unwrap(), saved);
+        assert!(matches!(
+            library.set_incognito_favorites(vec![input("", "https://a.example")]),
+            Err(Error::InvalidFavoriteName)
+        ));
+        assert!(
+            library
+                .set_incognito_favorites(vec![input("Bad", "javascript:alert(1)")])
+                .is_err()
+        );
+        assert_eq!(library.incognito_favorites().unwrap(), saved);
+    }
+
+    #[test]
+    fn an_incognito_favorites_icon_survives_clearing_the_history() {
+        let (_dir, library) = library();
+        library
+            .set_incognito_favorites(vec![input("Secret", "https://secret.example/")])
+            .unwrap();
+        let icon = format!("{ICON_PREFIX}AAAA");
+        library.set_icon("secret.example", &icon).unwrap();
+        library.clear_history().unwrap();
+        let favorites = library.incognito_favorites().unwrap();
+        assert_eq!(favorites[0].icon.as_deref(), Some(icon.as_str()));
     }
 
     #[test]
@@ -1075,12 +1205,20 @@ mod tests {
         let path = dir.path().join("library.json");
         let mut json: serde_json::Value =
             serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
-        for key in ["siteOptions", "bottomMargin", "siteBottomMargins"] {
+        for key in [
+            "siteOptions",
+            "bottomMargin",
+            "siteBottomMargins",
+            "incognitoSiteOptions",
+            "incognitoFavorites",
+        ] {
             json.as_object_mut().unwrap().remove(key);
         }
         fs::write(&path, json.to_string()).unwrap();
         let reloaded = reload(&dir);
-        assert!(reloaded.site_options().unwrap().is_empty());
+        assert!(reloaded.site_options(Mode::Normal).unwrap().is_empty());
+        assert!(reloaded.site_options(Mode::Incognito).unwrap().is_empty());
+        assert!(reloaded.incognito_favorites().unwrap().is_empty());
         assert_eq!(reloaded.bottom_margin().unwrap(), 0);
     }
 

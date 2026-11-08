@@ -193,6 +193,21 @@ export const ms: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Kegemaran memerlukan nama dan alamat yang sah.",
 
+  "fab.incognito": "Inkognito",
+  "fab.leaveIncognito": "Keluar dari inkognito",
+  "fab.leaveIncognitoHint": "Inkognito · ketik untuk keluar",
+  "incognito.authReason": "Tukar ke kegemaran inkognito",
+  "incognito.unlockReason": "Tunjukkan tetapan inkognito anda",
+  "incognito.favoritesTitle": "Kegemaran inkognito",
+  "incognito.favoritesNote":
+    "Dipaparkan menggantikan kegemaran anda semasa inkognito dihidupkan. {limit} yang pertama membentuk menu akses pantas. Membuka bahagian ini meminta Face ID, Touch ID atau kod laluan setiap kali.",
+  "incognito.favoritesEmpty": "Belum ada apa-apa. Tambah kegemaran di bawah.",
+  "incognito.recipesTitle": "Resipi inkognito",
+  "incognito.recipesNote":
+    "Suis ini hanya digunakan semasa inkognito dihidupkan. Ia bermula daripada lalai setiap resipi dan tidak pernah mengubah resipi biasa anda.",
+  "incognito.locked":
+    "Dikunci. Ketik untuk membuka kunci dengan Face ID, Touch ID atau kod laluan.",
+
   "recipes.title": "Resipi",
   "recipes.note":
     "Resipi untuk laman popular. undangan memasang aplikasi dan pop-up yang menyekat halaman disembunyikan secara lalai; Reels, Shorts dan cadangan ditunjukkan sehingga anda menyembunyikannya. Halaman dimuat semula apabila anda menukar suis. Tandakan bintang pada resipi untuk menambahkan laman itu ke kegemaran.",

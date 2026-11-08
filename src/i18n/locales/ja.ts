@@ -196,6 +196,20 @@ export const ja: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "お気に入りには名前と有効なアドレスが必要です。",
 
+  "fab.incognito": "シークレット",
+  "fab.leaveIncognito": "シークレットを終了",
+  "fab.leaveIncognitoHint": "シークレット · タップして終了",
+  "incognito.authReason": "シークレットのお気に入りに切り替え",
+  "incognito.unlockReason": "シークレット設定を表示",
+  "incognito.favoritesTitle": "シークレットのお気に入り",
+  "incognito.favoritesNote":
+    "シークレットがオンの間、通常のお気に入りの代わりに表示されます。最初の {limit} 件がクイックアクセスメニューになります。このセクションを開くたびに Face ID、Touch ID、またはパスコードが求められます。",
+  "incognito.favoritesEmpty": "まだ何もありません。下からお気に入りを追加してください。",
+  "incognito.recipesTitle": "シークレットのレシピ",
+  "incognito.recipesNote":
+    "これらのスイッチはシークレットがオンの間だけ有効です。各レシピの初期値から始まり、通常のレシピは変更されません。",
+  "incognito.locked": "ロック中。タップして Face ID、Touch ID、またはパスコードで解除。",
+
   "recipes.title": "レシピ",
   "recipes.note":
     "よく使うサイトのための、完成済みのレシピです。インストールを促す案内やページを妨げるポップアップは初期設定では非表示です。Reels、ショート、関連コンテンツは、非表示にするまで表示されます。スイッチを変えるとページが再読み込みされます。レシピに★を付けると、そのサイトがお気に入りに追加されます。",

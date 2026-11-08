@@ -194,6 +194,20 @@ export const ko: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "즐겨찾기에는 이름과 올바른 주소가 필요합니다.",
 
+  "fab.incognito": "시크릿",
+  "fab.leaveIncognito": "시크릿 종료",
+  "fab.leaveIncognitoHint": "시크릿 · 탭하여 종료",
+  "incognito.authReason": "시크릿 즐겨찾기로 전환",
+  "incognito.unlockReason": "시크릿 설정 보기",
+  "incognito.favoritesTitle": "시크릿 즐겨찾기",
+  "incognito.favoritesNote":
+    "시크릿이 켜져 있는 동안 일반 즐겨찾기 대신 표시됩니다. 처음 {limit}개가 빠른 실행 메뉴가 됩니다. 이 섹션을 열 때마다 Face ID, Touch ID 또는 암호를 요청합니다.",
+  "incognito.favoritesEmpty": "아직 아무것도 없습니다. 아래에서 즐겨찾기를 추가하세요.",
+  "incognito.recipesTitle": "시크릿 레시피",
+  "incognito.recipesNote":
+    "이 스위치는 시크릿이 켜져 있을 때만 적용됩니다. 각 레시피의 기본값에서 시작하며 일반 레시피는 절대 바꾸지 않습니다.",
+  "incognito.locked": "잠김. 탭하여 Face ID, Touch ID 또는 암호로 잠금 해제하세요.",
+
   "recipes.title": "레시피",
   "recipes.note":
     "인기 사이트를 위해 만들어 둔 레시피입니다. 설치 안내와 페이지를 막는 팝업은 기본적으로 숨겨집니다. Reels와 Shorts, 추천 콘텐츠는 숨기기 전까지 표시됩니다. 스위치를 바꾸면 페이지가 새로 고쳐집니다. 레시피에 별을 붙이면 해당 사이트가 즐겨찾기에 추가됩니다.",
