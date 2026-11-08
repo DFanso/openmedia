@@ -1,5 +1,13 @@
 import { create } from "zustand";
 import {
+  assistantReducer,
+  initialAssistant,
+  pendingJobId,
+  type AssistantEvent,
+  type AssistantState,
+} from "../features/ai/flow";
+import { assistant as assistantIpc, type PreparedRequest } from "../features/ai/ipc";
+import {
   applyState,
   findFavoriteSession,
   findTypedSession,
@@ -11,9 +19,11 @@ import {
   type SessionSource,
 } from "../features/web/sessions";
 import {
+  ai,
   errorMessage,
   library,
   siteView,
+  type AiState,
   type AppState,
   type Favorite,
   type FavoriteInput,
@@ -23,6 +33,12 @@ import {
 } from "../shared/ipc";
 import type { Edge } from "../features/fab/geometry";
 import { loadPosition } from "../features/fab/position";
+import {
+  iconForUrl,
+  setIconCache,
+  urlsWithoutBundledIcon,
+  useIconCache,
+} from "../shared/siteIcons";
 
 export type Sheet = "none" | "assistant" | "history" | "stats" | "settings";
 
@@ -44,6 +60,10 @@ export interface AppStore {
   /** Edge the floating button rests on; the back button takes the other one. */
   fabEdge: Edge;
   sites: SiteSettings[];
+  /** Provider settings, for routing the command bar; refreshed whenever the bar opens. */
+  aiState: AiState | null;
+  /** The assistant's step: what the user asked, what was sent, what came back. */
+  assistant: AssistantState;
   load: () => Promise<void>;
   openSheet: (sheet: Sheet) => void;
   closeSheet: () => void;
@@ -80,6 +100,21 @@ export interface AppStore {
   setSiteBottomMargin: (recipeId: string, pixels: number | null) => Promise<void>;
   setBackButton: (enabled: boolean) => Promise<void>;
   setFabEdge: (edge: Edge) => void;
+  /** Shows the exact payload before it is sent; on by default. */
+  setAiPreview: (enabled: boolean) => Promise<void>;
+  /** Reads the provider settings the command bar needs to know whether the assistant is ready. */
+  loadAi: () => Promise<void>;
+  /** The text in the command bar, kept in the state so "Ask again" can hand it back. */
+  editRequest: (text: string) => void;
+  /** Reads the open page and builds the request; the user sees it before it is sent. */
+  submitRequest: (request: string) => Promise<void>;
+  /** The user read the payload and pressed Send. */
+  confirmSend: () => Promise<void>;
+  acceptProposal: () => Promise<void>;
+  rejectProposal: () => Promise<void>;
+  /** Drops whatever is pending (and its page preview) and returns to the empty bar. */
+  cancelAssistant: (keepText?: boolean) => void;
+  retryAssistant: () => Promise<void>;
 }
 
 function updateSite(
@@ -106,22 +141,38 @@ export const selectPage = (store: AppStore): Session | null =>
 let nonce = 0;
 
 export const useApp = create<AppStore>((set, get) => {
-  const fetchIcons = async () => {
+  const applyIcons = () =>
+    set((current) => ({
+      state: current.state && {
+        ...current.state,
+        favorites: current.state.favorites.map((favorite) => ({
+          ...favorite,
+          icon: iconForUrl(favorite.url, current.state?.favorites ?? []),
+        })),
+      },
+    }));
+  const fetchIcons = async (urls: string[]) => {
+    const wanted = urlsWithoutBundledIcon(urls);
+    if (wanted.length === 0) return;
     try {
-      const favorites = await library.refreshIcons();
-      set((current) => ({ state: current.state && { ...current.state, favorites } }));
+      setIconCache(await library.refreshIcons(wanted));
+      applyIcons();
     } catch {
-      // icons are decoration; the monogram stays
+      // Missing decorative icons retain their monogram.
     }
   };
 
   /** Takes the saved favorites, fetches missing icons, and refreshes which sites are favorited. */
   const adoptFavorites = (favorites: Favorite[]) => {
+    const previous = new Set(get().state?.favorites.map((favorite) => favorite.url));
     set((current) => ({
       state: current.state && { ...current.state, favorites },
       error: null,
     }));
-    void fetchIcons();
+    applyIcons();
+    void fetchIcons(
+      favorites.filter((favorite) => !previous.has(favorite.url)).map((favorite) => favorite.url),
+    );
     void get().loadSites();
   };
 
@@ -156,6 +207,36 @@ export const useApp = create<AppStore>((set, get) => {
     get().trimSessions("routine");
   };
 
+  const dispatch = (event: AssistantEvent) =>
+    set((current) => ({ assistant: assistantReducer(current.assistant, event) }));
+
+  /** Rust holds a job (and the page shows its preview) until it is rejected; failures are harmless. */
+  const dropJob = (id: string | null) => {
+    if (id) void assistantIpc.reject(id).catch(() => {});
+  };
+
+  const runSend = async (prepared: PreparedRequest) => {
+    try {
+      const proposal = await assistantIpc.send(prepared.id);
+      const current = get().assistant;
+      if (current.status !== "sending" || current.prepared.id !== prepared.id) {
+        dropJob(prepared.id);
+        return;
+      }
+      dispatch({ type: "proposed", proposal });
+      // Let the user see the page with the preview applied.
+      if (get().assistant.status === "proposal" && get().sheet === "assistant") {
+        set({ sheet: "none" });
+      }
+    } catch (error) {
+      const current = get().assistant;
+      if (current.status === "sending" && current.prepared.id === prepared.id) {
+        dispatch({ type: "failed", error });
+        dropJob(prepared.id);
+      }
+    }
+  };
+
   return {
     state: null,
     error: null,
@@ -166,12 +247,15 @@ export const useApp = create<AppStore>((set, get) => {
     action: null,
     fabEdge: loadPosition().edge,
     sites: [],
+    aiState: null,
+    assistant: initialAssistant,
 
     load: async () => {
       try {
         const { bootSession, ...state } = await library.getState();
         void siteView.setColorScheme(state.theme).catch(() => {});
         set({ state, onboardingOpen: !state.onboarded });
+        applyIcons();
         if (bootSession) {
           startSession(
             bootSession.url,
@@ -185,7 +269,13 @@ export const useApp = create<AppStore>((set, get) => {
     },
 
     loadSecondary: () => {
-      void fetchIcons();
+      void library
+        .icons()
+        .then((icons) => {
+          useIconCache.getState().setIcons(icons);
+          applyIcons();
+        })
+        .catch(() => {});
       void get().loadSites();
     },
 
@@ -218,9 +308,10 @@ export const useApp = create<AppStore>((set, get) => {
       startSession(url, "typed");
       void library
         .addHistory(url)
-        .then((history) =>
-          set((current) => ({ state: current.state && { ...current.state, history } })),
-        )
+        .then((history) => {
+          set((current) => ({ state: current.state && { ...current.state, history } }));
+          void fetchIcons([url]);
+        })
         .catch((error: unknown) => set({ error: errorMessage(error) }));
     },
 
@@ -232,6 +323,7 @@ export const useApp = create<AppStore>((set, get) => {
 
     openHistory: (url) => {
       const live = findTypedSession(get().sessions, url);
+      if (live) void fetchIcons([url]);
       if (live) switchTo(live.id);
       else get().openAddress(url);
     },
@@ -407,5 +499,93 @@ export const useApp = create<AppStore>((set, get) => {
       }
     },
     setFabEdge: (fabEdge) => set({ fabEdge }),
+
+    setAiPreview: async (enabled) => {
+      const previous = get().state?.aiPreview;
+      set((current) => ({ state: current.state && { ...current.state, aiPreview: enabled } }));
+      try {
+        await assistantIpc.setPreview(enabled);
+      } catch (error) {
+        set((current) => ({
+          state:
+            current.state && previous !== undefined
+              ? { ...current.state, aiPreview: previous }
+              : current.state,
+          error: errorMessage(error),
+        }));
+      }
+    },
+
+    loadAi: async () => {
+      try {
+        set({ aiState: await ai.state() });
+      } catch {
+        // routing then treats the provider as missing; Settings shows the real error
+      }
+    },
+
+    editRequest: (text) => dispatch({ type: "edit", text }),
+
+    submitRequest: async (request) => {
+      dispatch({ type: "submit", request });
+      const started = get().assistant;
+      if (started.status !== "preparing") return;
+      try {
+        const prepared = await assistantIpc.prepare(started.request);
+        const current = get().assistant;
+        if (current.status !== "preparing" || current.request !== started.request) {
+          dropJob(prepared.id);
+          return;
+        }
+        const preview = get().state?.aiPreview ?? true;
+        dispatch({ type: "prepared", prepared, preview });
+        if (!preview) await runSend(prepared);
+      } catch (error) {
+        const current = get().assistant;
+        if (current.status === "preparing" && current.request === started.request) {
+          dispatch({ type: "failed", error });
+        }
+      }
+    },
+
+    confirmSend: async () => {
+      const current = get().assistant;
+      if (current.status !== "preview") return;
+      dispatch({ type: "send" });
+      await runSend(current.prepared);
+    },
+
+    acceptProposal: async () => {
+      const current = get().assistant;
+      if (current.status !== "proposal") return;
+      const id = current.proposal.id;
+      dispatch({ type: "accept" });
+      try {
+        await assistantIpc.accept(id);
+        await get().loadSites();
+        dispatch({ type: "accepted" });
+      } catch (error) {
+        dispatch({ type: "failed", error });
+      }
+    },
+
+    rejectProposal: async () => {
+      const current = get().assistant;
+      if (current.status !== "proposal") return;
+      dispatch({ type: "reject" });
+      dropJob(current.proposal.id);
+    },
+
+    cancelAssistant: (keepText) => {
+      dropJob(pendingJobId(get().assistant));
+      dispatch({ type: "reset", keepText });
+    },
+
+    retryAssistant: async () => {
+      const current = get().assistant;
+      if (current.status !== "error") return;
+      dropJob(current.jobId);
+      await get().submitRequest(current.request);
+    },
   };
 });

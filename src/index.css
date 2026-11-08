@@ -145,6 +145,17 @@ input {
   opacity: 0;
 }
 
+.assistant-dock {
+  animation: dock-in 260ms var(--ease-spring);
+}
+
+@keyframes dock-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
 /* Onboarding illustrations */
 .demo-fan-item {
   animation: demo-pop 3600ms var(--ease-spring) infinite;
@@ -229,6 +240,10 @@ input {
     animation: none;
   }
 
+  .assistant-dock {
+    animation: none;
+  }
+
   .demo-fan-item {
     opacity: 1;
   }
@@ -251,8 +266,20 @@ input {
   }
 }
 
+.usage-warning {
+  animation: usage-warning-in 220ms ease-out both;
+}
+
+@keyframes usage-warning-in {
+  from {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .screen {
+  .screen,
+  .usage-warning {
     animation: none;
   }
 }

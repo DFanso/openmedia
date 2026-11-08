@@ -7,6 +7,8 @@ use crate::{ContentRuleList, Error, Result};
 
 pub const MAX_BRIDGE_MESSAGE_BYTES: usize = 64 * 1024;
 pub const MAX_RULE_LISTS: usize = 8;
+pub const MAX_EVALUATE_SCRIPT_BYTES: usize = 128 * 1024;
+pub const MAX_EVALUATE_RESULT_BYTES: usize = 200_000;
 const MAX_RULE_LIST_ID_CHARS: usize = 64;
 
 pub fn parse_web_url(input: &str) -> Result<Url> {
@@ -31,6 +33,28 @@ pub fn parse_bridge_body(body: &str) -> Result<serde_json::Value> {
         return Err(Error::BridgeMessageTooLarge(MAX_BRIDGE_MESSAGE_BYTES));
     }
     serde_json::from_str(body).map_err(|_| Error::BridgeMessageInvalid)
+}
+
+/// Wraps a script expression so the page side returns its value as JSON text. The newlines stop a
+/// trailing `//` comment from swallowing the closing parenthesis; trailing semicolons are dropped.
+pub fn wrap_evaluate_script(script: &str) -> Result<String> {
+    let expression = script.trim().trim_end_matches(';').trim_end();
+    if expression.is_empty() || expression.len() > MAX_EVALUATE_SCRIPT_BYTES {
+        return Err(Error::InvalidScript(MAX_EVALUATE_SCRIPT_BYTES));
+    }
+    Ok(format!("JSON.stringify(\n{expression}\n)"))
+}
+
+/// The page's answer is hostile data: bounded in size here (the native side caps it too) and
+/// required to be JSON, so callers only ever parse text that is well formed.
+pub fn check_evaluate_result(json: String) -> Result<String> {
+    if json.len() > MAX_EVALUATE_RESULT_BYTES {
+        return Err(Error::EvaluateResultTooLarge(MAX_EVALUATE_RESULT_BYTES));
+    }
+    if serde_json::from_str::<serde::de::IgnoredAny>(&json).is_err() {
+        return Err(Error::BridgeMessageInvalid);
+    }
+    Ok(json)
 }
 
 /// Rule lists come from Rust, never from a page, but the native side reads `path` and hands it to
@@ -167,5 +191,40 @@ mod tests {
             parse_bridge_body(&huge),
             Err(Error::BridgeMessageTooLarge(_))
         ));
+    }
+
+    #[test]
+    fn evaluate_script_is_wrapped_as_json_stringify() {
+        assert_eq!(
+            wrap_evaluate_script(" 1 + 1 ;; ").unwrap(),
+            "JSON.stringify(\n1 + 1\n)"
+        );
+        // a trailing line comment cannot swallow the closing parenthesis
+        assert!(wrap_evaluate_script("x // note").unwrap().ends_with("\n)"));
+        assert!(matches!(
+            wrap_evaluate_script("  ; "),
+            Err(Error::InvalidScript(_))
+        ));
+        let huge = "1".repeat(MAX_EVALUATE_SCRIPT_BYTES + 1);
+        assert!(matches!(
+            wrap_evaluate_script(&huge),
+            Err(Error::InvalidScript(_))
+        ));
+    }
+
+    #[test]
+    fn evaluate_result_is_capped_and_must_be_json() {
+        assert_eq!(check_evaluate_result("[1,2]".into()).unwrap(), "[1,2]");
+        assert!(matches!(
+            check_evaluate_result("{nope".into()),
+            Err(Error::BridgeMessageInvalid)
+        ));
+        let huge = format!("\"{}\"", "x".repeat(MAX_EVALUATE_RESULT_BYTES));
+        assert!(matches!(
+            check_evaluate_result(huge),
+            Err(Error::EvaluateResultTooLarge(_))
+        ));
+        let edge = format!("\"{}\"", "x".repeat(MAX_EVALUATE_RESULT_BYTES - 2));
+        assert!(check_evaluate_result(edge).is_ok());
     }
 }

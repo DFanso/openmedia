@@ -44,6 +44,13 @@ describe("usageTargetOf", () => {
     });
   });
 
+  it("counts DNS trailing-dot addresses against the same daily allowance", () => {
+    expect(usageTargetOf("https://example.com./watch", "example.com.")).toEqual({
+      host: "example.com",
+      section: "/watch",
+    });
+  });
+
   it("ignores addresses that are not web pages", () => {
     expect(usageTargetOf("about:blank", null)).toBeNull();
     expect(usageTargetOf("not a url", null)).toBeNull();

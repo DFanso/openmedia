@@ -1,6 +1,6 @@
 # Roadmap
 
-> **Status: Phase 1 in progress, iOS first; Phase 3 groundwork started.** Done: Tauri scaffold, `tauri-plugin-siteview` (iOS), favorites, the floating-button shell, themes, onboarding, a first recipe slice, CI, the BYOK groundwork (Keychain-backed key storage, provider settings, connection test), and ad and tracker blocking on iOS. Android code was removed until iOS is stable; desktop is deferred. Update this page when phases start, finish, or change.
+> **Status: iOS foundation, bundled recipes and BYOK assistant implemented; hardening continues.** The shell includes unlimited favorites, History, Usage with daily warnings/limits, collapsed Settings and 18 bundled site recipes/icons. Active providers now handle requests through redacted preview and explicit acceptance. Android and desktop site views remain deferred; physical-device interaction and authenticated provider calls remain unverified.
 
 ## Goal
 
@@ -85,10 +85,7 @@ The vertical slice, then breadth.
 ## Phase 3 — BYOK AI assistant
 
 - ~~`SecretStore` implementation per S6; key management UI (add, test, delete).~~ Done for iOS: trait plus `keyring` (v3, `apple-native`), a settings section to add, test and delete providers and keys. See [AI Assistant](./ai-assistant.md#implemented-provider-settings).
-- Provider trait + adapters: Anthropic, OpenAI, Gemini, OpenRouter, OpenAI-compatible custom base URL ([AI Assistant](./ai-assistant.md)).
-- Snapshot + two-pass redaction + preview-before-send UI.
-- Prompt contract v1, patch schema, validation, retry-once.
-- Preview → match report → repair loop (max 2) → accept/reject.
+- **Implemented:** Anthropic and OpenAI-compatible adapters (including Gemini/OpenRouter presets), bounded DOM snapshots, Rust redaction, preview-before-send, validated patches with one correction attempt, page previews, match counts with up to two repair rounds, and explicit accept/reject. See [AI Assistant](./ai-assistant.md).
 - Repair of stale rules.
 - Error taxonomy in the UI; token estimate and size cap.
 - Fixture-driven tests; recorded provider fixtures; redaction property tests.
@@ -121,7 +118,7 @@ All without a backend.
 - Community recipe index: a public GitHub repo of recipe files + generated index; app fetches it on user action; pinned commit or signed index; author shown; review UI before apply.
 - Recipe update flow: bundled recipe updates vs user forks.
 - Optional user-owned sync: sync recipe/settings folder to a user-provided git repo or file location. Never includes keys or cookies.
-- Deferred rule types evaluated here: `limit` (daily allowance), `scroll-stop`.
+- Deferred recipe rule types: `scroll-stop`. Daily site allowances now live in Usage policies, not in recipes.
 
 **Exit:** a recipe made on one device installs on another through export/import and through the community index, with review.
 
@@ -154,7 +151,7 @@ All without a backend.
 | 2026-11-07 | Defaults: React, Zustand, Tailwind, yarn, Vitest, Playwright | Boring; yarn matches the author's other projects | Before Phase 1 only; cheap to change until the scaffold exists |
 | 2026-11-07 | Recipes get `options`: named switches that group rules. Annoyances default on, content off. Choices are stored as overrides, keyed by recipe and option id | Users toggle "Reels" or "app prompts", not seven selectors; defaults can change in a release without a migration | A recipe needs per-rule choices |
 | 2026-11-07 | Toggling a site option recompiles the document-start script and reloads the page (`set_document_start_script`) | Same mechanism as ad blocking; no live engine yet | The engine can apply `__om.update` without a reload |
-| 2026-11-07 | Favorites change only in Settings; the command bar's "add this page" button is removed | Browsing must not alter the user's list | — |
+| 2026-11-08 | Favorites can be toggled from the current page, History or Settings; the first six remain quick access | Explicit user action adds a typed site without making browsing itself alter favorites; supersedes Settings-only favorites | — |
 | 2026-11-07 | Bottom margin is native (the site view rectangle), global with a per-site override resolved in Rust | CSS padding cannot move a page's own fixed bars off the screen edge | — |
 | 2026-11-07 | iOS and Android are first-class; desktop deferred | Mobile is the product. S1 (desktop child webview) moves out of the critical path | Mobile is blocked, or desktop demand appears |
 | 2026-11-07 | iOS 17 minimum | `WKWebsiteDataStore(forIdentifier:)` needs it; verified working on iOS 26.5 simulator | A non-isolated fallback is accepted |
@@ -184,6 +181,9 @@ All without a backend.
 | 2026-11-07 | One WebKit rule list per filter list (EasyList, EasyPrivacy), cached on disk by content hash and in WebKit's store by id | Each stays far below the cap (74,981 and 56,385 rules at the bundled versions); the multi-second compile runs once per list version | |
 | 2026-11-07 | The converter's bare `if-domain`/`unless-domain` entries get a `*` prefix | Verified on macOS WebKit: a bare domain matches only that exact host, so `example.org##.ad` would not hide on `www.example.org` | The `adblock` crate emits the prefix itself |
 | 2026-11-08 | Changes to a bundled recipe are saved as a **fork** (same id, `origin` user/ai, `forkedFrom` = bundled version) in `<app_data>/recipes/`, which replaces the bundled recipe while it exists | App updates replace bundled recipes; a user's or the assistant's changes must survive them. Same id keeps the saved switches and margin without a migration | Users want a newer bundled recipe merged into their copy, or several copies per site |
+| 2026-11-08 | Usage extends Stats in the fan above History: any site can have optional daily warnings and limits, reset at local midnight | Reuses local foreground accounting; top warnings and native iOS blur shields stop loads, navigation, interaction and media for exhausted sessions only | Page JavaScript is not suspended |
+| 2026-11-08 | Settings sections use closed-by-default native disclosures | Keeps long recipe, favorites and provider lists out of the initial screen | — |
+| 2026-11-08 | The command bar uses the active BYOK provider rather than a hardcoded disconnected message | Existing assistant implementation reused, with redacted preview, validation and explicit acceptance; keys remain in Rust | — |
 
 ## Open questions
 

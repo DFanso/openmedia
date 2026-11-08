@@ -28,6 +28,7 @@ export interface AppState {
   /** Pixels kept clear under every page that has no margin of its own. */
   bottomMargin: number;
   backButton: boolean;
+  aiPreview: boolean;
 }
 
 /** The page Rust already started loading at launch; the shell takes it over. */
@@ -136,7 +137,8 @@ export const library = {
   /** Adds a pre-made recipe's site to the favorites, or removes the site's favorites. */
   setSiteFavorite: (recipeId: string, favorite: boolean) =>
     invoke<Favorite[]>("set_site_favorite", { recipeId, favorite }),
-  refreshIcons: () => invoke<Favorite[]>("refresh_icons"),
+  icons: () => invoke<Record<string, string>>("get_icons"),
+  refreshIcons: (urls: string[]) => invoke<Record<string, string>>("refresh_icons", { urls }),
   setLastUrl: (url: string) => command("set_last_url", { url }),
   completeOnboarding: () => command("complete_onboarding"),
   resetOnboarding: () => command("reset_onboarding"),

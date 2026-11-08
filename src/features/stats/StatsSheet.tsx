@@ -3,8 +3,10 @@ import { useApp } from "../../app/store";
 import { CloseIcon } from "../../shared/icons";
 import { errorMessage, usage, type SiteUsage, type UsageReport } from "../../shared/ipc";
 import { scopeCovers } from "../web/sessions";
+import { UsagePoliciesForm } from "./UsagePoliciesForm";
 import { formatDuration, localDay, sectionLabel } from "./format";
 import { settleUsageWrites } from "./tracker";
+import { useUsageControl } from "./policy";
 
 const RANGES = [
   { days: 1, label: "Today" },
@@ -73,7 +75,10 @@ function ClearStats({ onCleared }: { onCleared: () => void }) {
     setConfirming(false);
     usage
       .clear()
-      .then(onCleared)
+      .then(() => {
+        useUsageControl.setState({ seconds: {}, warning: null });
+        onCleared();
+      })
       .catch((error: unknown) => reportError(errorMessage(error)));
   };
 
@@ -138,10 +143,10 @@ export function StatsSheet() {
   return (
     <div data-hit="" className="fixed inset-0 z-50 flex flex-col bg-ink">
       <header className="flex items-center justify-between px-5 pt-[calc(env(safe-area-inset-top)+12px)] pb-3">
-        <h1 className="text-xs font-medium tracking-[0.22em] text-paper/60 uppercase">Stats</h1>
+        <h1 className="text-xs font-medium tracking-[0.22em] text-paper/60 uppercase">Usage</h1>
         <button
           type="button"
-          aria-label="Close stats"
+          aria-label="Close usage"
           onClick={closeSheet}
           className="grid size-11 place-items-center rounded-full text-paper/80"
         >
@@ -150,6 +155,7 @@ export function StatsSheet() {
       </header>
 
       <div className="flex-1 overflow-y-auto px-5 pb-[calc(env(safe-area-inset-bottom)+32px)]">
+        <UsagePoliciesForm />
         <div role="group" aria-label="Time range" className="flex gap-2">
           {RANGES.map((range) => (
             <button

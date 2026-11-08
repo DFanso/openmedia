@@ -1,4 +1,12 @@
+pub mod agent;
+pub mod anthropic;
 pub mod connection;
+pub mod openai;
+pub mod patch;
+pub mod prompt;
+pub mod provider;
+pub mod redact;
+pub mod snapshot;
 
 use serde::{Deserialize, Serialize};
 use url::Url;

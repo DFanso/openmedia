@@ -17,6 +17,9 @@ const FORMAT_VERSION: u32 = 4;
 const MAX_HISTORY: usize = 100;
 const MAX_FAVORITE_NAME_CHARS: usize = 20;
 const MAX_ICON_CHARS: usize = 200_000;
+/// The most site icons the app keeps. Each one is a small PNG, so this stays well under a
+/// megabyte.
+const MAX_ICONS: usize = 200;
 /// Enough to clear a home indicator and a tab bar; more would leave no page to look at.
 pub const MAX_BOTTOM_MARGIN: u32 = 200;
 const ICON_PREFIX: &str = "data:image/png;base64,";
@@ -69,6 +72,8 @@ pub struct AppState {
     /// Pixels kept clear under every page, unless the site has its own.
     pub bottom_margin: u32,
     pub back_button: bool,
+    /// Show the exact AI payload and ask before sending it.
+    pub ai_preview: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -97,6 +102,9 @@ struct LibraryData {
     /// Off by default; the shell can show a floating back button over the page.
     #[serde(default)]
     back_button: bool,
+    /// On by default: the assistant shows what it will send and waits for the user.
+    #[serde(default = "enabled")]
+    ai_preview: bool,
     /// Site icons by host. They come from the sites themselves and hold nothing private.
     #[serde(default)]
     icons: BTreeMap<String, String>,
@@ -162,6 +170,7 @@ impl Library {
             ad_block: data.ad_block,
             bottom_margin: data.bottom_margin,
             back_button: data.back_button,
+            ai_preview: data.ai_preview,
         })
     }
 
@@ -201,6 +210,7 @@ impl Library {
         let mut data = self.lock()?;
         data.history.clear();
         data.last_url = None;
+        prune_icons(&mut data);
         self.save(&data)
     }
 
@@ -272,27 +282,56 @@ impl Library {
         self.save(&data)
     }
 
-    /// Favorites whose site has no cached icon yet, as `(host, page url)`.
-    pub fn favorites_missing_icons(&self) -> Result<Vec<(String, String)>> {
+    pub fn set_ai_preview(&self, enabled: bool) -> Result<()> {
+        let mut data = self.lock()?;
+        data.ai_preview = enabled;
+        self.save(&data)
+    }
+
+    /// The pages of `urls` whose site has no cached icon yet, as `(host, page url)`. A site is
+    /// known by its domain, so `www.example.com` and `example.com` count as one.
+    pub fn missing_icons(&self, urls: &[String]) -> Result<Vec<(String, String)>> {
         let data = self.lock()?;
         let mut missing: Vec<(String, String)> = Vec::new();
-        for favorite in &data.favorites {
-            if let Some(host) = host_of(&favorite.url)
-                && !data.icons.contains_key(&host)
-                && !missing.iter().any(|(h, _)| *h == host)
-            {
-                missing.push((host, favorite.url.clone()));
+        for url in urls {
+            let Some(host) = host_of(url) else { continue };
+            if icon_for_host(&data, &host).is_some() {
+                continue;
             }
+            if missing.iter().any(|(known, _)| same_site(known, &host)) {
+                continue;
+            }
+            missing.push((host, url.clone()));
         }
         Ok(missing)
     }
 
+    /// Every icon the app has cached, by host.
+    pub fn icons(&self) -> Result<BTreeMap<String, String>> {
+        Ok(self.lock()?.icons.clone())
+    }
+
+    /// The icons the app has for these pages, by host.
+    pub fn icons_for(&self, urls: &[String]) -> Result<BTreeMap<String, String>> {
+        let data = self.lock()?;
+        let mut icons = BTreeMap::new();
+        for url in urls {
+            let Some(host) = host_of(url) else { continue };
+            if let Some(icon) = icon_for_host(&data, &host) {
+                icons.insert(host, icon);
+            }
+        }
+        Ok(icons)
+    }
+
+    /// Caches one site's icon. Anything that is not a small PNG data URL is ignored.
     pub fn set_icon(&self, host: &str, data_url: &str) -> Result<()> {
         if !data_url.starts_with(ICON_PREFIX) || data_url.len() > MAX_ICON_CHARS {
             return Ok(());
         }
         let mut data = self.lock()?;
         data.icons.insert(host.to_owned(), data_url.to_owned());
+        prune_icons(&mut data);
         self.save(&data)
     }
 
@@ -378,16 +417,78 @@ fn enabled() -> bool {
 }
 
 fn host_of(url: &str) -> Option<String> {
-    parse_web_url(url)
-        .ok()
-        .and_then(|u| u.host_str().map(str::to_owned))
+    parse_web_url(url).ok().and_then(|u| {
+        u.host_str()
+            .map(|host| host.trim_end_matches('.').to_owned())
+    })
+}
+
+/// Second-level labels under a two-letter country code. The same short list the site view uses to
+/// pin a session to one domain.
+const COUNTRY_SECOND_LEVEL: [&str; 12] = [
+    "co", "com", "org", "net", "gov", "edu", "ac", "or", "ne", "go", "gob", "mil",
+];
+
+/// The domain a host belongs to: `www.instagram.com` and `m.instagram.com` both give
+/// `instagram.com`. A host without a registrable part is kept whole.
+fn registrable_domain(host: &str) -> String {
+    let host = host.trim_end_matches('.').to_lowercase();
+    let labels: Vec<&str> = host.split('.').filter(|label| !label.is_empty()).collect();
+    if labels.len() <= 2 || labels.iter().all(|label| label.parse::<u32>().is_ok()) {
+        return host;
+    }
+    let tld = labels[labels.len() - 1];
+    let second = labels[labels.len() - 2];
+    let keep = if tld.len() == 2 && COUNTRY_SECOND_LEVEL.contains(&second) {
+        3
+    } else {
+        2
+    };
+    labels[labels.len() - keep..].join(".")
+}
+
+/// True for two hosts of one site: the same host, or two of the same domain.
+fn same_site(one: &str, other: &str) -> bool {
+    one.eq_ignore_ascii_case(other) || registrable_domain(one) == registrable_domain(other)
+}
+
+/// The cached icon for a host: the one stored for it, or the one stored for its domain.
+fn icon_for_host(data: &LibraryData, host: &str) -> Option<String> {
+    data.icons
+        .get(host)
+        .or_else(|| data.icons.get(&registrable_domain(host)))
+        .cloned()
+}
+
+/// Drops the icons of sites the user no longer has anywhere, and keeps the cache bounded: the
+/// oldest visited sites go first, a favorite's icon never does.
+fn prune_icons(data: &mut LibraryData) {
+    let favorites: Vec<String> = data
+        .favorites
+        .iter()
+        .filter_map(|favorite| host_of(&favorite.url))
+        .collect();
+    let history: Vec<String> = data.history.iter().filter_map(|url| host_of(url)).collect();
+    let mut wanted = favorites.clone();
+    wanted.extend(history.iter().cloned());
+    data.icons
+        .retain(|host, _| wanted.iter().any(|keep| same_site(keep, host)));
+    for host in history.iter().rev() {
+        if data.icons.len() <= MAX_ICONS {
+            break;
+        }
+        if favorites.iter().any(|keep| same_site(keep, host)) {
+            continue;
+        }
+        data.icons.retain(|cached, _| !same_site(cached, host));
+    }
 }
 
 fn with_icons(data: &LibraryData) -> Vec<Favorite> {
     data.favorites
         .iter()
         .map(|favorite| Favorite {
-            icon: host_of(&favorite.url).and_then(|host| data.icons.get(&host).cloned()),
+            icon: host_of(&favorite.url).and_then(|host| icon_for_host(data, &host)),
             ..favorite.clone()
         })
         .collect()
@@ -441,6 +542,7 @@ fn default_data() -> LibraryData {
         bottom_margin: 0,
         site_bottom_margins: BTreeMap::new(),
         back_button: false,
+        ai_preview: true,
         icons: BTreeMap::new(),
         history: Vec::new(),
         ai: AiSettings::default(),
@@ -750,11 +852,32 @@ mod tests {
     }
 
     #[test]
+    fn the_ai_preview_is_on_by_default_and_the_choice_persists() {
+        let (dir, library) = library();
+        assert!(library.state().unwrap().ai_preview);
+        library.set_ai_preview(false).unwrap();
+        assert!(!reload(&dir).state().unwrap().ai_preview);
+    }
+
+    #[test]
+    fn a_file_saved_before_the_ai_preview_existed_keeps_it_on() {
+        let (dir, library) = library();
+        let path = dir.path().join("library.json");
+        let mut saved: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
+        assert!(saved.as_object_mut().unwrap().remove("aiPreview").is_some());
+        fs::write(&path, saved.to_string()).unwrap();
+        drop(library);
+        assert!(reload(&dir).state().unwrap().ai_preview);
+    }
+
+    #[test]
     fn icons_are_cached_by_host_and_shown_on_matching_favorites() {
         let (dir, library) = library();
+        let urls = vec!["https://www.reddit.com/".to_owned()];
         assert!(
             library
-                .favorites_missing_icons()
+                .missing_icons(&urls)
                 .unwrap()
                 .iter()
                 .any(|(host, _)| host == "www.reddit.com")
@@ -771,7 +894,7 @@ mod tests {
         assert_eq!(reddit.icon.as_deref(), Some("data:image/png;base64,AAAA"));
         assert!(
             library
-                .favorites_missing_icons()
+                .missing_icons(&urls)
                 .unwrap()
                 .iter()
                 .all(|(host, _)| host != "www.reddit.com")
@@ -779,9 +902,25 @@ mod tests {
     }
 
     #[test]
+    fn one_icon_serves_every_host_of_the_same_site() {
+        let (_dir, library) = library();
+        library
+            .set_icon("reddit.com", "data:image/png;base64,AAAA")
+            .unwrap();
+        let urls = vec!["https://www.reddit.com/r/".to_owned()];
+        assert!(library.missing_icons(&urls).unwrap().is_empty());
+        let icons = library.icons_for(&urls).unwrap();
+        assert_eq!(
+            icons.get("www.reddit.com").map(String::as_str),
+            Some("data:image/png;base64,AAAA")
+        );
+    }
+
+    #[test]
     fn only_small_png_data_urls_are_accepted_as_icons() {
         let (_dir, library) = library();
-        let before = library.favorites_missing_icons().unwrap();
+        let urls = vec!["https://www.reddit.com/".to_owned()];
+        let before = library.missing_icons(&urls).unwrap();
         library
             .set_icon("www.reddit.com", "https://evil.example/x.png")
             .unwrap();
@@ -791,7 +930,30 @@ mod tests {
                 &format!("{ICON_PREFIX}{}", "A".repeat(MAX_ICON_CHARS)),
             )
             .unwrap();
-        assert_eq!(library.favorites_missing_icons().unwrap(), before);
+        assert_eq!(library.missing_icons(&urls).unwrap(), before);
+    }
+
+    #[test]
+    fn clearing_history_drops_the_icons_of_sites_the_user_no_longer_has() {
+        let (dir, library) = library();
+        library.add_history("https://a.example/").unwrap();
+        library
+            .set_icon("a.example", "data:image/png;base64,AAAA")
+            .unwrap();
+        assert!(!library.icons().unwrap().is_empty());
+        library.clear_history().unwrap();
+        assert!(library.icons().unwrap().is_empty());
+        assert!(reload(&dir).icons().unwrap().is_empty());
+    }
+
+    #[test]
+    fn a_favorites_icon_survives_clearing_the_history() {
+        let (_dir, library) = library();
+        library
+            .set_icon("www.reddit.com", "data:image/png;base64,AAAA")
+            .unwrap();
+        library.clear_history().unwrap();
+        assert!(library.icons().unwrap().contains_key("www.reddit.com"));
     }
 
     #[test]

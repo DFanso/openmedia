@@ -22,13 +22,14 @@
 - **The real site, not a copy.** Pages load in a native web view; you log in to the actual origin and your session stays on the device.
 - **Customization is data.** What gets hidden is a declarative recipe, so it can be read, tested against DOM fixtures, and fixed when a site changes. Reddit's "open the app" prompts are the first bundled recipe.
 - **Out of the way.** The web fills the screen. A single draggable button holds everything else.
-- **Local first.** No server, no telemetry, no account. The only network traffic is the sites you open.
+- **Local first.** No server, no telemetry, no account. Network requests go to opened sites and, only on request, your configured AI provider.
 
 ## Highlights
 
 - **Floating button:** tap to type an address, hold to fan out your favorites (Instagram, Facebook, Twitter, Reddit, YouTube by default, with their site icons) and settings, drag it to either edge. A thin progress ring hugs its edge while held.
-- **Favorites:** as many as you like, edited, reordered, added and removed in Settings; a star on each pre-made recipe adds its site. The first six are the quick-access menu in the fan.
-- **Pre-made recipes:** per-site switches in Settings (hide Reels, Shorts, Stories, suggested posts, app-install prompts and more) for the five default sites, and a bottom margin for pages that run under the screen edge.
+- **Favorites:** star the current page, a history entry or a pre-made recipe. Edit and reorder in Settings; the first six form quick access.
+- **Pre-made recipes:** bundled site icons and per-site switches for 18 sites; hide Reels, Shorts, Stories, app prompts and more. Long Settings sections start collapsed.
+- **Usage:** per-site foreground time with optional daily warnings and limits for any site. Top notices warn; exhausted sites are blurred, with interaction, navigation and media stopped until midnight or a policy change.
 - **Pull to refresh** on the page, and **light, dark or system** theme that sites can follow.
 - **Ad and tracker blocking:** EasyList and EasyPrivacy are built into the app and compiled to WebKit content rules, so ads and trackers are blocked before they load, with no list downloads. One switch in Settings.
 - **Recipes:** bundled, validated in Rust, injected at document start so removed things never flash.
@@ -36,11 +37,12 @@
 - **First-run guide:** four short steps, replayable from Settings.
 - **Bring your own AI key:** add providers (Anthropic, OpenAI, Gemini, OpenRouter, or a local OpenAI-compatible server) in Settings. Keys go to the iOS Keychain through Rust and never come back to the UI; "Test connection" lists the provider's models.
   - **Where to get a key:** Settings recommends [OpenRouter](https://openrouter.ai) (free variants and paid models), [OpenCode Zen / Console](https://opencode.ai/console) (paid access from external clients; its free-tier chat models require OpenCode), and local [Ollama](https://ollama.com) / [LM Studio](https://lmstudio.ai) servers (no model API fees). See [AI Assistant](docs/wiki/ai-assistant.md).
-- **Planned:** the AI assistant itself (it writes recipes; today the saved providers are not used yet), a catalog of bundled recipes, Android, desktop. See the [roadmap](docs/wiki/roadmap.md).
+- **AI assistant:** use the active provider to request a change on the current page, preview the redacted payload, then accept or reject its validated recipe proposal.
+- **Planned:** Android and desktop site views, additional runtime capabilities and sharing. See the [roadmap](docs/wiki/roadmap.md).
 
 ## Status
 
-Early. It runs on the **iOS simulator**. Not built yet: Android, desktop site views, and the AI assistant itself (the prompt box accepts addresses only). Nothing has been tested on a physical device, and no key has been tested against a real provider. What was and was not verified is listed in [Platform Support](docs/wiki/platform-support.md#verified-results).
+Early, iOS first. Android and desktop site views are not built. Physical-device interaction and authenticated requests to a real AI provider remain unverified. Shell flows use in-memory IPC fixtures for smoke checks; native Swift compilation and Rust tests cover the implementation boundaries. See [Platform Support](docs/wiki/platform-support.md#verified-results).
 
 ## Run it
 

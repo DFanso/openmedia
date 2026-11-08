@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
+import { useApp } from "../../app/store";
 import { PlusIcon } from "../../shared/icons";
 import { ai, errorMessage, type AiState, type Provider, type ProviderKind } from "../../shared/ipc";
 import { PRESETS } from "./presets";
+import { Switch } from "./Switch";
 import { Group, Section, field, quietButton } from "./ui";
 
 interface Draft {
@@ -33,6 +35,20 @@ const draftOf = (p: Provider): Draft => ({
   hasKey: p.hasKey,
 });
 
+/** What the command bar can do right now, in the user's words. */
+function connectionLine(state: AiState | null): string {
+  if (!state || state.providers.length === 0) {
+    return "No provider yet. The command bar opens addresses only.";
+  }
+  const active = state.providers.find((p) => p.id === state.activeId);
+  if (!active) return "No provider is active. The command bar opens addresses only.";
+  if (!active.hasKey) {
+    return `${active.name} is active but has no key yet. The command bar opens addresses only.`;
+  }
+  const model = active.model ? ` (${active.model})` : "";
+  return `Ready: ${active.name}${model} answers requests in the command bar.`;
+}
+
 /** Bring-your-own-key providers. Keys go to Rust and the Keychain and never come back. */
 export function AiSection() {
   const [state, setState] = useState<AiState | null>(null);
@@ -63,11 +79,15 @@ export function AiSection() {
     await reload();
   };
 
+  const preview = useApp((s) => s.state?.aiPreview ?? true);
+  const setAiPreview = useApp((s) => s.setAiPreview);
+
   return (
     <Section
       title="AI assistant"
-      note="Bring your own key. It is stored in the iOS Keychain, read only by the app's Rust core, and sent only to the provider you choose. The assistant itself is not connected yet; saved providers are used once it ships."
+      note="Bring your own key. It is stored in the iOS Keychain, read only by the app's Rust core, and sent only to the provider you choose. Pick one as active, then describe a change in the command bar. The page's structure (not your cookies, passwords or typed text) goes to that provider only when you press Send."
     >
+      <p className="px-1 pb-2 text-[13px] leading-snug text-paper/60">{connectionLine(state)}</p>
       {state && state.providers.length > 0 && (
         <Group>
           {state.providers.map((p) => (
@@ -115,6 +135,15 @@ export function AiSection() {
         </button>
       )}
       {error && !draft && <p className="mt-2 px-1 text-sm text-accent">{error}</p>}
+
+      <Group>
+        <Switch
+          label="Preview before sending"
+          description="Shows the exact text that would go to the provider, and waits for you."
+          checked={preview}
+          onChange={(on) => void setAiPreview(on)}
+        />
+      </Group>
 
       <details className="mt-4 rounded-2xl border border-hair bg-paper/[0.04] px-4 py-3 text-sm text-paper/70">
         <summary className="cursor-pointer font-medium text-paper">Where to get a key</summary>

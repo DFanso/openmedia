@@ -15,6 +15,10 @@ const FORMAT_VERSION: u32 = 1;
 pub const RETAINED_DAYS: u32 = 30;
 const MAX_HOSTS_PER_DAY: usize = 200;
 const MAX_SECTIONS_PER_HOST: usize = 60;
+/// How many sites may carry a daily warning or limit.
+pub const MAX_POLICY_HOSTS: usize = 200;
+/// The largest threshold a policy may set: a whole day.
+pub const MAX_POLICY_SECONDS: u32 = 86_400;
 /// One flush never covers more than this; the shell flushes every few seconds.
 pub const MAX_SECONDS_PER_RECORD: u32 = 3600;
 const MAX_HOST_CHARS: usize = 253;
@@ -32,6 +36,10 @@ struct UsageData {
     version: u32,
     /// Local date `YYYY-MM-DD` -> host -> section -> seconds.
     days: BTreeMap<String, Hosts>,
+    /// The daily warning and limit the user set, per host. Kept in the same file as the
+    /// seconds, but apart from them: clearing the stats never clears the limits.
+    #[serde(default)]
+    policies: UsagePolicies,
 }
 
 impl UsageData {
@@ -39,9 +47,33 @@ impl UsageData {
         Self {
             version: FORMAT_VERSION,
             days: BTreeMap::new(),
+            policies: UsagePolicies::new(),
         }
     }
 }
+
+/// What the user set for one site: when the app warns, and when it closes the site for the day.
+/// Both are seconds of use in one local day; `None` means that step never happens.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct UsagePolicy {
+    /// Seconds after which the app warns; `None` warns never.
+    #[serde(default)]
+    pub warn_seconds: Option<u32>,
+    /// Seconds after which the app closes the site for the day; `None` never closes it.
+    #[serde(default)]
+    pub limit_seconds: Option<u32>,
+}
+
+impl UsagePolicy {
+    /// A policy with neither step: the site has no limit, and setting it removes the policy.
+    fn is_unset(&self) -> bool {
+        self.warn_seconds.is_none() && self.limit_seconds.is_none()
+    }
+}
+
+/// The policy of every site the user set one for, keyed by host.
+pub type UsagePolicies = BTreeMap<String, UsagePolicy>;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -92,6 +124,8 @@ impl Usage {
 
     /// Adds `seconds` to a site section for `day`, then drops days older than the retention
     /// window counted back from the newest recorded day. Sites or sections beyond the per-day caps are not recorded.
+    /// A site that has reached its daily limit does not accrue more time: the app closes it, so
+    /// the seconds it would earn are never counted.
     pub fn record(&self, day: &str, host: &str, section: &str, seconds: u32) -> Result<()> {
         let today = day_number(day).ok_or(Error::InvalidUsage("the day must be YYYY-MM-DD"))?;
         if !valid_host(host) {
@@ -104,6 +138,9 @@ impl Usage {
             return Err(Error::InvalidUsage("seconds out of range"));
         }
         let mut data = self.lock()?;
+        if reached_limit(&data, day, host) {
+            return Ok(());
+        }
         let hosts = data.days.entry(day.to_owned()).or_default();
         if hosts.contains_key(host) || hosts.len() < MAX_HOSTS_PER_DAY {
             let sections = hosts.entry(host.to_owned()).or_default();
@@ -145,9 +182,41 @@ impl Usage {
         Ok(summarize(merged))
     }
 
+    /// The daily warning and limit of every site the user set one for.
+    pub fn policies(&self) -> Result<UsagePolicies> {
+        let data = self.lock()?;
+        Ok(data.policies.clone())
+    }
+
+    /// Saves the daily warning and limit for one site, and returns every policy. A policy with
+    /// neither step removes the site's policy, which is how a limit is lifted.
+    pub fn set_policy(&self, host: &str, policy: UsagePolicy) -> Result<UsagePolicies> {
+        if !valid_host(host) {
+            return Err(Error::InvalidUsage("invalid host"));
+        }
+        check_policy(&policy)?;
+        let mut data = self.lock()?;
+        let previous = data.policies.clone();
+        if policy.is_unset() {
+            data.policies.remove(host);
+        } else {
+            if !data.policies.contains_key(host) && data.policies.len() >= MAX_POLICY_HOSTS {
+                return Err(Error::InvalidUsage("too many sites carry a limit"));
+            }
+            data.policies.insert(host.to_owned(), policy);
+        }
+        if let Err(error) = self.save(&data) {
+            data.policies = previous;
+            return Err(error);
+        }
+        Ok(data.policies.clone())
+    }
+
+    /// Wipes every recorded usage second. The limits the user set stay: they are the user's
+    /// settings, not the numbers they produced.
     pub fn clear(&self) -> Result<()> {
         let mut data = self.lock()?;
-        *data = UsageData::empty();
+        data.days.clear();
         self.save(&data)
     }
 
@@ -158,6 +227,81 @@ impl Usage {
     fn save(&self, data: &UsageData) -> Result<()> {
         write_atomically(&self.path, &serde_json::to_vec(data)?)?;
         Ok(())
+    }
+}
+
+/// A threshold must be a real number of seconds inside one day, and the warning must come
+/// before the limit: a limit at or below the warning would close the site before it warns.
+fn check_policy(policy: &UsagePolicy) -> Result<()> {
+    for seconds in [policy.warn_seconds, policy.limit_seconds]
+        .into_iter()
+        .flatten()
+    {
+        if seconds == 0 || seconds > MAX_POLICY_SECONDS {
+            return Err(Error::InvalidUsage(
+                "a usage threshold must be between 1 and 86400 seconds",
+            ));
+        }
+    }
+    if let (Some(warn), Some(limit)) = (policy.warn_seconds, policy.limit_seconds)
+        && warn >= limit
+    {
+        return Err(Error::InvalidUsage(
+            "the warning threshold must be below the limit",
+        ));
+    }
+    Ok(())
+}
+
+/// True when the site has already used up its daily limit on `day`.
+fn reached_limit(data: &UsageData, day: &str, host: &str) -> bool {
+    let Some(policy) = policy_for_host(&data.policies, host) else {
+        return false;
+    };
+    let Some(limit) = policy.limit_seconds else {
+        return false;
+    };
+    let spent = data
+        .days
+        .get(day)
+        .and_then(|hosts| hosts.get(host))
+        .map(|sections| sections.values().sum::<u64>())
+        .unwrap_or(0);
+    spent >= u64::from(limit)
+}
+
+/// The policy that applies to `host`: the strictest one among the host itself and the domains
+/// around it, so a limit set on a site also covers its subdomains and the other way round. The
+/// shell matches domains the same way; see `policyForHost` in `src/features/stats/policy.ts`.
+fn policy_for_host(policies: &UsagePolicies, host: &str) -> Option<UsagePolicy> {
+    policies
+        .iter()
+        .filter(|(site, _)| same_site(host, site))
+        .map(|(_, policy)| policy)
+        .cloned()
+        .reduce(|best, policy| UsagePolicy {
+            warn_seconds: strictest(best.warn_seconds, policy.warn_seconds),
+            limit_seconds: strictest(best.limit_seconds, policy.limit_seconds),
+        })
+}
+
+/// True when `site` is `host` itself or a domain around it: a parent domain or a subdomain.
+fn same_site(host: &str, site: &str) -> bool {
+    host == site || ends_with_domain(host, site) || ends_with_domain(site, host)
+}
+
+/// True when `host` ends with `domain` at a domain boundary: `m.youtube.com` ends with
+/// `youtube.com`, but `notyoutube.com` does not.
+fn ends_with_domain(host: &str, domain: &str) -> bool {
+    host.strip_suffix(domain)
+        .is_some_and(|rest| rest.ends_with('.'))
+}
+
+/// The stricter of two thresholds. `None` means there is no threshold, so the other one wins.
+fn strictest(a: Option<u32>, b: Option<u32>) -> Option<u32> {
+    match (a, b) {
+        (None, other) | (other, None) => other,
+        (Some(a), Some(b)) => Some(a.min(b)),
     }
 }
 
@@ -462,7 +606,170 @@ mod tests {
         let text = fs::read_to_string(dir.path().join("usage.json")).unwrap();
         assert_eq!(
             text,
-            r#"{"version":1,"days":{"2026-11-08":{"youtube.com":{"/watch":7}}}}"#
+            r#"{"version":1,"days":{"2026-11-08":{"youtube.com":{"/watch":7}}},"policies":{}}"#
         );
+    }
+
+    fn policy(warn: Option<u32>, limit: Option<u32>) -> UsagePolicy {
+        UsagePolicy {
+            warn_seconds: warn,
+            limit_seconds: limit,
+        }
+    }
+
+    #[test]
+    fn policies_persist_and_survive_a_reload() {
+        let (dir, usage) = usage();
+        let policies = usage
+            .set_policy("youtube.com", policy(Some(300), Some(3600)))
+            .unwrap();
+        assert_eq!(policies.len(), 1);
+        assert_eq!(
+            policies.get("youtube.com"),
+            Some(&policy(Some(300), Some(3600)))
+        );
+        let reloaded = reload(&dir);
+        assert_eq!(
+            reloaded.policies().unwrap().get("youtube.com"),
+            Some(&policy(Some(300), Some(3600)))
+        );
+        // A policy with only a limit is a policy too.
+        usage
+            .set_policy("reddit.com", policy(None, Some(600)))
+            .unwrap();
+        assert_eq!(
+            reload(&dir).policies().unwrap().get("reddit.com"),
+            Some(&policy(None, Some(600)))
+        );
+    }
+
+    #[test]
+    fn a_policy_with_neither_step_removes_the_site() {
+        let (dir, usage) = usage();
+        usage
+            .set_policy("youtube.com", policy(Some(300), None))
+            .unwrap();
+        let policies = usage.set_policy("youtube.com", policy(None, None)).unwrap();
+        assert!(policies.is_empty());
+        assert!(reload(&dir).policies().unwrap().is_empty());
+    }
+
+    #[test]
+    fn rejects_invalid_thresholds_and_hosts() {
+        let (_dir, usage) = usage();
+        let bad = [
+            policy(Some(0), None),
+            policy(None, Some(0)),
+            policy(None, Some(MAX_POLICY_SECONDS + 1)),
+            policy(Some(MAX_POLICY_SECONDS + 1), None),
+            policy(Some(600), Some(600)),
+            policy(Some(900), Some(600)),
+        ];
+        for policy in bad {
+            let shown = format!("{policy:?}");
+            assert!(
+                matches!(
+                    usage.set_policy("youtube.com", policy),
+                    Err(Error::InvalidUsage(_))
+                ),
+                "{shown}"
+            );
+        }
+        for host in ["", "A.com", "https://a.com", "a.com/path"] {
+            assert!(
+                matches!(
+                    usage.set_policy(host, policy(Some(60), Some(120))),
+                    Err(Error::InvalidUsage(_))
+                ),
+                "{host}"
+            );
+        }
+        assert!(usage.policies().unwrap().is_empty());
+    }
+
+    #[test]
+    fn clearing_the_stats_keeps_the_policies() {
+        let (dir, usage) = usage();
+        usage
+            .record("2026-11-08", "youtube.com", "/watch", 7)
+            .unwrap();
+        usage
+            .set_policy("youtube.com", policy(Some(300), Some(3600)))
+            .unwrap();
+        usage.clear().unwrap();
+        let reloaded = reload(&dir);
+        assert_eq!(reloaded.report("2026-11-08", 30).unwrap().total_seconds, 0);
+        assert_eq!(
+            reloaded.policies().unwrap().get("youtube.com"),
+            Some(&policy(Some(300), Some(3600)))
+        );
+    }
+
+    #[test]
+    fn a_site_at_its_limit_stops_accruing_time() {
+        let (_dir, usage) = usage();
+        usage
+            .set_policy("youtube.com", policy(Some(300), Some(600)))
+            .unwrap();
+        usage
+            .record("2026-11-08", "youtube.com", "/watch", 600)
+            .unwrap();
+        usage
+            .record("2026-11-08", "youtube.com", "/watch", 60)
+            .unwrap();
+        assert_eq!(usage.report("2026-11-08", 1).unwrap().sites[0].seconds, 600);
+        // Another day counts on its own.
+        usage
+            .record("2026-11-09", "youtube.com", "/watch", 60)
+            .unwrap();
+        assert_eq!(usage.report("2026-11-09", 1).unwrap().sites[0].seconds, 60);
+    }
+
+    #[test]
+    fn a_limit_covers_the_domains_around_the_site() {
+        let (_dir, usage) = usage();
+        usage
+            .set_policy("youtube.com", policy(None, Some(600)))
+            .unwrap();
+        usage
+            .record("2026-11-08", "m.youtube.com", "/watch", 600)
+            .unwrap();
+        usage
+            .record("2026-11-08", "m.youtube.com", "/watch", 60)
+            .unwrap();
+        assert_eq!(usage.report("2026-11-08", 1).unwrap().sites[0].seconds, 600);
+        // A lookalike domain is a site of its own.
+        usage
+            .record("2026-11-08", "notyoutube.com", "/", 60)
+            .unwrap();
+        assert_eq!(usage.report("2026-11-08", 1).unwrap().total_seconds, 660);
+    }
+
+    #[test]
+    fn an_existing_file_without_policies_still_loads() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("usage.json");
+        fs::write(
+            &path,
+            r#"{"version":1,"days":{"2026-11-08":{"a.com":{"/":5}}}}"#,
+        )
+        .unwrap();
+        let usage = Usage::load(path).unwrap();
+        assert_eq!(usage.report("2026-11-08", 1).unwrap().total_seconds, 5);
+        assert!(usage.policies().unwrap().is_empty());
+    }
+
+    #[test]
+    fn caps_the_number_of_sites_with_a_limit() {
+        let (_dir, usage) = usage();
+        for i in 0..MAX_POLICY_HOSTS {
+            usage
+                .set_policy(&format!("h{i}.com"), policy(None, Some(600)))
+                .unwrap();
+        }
+        assert!(matches!(
+            usage.set_policy("one-too-many.com", policy(None, Some(600))),
+            Err(Error::InvalidUsage(_))
+        ));
     }
 }

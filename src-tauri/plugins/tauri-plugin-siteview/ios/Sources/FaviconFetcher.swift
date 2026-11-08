@@ -1,5 +1,23 @@
 import UIKit
 
+private final class FaviconRedirects: NSObject, URLSessionTaskDelegate {
+  let scope: String
+
+  init(scope: String) { self.scope = scope }
+
+  func urlSession(
+    _ session: URLSession, task: URLSessionTask,
+    willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest,
+    completionHandler: @escaping (URLRequest?) -> Void
+  ) {
+    let allowed = request.url.map {
+      ["http", "https"].contains($0.scheme ?? "")
+        && DomainScope.registrableDomain(of: $0.host ?? "") == scope
+    } ?? false
+    completionHandler(allowed ? request : nil)
+  }
+}
+
 /// Fetches a site's icon from the site itself and returns it as a small PNG `data:` URL.
 /// Nothing goes through a third-party icon service; the only host contacted is the page's own.
 enum FaviconFetcher {
@@ -8,8 +26,14 @@ enum FaviconFetcher {
   private static let outputSize = CGSize(width: 96, height: 96)
 
   static func fetch(for page: URL) async -> String? {
+    let scope = DomainScope.registrableDomain(of: page.host ?? "")
+    let configuration = URLSessionConfiguration.ephemeral
+    configuration.httpShouldSetCookies = false
+    let session = URLSession(configuration: configuration, delegate: FaviconRedirects(scope: scope), delegateQueue: nil)
+    defer { session.invalidateAndCancel() }
     var candidates: [URL] = []
-    if let html = await text(from: page) {
+    if let data = await get(page, using: session, scope: scope) {
+      let html = String(decoding: data, as: UTF8.self)
       candidates += iconLinks(in: html, base: page)
     }
     for path in ["/apple-touch-icon.png", "/favicon.ico"] {
@@ -21,33 +45,36 @@ enum FaviconFetcher {
     var tried = Set<URL>()
     for url in candidates {
       guard tried.count < maxCandidates, tried.insert(url).inserted else { continue }
-      if let png = await png(from: url) {
+      if let data = await get(url, using: session, scope: scope),
+        data.count > 100, let image = UIImage(data: data),
+        image.size.width <= 4096, image.size.height <= 4096
+      {
+        let png = UIGraphicsImageRenderer(size: outputSize).pngData { _ in
+          image.draw(in: CGRect(origin: .zero, size: outputSize))
+        }
         return "data:image/png;base64," + png.base64EncodedString()
       }
     }
     return nil
   }
 
-  private static func get(_ url: URL) async -> Data? {
+  private static func get(_ url: URL, using session: URLSession, scope: String) async -> Data? {
+    guard ["http", "https"].contains(url.scheme ?? ""),
+      DomainScope.registrableDomain(of: url.host ?? "") == scope
+    else { return nil }
     var request = URLRequest(url: url)
     request.timeoutInterval = 8
-    guard
-      let (data, response) = try? await URLSession.shared.data(for: request),
-      (response as? HTTPURLResponse)?.statusCode == 200,
-      data.count <= maxBytes
-    else { return nil }
-    return data
-  }
-
-  private static func text(from url: URL) async -> String? {
-    guard let data = await get(url) else { return nil }
-    return String(decoding: data, as: UTF8.self)
-  }
-
-  private static func png(from url: URL) async -> Data? {
-    guard let data = await get(url), data.count > 100, let image = UIImage(data: data) else { return nil }
-    return UIGraphicsImageRenderer(size: outputSize).pngData { _ in
-      image.draw(in: CGRect(origin: .zero, size: outputSize))
+    do {
+      let (bytes, response) = try await session.bytes(for: request)
+      guard (response as? HTTPURLResponse)?.statusCode == 200 else { return nil }
+      var data = Data()
+      for try await byte in bytes {
+        guard data.count < maxBytes else { return nil }
+        data.append(byte)
+      }
+      return data
+    } catch {
+      return nil
     }
   }
 

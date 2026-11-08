@@ -1,9 +1,11 @@
 import { lazy, Suspense, useEffect, useState } from "react";
+import { AssistantDock } from "../features/ai/AssistantDock";
 import { BackButton } from "../features/back/BackButton";
 import { Fab } from "../features/fab/Fab";
 import { CommandBar } from "../features/sheet/CommandBar";
 import { HistorySheet } from "../features/history/HistorySheet";
 import { startUsageTracking } from "../features/stats/tracker";
+import { UsageGuard } from "../features/stats/UsageGuard";
 import { WebLayer } from "../features/web/WebLayer";
 import { useApplyTheme } from "../shared/theme";
 import { hideSplash, hideSplashWhen, pageShowing } from "./splash";
@@ -52,9 +54,11 @@ export function App() {
   return (
     <>
       <WebLayer />
+      <UsageGuard />
       <Fab />
       <BackButton />
       <CommandBar />
+      <AssistantDock />
       <HistorySheet />
       <Suspense fallback={null}>
         {(idle || sheet === "settings") && <SettingsScreen />}

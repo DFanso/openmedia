@@ -1,6 +1,6 @@
 # Architecture
 
-> **Status: Design.** Describes the intended system. Nothing here is implemented yet.
+> **Status: Partially implemented, iOS first.** The shell, native site sessions, bundled recipe subset, BYOK assistant and local usage controls exist. Desktop, Android, multiple profiles and the full runtime described below remain planned; see the roadmap and component pages for implemented boundaries.
 
 ## Overview
 
@@ -76,7 +76,7 @@ A self-contained script bundled to a single IIFE and injected at document start 
 
 ### Shell (React)
 
-One full-screen page with a floating button on top ([UI Design](./ui-design.md)): tap opens the command bar (addresses now, AI chat later), hold fans out favorites, history and settings, settings edits the favorites and clears history. The shell keeps the list of live sessions (one native view each) and decides which to switch to, open or close ([Sessions](./ui-design.md#sessions)); the native side only opens, shows and closes, and pins each session to its domain. Later: customize panel (rule list with toggles, picker), provider keys, privacy preview. Talks to Rust over Tauri IPC only.
+One full-screen page with floating controls ([UI Design](./ui-design.md)): tap opens addresses or AI requests, hold opens favorites, Usage, History and Settings. Current pages and history entries have favorite actions; Settings edits and reorders the list in collapsed disclosures. Daily per-site warnings and limits reuse foreground usage accounting (`src/features/stats`, `src-tauri/src/usage.rs`); native iOS shields enforce exhausted sessions without changing other sites. The shell owns session lifetime; native code opens, shows, closes and pins each session to its domain. AI requests run in Rust with redacted payload preview, validated proposals and explicit acceptance. Keys stay in the secure store.
 
 ## Core data flows
 

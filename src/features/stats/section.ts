@@ -38,7 +38,7 @@ export function usageTargetOf(url: string, scope: string | null): UsageTarget | 
     return null;
   }
   if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return null;
-  const host = (scope ?? parsed.hostname).toLowerCase();
+  const host = (scope ?? parsed.hostname).toLowerCase().replace(/\.$/, "");
   if (!PLAIN_HOST.test(host)) return null;
   return { host, section: sectionOf(parsed.pathname) };
 }

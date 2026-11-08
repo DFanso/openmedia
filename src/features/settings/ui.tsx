@@ -19,13 +19,18 @@ interface SectionProps {
 /** A titled block of settings. The title is small and quiet; the controls carry the weight. */
 export function Section({ title, note, children }: SectionProps) {
   return (
-    <section>
-      <h2 className="px-1 pb-2 text-xs font-semibold tracking-[0.16em] text-paper/50 uppercase">
-        {title}
-      </h2>
-      {children}
-      {note && <p className="px-1 pt-2.5 text-[13px] leading-snug text-paper/50">{note}</p>}
-    </section>
+    <details className="group">
+      <summary className="flex cursor-pointer list-none items-center justify-between px-1 py-2 text-sm font-semibold text-paper">
+        <span>{title}</span>
+        <span aria-hidden="true" className="text-paper/45 group-open:rotate-180">
+          ⌄
+        </span>
+      </summary>
+      <div className="pt-3">
+        {children}
+        {note && <p className="px-1 pt-2.5 text-[13px] leading-snug text-paper/50">{note}</p>}
+      </div>
+    </details>
   );
 }
 

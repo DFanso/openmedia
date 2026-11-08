@@ -234,7 +234,7 @@ export function Fab() {
       <button
         type="button"
         data-open={fanOpen}
-        aria-label="Stats"
+        aria-label="Usage"
         tabIndex={fanOpen ? 0 : -1}
         onClick={() => {
           select({ kind: "stats" });
