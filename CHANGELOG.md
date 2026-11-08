@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-08
 
+### perf(startup): no empty screens, page opens at launch
+
+**What:** Launching showed an empty screen, then the splash, then an empty screen again (about 0.5 s or more on script-rendered sites) before the page.
+
+**Change:** The launch screen and the splash show the same logo in the same place, and the splash's logo and stylesheet ride in the first HTML, so no frame is empty. The splash now stays until the page has painted (native `painted` flag on `siteview:state`, from the page's first contentful paint) instead of leaving at the first address. Core opens the start page from `setup`, in parallel with the shell's boot (`boot.rs`, `adopt_boot_session`, optional rect on the native `open`), and resolves its host first. The shell requests `get_state` before React renders, runs its hot commands off the main thread, loads Settings, Stats and the guide as separate chunks, and fetches site options and favicons after the first page shows; the library file is no longer rewritten at every launch. On the simulator, empty frames after the app appears went from 1.4-2.9 s to 0 over three alternating runs; time to page has a wide spread and is not claimed beyond its direction. Real devices and real sites were not measured. See [Platform Support](docs/wiki/platform-support.md#startup).
+
 ### feat(stats): on-device usage stats sheet
 
 **What:** There was no way to see how much time goes to which site or to which part of it (Shorts, Reels, Watch).

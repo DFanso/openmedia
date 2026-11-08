@@ -1,5 +1,6 @@
 mod ad_block;
 mod ai;
+mod boot;
 mod commands;
 mod error;
 mod library;
@@ -19,15 +20,18 @@ pub fn run() {
             let library = library::Library::load(data_dir.join("library.json"))?;
             let ad_block_enabled = library.ad_block_enabled()?;
             app.manage(library);
-            app.manage(usage::Usage::load(data_dir.join("usage.json"))?);
             app.manage(recipes::Recipes::load(data_dir.join("recipes"))?);
             let ad_block = ad_block::AdBlock::bundled(app.path().app_cache_dir()?.join("ad-block"));
             app.manage(ad_block.clone());
+            // The start page opens now, on another thread, while the shell boots; see `boot.rs`.
+            let boot = boot::Boot::start(app.handle(), &app.state::<library::Library>())?;
+            app.manage(boot);
             if ad_block_enabled {
                 // Converting the lists takes seconds on the first run; do it while the shell loads
                 // so the first page open does not wait. A failure surfaces when a page opens.
                 tauri::async_runtime::spawn_blocking(move || ad_block.rule_lists());
             }
+            app.manage(usage::Usage::load(data_dir.join("usage.json"))?);
             app.manage(commands::Secrets(Box::new(secrets::KeychainStore)));
             Ok(())
         })
@@ -46,6 +50,7 @@ pub fn run() {
             commands::set_theme,
             commands::refresh_icons,
             commands::open_site,
+            commands::adopt_boot_session,
             commands::set_ad_block,
             commands::get_sites,
             commands::set_site_option,

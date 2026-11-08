@@ -30,6 +30,17 @@ export interface AppState {
   backButton: boolean;
 }
 
+/** The page Rust already started loading at launch; the shell takes it over. */
+export interface BootSession {
+  id: string;
+  url: string;
+}
+
+/** `get_state`: the saved state plus the page opened for it, if there is one. */
+export interface Startup extends AppState {
+  bootSession: BootSession | null;
+}
+
 export type OptionGroup = "annoyance" | "content";
 
 /** One toggle for a site. `enabled` already reflects the user's choice or the site's default. */
@@ -97,6 +108,8 @@ export interface SiteViewState {
   loading: boolean;
   canGoBack: boolean;
   canGoForward: boolean;
+  /** The page has drawn its first content and is showing. */
+  painted: boolean;
   /** The registrable domain the session is pinned to. */
   scope: string;
 }
@@ -105,8 +118,20 @@ async function command(name: string, args?: Record<string, unknown>): Promise<vo
   await invoke(name, args);
 }
 
+let startupRequest: Promise<Startup> | null = null;
+
+/** Asks for the startup state now, so the answer is on its way while the shell renders. */
+export function prefetchStartup(): void {
+  startupRequest ??= invoke<Startup>("get_state");
+}
+
 export const library = {
-  getState: () => invoke<AppState>("get_state"),
+  /** The startup state: the one `prefetchStartup` asked for, if it is still unclaimed. */
+  getState: (): Promise<Startup> => {
+    const request = startupRequest ?? invoke<Startup>("get_state");
+    startupRequest = null;
+    return request;
+  },
   setFavorites: (favorites: FavoriteInput[]) => invoke<Favorite[]>("set_favorites", { favorites }),
   /** Adds a pre-made recipe's site to the favorites, or removes the site's favorites. */
   setSiteFavorite: (recipeId: string, favorite: boolean) =>
@@ -135,6 +160,12 @@ export const library = {
    */
   openSite: (session: string, url: string, rect: Rect) =>
     command("open_site", { session, url, rect }),
+  /**
+   * Takes over the page Rust opened at launch: gives it the real rectangle and re-announces its
+   * state. If that page is gone, opens `url` instead; see `adopt_boot_session` in Rust.
+   */
+  adoptBootSession: (session: string, url: string, rect: Rect) =>
+    command("adopt_boot_session", { session, url, rect }),
   /** Remembers a typed address and returns the history, newest first. */
   addHistory: (url: string) => invoke<string[]>("add_history", { url }),
   /** Forgets the typed addresses and the remembered last page. */

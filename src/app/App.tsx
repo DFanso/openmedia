@@ -1,38 +1,53 @@
-import { hideSplash, hideSplashWhen } from "./splash";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { BackButton } from "../features/back/BackButton";
 import { Fab } from "../features/fab/Fab";
-import { Onboarding } from "../features/onboarding/Onboarding";
 import { CommandBar } from "../features/sheet/CommandBar";
 import { HistorySheet } from "../features/history/HistorySheet";
-import { StatsSheet } from "../features/stats/StatsSheet";
 import { startUsageTracking } from "../features/stats/tracker";
-import { SettingsScreen } from "../features/settings/SettingsScreen";
 import { WebLayer } from "../features/web/WebLayer";
 import { useApplyTheme } from "../shared/theme";
-import { useApp } from "./store";
+import { hideSplash, hideSplashWhen, pageShowing } from "./splash";
+import { selectPage, useApp } from "./store";
 import { useHitRegions } from "./useHitRegions";
 
-/** True with no page to wait for, or once the visible page has reported an address. */
-function activePageHasUrl(): boolean {
-  const { activeId, sessions } = useApp.getState();
-  return activeId === null || sessions.some((s) => s.id === activeId && s.url !== null);
+/** Heavy screens load after the first page shows; most launches never open them. */
+const loadSettings = () => import("../features/settings/SettingsScreen");
+const loadStats = () => import("../features/stats/StatsSheet");
+const loadOnboarding = () => import("../features/onboarding/Onboarding");
+const SettingsScreen = lazy(() =>
+  loadSettings().then((module) => ({ default: module.SettingsScreen })),
+);
+const StatsSheet = lazy(() => loadStats().then((module) => ({ default: module.StatsSheet })));
+const Onboarding = lazy(() => loadOnboarding().then((module) => ({ default: module.Onboarding })));
+
+function firstPageShowing(): boolean {
+  const store = useApp.getState();
+  return store.error !== null || pageShowing(selectPage(store));
 }
 
 export function App() {
   const load = useApp((s) => s.load);
+  const loadSecondary = useApp((s) => s.loadSecondary);
   const error = useApp((s) => s.error);
   const sheet = useApp((s) => s.sheet);
+  const onboardingOpen = useApp((s) => s.onboardingOpen);
   const reportError = useApp((s) => s.reportError);
   const theme = useApp((s) => s.state?.theme ?? "system");
+  const [idle, setIdle] = useState(false);
   useApplyTheme(theme);
   useHitRegions();
 
   useEffect(() => startUsageTracking(), []);
 
   useEffect(() => {
-    void load().then(() => hideSplashWhen(activePageHasUrl, useApp.subscribe), hideSplash);
-  }, [load]);
+    void load()
+      .then(() => hideSplashWhen(firstPageShowing, useApp.subscribe), hideSplash)
+      .then(() => {
+        loadSecondary();
+        void Promise.all([loadSettings(), loadStats()]);
+        setIdle(true);
+      });
+  }, [load, loadSecondary]);
 
   return (
     <>
@@ -40,10 +55,12 @@ export function App() {
       <Fab />
       <BackButton />
       <CommandBar />
-      <SettingsScreen />
       <HistorySheet />
-      <StatsSheet />
-      <Onboarding />
+      <Suspense fallback={null}>
+        {(idle || sheet === "settings") && <SettingsScreen />}
+        {(idle || sheet === "stats") && <StatsSheet />}
+        {onboardingOpen && <Onboarding />}
+      </Suspense>
       {error && sheet !== "settings" && (
         <button
           type="button"

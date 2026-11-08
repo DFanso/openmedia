@@ -25,7 +25,7 @@ The site view loads third-party code we do not control, and our injected engine 
 ## Invariants
 
 1. **Keys never leave Rust.** Not to the shell, not to a site view, not to logs.
-2. **Site views have no general IPC.** No capability grants a site-view webview access to Tauri core, plugins, filesystem, shell, http, or store commands. The shell itself is not granted the plugin's `open`; it opens pages through the app's `open_site`, which attaches the recipe script in Rust.
+2. **Site views have no general IPC.** No capability grants a site-view webview access to Tauri core, plugins, filesystem, shell, http, or store commands. The shell itself is not granted the plugin's `open`; pages are opened by Rust (`open_session`, reached through the app's `open_site` and `adopt_boot_session`, and by Core itself at launch), which attaches the recipe script and rule lists.
 3. **The bridge is write-only and low-privilege.** The only thing a site view can invoke is "deliver this message to Core", where Core treats it as untrusted data and the message set cannot trigger actions (it can't open files, read keys, or call the LLM).
 4. **AI output and imported recipes are untrusted** and validated before use ([Recipe Format](./recipe-format.md#validation-rust-before-anything-reaches-a-webview)).
 5. **No `script` rule from AI.** Script rules need explicit per-recipe user confirmation, keyed by content hash.
@@ -77,8 +77,8 @@ Blocking uses WebKit content rule lists attached to the site view's `WKUserConte
 Each opened site is a session (a separate native web view) pinned to the registrable domain it was opened on. The plugin cancels a main-frame navigation outside that domain, and `target=_blank` / `window.open` to one, and shows the address in a system popup browser (`SFSafariViewController`) instead. This adds no path from a site to native code:
 
 - The popup is a separate process. It shares no cookies, storage, recipe script or bridge with the profile's views. Only `http` and `https` addresses open (`DomainScope.verdict`); one popup at a time.
-- The shell's `siteview:default` set gains `activate` and `close` (both take a UUID session id, validated in Rust). `open` stays ungranted; `open_site` is the only way to create a session.
-- The plugin sends the shell two new events: `siteview:closed` (a session id the native side dropped) and `siteview:memory` (the OS asked for memory). `siteview:state` now carries the session id and its domain. They flow native to shell only; a page cannot raise or read them.
+- The shell's `siteview:default` set gains `activate` and `close` (both take a UUID session id, validated in Rust). `open` stays ungranted; `open_site` and `adopt_boot_session` are the only shell-reachable ways to create a session, and both end in the same validated `open_session` (session id is a UUID, address is `http(s)`). At launch Core opens the start page itself (`boot.rs`), before the shell exists; `adopt_boot_session` only takes over that one session, by the id Core generated.
+- The plugin sends the shell two new events: `siteview:closed` (a session id the native side dropped) and `siteview:memory` (the OS asked for memory). `siteview:state` now carries the session id, its domain and whether the page has painted (`painted`, set by native code when the page's own first-paint report arrives; a page that fakes it only makes itself visible). They flow native to shell only; a page cannot raise or read them.
 - Pinning also limits what a hostile page can do with a session: it cannot navigate the profile's logged-in view to an unrelated site after load, only offer it in a throwaway popup. It is not a sandbox: until the first load finishes, redirects may change the domain, and subframes are not restricted.
 
 History (the addresses the user typed) is stored in `library.json` on the device, like favorites, and holds no page content. "Clear history" removes it and the remembered last page.

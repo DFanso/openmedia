@@ -29,6 +29,7 @@ export type Sheet = "none" | "assistant" | "history" | "stats" | "settings";
 /** What the web layer must do natively next; `nonce` makes a repeat of the same action distinct. */
 export type SessionAction = { nonce: number } & (
   | { type: "open"; id: string; url: string; previousId: string | null }
+  | { type: "adopt"; id: string; url: string; previousId: null }
   | { type: "activate"; id: string }
 );
 
@@ -46,6 +47,8 @@ export interface AppStore {
   load: () => Promise<void>;
   openSheet: (sheet: Sheet) => void;
   closeSheet: () => void;
+  /** Fetches what only Settings and the fan need: site options and missing icons. Runs after the first page shows. */
+  loadSecondary: () => void;
   /** Marks the guide unseen again and shows it now. */
   resetGuide: () => Promise<void>;
   finishGuide: () => Promise<void>;
@@ -125,15 +128,18 @@ export const useApp = create<AppStore>((set, get) => {
   const markUsed = (sessions: Session[], id: string | null, now: number) =>
     sessions.map((session) => (session.id === id ? { ...session, lastUsed: now } : session));
 
-  const startSession = (url: string, source: SessionSource) => {
+  /** A new session. `adoptedId` names a page Rust already opened at launch, which is taken over. */
+  const startSession = (url: string, source: SessionSource, adoptedId?: string) => {
     const now = Date.now();
-    const id = crypto.randomUUID();
+    const id = adoptedId ?? crypto.randomUUID();
     const previousId = get().activeId;
     set((current) => ({
       sessions: [...markUsed(current.sessions, previousId, now), newSession(id, source, url, now)],
       activeId: id,
       sheet: "none",
-      action: { nonce: ++nonce, type: "open", id, url, previousId },
+      action: adoptedId
+        ? { nonce: ++nonce, type: "adopt", id, url, previousId: null }
+        : { nonce: ++nonce, type: "open", id, url, previousId },
     }));
     get().trimSessions("routine");
   };
@@ -163,16 +169,24 @@ export const useApp = create<AppStore>((set, get) => {
 
     load: async () => {
       try {
-        const state = await library.getState();
-        const start = state.lastUrl ?? state.favorites[0]?.url;
+        const { bootSession, ...state } = await library.getState();
         void siteView.setColorScheme(state.theme).catch(() => {});
         set({ state, onboardingOpen: !state.onboarded });
-        if (start) startSession(start, startSource(state.favorites, start));
-        void fetchIcons();
-        void get().loadSites();
+        if (bootSession) {
+          startSession(
+            bootSession.url,
+            startSource(state.favorites, bootSession.url),
+            bootSession.id,
+          );
+        }
       } catch (error) {
         set({ error: errorMessage(error) });
       }
+    },
+
+    loadSecondary: () => {
+      void fetchIcons();
+      void get().loadSites();
     },
 
     openSheet: (sheet) => set({ sheet }),

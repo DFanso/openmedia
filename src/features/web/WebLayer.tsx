@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { errorMessage, library, siteView } from "../../shared/ipc";
 import { useApp } from "../../app/store";
 import { usePageMargin } from "./usePageMargin";
@@ -22,6 +22,8 @@ export function WebLayer() {
   const forgetSessions = useApp((s) => s.forgetSessions);
   const trimSessions = useApp((s) => s.trimSessions);
   const reportError = useApp((s) => s.reportError);
+  /** Native events are only announced once, so no action may run before the listeners exist. */
+  const [listening, setListening] = useState(false);
 
   const bottomMargin = usePageMargin();
 
@@ -29,16 +31,18 @@ export function WebLayer() {
 
   useEffect(() => {
     const element = slot.current;
-    if (!profileId || !action || !element) return;
+    if (!listening || !profileId || !action || !element) return;
     const run =
-      action.type === "open"
-        ? library.openSite(action.id, action.url, readRect(element))
-        : siteView.activate(action.id);
+      action.type === "activate"
+        ? siteView.activate(action.id)
+        : action.type === "adopt"
+          ? library.adoptBootSession(action.id, action.url, readRect(element))
+          : library.openSite(action.id, action.url, readRect(element));
     run.catch((error: unknown) => {
-      if (action.type === "open") sessionOpenFailed(action.id);
+      if (action.type !== "activate") sessionOpenFailed(action.id);
       reportError(errorMessage(error));
     });
-  }, [profileId, action, sessionOpenFailed, reportError]);
+  }, [listening, profileId, action, sessionOpenFailed, reportError]);
 
   useEffect(() => {
     let lastSaved = "";
@@ -56,7 +60,12 @@ export function WebLayer() {
       siteView.onError(reportError),
     ];
     const sweep = window.setInterval(() => trimSessions("routine"), SWEEP_MS);
+    let cancelled = false;
+    void Promise.all(unlisten).then(() => {
+      if (!cancelled) setListening(true);
+    });
     return () => {
+      cancelled = true;
       window.clearInterval(sweep);
       void Promise.all(unlisten).then((fns) => fns.forEach((fn) => fn()));
     };

@@ -118,20 +118,36 @@ pub struct Library {
 
 impl Library {
     pub fn load(path: PathBuf) -> Result<Self> {
-        let data = match fs::read_to_string(&path) {
+        let (data, needs_save) = match fs::read_to_string(&path) {
             Ok(text) => parse(&text)?,
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => default_data(),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => (default_data(), true),
             Err(e) => return Err(e.into()),
         };
         let library = Self {
             path,
             data: Mutex::new(data),
         };
-        {
+        if needs_save {
             let data = library.lock()?;
             library.save(&data)?;
         }
         Ok(library)
+    }
+
+    pub fn profile_id(&self) -> Result<Uuid> {
+        Ok(self.lock()?.profile_id)
+    }
+
+    /// The page to open at launch: the last page the user was on, else the first favorite. An
+    /// address that no longer parses is skipped, so a damaged file cannot leave the app empty.
+    pub fn start_url(&self) -> Result<Option<String>> {
+        let data = self.lock()?;
+        Ok(data
+            .last_url
+            .iter()
+            .chain(data.favorites.iter().map(|favorite| &favorite.url))
+            .find(|url| parse_web_url(url).is_ok())
+            .cloned())
     }
 
     pub fn state(&self) -> Result<AppState> {
@@ -377,7 +393,8 @@ fn with_icons(data: &LibraryData) -> Vec<Favorite> {
         .collect()
 }
 
-fn parse(text: &str) -> Result<LibraryData> {
+/// The library as stored, and whether reading it changed it so it must be written back.
+fn parse(text: &str) -> Result<(LibraryData, bool)> {
     let mut data: LibraryData = serde_json::from_str(text)?;
     match data.version {
         2 => {
@@ -398,8 +415,9 @@ fn parse(text: &str) -> Result<LibraryData> {
         3 | FORMAT_VERSION => {}
         version => return Err(Error::UnsupportedVersion(version)),
     }
+    let migrated = data.version != FORMAT_VERSION;
     data.version = FORMAT_VERSION;
-    Ok(data)
+    Ok((data, migrated))
 }
 
 fn default_data() -> LibraryData {
@@ -578,6 +596,46 @@ mod tests {
     fn favorites_may_be_emptied() {
         let (_dir, library) = library();
         assert!(library.set_favorites(vec![]).unwrap().is_empty());
+    }
+
+    #[test]
+    fn the_start_page_is_the_last_page_else_the_first_favorite() {
+        let (_dir, library) = library();
+        assert_eq!(
+            library.start_url().unwrap().as_deref(),
+            Some("https://www.instagram.com/")
+        );
+        library.set_last_url("https://m.youtube.com/feed").unwrap();
+        assert_eq!(
+            library.start_url().unwrap().as_deref(),
+            Some("https://m.youtube.com/feed")
+        );
+        library.set_favorites(vec![]).unwrap();
+        library.clear_history().unwrap();
+        assert_eq!(library.start_url().unwrap(), None);
+    }
+
+    #[test]
+    fn a_damaged_last_page_falls_back_to_the_first_favorite() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("library.json");
+        let mut saved = default_data();
+        saved.last_url = Some("javascript:alert(1)".into());
+        fs::write(&path, serde_json::to_vec(&saved).unwrap()).unwrap();
+        assert_eq!(
+            Library::load(path).unwrap().start_url().unwrap().as_deref(),
+            Some("https://www.instagram.com/")
+        );
+    }
+
+    #[test]
+    fn loading_a_current_library_does_not_rewrite_it() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("library.json");
+        let text = serde_json::to_string(&default_data()).unwrap();
+        fs::write(&path, &text).unwrap();
+        Library::load(path.clone()).unwrap();
+        assert_eq!(fs::read_to_string(&path).unwrap(), text);
     }
 
     #[test]
