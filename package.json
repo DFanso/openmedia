@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "yarn icons:fetch && tsc && vite build",
+    "build": "node scripts/build.mjs",
+    "build:web": "yarn icons:fetch && tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
     "ts:check": "tsc --noEmit",
