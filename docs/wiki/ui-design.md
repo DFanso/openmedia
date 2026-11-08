@@ -82,7 +82,7 @@ Other sites are fetched natively when added as favorites or entered/opened from 
 
 ## Sessions
 
-Every site the user opens is a **session**: its own native web view, kept alive underneath the one that is visible. Opening something never closes or reloads what was already open.
+Every site the user opens is a **session**: its own native web view, kept alive underneath the one that is visible. Opening another page does not reload existing pages; hidden sessions may be closed by the policy below.
 
 | User action | Result |
 |-------------|--------|
@@ -93,11 +93,12 @@ Every site the user opens is a **session**: its own native web view, kept alive 
 
 **A session never leaves its domain.** Each session is pinned to the registrable domain of its address (`www.instagram.com` and `m.instagram.com` are both `instagram.com`; a short built-in list handles `co.uk`-style suffixes instead of the full public suffix list). A main-frame navigation outside it is cancelled and shown in a popup browser, an `SFSafariViewController` presented over the app, with its own Close button. The popup shares nothing with the profile's cookies or recipes. One popup at a time. Until a session's first load finishes, redirects may change its domain (`twitter.com` to `x.com`) and the session adopts the final one. Subframes (ads, embeds) are not blocked. Same-domain `target=_blank` loads in place.
 
-**Which sessions stay alive.** The shell (`features/web/sessions.ts`, unit-tested) closes hidden sessions, never the visible one, when:
+**Which sessions stay alive.** The shell (`features/web/sessions.ts`, unit-tested) keeps one reusable session for each of the first six favorites warm once opened. These sessions are exempt from routine idle and count eviction; matching uses the same domain and session preference as a favorite tap, including typed or restored sessions. Duplicate favorites can share one retained session. Nothing is preloaded.
 
-- one has been hidden for more than 20 minutes;
-- more than 5 are alive: typed and restored sessions go before favorite sessions, oldest first;
-- the OS sends a memory warning: every hidden session goes.
+- Other hidden sessions close after 20 minutes idle.
+- The usual cap is 5 total sessions, expanded only enough for the retained quick-access sessions plus the visible page: at most 7. Unprotected typed and restored sessions go before unprotected favorite sessions, oldest first.
+- Editing or reordering favorites immediately reconciles retention against the new first six.
+- The OS memory warning still closes **every hidden session**, including quick-access sessions. The visible page is never closed by the shell's sweep.
 
 A hidden session whose web content process dies is dropped natively and the shell is told. Reopening anything that was closed starts it fresh. A sweep runs every minute and after each open or switch. Startup restores the last page; if it is on a favorite's site it counts as that favorite's session.
 

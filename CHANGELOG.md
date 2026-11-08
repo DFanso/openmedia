@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-08
 
+### perf(web): keep quick-access sites warm after opening
+
+**Change:** Retain one reusable session per first-six favorite across routine idle sweeps and other browsing, so favorite taps switch pages rather than reload them. The usual five-session budget expands only as needed, to at most six quick-access pages plus the visible page; favorite edits reconcile retention immediately. Memory warnings still release every hidden page. No preloading or extra speculative requests.
+
+**Verified:** Retention regressions and a real-store smoke with mocked IPC: all six pages survive an idle sweep and 12 typed opens, favorite taps reuse the original sessions, removal immediately releases a stale page, and memory pressure releases hidden pages before a fresh reopen. Native switching latency, memory and battery costs remain unmeasured on-device.
+
 ### feat(browsing): favorites, connected assistant, site icons and daily usage controls
 
 **Change:** Favorite stars on the current page and History, offline icons for all 18 bundled recipes, shared cached icons for custom sites/history, and collapsed-by-default Settings sections. The command bar now uses the active BYOK provider through redacted preview, validated proposals and explicit accept/reject instead of always reporting it disconnected.
