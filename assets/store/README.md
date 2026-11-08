@@ -10,8 +10,8 @@ and Google's [preview assets help](https://support.google.com/googleplay/android
 
 | Folder                | Store slot                      | Size (px)   | Count | Store rule                                                                                        |
 | --------------------- | ------------------------------- | ----------- | ----- | ------------------------------------------------------------------------------------------------- |
-| `ios/iphone-6.3/`     | iPhone with Dynamic Island, medium display (**required**) | 1206 × 2622 | 8 | Apple also accepts 1179 × 2556. Required slot for any iPhone app; 1 to 10 per slot |
-| `ios/iphone-6.9/`     | iPhone with Dynamic Island, large display (optional) | 1320 × 2868 | 8     | Apple also accepts 1290 × 2796 and 1260 × 2736. If omitted, App Store Connect scales the required set up |
+| `ios/iphone-6.3/`     | iPhone with Dynamic Island, medium display (**required**) | 1206 × 2622 | 8 | Apple also accepts 1179 × 2556; 1 to 10 per slot |
+| `ios/iphone-6.1/`     | iPhone, 6.1" display                                 | 1179 × 2556 | 8 | Exact accepted screenshot size; 1 to 10 per slot  |
 | `ios/ipad-13/`        | iPad, 13" (required for iPad)   | 2064 × 2752 | 8     | Apple also accepts 2048 × 2732; 1 to 10 per slot                                                  |
 | `android/phone/`      | Phone                           | 1080 × 1920 | 8     | 9:16 or 16:9, 320 to 3840 px a side, 2 to 8 shots. 1080 px or more keeps the listing promotable   |
 | `android/tablet/`     | 7" and 10" tablet (same files)  | 1440 × 2560 | 8     | 9:16 or 16:9, 1080 to 7680 px a side, up to 8 each                                                |
