@@ -18,7 +18,7 @@ All notable changes to OpenMedia are documented here.
 
 **Unverified:** Physical-device interactions and authenticated calls to a real provider. Native media suspension and shields compiled but were not exercised on a device. Limits do not suspend arbitrary page JavaScript.
 
-**PR:** n/a
+**PR:** [#23](https://github.com/skepjandi/openmedia/pull/23)
 
 ### feat(web): simple loader while a site opens
 
