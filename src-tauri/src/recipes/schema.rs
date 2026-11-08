@@ -113,6 +113,11 @@ pub struct Recipe {
     pub options: Vec<SiteOption>,
     pub rules: Vec<Rule>,
     pub meta: Option<Meta>,
+    /// Set on a customized copy of a bundled recipe: the bundled version it was copied from. The
+    /// copy keeps the bundled recipe's id, so the user's switches and margin carry over, and it
+    /// replaces the bundled one for as long as it exists.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub forked_from: Option<String>,
 }
 
 impl Recipe {
@@ -146,6 +151,12 @@ impl Recipe {
             return Err(Error::Recipe(format!(
                 "recipe {} uses unsupported schema {}",
                 self.id, self.schema
+            )));
+        }
+        if self.forked_from.is_some() && self.origin == Origin::Bundled {
+            return Err(Error::Recipe(format!(
+                "recipe {} is bundled and cannot be a fork",
+                self.id
             )));
         }
         if self.id.trim().is_empty() || self.name.trim().is_empty() {

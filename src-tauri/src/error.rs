@@ -11,6 +11,8 @@ pub enum Error {
     UnknownSite,
     #[error("the bottom margin can be at most {0} pixels")]
     InvalidMargin(u32),
+    #[error("invalid usage record: {0}")]
+    InvalidUsage(&'static str),
     #[error("no such site option")]
     UnknownOption,
     #[error(transparent)]

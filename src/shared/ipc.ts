@@ -52,6 +52,10 @@ export interface SiteSettings {
   options: SiteOption[];
   /** The site's own bottom margin, or null to use the shared one. */
   bottomMargin: number | null;
+  /** The site runs on the user's own changed copy of the bundled recipe (a fork). */
+  customized: boolean;
+  /** The app now ships a different version than the one the copy was made from. */
+  originalUpdated: boolean;
 }
 
 export type ProviderKind = "anthropic" | "openAiCompatible";
@@ -118,6 +122,8 @@ export const library = {
   /** Saves the toggle and reloads the open page under it; see `set_site_option` in Rust. */
   setSiteOption: (recipeId: string, optionId: string, enabled: boolean) =>
     command("set_site_option", { recipeId, optionId, enabled }),
+  /** Drops the changed copy so the bundled recipe applies again; see `restore_recipe_original`. */
+  restoreRecipeOriginal: (recipeId: string) => command("restore_recipe_original", { recipeId }),
   setBottomMargin: (pixels: number) => command("set_bottom_margin", { pixels }),
   setSiteBottomMargin: (recipeId: string, pixels: number | null) =>
     command("set_site_bottom_margin", { recipeId, pixels }),
@@ -134,6 +140,34 @@ export const library = {
   /** Forgets the typed addresses and the remembered last page. */
   clearHistory: () => command("clear_history"),
   setBackButton: (enabled: boolean) => command("set_back_button", { enabled }),
+};
+
+export interface SectionUsage {
+  /** `/` for the site's root, `*` for anything unrecognised, else `/` and the first path segment. */
+  section: string;
+  seconds: number;
+}
+
+export interface SiteUsage {
+  host: string;
+  /** The bundled recipe's name for the site, when there is one. */
+  name: string | null;
+  seconds: number;
+  sections: SectionUsage[];
+}
+
+export interface UsageReport {
+  totalSeconds: number;
+  /** Busiest first. */
+  sites: SiteUsage[];
+}
+
+/** Time on sites, kept in `usage.json` on this device; see `usage.rs`. */
+export const usage = {
+  record: (day: string, host: string, section: string, seconds: number) =>
+    command("record_usage", { day, host, section, seconds }),
+  report: (today: string, days: number) => invoke<UsageReport>("get_usage", { today, days }),
+  clear: () => command("clear_usage"),
 };
 
 export const ai = {

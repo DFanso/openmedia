@@ -6,42 +6,114 @@ mod selector;
 pub use compile::{OptionChoices, page_script};
 pub use schema::{OptionGroup, Recipe};
 
+use std::{
+    collections::BTreeMap,
+    fs,
+    path::PathBuf,
+    sync::{PoisonError, RwLock},
+};
+
+use schema::Origin;
 use url::Url;
 
-use crate::error::Result;
+use crate::error::{Error, Result};
+use crate::library::write_atomically;
 
-const BUNDLED: [&str; 5] = [
+const BUNDLED: &[&str] = &[
     include_str!("../../../recipes/bundled/instagram.json"),
     include_str!("../../../recipes/bundled/facebook.json"),
     include_str!("../../../recipes/bundled/twitter.json"),
     include_str!("../../../recipes/bundled/reddit.json"),
     include_str!("../../../recipes/bundled/youtube.json"),
+    include_str!("../../../recipes/bundled/threads.json"),
+    include_str!("../../../recipes/bundled/telegram.json"),
+    include_str!("../../../recipes/bundled/douyin.json"),
+    include_str!("../../../recipes/bundled/messenger.json"),
+    include_str!("../../../recipes/bundled/discord.json"),
+    include_str!("../../../recipes/bundled/kuaishou.json"),
+    include_str!("../../../recipes/bundled/linkedin.json"),
+    include_str!("../../../recipes/bundled/whatsapp.json"),
+    include_str!("../../../recipes/bundled/snapchat.json"),
+    include_str!("../../../recipes/bundled/pinterest.json"),
+    include_str!("../../../recipes/bundled/weibo.json"),
+    include_str!("../../../recipes/bundled/tiktok.json"),
+    include_str!("../../../recipes/bundled/twitch.json"),
 ];
+
+const MAX_FORK_BYTES: usize = 256 * 1024;
+
+/// Test-only: the bundled recipes with no fork folder.
+#[cfg(test)]
+impl Recipes {
+    pub fn bundled_only() -> Self {
+        Self::load(PathBuf::from("/nonexistent/openmedia-test")).unwrap()
+    }
+}
 
 pub fn bundled() -> Result<Vec<Recipe>> {
     BUNDLED.iter().map(|json| Recipe::parse(json)).collect()
 }
 
-/// The recipes the app ships with. The page script is compiled from them on demand, because it
+/// The recipes in effect: the ones the app ships with, each replaced by the user's customized copy
+/// (a fork) when one exists. A fork is a file in `dir`, written when the user or the assistant
+/// changes a bundled recipe; app updates replace the bundled recipes but never touch these files,
+/// so a user's changes survive an update. The page script is compiled on demand, because it
 /// depends on the user's toggles.
-pub struct Recipes(Vec<Recipe>);
+pub struct Recipes {
+    bundled: Vec<Recipe>,
+    dir: PathBuf,
+    forks: RwLock<BTreeMap<String, Recipe>>,
+}
 
 impl Recipes {
-    pub fn bundled() -> Result<Self> {
-        Ok(Self(bundled()?))
+    /// Loads the bundled recipes and every valid fork in `dir`. A fork file that is unreadable,
+    /// invalid, or for a recipe that is no longer bundled is skipped, so a damaged file can never
+    /// stop the app from starting; the bundled recipe applies instead.
+    pub fn load(dir: PathBuf) -> Result<Self> {
+        let bundled = bundled()?;
+        let mut forks = BTreeMap::new();
+        for entry in fs::read_dir(&dir).into_iter().flatten().flatten() {
+            let path = entry.path();
+            if path.extension().is_none_or(|extension| extension != "json") {
+                continue;
+            }
+            let Ok(text) = fs::read_to_string(&path) else {
+                continue;
+            };
+            if let Ok(fork) = parse_fork(&bundled, &text) {
+                forks.insert(fork.id.clone(), fork);
+            }
+        }
+        Ok(Self {
+            bundled,
+            dir,
+            forks: RwLock::new(forks),
+        })
     }
 
-    pub fn all(&self) -> &[Recipe] {
-        &self.0
+    pub fn all(&self) -> Vec<Recipe> {
+        let forks = self.forks.read().unwrap_or_else(PoisonError::into_inner);
+        self.bundled
+            .iter()
+            .map(|recipe| forks.get(&recipe.id).unwrap_or(recipe).clone())
+            .collect()
     }
 
-    pub fn get(&self, id: &str) -> Option<&Recipe> {
-        self.0.iter().find(|recipe| recipe.id == id)
+    pub fn get(&self, id: &str) -> Option<Recipe> {
+        self.all().into_iter().find(|recipe| recipe.id == id)
+    }
+
+    /// The version of the recipe the app currently ships under this id.
+    pub fn bundled_version(&self, id: &str) -> Option<&str> {
+        self.bundled
+            .iter()
+            .find(|recipe| recipe.id == id)
+            .map(|recipe| recipe.version.as_str())
     }
 
     /// The recipe whose `match` patterns cover this page.
-    pub fn for_url(&self, url: &Url) -> Option<&Recipe> {
-        self.0.iter().find(|recipe| {
+    pub fn for_url(&self, url: &Url) -> Option<Recipe> {
+        self.all().into_iter().find(|recipe| {
             recipe
                 .matches
                 .iter()
@@ -52,7 +124,63 @@ impl Recipes {
 
     /// The script injected into every site view: all recipes, matched by the page itself.
     pub fn script(&self, choices: &OptionChoices) -> Result<String> {
-        page_script(&self.0, choices)
+        page_script(&self.all(), choices)
+    }
+
+    /// Saves a changed copy of a bundled recipe. The copy keeps the bundled recipe's id and
+    /// replaces it from now on. It is validated like any recipe, must not claim to be bundled, and
+    /// records the bundled version it came from so Settings can say when the original has moved on.
+    pub fn save_fork(&self, json: &str) -> Result<Recipe> {
+        if json.len() > MAX_FORK_BYTES {
+            return Err(Error::Recipe("the recipe is too large".into()));
+        }
+        let mut fork = Recipe::parse(json)?;
+        let base = self
+            .bundled
+            .iter()
+            .find(|recipe| recipe.id == fork.id)
+            .ok_or(Error::UnknownSite)?;
+        if !matches!(fork.origin, Origin::User | Origin::Ai) {
+            return Err(Error::Recipe("a fork must have origin user or ai".into()));
+        }
+        fork.forked_from = Some(base.version.clone());
+        write_atomically(
+            &self.dir.join(format!("{}.json", fork.id)),
+            &serde_json::to_vec_pretty(&fork)?,
+        )?;
+        self.forks
+            .write()
+            .unwrap_or_else(PoisonError::into_inner)
+            .insert(fork.id.clone(), fork.clone());
+        Ok(fork)
+    }
+
+    /// Drops the customized copy; the bundled recipe applies again.
+    pub fn restore_original(&self, id: &str) -> Result<()> {
+        if self.bundled_version(id).is_none() {
+            return Err(Error::UnknownSite);
+        }
+        match fs::remove_file(self.dir.join(format!("{id}.json"))) {
+            Err(error) if error.kind() != std::io::ErrorKind::NotFound => return Err(error.into()),
+            _ => {}
+        }
+        self.forks
+            .write()
+            .unwrap_or_else(PoisonError::into_inner)
+            .remove(id);
+        Ok(())
+    }
+}
+
+fn parse_fork(bundled: &[Recipe], text: &str) -> Result<Recipe> {
+    let fork = Recipe::parse(text)?;
+    let is_fork = fork.forked_from.is_some()
+        && matches!(fork.origin, Origin::User | Origin::Ai)
+        && bundled.iter().any(|recipe| recipe.id == fork.id);
+    if is_fork {
+        Ok(fork)
+    } else {
+        Err(Error::UnknownSite)
     }
 }
 
@@ -194,15 +322,103 @@ mod tests {
 
     #[test]
     fn the_page_script_only_carries_enabled_rules() {
-        let recipes = Recipes(vec![Recipe::parse(TOGGLED).unwrap()]);
-        let script = recipes.script(&OptionChoices::new()).unwrap();
+        let recipes = vec![Recipe::parse(TOGGLED).unwrap()];
+        let script = page_script(&recipes, &OptionChoices::new()).unwrap();
         assert!(script.contains(".nag{display:none!important}"));
         assert!(!script.contains(".feed"));
     }
 
+    fn fork_json(id: &str, origin: &str, css: &str) -> String {
+        format!(
+            r#"{{"schema":1,"id":"{id}","name":"Reddit","version":"1.0.0","origin":"{origin}","forkedFrom":"0.0.1","match":["https://*.reddit.com/*"],
+              "options":[{{"id":"mine","label":"Mine","description":"d","group":"content","default":true}}],
+              "rules":[{{"id":"r","label":"l","type":"hide","option":"mine","target":{{"css":"{css}"}}}}]}}"#
+        )
+    }
+
+    #[test]
+    fn a_fork_replaces_its_bundled_recipe_and_survives_a_restart_until_restored() {
+        let dir = tempfile::tempdir().unwrap();
+        let recipes = Recipes::load(dir.path().join("recipes")).unwrap();
+        let before = recipes.get("reddit.default").unwrap();
+        assert_eq!(before.forked_from, None);
+
+        let saved = recipes
+            .save_fork(&fork_json("reddit.default", "ai", ".mine-only"))
+            .unwrap();
+        assert_eq!(
+            saved.forked_from.as_deref(),
+            recipes.bundled_version("reddit.default"),
+            "the recorded base is the bundled version, not what the JSON claimed"
+        );
+        let script = recipes.script(&OptionChoices::new()).unwrap();
+        assert!(script.contains(".mine-only"));
+        assert!(
+            !script.contains("shreddit-ad-post"),
+            "the bundled rules are gone"
+        );
+        assert_eq!(recipes.all().len(), bundled().unwrap().len());
+
+        let restarted = Recipes::load(dir.path().join("recipes")).unwrap();
+        assert_eq!(restarted.get("reddit.default"), Some(saved));
+
+        restarted.restore_original("reddit.default").unwrap();
+        assert_eq!(restarted.get("reddit.default"), Some(before));
+        let after_restore = Recipes::load(dir.path().join("recipes")).unwrap();
+        assert_eq!(
+            after_restore.get("reddit.default").unwrap().forked_from,
+            None
+        );
+    }
+
+    #[test]
+    fn only_user_or_ai_copies_of_bundled_recipes_can_be_saved_and_nothing_is_written_otherwise() {
+        let dir = tempfile::tempdir().unwrap();
+        let folder = dir.path().join("recipes");
+        let recipes = Recipes::load(folder.clone()).unwrap();
+        for json in [
+            fork_json("reddit.default", "bundled", "a"),
+            fork_json("reddit.default", "imported", "a"),
+            fork_json("nothing.default", "ai", "a"),
+            fork_json("reddit.default", "ai", "a{x}"),
+        ] {
+            assert!(recipes.save_fork(&json).is_err(), "{json}");
+        }
+        assert!(recipes.save_fork(&"x".repeat(MAX_FORK_BYTES + 1)).is_err());
+        assert!(!folder.exists() || fs::read_dir(&folder).unwrap().next().is_none());
+        assert!(recipes.restore_original("nothing.default").is_err());
+        assert_eq!(recipes.get("reddit.default").unwrap().forked_from, None);
+    }
+
+    #[test]
+    fn a_damaged_or_stale_fork_file_is_ignored_instead_of_stopping_startup() {
+        let dir = tempfile::tempdir().unwrap();
+        let folder = dir.path().join("recipes");
+        fs::create_dir_all(&folder).unwrap();
+        fs::write(folder.join("reddit.default.json"), "{ not json").unwrap();
+        fs::write(
+            folder.join("old.default.json"),
+            fork_json("old.default", "user", "a"),
+        )
+        .unwrap();
+        fs::write(
+            folder.join("youtube.default.json"),
+            fork_json("youtube.default", "bundled", "a"),
+        )
+        .unwrap();
+        fs::write(folder.join("notes.txt"), "hello").unwrap();
+        let recipes = Recipes::load(folder).unwrap();
+        assert!(
+            recipes
+                .all()
+                .iter()
+                .all(|recipe| recipe.forked_from.is_none())
+        );
+    }
+
     #[test]
     fn a_page_belongs_to_the_recipe_that_matches_its_url() {
-        let recipes = Recipes::bundled().unwrap();
+        let recipes = Recipes::bundled_only();
         let page = |url: &str| {
             recipes
                 .for_url(&Url::parse(url).unwrap())

@@ -89,9 +89,25 @@ function SiteOptions({ site }: { site: SiteSettings }) {
   const setSiteOption = useApp((s) => s.setSiteOption);
   const setSiteBottomMargin = useApp((s) => s.setSiteBottomMargin);
   const sharedMargin = useApp((s) => s.state?.bottomMargin ?? 0);
+  const restoreRecipeOriginal = useApp((s) => s.restoreRecipeOriginal);
 
   return (
     <div className="flex flex-col gap-5 border-t border-hair px-3 py-4">
+      {site.customized && (
+        <div className="flex flex-col gap-2 rounded-2xl border border-hair px-4 py-3">
+          <p className="text-sm leading-snug text-paper/55">
+            This recipe is your changed copy, so app updates leave it alone.
+            {site.originalUpdated && " The app's original has been updated since you changed it."}
+          </p>
+          <button
+            type="button"
+            onClick={() => void restoreRecipeOriginal(site.recipeId)}
+            className="self-start text-sm font-medium text-accent"
+          >
+            Restore the original
+          </button>
+        </div>
+      )}
       {GROUPS.map(({ group, title }) => {
         const options = site.options.filter((option) => option.group === group);
         if (options.length === 0) return null;

@@ -4,6 +4,7 @@ import {
   FAVORITE_SIZE,
   HISTORY_SIZE,
   SETTINGS_SIZE,
+  STATS_SIZE,
   fabCenter,
   fanLayout,
   fanTargetAt,
@@ -50,6 +51,7 @@ describe("fanLayout", () => {
             ...layout.favorites.map((center) => ({ center, size: FAVORITE_SIZE })),
             { center: layout.settings, size: SETTINGS_SIZE },
             { center: layout.history, size: HISTORY_SIZE },
+            { center: layout.stats, size: STATS_SIZE },
           ];
           for (const { center, size } of items) {
             expect(center.x - size / 2).toBeGreaterThanOrEqual(0);
@@ -103,6 +105,19 @@ describe("fanLayout", () => {
       }
     }
   });
+
+  it("stacks stats directly above history in the same column", () => {
+    for (const edge of edges) {
+      for (const y of heights) {
+        for (const count of [0, 6]) {
+          const origin = fabCenter(edge, y, phone, insets);
+          const layout = fanLayout(origin, edge, phone, insets, count);
+          expect(layout.stats.x).toBe(layout.history.x);
+          expect(layout.stats.y).toBeLessThan(layout.history.y);
+        }
+      }
+    }
+  });
 });
 
 describe("fanTargetAt", () => {
@@ -113,6 +128,7 @@ describe("fanTargetAt", () => {
     expect(fanTargetAt(layout.favorites[2], layout)).toEqual({ kind: "favorite", index: 2 });
     expect(fanTargetAt(layout.settings, layout)).toEqual({ kind: "settings" });
     expect(fanTargetAt(layout.history, layout)).toEqual({ kind: "history" });
+    expect(fanTargetAt(layout.stats, layout)).toEqual({ kind: "stats" });
   });
 
   it("returns null away from every item", () => {

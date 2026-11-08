@@ -1,15 +1,23 @@
-import { hideSplash } from "./splash";
+import { hideSplash, hideSplashWhen } from "./splash";
 import { useEffect } from "react";
 import { BackButton } from "../features/back/BackButton";
 import { Fab } from "../features/fab/Fab";
 import { Onboarding } from "../features/onboarding/Onboarding";
 import { CommandBar } from "../features/sheet/CommandBar";
 import { HistorySheet } from "../features/history/HistorySheet";
+import { StatsSheet } from "../features/stats/StatsSheet";
+import { startUsageTracking } from "../features/stats/tracker";
 import { SettingsScreen } from "../features/settings/SettingsScreen";
 import { WebLayer } from "../features/web/WebLayer";
 import { useApplyTheme } from "../shared/theme";
 import { useApp } from "./store";
 import { useHitRegions } from "./useHitRegions";
+
+/** True with no page to wait for, or once the visible page has reported an address. */
+function activePageHasUrl(): boolean {
+  const { activeId, sessions } = useApp.getState();
+  return activeId === null || sessions.some((s) => s.id === activeId && s.url !== null);
+}
 
 export function App() {
   const load = useApp((s) => s.load);
@@ -20,8 +28,10 @@ export function App() {
   useApplyTheme(theme);
   useHitRegions();
 
+  useEffect(() => startUsageTracking(), []);
+
   useEffect(() => {
-    void load().finally(hideSplash);
+    void load().then(() => hideSplashWhen(activePageHasUrl, useApp.subscribe), hideSplash);
   }, [load]);
 
   return (
@@ -32,6 +42,7 @@ export function App() {
       <CommandBar />
       <SettingsScreen />
       <HistorySheet />
+      <StatsSheet />
       <Onboarding />
       {error && sheet !== "settings" && (
         <button

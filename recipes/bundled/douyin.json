@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "id": "douyin.default",
+  "name": "Douyin",
+  "version": "1.0.0",
+  "origin": "bundled",
+  "match": ["https://*.douyin.com/*"],
+  "options": [
+    {
+      "id": "guide-overlay",
+      "label": "Hide the scroll tutorial overlay",
+      "description": "The \"scroll to see more videos\" guide with a confirm button that sits over the first video.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "login-nag",
+      "label": "Hide login prompt panels",
+      "description": "The login-nudge panels that Douyin attaches to each video's side rail and info area.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "ai-features",
+      "label": "Hide AI entry and chapter summaries",
+      "description": "The AI assistant button on videos, the chapter button in the player and the AI chapter summary card.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "follow-buttons",
+      "label": "Hide follow buttons",
+      "description": "The small follow badge on creator avatars next to each video.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "video-info",
+      "label": "Hide author and caption text",
+      "description": "The author name, date, co-creators and caption shown over each video.",
+      "group": "content",
+      "default": false
+    }
+  ],
+  "rules": [
+    {
+      "id": "guide-mask",
+      "label": "Recommendation guide mask",
+      "type": "hide",
+      "option": "guide-overlay",
+      "target": {
+        "css": "[data-e2e=\"recommend-guide-mask\"]"
+      }
+    },
+    {
+      "id": "disturb-login-panel",
+      "label": "Login nudge panels",
+      "type": "hide",
+      "option": "login-nag",
+      "target": {
+        "css": ".disturb-login-panel"
+      }
+    },
+    {
+      "id": "ai-entry",
+      "label": "AI entry button",
+      "type": "hide",
+      "option": "ai-features",
+      "target": {
+        "css": ".ai-douyin-entry"
+      }
+    },
+    {
+      "id": "chapter-button",
+      "label": "Chapter button in the player",
+      "type": "hide",
+      "option": "ai-features",
+      "target": {
+        "css": "[data-e2e=\"chapter-container\"]"
+      }
+    },
+    {
+      "id": "chapter-card",
+      "label": "AI chapter summary card",
+      "type": "hide",
+      "option": "ai-features",
+      "target": {
+        "css": "#chapterVideoSideCard"
+      }
+    },
+    {
+      "id": "follow-icon",
+      "label": "Follow badge on avatars",
+      "type": "hide",
+      "option": "follow-buttons",
+      "target": {
+        "css": "[data-e2e=\"feed-follow-icon\"]"
+      }
+    },
+    {
+      "id": "video-info",
+      "label": "Author and caption block",
+      "type": "hide",
+      "option": "video-info",
+      "target": {
+        "css": "[data-e2e=\"video-info\"]"
+      }
+    }
+  ],
+  "meta": {
+    "homepage": "https://www.douyin.com/",
+    "lastVerified": "2026-11-07",
+    "notes": "Douyin serves an iPhone UA the same React app on www.douyin.com (title and feed render logged out; no captcha wall appeared, though an invisible nocaptcha iframe is present). Logged out the home page is a vertical video feed (data-e2e=slideList with data-e2e=feed-item slides, xgplayer controls) under a header with search, Log in, Get APP. LIVE counts (headless Chromium 390x844): recommend-guide-mask 1, .disturb-login-panel 3 (empty or zero-size until Douyin triggers it; that it is the login nag is INFERRED from the class name), .ai-douyin-entry 2, chapter-container 1, #chapterVideoSideCard 1, feed-follow-icon 5, video-info 2. Not verified: logged-in pages, WKWebView rendering, the real appearance of the login panels, other routes (search, user, video, live). Not hidden because it has no stable hook: the Get APP and Log in buttons in the header (hashed classes, text only); CSS cannot match text. Headless rendering showed a dark empty player, so visual effect of the hides was not confirmed."
+  }
+}

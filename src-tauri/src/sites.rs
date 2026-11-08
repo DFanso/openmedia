@@ -32,6 +32,10 @@ pub struct SiteSettings {
     pub favorite: bool,
     pub options: Vec<OptionView>,
     pub bottom_margin: Option<u32>,
+    /// The site runs on the user's own changed copy of the bundled recipe.
+    pub customized: bool,
+    /// The app now ships a different version than the one the copy was made from.
+    pub original_updated: bool,
 }
 
 pub fn site_settings(
@@ -42,7 +46,7 @@ pub fn site_settings(
 ) -> Vec<SiteSettings> {
     recipes
         .all()
-        .iter()
+        .into_iter()
         .map(|recipe| {
             let saved = choices.get(&recipe.id);
             let mut options: Vec<OptionView> = recipe
@@ -61,6 +65,7 @@ pub fn site_settings(
                 })
                 .collect();
             options.sort_by_key(|option| option.group);
+            let customized = recipe.forked_from.is_some();
             SiteSettings {
                 recipe_id: recipe.id.clone(),
                 name: recipe.name.clone(),
@@ -70,6 +75,9 @@ pub fn site_settings(
                     .any(|favorite| is_favorite_of(recipes, &recipe.id, favorite)),
                 options,
                 bottom_margin: margins.get(&recipe.id).copied(),
+                customized,
+                original_updated: customized
+                    && recipes.bundled_version(&recipe.id) != recipe.forked_from.as_deref(),
             }
         })
         .collect()
@@ -134,7 +142,7 @@ mod tests {
 
     #[test]
     fn every_bundled_site_is_listed_with_annoyances_first_and_defaults_applied() {
-        let recipes = Recipes::bundled().unwrap();
+        let recipes = Recipes::bundled_only();
         let sites = site_settings(&recipes, &OptionChoices::new(), &BTreeMap::new(), &[]);
         assert_eq!(sites.len(), recipes.all().len());
         for site in &sites {
@@ -153,7 +161,7 @@ mod tests {
 
     #[test]
     fn saved_choices_show_up_in_the_listing_and_only_for_their_own_site() {
-        let recipes = Recipes::bundled().unwrap();
+        let recipes = Recipes::bundled_only();
         let choices = OptionChoices::from([(
             "youtube.default".to_owned(),
             [("shorts".to_owned(), true), ("open-app".to_owned(), false)].into(),
@@ -173,7 +181,7 @@ mod tests {
 
     #[test]
     fn a_page_uses_its_sites_margin_else_the_shared_one() {
-        let recipes = Recipes::bundled().unwrap();
+        let recipes = Recipes::bundled_only();
         let margins = BTreeMap::from([("youtube.default".to_owned(), 40)]);
         let margin =
             |url: &str| bottom_margin_for(&recipes, &margins, 12, &Url::parse(url).unwrap());
@@ -183,8 +191,38 @@ mod tests {
     }
 
     #[test]
+    fn a_customized_site_is_flagged_and_says_when_the_original_has_moved_on() {
+        let dir = tempfile::tempdir().unwrap();
+        let recipes = Recipes::load(dir.path().to_owned()).unwrap();
+        let fork = r#"{"schema":1,"id":"reddit.default","name":"Reddit","version":"1.0.0","origin":"ai","match":["https://*.reddit.com/*"],
+          "options":[{"id":"mine","label":"Mine","description":"d","group":"content","default":false}],
+          "rules":[{"id":"r","label":"l","type":"hide","option":"mine","target":{"css":"a"}}]}"#;
+        recipes.save_fork(fork).unwrap();
+        let listing = |recipes: &Recipes| {
+            site_settings(recipes, &OptionChoices::new(), &BTreeMap::new(), &[])
+        };
+        let sites = listing(&recipes);
+        let reddit = site(&sites, "reddit.default");
+        assert!(reddit.customized && !reddit.original_updated);
+        assert_eq!(reddit.options.len(), 1);
+        assert!(
+            sites
+                .iter()
+                .filter(|s| s.recipe_id != "reddit.default")
+                .all(|s| !s.customized)
+        );
+
+        let old = fork.replace(r#""origin":"ai""#, r#""origin":"ai","forkedFrom":"0.0.1""#);
+        std::fs::write(dir.path().join("reddit.default.json"), old).unwrap();
+        let restarted = Recipes::load(dir.path().to_owned()).unwrap();
+        let sites = listing(&restarted);
+        let reddit = site(&sites, "reddit.default");
+        assert!(reddit.customized && reddit.original_updated);
+    }
+
+    #[test]
     fn twitter_and_x_addresses_share_one_site() {
-        let recipes = Recipes::bundled().unwrap();
+        let recipes = Recipes::bundled_only();
         let id = |url: &str| {
             recipes
                 .for_url(&Url::parse(url).unwrap())
@@ -216,16 +254,16 @@ mod tests {
 
     #[test]
     fn every_homepage_belongs_to_its_own_site() {
-        let recipes = Recipes::bundled().unwrap();
+        let recipes = Recipes::bundled_only();
         for recipe in recipes.all() {
             let url = Url::parse(recipe.homepage().unwrap()).unwrap();
-            assert_eq!(recipes.for_url(&url).map(|r| &r.id), Some(&recipe.id));
+            assert_eq!(recipes.for_url(&url).map(|r| r.id), Some(recipe.id));
         }
     }
 
     #[test]
     fn a_site_is_a_favorite_when_any_favorite_opens_it() {
-        let recipes = Recipes::bundled().unwrap();
+        let recipes = Recipes::bundled_only();
         let favorites = [
             favorite("X", "https://x.com/home"),
             favorite("Mine", "https://example.com/"),
@@ -242,7 +280,7 @@ mod tests {
 
     #[test]
     fn favoriting_a_site_appends_its_homepage_once() {
-        let recipes = Recipes::bundled().unwrap();
+        let recipes = Recipes::bundled_only();
         let favorites = [favorite("Mine", "https://example.com/")];
         let added = with_site_favorite(&recipes, &favorites, "youtube.default", true).unwrap();
         assert_eq!(
@@ -264,7 +302,7 @@ mod tests {
 
     #[test]
     fn unfavoriting_a_site_drops_only_its_favorites() {
-        let recipes = Recipes::bundled().unwrap();
+        let recipes = Recipes::bundled_only();
         let favorites = [
             favorite("YT", "https://m.youtube.com/"),
             favorite("Mine", "https://example.com/"),
@@ -276,7 +314,7 @@ mod tests {
 
     #[test]
     fn an_unknown_site_cannot_be_favorited() {
-        let recipes = Recipes::bundled().unwrap();
+        let recipes = Recipes::bundled_only();
         assert!(matches!(
             with_site_favorite(&recipes, &[], "nope.default", true),
             Err(Error::UnknownSite)

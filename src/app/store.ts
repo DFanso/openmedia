@@ -24,7 +24,7 @@ import {
 import type { Edge } from "../features/fab/geometry";
 import { loadPosition } from "../features/fab/position";
 
-export type Sheet = "none" | "assistant" | "history" | "settings";
+export type Sheet = "none" | "assistant" | "history" | "stats" | "settings";
 
 /** What the web layer must do natively next; `nonce` makes a repeat of the same action distinct. */
 export type SessionAction = { nonce: number } & (
@@ -32,7 +32,7 @@ export type SessionAction = { nonce: number } & (
   | { type: "activate"; id: string }
 );
 
-interface AppStore {
+export interface AppStore {
   state: AppState | null;
   error: string | null;
   sheet: Sheet;
@@ -71,6 +71,7 @@ interface AppStore {
   setAdBlock: (enabled: boolean) => Promise<void>;
   loadSites: () => Promise<void>;
   setSiteOption: (recipeId: string, optionId: string, enabled: boolean) => Promise<void>;
+  restoreRecipeOriginal: (recipeId: string) => Promise<void>;
   setBottomMargin: (pixels: number) => Promise<void>;
   /** `null` returns the site to the shared margin. */
   setSiteBottomMargin: (recipeId: string, pixels: number | null) => Promise<void>;
@@ -336,6 +337,15 @@ export const useApp = create<AppStore>((set, get) => {
         await library.setSiteOption(recipeId, optionId, enabled);
       } catch (error) {
         set({ sites: before, error: errorMessage(error) });
+      }
+    },
+
+    restoreRecipeOriginal: async (recipeId) => {
+      try {
+        await library.restoreRecipeOriginal(recipeId);
+        set({ sites: await library.getSites() });
+      } catch (error) {
+        set({ error: errorMessage(error) });
       }
     },
 
