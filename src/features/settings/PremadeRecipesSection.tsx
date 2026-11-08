@@ -20,6 +20,7 @@ export function PremadeRecipesSection() {
   return (
     <Section
       title="Pre-made recipes"
+      defaultOpen={false}
       note="Ready-made recipes for popular sites. Install prompts and pop-ups that block the page are hidden by default; Reels, Shorts and suggestions are shown until you hide them. The page reloads when you change a switch. Star a recipe to add its site to your favorites."
     >
       <div className="flex flex-col gap-3">

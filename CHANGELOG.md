@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-08
 
+### feat(settings): collapse only Pre-made recipes and More favorites by default
+
+**Change:** Settings sections now start open; only the long Pre-made recipes section starts collapsed, via a new `defaultOpen` prop on `Section`. "More favorites" is a collapsible block, collapsed by default.
+
+**Verified:** TypeScript, ESLint, Prettier, 178 frontend tests. Rendering in the running app not exercised.
+
+**PR:** n/a
+
 ### perf(web): keep quick-access sites warm after opening
 
 **Change:** Retain one reusable session per first-six favorite across routine idle sweeps and other browsing, so favorite taps switch pages rather than reload them. The usual five-session budget expands only as needed, to at most six quick-access pages plus the visible page; favorite edits reconcile retention immediately. Memory warnings still release every hidden page. No preloading or extra speculative requests.

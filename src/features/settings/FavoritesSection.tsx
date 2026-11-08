@@ -78,12 +78,17 @@ export function FavoritesSection() {
       )}
 
       {more.length > 0 && (
-        <div className="mt-5">
-          <GroupLabel>More favorites · {more.length}</GroupLabel>
+        <details className="group/more mt-5">
+          <summary className="flex cursor-pointer list-none items-center justify-between px-1 pt-1 pb-2 text-[13px] font-medium text-paper/60">
+            <span>More favorites · {more.length}</span>
+            <span aria-hidden="true" className="text-paper/45 group-open/more:rotate-180">
+              ⌄
+            </span>
+          </summary>
           <Group>
             {more.map((favorite, index) => renderRow(favorite, index + QUICK_ACCESS_LIMIT))}
           </Group>
-        </div>
+        </details>
       )}
 
       <div className="mt-4">
