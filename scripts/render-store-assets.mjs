@@ -70,6 +70,15 @@ const captureFile = (device, index, slug) =>
 // width and its top edge in % of the canvas height (the frame bleeds off the bottom).
 const sets = [
   {
+    dir: "ios/iphone-6.3",
+    width: 1206,
+    height: 2622,
+    capture: "iphone-17-pro-max",
+    kind: "phone",
+    deviceWidth: 78,
+    top: 21,
+  },
+  {
     dir: "ios/iphone-6.9",
     width: 1320,
     height: 2868,
