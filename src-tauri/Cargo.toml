@@ -22,6 +22,7 @@ tauri-build = { version = "2", features = [] }
 [dependencies]
 tauri = { version = "2", features = [] }
 tauri-plugin-siteview = { path = "plugins/tauri-plugin-siteview" }
+tauri-plugin-billing = { path = "plugins/tauri-plugin-billing" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"

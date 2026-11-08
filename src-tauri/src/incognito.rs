@@ -17,6 +17,7 @@ use tauri::{AppHandle, Manager, State};
 use tauri_plugin_siteview::{AuthenticateRequest, SetDocumentStartScriptRequest, SiteviewExt};
 
 use crate::commands::current_script;
+use crate::entitlement::Entitlement;
 use crate::error::Result;
 use crate::library::{Favorite, FavoriteInput, Library, Mode};
 use crate::recipes::Recipes;
@@ -57,13 +58,27 @@ fn switch_mode(app: &AppHandle, active: bool) -> Result<()> {
     Ok(())
 }
 
+/// Leaves incognito when the entitlement is gone. Used when Pro is lost, so the private set is
+/// not left open behind the paywall.
+pub fn leave_incognito(app: &AppHandle) {
+    if !app.state::<Incognito>().is_active() {
+        return;
+    }
+    let _ = switch_mode(app, false);
+}
+
 /// Asks the device owner to prove it is them, without changing anything. Settings uses this
 /// before it shows the incognito favorites or recipes. `false` means they cancelled or failed.
 ///
 /// Async because the plugin waits for native code that needs the main thread: a synchronous
 /// command would deadlock the app.
 #[tauri::command]
-pub async fn unlock_incognito(app: AppHandle, reason: String) -> Result<bool> {
+pub async fn unlock_incognito(
+    app: AppHandle,
+    entitlement: State<'_, Entitlement>,
+    reason: String,
+) -> Result<bool> {
+    entitlement.require_pro()?;
     Ok(app
         .siteview()
         .authenticate(AuthenticateRequest { reason })?)
@@ -72,7 +87,12 @@ pub async fn unlock_incognito(app: AppHandle, reason: String) -> Result<bool> {
 /// Turns incognito on after a successful check and returns its quick-access favorites. `None`
 /// means the check was cancelled or failed, and nothing changed.
 #[tauri::command]
-pub async fn enter_incognito(app: AppHandle, reason: String) -> Result<Option<Vec<Favorite>>> {
+pub async fn enter_incognito(
+    app: AppHandle,
+    entitlement: State<'_, Entitlement>,
+    reason: String,
+) -> Result<Option<Vec<Favorite>>> {
+    entitlement.require_pro()?;
     if !app
         .siteview()
         .authenticate(AuthenticateRequest { reason })?
@@ -90,7 +110,11 @@ pub async fn exit_incognito(app: AppHandle) -> Result<()> {
 }
 
 #[tauri::command(async)]
-pub fn get_incognito_favorites(library: State<'_, Library>) -> Result<Vec<Favorite>> {
+pub fn get_incognito_favorites(
+    library: State<'_, Library>,
+    entitlement: State<'_, Entitlement>,
+) -> Result<Vec<Favorite>> {
+    entitlement.require_pro()?;
     library.incognito_favorites()
 }
 
@@ -98,8 +122,10 @@ pub fn get_incognito_favorites(library: State<'_, Library>) -> Result<Vec<Favori
 #[tauri::command(async)]
 pub fn set_incognito_favorites(
     library: State<'_, Library>,
+    entitlement: State<'_, Entitlement>,
     favorites: Vec<FavoriteInput>,
 ) -> Result<Vec<Favorite>> {
+    entitlement.require_pro()?;
     library.set_incognito_favorites(favorites)
 }
 

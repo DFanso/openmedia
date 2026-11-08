@@ -22,6 +22,7 @@ use crate::ai::{
     provider, validate_key,
 };
 use crate::boot::{Boot, Startup};
+use crate::entitlement::Entitlement;
 use crate::error::{Error, Result};
 use crate::incognito::Incognito;
 use crate::library::{Favorite, FavoriteInput, Library, Mode, Theme};
@@ -114,9 +115,11 @@ pub fn record_usage(
 pub fn get_usage(
     usage: State<'_, Usage>,
     recipes: State<'_, Recipes>,
+    entitlement: State<'_, Entitlement>,
     today: String,
     days: u32,
 ) -> Result<UsageReport> {
+    entitlement.require_pro()?;
     let mut report = usage.report(&today, days)?;
     for site in &mut report.sites {
         site.name = Url::parse(&format!("https://{}/", site.host))
@@ -415,7 +418,12 @@ pub fn set_back_button(library: State<'_, Library>, enabled: bool) -> Result<()>
 
 /// Turns the "show what will be sent" step of the AI assistant on or off.
 #[tauri::command]
-pub fn set_ai_preview(library: State<'_, Library>, enabled: bool) -> Result<()> {
+pub fn set_ai_preview(
+    library: State<'_, Library>,
+    entitlement: State<'_, Entitlement>,
+    enabled: bool,
+) -> Result<()> {
+    entitlement.require_pro()?;
     library.set_ai_preview(enabled)
 }
 
@@ -468,8 +476,10 @@ pub fn ai_state(library: State<'_, Library>, secrets: State<'_, Secrets>) -> Res
 pub fn ai_save_provider(
     library: State<'_, Library>,
     secrets: State<'_, Secrets>,
+    entitlement: State<'_, Entitlement>,
     provider: ProviderInput,
 ) -> Result<ProviderView> {
+    entitlement.require_pro()?;
     view(&secrets, library.upsert_provider(provider)?)
 }
 
@@ -488,9 +498,11 @@ pub fn ai_delete_provider(
 pub fn ai_set_key(
     library: State<'_, Library>,
     secrets: State<'_, Secrets>,
+    entitlement: State<'_, Entitlement>,
     id: Uuid,
     key: String,
 ) -> Result<()> {
+    entitlement.require_pro()?;
     save_key(&library, secrets.0.as_ref(), id, &key)
 }
 
@@ -505,7 +517,12 @@ pub fn ai_remove_key(
 }
 
 #[tauri::command]
-pub fn ai_set_active(library: State<'_, Library>, id: Option<Uuid>) -> Result<()> {
+pub fn ai_set_active(
+    library: State<'_, Library>,
+    entitlement: State<'_, Entitlement>,
+    id: Option<Uuid>,
+) -> Result<()> {
+    entitlement.require_pro()?;
     library.set_active_provider(id)
 }
 
@@ -514,8 +531,10 @@ pub fn ai_set_active(library: State<'_, Library>, id: Option<Uuid>) -> Result<()
 pub async fn ai_test(
     library: State<'_, Library>,
     secrets: State<'_, Secrets>,
+    entitlement: State<'_, Entitlement>,
     id: Uuid,
 ) -> Result<Vec<String>> {
+    entitlement.require_pro()?;
     let provider = library.provider(id)?;
     let key = secrets.0.get(id)?.ok_or(Error::NoKey)?;
     list_models(models_request(provider.kind, &provider.base_url, &key)).await
@@ -566,8 +585,10 @@ pub async fn ai_prepare(
     recipes: State<'_, Recipes>,
     secrets: State<'_, Secrets>,
     agent: State<'_, Agent>,
+    entitlement: State<'_, Entitlement>,
     request: String,
 ) -> Result<PreparedRequest> {
+    entitlement.require_pro()?;
     let (provider, _key) = active_provider(&library, &secrets)?;
     let choices = library.site_options(app.state::<Incognito>().mode())?;
     agent::prepare(
@@ -603,8 +624,10 @@ pub async fn ai_send(
     library: State<'_, Library>,
     secrets: State<'_, Secrets>,
     agent: State<'_, Agent>,
+    entitlement: State<'_, Entitlement>,
     id: Uuid,
 ) -> Result<Proposal> {
+    entitlement.require_pro()?;
     let (config, key) = active_provider(&library, &secrets)?;
     agent::send(&agent, &LivePage(&app), &LiveModel { config, key }, id).await
 }
@@ -617,8 +640,10 @@ pub async fn ai_accept(
     library: State<'_, Library>,
     recipes: State<'_, Recipes>,
     agent: State<'_, Agent>,
+    entitlement: State<'_, Entitlement>,
     id: Uuid,
 ) -> Result<()> {
+    entitlement.require_pro()?;
     match agent::accept(&agent, &LivePage(&app), id)? {
         Accepted::EnableOption {
             recipe_id,

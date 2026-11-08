@@ -187,6 +187,7 @@ All without a backend.
 | 2026-11-08 | Quick-access sites get unread badges and local notifications read from the page title's leading `(N)`; notification text is app-owned, never page text; no push | User asked for notifications from quick-access sites like messages. The retained hidden sessions already report titles, so no page script, bridge message or backend is needed. Works only while iOS keeps the app and its web views running | A site needs counts the title lacks (a recipe-declared source), background delivery matters enough to revisit a backend, or Android lands |
 | 2026-11-08 | Settings sections use closed-by-default native disclosures | Keeps long recipe, favorites and provider lists out of the initial screen | — |
 | 2026-11-08 | The command bar uses the active BYOK provider rather than a hardcoded disconnected message | Existing assistant implementation reused, with redacted preview, validation and explicit acceptance; keys remain in Rust | — |
+| 2026-11-08 | Paywall: AI, incognito and usage need a Pro entitlement; opening links, favorites, history, bundled recipes and ad blocking stay free. Lifetime $18.99, yearly $10, monthly $2 with a 14-day trial. Purchases and restore go through RevenueCat via an in-repo `tauri-plugin-billing` (StoreKit 2 on iOS, Play Billing on Android); the gate is enforced in Rust | User asked for monetization with no login. RevenueCat has no Tauri SDK, so the plugin wraps `purchases-ios` and `purchases-android`. Restore Purchases recovers the entitlement on a new device through the store account. This amends invariant 1: RevenueCat is the only third-party network destination besides user-chosen sites and providers | Desktop distribution needs a billing path; the store policy on gating a BYOK feature changes; RevenueCat is replaced |
 
 ## Open questions
 
@@ -195,7 +196,7 @@ All without a backend.
 3. **Minimum iOS version**: decided, iOS 17. See the decision log.
 4. **Do we support multiple tabs per profile on mobile in v1?** Memory and plugin complexity; start with one active site view plus a lightweight switcher.
 5. **Licensing**: choose a license before opening to contributors (not yet decided).
-6. **Monetization**: none assumed. Not planned; no code depends on it.
+6. **Monetization**: decided, see the 2026-11-08 paywall decision. Desktop billing is open.
 7. **Bundled recipe maintenance**: who keeps Instagram's recipe alive when the site changes? Stale detection plus community PRs; define the contribution flow in Phase 5.
 
 ## Risk register

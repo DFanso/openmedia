@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { selectPage, useApp } from "../../app/store";
-import { describeError } from "../../i18n/errors";
+import { appError, selectPage, useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { primaryButton, quietButton } from "../settings/ui";
 import { formatDuration } from "./format";
@@ -10,6 +9,7 @@ import { limitReached, policyForHost, usageSeconds, useUsageControl } from "./po
 import { usageTargetOf } from "./section";
 import { nameForHost, SiteBadge, useFavorites } from "./SiteBadge";
 import { UsageMeter } from "./UsageMeter";
+import { useEntitlementStore } from "../paywall/store";
 import { openLimits } from "./view";
 
 function rememberWarning(day: string, host: string, threshold: number): boolean {
@@ -143,14 +143,14 @@ export function UsageGuard() {
   const sheet = useApp((state) => state.sheet);
   const onboarding = useApp((state) => state.onboardingOpen);
   const reportError = useApp((state) => state.reportError);
-  const t = useT();
+  const isPro = useEntitlementStore((state) => state.status === "pro");
   const requested = useRef(new Map<string, boolean>());
   const queues = useRef(new Map<string, Promise<unknown>>());
   const warned = useRef(new Set<string>());
   const host = page ? usageTargetOf(page.url ?? page.openedUrl, page.scope)?.host : undefined;
   const seconds = host ? usageSeconds(control.seconds, host) : 0;
   const policy = host ? policyForHost(control.policies, host) : undefined;
-  const blocked = control.ready && limitReached(policy, seconds);
+  const blocked = isPro && control.ready && limitReached(policy, seconds);
 
   useEffect(() => {
     if (!control.ready) return;
@@ -164,6 +164,7 @@ export function UsageGuard() {
     for (const session of sessions) {
       const target = usageTargetOf(session.url ?? session.openedUrl, session.scope);
       const shouldBlock =
+        isPro &&
         !!target &&
         limitReached(
           policyForHost(control.policies, target.host),
@@ -177,15 +178,15 @@ export function UsageGuard() {
         .catch((error: unknown) => {
           if (requested.current.get(session.id) === shouldBlock)
             requested.current.delete(session.id);
-          reportError(describeError(error, t));
+          reportError(appError(error));
         });
       queues.current.set(session.id, queued);
     }
-  }, [control, sessions, reportError, t]);
+  }, [control, sessions, reportError, isPro]);
 
   useEffect(() => {
     const threshold = policy?.warnSeconds;
-    if (sheet !== "none" || onboarding || document.visibilityState !== "visible") return;
+    if (!isPro || sheet !== "none" || onboarding || document.visibilityState !== "visible") return;
     if (!control.ready || !host || threshold == null || seconds < threshold || blocked) return;
     const key = `${control.day}:${host}:${threshold}`;
     if (warned.current.has(key)) return;
@@ -193,7 +194,17 @@ export function UsageGuard() {
     if (rememberWarning(control.day, host, threshold)) {
       useUsageControl.setState({ warning: { host, seconds } });
     }
-  }, [control.ready, control.day, host, policy?.warnSeconds, seconds, blocked, sheet, onboarding]);
+  }, [
+    isPro,
+    control.ready,
+    control.day,
+    host,
+    policy?.warnSeconds,
+    seconds,
+    blocked,
+    sheet,
+    onboarding,
+  ]);
 
   useEffect(() => {
     if (!control.warning) return;

@@ -26,8 +26,9 @@ import {
   type GestureState,
 } from "./gesture";
 import { loadPosition, savePosition, type FabPosition } from "./position";
-import { HistoryIcon, IncognitoIcon, SlidersIcon, StatsIcon } from "../../shared/icons";
+import { HistoryIcon, IncognitoIcon, LockIcon, SlidersIcon, StatsIcon } from "../../shared/icons";
 import logoMark from "../../assets/logo-mark.svg";
+import { useEntitlementStore } from "../paywall/store";
 
 const idle: GestureState = { phase: "idle" };
 
@@ -67,6 +68,7 @@ export function Fab() {
   const openFavorite = useApp((s) => s.openFavorite);
   const onboardingOpen = useApp((s) => s.onboardingOpen);
   const setFabEdge = useApp((s) => s.setFabEdge);
+  const isPro = useEntitlementStore((state) => state.status === "pro");
   const t = useT();
   const viewport = useViewport();
   const insets = useInsets();
@@ -285,6 +287,11 @@ export function Fab() {
         }`}
       >
         <StatsIcon />
+        {!isPro && (
+          <span className="absolute -end-1 -top-1 rounded-full bg-ink p-1">
+            <LockIcon />
+          </span>
+        )}
       </button>
 
       <button
@@ -311,6 +318,11 @@ export function Fab() {
         } ${incognito.active ? "" : "text-white"} ${incognito.busy ? "animate-pulse" : ""}`}
       >
         <IncognitoIcon active={incognito.active} />
+        {!isPro && (
+          <span className="absolute -end-1 -top-1 rounded-full bg-ink p-1">
+            <LockIcon />
+          </span>
+        )}
         {incognito.active && (
           <span
             className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-[11px] font-medium tracking-[0.14em] whitespace-nowrap text-white uppercase [text-shadow:0_1px_6px_rgb(0_0_0/0.7)] ${
@@ -365,11 +377,17 @@ export function Fab() {
           transition: gesture.phase === "dragging" ? "none" : "transform 320ms var(--ease-spring)",
           touchAction: "none",
         }}
-        className={`fab fixed top-0 left-0 z-30 grid place-items-center rounded-full ${
-          hidden ? "pointer-events-none opacity-0" : ""
-        }`}
+        className={`fab fixed top-0 left-0 z-30 grid place-items-center rounded-full ${hidden ? "pointer-events-none opacity-0" : ""}`}
       >
         <img src={logoMark} alt="" draggable={false} className="fab-logo relative size-10" />
+        {!isPro && (
+          <span
+            aria-hidden="true"
+            className="absolute -bottom-1 -end-1 grid size-6 place-items-center rounded-full border border-white/70 bg-ink text-white"
+          >
+            <LockIcon />
+          </span>
+        )}
         {anyUnread && !fanOpen && (
           <span
             aria-hidden="true"

@@ -3,6 +3,9 @@ use zeroize::Zeroizing;
 
 use crate::error::{Error, Result};
 
+/// The Keychain service the secrets live under. Android has no service: its store keeps the
+/// secret under its own name.
+#[cfg(not(target_os = "android"))]
 const SERVICE: &str = "surf.openmedia";
 
 /// Where API keys live. Keys go in and come out only through this trait, and only Rust code
@@ -17,16 +20,28 @@ pub trait SecretStore: Send + Sync {
     }
 }
 
-/// The OS secure store: the Keychain on iOS and macOS.
+/// The OS secure store: the Keychain on iOS and macOS, the Android Keystore on Android.
+#[cfg(not(target_os = "android"))]
 pub struct KeychainStore;
 
+/// The OS secure store on Android: a key in the Android Keystore encrypts the secret, and only
+/// the ciphertext is written to the app's own preferences.
+#[cfg(target_os = "android")]
+pub use tauri_plugin_siteview::AndroidSecretStore as KeychainStore;
+
+/// The name a secret is stored under.
+fn secret_id(id: Uuid) -> String {
+    format!("ai-provider:{id}")
+}
+
+#[cfg(not(target_os = "android"))]
 impl KeychainStore {
     fn entry(id: Uuid) -> Result<keyring::Entry> {
-        keyring::Entry::new(SERVICE, &format!("ai-provider:{id}"))
-            .map_err(|e| Error::Secret(e.to_string()))
+        keyring::Entry::new(SERVICE, &secret_id(id)).map_err(|e| Error::Secret(e.to_string()))
     }
 }
 
+#[cfg(not(target_os = "android"))]
 impl SecretStore for KeychainStore {
     fn set(&self, id: Uuid, secret: &str) -> Result<()> {
         Self::entry(id)?
@@ -47,6 +62,27 @@ impl SecretStore for KeychainStore {
             Ok(()) | Err(keyring::Error::NoEntry) => Ok(()),
             Err(e) => Err(Error::Secret(e.to_string())),
         }
+    }
+}
+
+#[cfg(target_os = "android")]
+impl SecretStore for KeychainStore {
+    fn set(&self, id: Uuid, secret: &str) -> Result<()> {
+        tauri_plugin_siteview::AndroidSecretStore::set(&secret_id(id), secret)
+            .map_err(Error::Secret)
+    }
+
+    fn get(&self, id: Uuid) -> Result<Option<Zeroizing<String>>> {
+        match tauri_plugin_siteview::AndroidSecretStore::get(&secret_id(id))
+            .map_err(Error::Secret)?
+        {
+            Some(secret) => Ok(Some(Zeroizing::new(secret))),
+            None => Ok(None),
+        }
+    }
+
+    fn delete(&self, id: Uuid) -> Result<()> {
+        tauri_plugin_siteview::AndroidSecretStore::delete(&secret_id(id)).map_err(Error::Secret)
     }
 }
 

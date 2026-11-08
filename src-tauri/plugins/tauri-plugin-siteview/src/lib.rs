@@ -21,6 +21,11 @@ use desktop::Siteview;
 #[cfg(mobile)]
 use mobile::Siteview;
 
+/// The Android secret store. Android has no `keyring` backend, so the plugin's Android side
+/// keeps the key in the Android Keystore.
+#[cfg(target_os = "android")]
+pub use mobile::AndroidSecretStore;
+
 pub trait SiteviewExt<R: Runtime> {
     fn siteview(&self) -> &Siteview<R>;
 }

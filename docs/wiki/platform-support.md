@@ -1,6 +1,6 @@
 # Platform Support
 
-> **Status: Partially implemented.** The iOS site view exists (`src-tauri/plugins/tauri-plugin-siteview`, Swift). Only the iOS checks under [Verified results](#verified-results) were run, on one simulator; everything else marked **verify** is still unproven. The Android Kotlin code was removed (see the [roadmap](./roadmap.md#decision-log)) and will be rewritten after iOS is stable. Desktop is deferred.
+> **Status: Partially implemented.** The iOS site view exists (`src-tauri/plugins/tauri-plugin-siteview`, Swift) and the Android one now exists too (`.../android`, Kotlin). Only the iOS checks under [Verified results](#verified-results) were run, on one simulator; the Android code has not been run on a device or an emulator, and everything else marked **verify** is still unproven. Desktop is deferred.
 
 ## The core constraint
 
@@ -21,7 +21,7 @@ The shell talks to one plugin API (`open`, `set_rect`, `navigate`, …); desktop
 | Isolated profiles | `data_store_identifier` (**verify** min OS) | `data_directory` | `data_directory` | `WKWebsiteDataStore(forIdentifier:)` (iOS 17+; **verify** fallback for older) | One global `CookieManager` per app; per-profile needs androidx.webkit multi-profile (feature-gated, **verify**) |
 | Page → Core channel | Bridge A (**verify**) | Bridge A (**verify**) | Bridge A (**verify**) | Bridge B (script message handler) | Bridge B (web message listener) |
 | Secret store | Keychain | Credential Manager | Secret Service | Keychain | Keystore-backed |
-| Ad and tracker blocking | Not built (deferred with desktop) | Not built | Not built | `WKContentRuleList` from bundled lists ([Ad Blocking](./ad-blocking.md)) | Not built; Android WebView has no rule-list API, so it needs request interception (`shouldInterceptRequest`) with the `adblock` engine |
+| Ad and tracker blocking | Not built (deferred with desktop) | Not built | Not built | `WKContentRuleList` from bundled lists ([Ad Blocking](./ad-blocking.md)) | Request interception (`shouldInterceptRequest`) over the same rule JSON ([Ad Blocking](./ad-blocking.md)) |
 | Auto-update | updater plugin | updater plugin | updater plugin | App Store | Play Store |
 | Priority | 3 | 4 | 4 | **1** | **1** |
 
@@ -151,6 +151,23 @@ The site view is a native view *below* the Tauri shell, so the shell's floating 
 - Tap-to-pick, AI chat, and the rule list live in the command bar and settings; the picker highlight lives in the page (engine).
 
 Fallback if the native-plugin approach fails: navigate the main webview to the site and inject shell UI as an overlay in the page. Much weaker (shell dies on navigation, UI shares a realm with the hostile page), so treated as a last resort and not planned.
+
+## The Android site view
+
+`src-tauri/plugins/tauri-plugin-siteview/android` (Kotlin, package `surf.openmedia.siteview`, class `SiteViewPlugin`) is the Android twin of the Swift plugin and speaks the same Rust API (`src/models.rs` is the source of truth; the JSON is camelCase, and `setBlocked`, `authenticate` and `evaluate` stay Rust-only).
+
+- **Layout.** Tauri puts the shell webview straight into the activity's content view, so the plugin adds its own `PageLayer` (a `ViewGroup`) as the first child of that content frame: the page views live in the layer, below the shell, and the layer lays them out at the rectangle the shell reports with `set_rect`. The shell is made transparent (`setBackgroundColor(Color.TRANSPARENT)`) so the page shows through it, and a backdrop in the layer holds the app's own colour until a page has painted.
+- **Touch routing.** Android has no hit-test fall-through between sibling views, so the shell webview keeps an `OnTouchListener`: a touch inside a region the shell reported goes to the shell, every other touch is copied to the page webview with its coordinates moved into the page's space and dispatched there. The page view is the target, so the shell never sees a page touch.
+- **Profiles.** `open` refuses to run unless the System WebView reports `MULTI_PROFILE` and `WEB_MESSAGE_LISTENER`, and the page is put in the profile named by the shell's profile id (`WebViewCompat.setProfile`). There is no single-profile fallback: the profile-isolation invariant would break.
+- **Document start.** The recipe script and the first-paint reporter go in with `WebViewCompat.addDocumentStartJavaScript`. Without that feature the scripts are injected when the page starts instead, which is late: a CSS-first rule may flash.
+- **Bridge.** `WebViewCompat.addWebMessageListener` gives the page a write-only `openmedia` object. Only the main frame's messages are taken, the body must be a JSON object or array, and the message's own origin travels with it. No Tauri IPC reaches a page view.
+- **Popups.** A navigation outside the session's domain is cancelled and opened in a Custom Tab, which shares nothing with the profile.
+- **Blocking.** A closed site is covered by a native shield, its load stops, its timers stop (the closest Android has to suspending media) and every navigation it asks for is refused.
+- **Owner check.** `BiometricPrompt` with `BIOMETRIC_WEAK`, plus `DEVICE_CREDENTIAL` on Android 11 and above; a device with neither fails closed.
+- **Notifications.** A local notification for a hidden session, with the session id in the intent; the tap is reported back as `siteview:notification-tap`. `POST_NOTIFICATIONS` is requested the first time one is due.
+- **Secrets.** Android has no `keyring` backend, so the plugin's Kotlin side keeps a key in the Android Keystore (AES-GCM) and writes only the ciphertext to the app's preferences, which the app's backup rules exclude. Rust reaches it through a Rust-only plugin command, so no webview can ask for a key.
+
+**Not verified.** Nothing here has been run: the machine's disk was full for the whole session, so the Android project could not be compiled, let alone launched. The Kotlin and the Rust changes are unbuilt; see the pull request for the commands to build and run it.
 
 ## Known platform constraints
 

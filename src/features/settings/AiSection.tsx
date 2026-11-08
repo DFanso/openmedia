@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useApp } from "../../app/store";
-import { describeError } from "../../i18n/errors";
+import { appError, useApp } from "../../app/store";
 import type { Translate } from "../../i18n/translate";
 import { useT } from "../../i18n/useT";
 import { PlusIcon } from "../../shared/icons";
@@ -8,6 +7,7 @@ import { ai, type AiState, type Provider, type ProviderKind } from "../../shared
 import { PRESETS } from "./presets";
 import { Switch } from "./Switch";
 import { Group, Section, field, quietButton } from "./ui";
+import { useEntitlementStore } from "../paywall/store";
 
 interface Draft {
   id?: string;
@@ -59,88 +59,145 @@ export function AiSection() {
     try {
       setState(await ai.state());
     } catch (e) {
-      setError(describeError(e, t));
+      setError(appError(e));
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
     ai.state().then(
       (loaded) => !cancelled && setState(loaded),
-      (e: unknown) => !cancelled && setError(describeError(e, t)),
+      (e: unknown) => !cancelled && setError(appError(e)),
     );
     return () => {
       cancelled = true;
     };
-  }, [t]);
+  }, []);
 
   const makeActive = async (id: string) => {
-    await ai.setActive(id).catch((e: unknown) => setError(describeError(e, t)));
+    await ai.setActive(id).catch((e: unknown) => setError(appError(e)));
     await reload();
   };
 
   const preview = useApp((s) => s.state?.aiPreview ?? true);
   const setAiPreview = useApp((s) => s.setAiPreview);
+  const openSheet = useApp((state) => state.openSheet);
+  const isPro = useEntitlementStore((state) => state.status === "pro");
 
   return (
     <Section title={t("ai.title")} note={t("ai.note")}>
       <p className="px-1 pb-2 text-[13px] leading-snug text-paper/60">{connectionLine(state, t)}</p>
+      {!isPro && (
+        <button
+          type="button"
+          onClick={() => openSheet("paywall")}
+          className="mb-3 w-full rounded-full border border-accent/50 px-4 py-3 text-sm text-accent"
+        >
+          {t("paywall.lockedHint")}
+        </button>
+      )}
       {state && state.providers.length > 0 && (
         <Group>
           {state.providers.map((p) => (
             <div key={p.id} className="flex items-center gap-3 px-4 py-3">
-              <button
-                type="button"
-                aria-label={t("ai.use", { name: p.name })}
-                aria-pressed={state.activeId === p.id}
-                onClick={() => void makeActive(p.id)}
-                className={`grid size-5 shrink-0 place-items-center rounded-full border ${
-                  state.activeId === p.id ? "border-accent" : "border-paper/30"
-                }`}
-              >
-                {state.activeId === p.id && <span className="size-2.5 rounded-full bg-accent" />}
-              </button>
-              <div className="min-w-0 flex-1">
-                <div className="truncate text-base font-medium">{p.name}</div>
-                <div className="truncate text-sm text-paper/55">
-                  {p.hasKey ? t("ai.keySaved") : t("ai.noKey")}
-                  {p.model ? ` · ${p.model}` : ""}
-                </div>
-              </div>
-              <button type="button" className={quietButton} onClick={() => setDraft(draftOf(p))}>
-                {t("common.edit")}
-              </button>
+              {isPro ? (
+                <>
+                  <button
+                    type="button"
+                    aria-label={t("ai.use", { name: p.name })}
+                    aria-pressed={state.activeId === p.id}
+                    onClick={() => void makeActive(p.id)}
+                    className={`grid size-5 shrink-0 place-items-center rounded-full border ${state.activeId === p.id ? "border-accent" : "border-paper/30"}`}
+                  >
+                    {state.activeId === p.id && (
+                      <span className="size-2.5 rounded-full bg-accent" />
+                    )}
+                  </button>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-base font-medium">{p.name}</div>
+                    <div className="truncate text-sm text-paper/55">
+                      {p.hasKey ? t("ai.keySaved") : t("ai.noKey")}
+                      {p.model ? ` · ${p.model}` : ""}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className={quietButton}
+                    onClick={() => setDraft(draftOf(p))}
+                  >
+                    {t("common.edit")}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-base font-medium">{p.name}</div>
+                    <div className="truncate text-sm text-paper/55">
+                      {p.hasKey ? t("ai.keySaved") : t("ai.noKey")}
+                    </div>
+                  </div>
+                  {p.hasKey && (
+                    <button
+                      type="button"
+                      className={quietButton}
+                      onClick={() =>
+                        void ai
+                          .removeKey(p.id)
+                          .then(reload)
+                          .catch((e: unknown) => setError(appError(e)))
+                      }
+                    >
+                      {t("common.remove")}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className={quietButton}
+                    onClick={() =>
+                      void ai
+                        .deleteProvider(p.id)
+                        .then(reload)
+                        .catch((e: unknown) => setError(appError(e)))
+                    }
+                  >
+                    {t("common.delete")}
+                  </button>
+                </>
+              )}
             </div>
           ))}
         </Group>
       )}
 
-      {draft ? (
-        <ProviderForm
-          key={draft.id ?? "new"}
-          initial={draft}
-          onClose={() => setDraft(null)}
-          onChanged={reload}
-        />
-      ) : (
-        <button
-          type="button"
-          onClick={() => setDraft(blankDraft())}
-          className="mt-3 flex items-center gap-2 px-1 py-1 text-sm font-medium text-accent"
-        >
-          <PlusIcon /> {t("ai.addProvider")}
-        </button>
-      )}
+      {isPro &&
+        (draft ? (
+          <ProviderForm
+            key={draft.id ?? "new"}
+            initial={draft}
+            onClose={() => setDraft(null)}
+            onChanged={reload}
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setDraft(blankDraft())}
+            className="mt-3 flex items-center gap-2 px-1 py-1 text-sm font-medium text-accent"
+          >
+            <PlusIcon /> {t("ai.addProvider")}
+          </button>
+        ))}
       {error && !draft && <p className="mt-2 px-1 text-sm text-accent">{error}</p>}
 
-      <Group>
-        <Switch
-          label={t("ai.previewToggle")}
-          description={t("ai.previewNote")}
-          checked={preview}
-          onChange={(on) => void setAiPreview(on)}
-        />
-      </Group>
+      {isPro && (
+        <Group>
+          <Switch
+            label={t("ai.previewToggle")}
+            description={t("ai.previewNote")}
+            checked={preview}
+            onChange={(on) => void setAiPreview(on)}
+          />
+        </Group>
+      )}
 
       <details className="mt-4 rounded-2xl border border-hair bg-paper/[0.04] px-4 py-3 text-sm text-paper/70">
         <summary className="cursor-pointer font-medium text-paper">{t("ai.whereToGetKey")}</summary>
@@ -209,7 +266,7 @@ function ProviderForm({ initial, onClose, onChanged }: FormProps) {
     try {
       await action();
     } catch (e) {
-      setNote(describeError(e, t));
+      setNote(appError(e));
     } finally {
       setBusy(false);
     }

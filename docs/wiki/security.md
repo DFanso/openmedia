@@ -30,7 +30,7 @@ The site view loads third-party code we do not control, and our injected engine 
 4. **AI output and imported recipes are untrusted** and validated before use ([Recipe Format](./recipe-format.md#validation-rust-before-anything-reaches-a-webview)).
 5. **No `script` rule from AI.** Script rules need explicit per-recipe user confirmation, keyed by content hash.
 6. **Profile isolation.** Each profile has its own cookie/storage store. The shell webview has none of their data.
-7. **No backend, no telemetry.** The app has no server to leak to; do not add one.
+7. **No backend, no telemetry.** The app has no server of ours to leak to; do not add one. The single third-party exception is RevenueCat, reached only from `tauri-plugin-billing` for purchases and restore, with an anonymous app-user ID and no page, URL, key or recipe data ([Paywall](./paywall.md#privacy-and-invariants)).
 8. **Redact before send; preview by default.**
 
 ## The bridge

@@ -31,6 +31,8 @@ import {
   type SiteViewState,
   type Theme,
 } from "../shared/ipc";
+import { useEntitlementStore } from "../features/paywall/store";
+import { isProRequired } from "../features/paywall/ipc";
 import { detectLocale, resolveLocale, type Locale } from "../i18n/locales";
 import { describeError } from "../i18n/errors";
 import { createTranslator } from "../i18n/translate";
@@ -43,7 +45,7 @@ import {
   useIconCache,
 } from "../shared/siteIcons";
 
-export type Sheet = "none" | "assistant" | "history" | "stats" | "settings";
+export type Sheet = "none" | "assistant" | "history" | "stats" | "settings" | "paywall";
 
 /** What the web layer must do natively next; `nonce` makes a repeat of the same action distinct. */
 export type SessionAction = { nonce: number } & (
@@ -188,6 +190,10 @@ export const selectLocale = (store: AppStore): Locale =>
 
 /** The message for something that went wrong, in the language the app is in. */
 export function appError(error: unknown): string {
+  if (isProRequired(error)) {
+    useApp.setState({ sheet: "paywall" });
+    return "";
+  }
   return describeError(error, createTranslator(selectLocale(useApp.getState())));
 }
 
@@ -288,6 +294,13 @@ export const useApp = create<AppStore>((set, get) => {
   const dispatch = (event: AssistantEvent) =>
     set((current) => ({ assistant: assistantReducer(current.assistant, event) }));
 
+  const showProPaywall = (error: unknown): boolean => {
+    if (!isProRequired(error)) return false;
+    dropJob(pendingJobId(get().assistant));
+    dispatch({ type: "reset", keepText: true });
+    set({ sheet: "paywall" });
+    return true;
+  };
   /** Rust holds a job (and the page shows its preview) until it is rejected; failures are harmless. */
   const dropJob = (id: string | null) => {
     if (id) void assistantIpc.reject(id).catch(() => {});
@@ -307,6 +320,7 @@ export const useApp = create<AppStore>((set, get) => {
         set({ sheet: "none" });
       }
     } catch (error) {
+      if (showProPaywall(error)) return;
       const current = get().assistant;
       if (current.status === "sending" && current.prepared.id === prepared.id) {
         dispatch({ type: "failed", error });
@@ -359,7 +373,10 @@ export const useApp = create<AppStore>((set, get) => {
       void get().loadSites();
     },
 
-    openSheet: (sheet) => set({ sheet }),
+    openSheet: (sheet) => {
+      const isPro = useEntitlementStore.getState().status === "pro";
+      set({ sheet: !isPro && (sheet === "assistant" || sheet === "stats") ? "paywall" : sheet });
+    },
     closeSheet: () => set({ sheet: "none" }),
 
     resetGuide: async () => {
@@ -647,6 +664,7 @@ export const useApp = create<AppStore>((set, get) => {
         dispatch({ type: "prepared", prepared, preview });
         if (!preview) await runSend(prepared);
       } catch (error) {
+        if (showProPaywall(error)) return;
         const current = get().assistant;
         if (current.status === "preparing" && current.request === started.request) {
           dispatch({ type: "failed", error });
@@ -671,6 +689,7 @@ export const useApp = create<AppStore>((set, get) => {
         await get().loadSites();
         dispatch({ type: "accepted" });
       } catch (error) {
+        if (showProPaywall(error)) return;
         dispatch({ type: "failed", error });
       }
     },
@@ -695,6 +714,10 @@ export const useApp = create<AppStore>((set, get) => {
     },
 
     enterIncognito: async () => {
+      if (useEntitlementStore.getState().status !== "pro") {
+        set({ sheet: "paywall" });
+        return;
+      }
       if (get().incognito.busy) return;
       setIncognitoBusy(true);
       try {
@@ -727,6 +750,10 @@ export const useApp = create<AppStore>((set, get) => {
     },
 
     unlockIncognito: async () => {
+      if (useEntitlementStore.getState().status !== "pro") {
+        set({ sheet: "paywall" });
+        return false;
+      }
       try {
         return await incognitoIpc.unlock(translate()("incognito.unlockReason"));
       } catch (error) {

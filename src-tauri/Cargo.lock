@@ -2314,6 +2314,7 @@ dependencies = [
  "sha2",
  "tauri",
  "tauri-build",
+ "tauri-plugin-billing",
  "tauri-plugin-siteview",
  "tempfile",
  "thiserror 2.0.21",
@@ -3767,6 +3768,17 @@ dependencies = [
  "serde_json",
  "tauri-utils",
  "walkdir",
+]
+
+[[package]]
+name = "tauri-plugin-billing"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-plugin",
+ "thiserror 2.0.21",
 ]
 
 [[package]]

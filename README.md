@@ -22,7 +22,7 @@
 - **The real site, not a copy.** Pages load in a native web view; you log in to the actual origin and your session stays on the device.
 - **Customization is data.** What gets hidden is a declarative recipe, so it can be read, tested against DOM fixtures, and fixed when a site changes. Reddit's "open the app" prompts are the first bundled recipe.
 - **Out of the way.** The web fills the screen. A single draggable button holds everything else.
-- **Local first.** No server, no telemetry, no account. Network requests go to opened sites and, only on request, your configured AI provider.
+- **Local first.** No server of ours, no telemetry, no account. Network requests go to opened sites, your configured AI provider on request, and RevenueCat for purchases and restore ([Paywall](docs/wiki/paywall.md)).
 
 ## Highlights
 
@@ -38,6 +38,7 @@
 - **Bring your own AI key:** add providers (Anthropic, OpenAI, Gemini, OpenRouter, or a local OpenAI-compatible server) in Settings. Keys go to the iOS Keychain through Rust and never come back to the UI; "Test connection" lists the provider's models.
   - **Where to get a key:** Settings recommends [OpenRouter](https://openrouter.ai) (free variants and paid models), [OpenCode Zen / Console](https://opencode.ai/console) (paid access from external clients; its free-tier chat models require OpenCode), and local [Ollama](https://ollama.com) / [LM Studio](https://lmstudio.ai) servers (no model API fees). See [AI Assistant](docs/wiki/ai-assistant.md).
 - **AI assistant:** use the active provider to request a change on the current page, preview the redacted payload, then accept or reject its validated recipe proposal.
+- **Pro:** AI, incognito and usage are paywalled (one-time $18.99, or $2 monthly with a 14-day trial, or $10 yearly). Opening links, favorites, history, recipes and ad blocking stay free. Restore Purchases brings Pro to another device on the same store account.
 - **Planned:** Android and desktop site views, additional runtime capabilities and sharing. See the [roadmap](docs/wiki/roadmap.md).
 
 ## Status
