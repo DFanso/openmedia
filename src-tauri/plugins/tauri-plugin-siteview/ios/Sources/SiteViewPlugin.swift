@@ -286,6 +286,10 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     webview.isOpaque = false
     webview.backgroundColor = .clear
     webview.scrollView.backgroundColor = .clear
+    // The shell is app chrome: no pinch zoom, whatever the viewport meta says.
+    webview.scrollView.minimumZoomScale = 1
+    webview.scrollView.maximumZoomScale = 1
+    webview.scrollView.pinchGestureRecognizer?.isEnabled = false
     NotificationCenter.default.addObserver(
       forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: .main
     ) { [weak self] _ in self?.send(MemoryWarningEvent()) }

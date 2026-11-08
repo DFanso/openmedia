@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-08
 
+### fix(shell): disable pinch zoom on the app's own screens
+
+**What:** Settings, Usage, onboarding and the other shell screens could be pinched and zoomed like a web page.
+
+**Change:** The shell's viewport meta now pins scale to 1 (`user-scalable=no`), `body` sets `touch-action: pan-x pan-y`, and the iOS plugin fixes the shell web view's zoom range at 1 and disables its pinch recognizer. Site views are separate web views and keep their own zoom.
+
+**Verified:** Diff only. **Not verified:** on a device or simulator (iOS pinch, Android WebView); the Swift change was not compiled here.
+
 ### feat(fab): unread badges and local notifications for quick-access sites
 
 **What:** Quick-access sites (messages and the like) gave no sign of new activity while another page was showing.
