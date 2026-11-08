@@ -10,7 +10,8 @@ and Google's [preview assets help](https://support.google.com/googleplay/android
 
 | Folder                | Store slot                      | Size (px)   | Count | Store rule                                                                                        |
 | --------------------- | ------------------------------- | ----------- | ----- | ------------------------------------------------------------------------------------------------- |
-| `ios/iphone-6.9/`     | iPhone, 6.9" (required)         | 1320 × 2868 | 8     | Apple also accepts 1290 × 2796 and 1260 × 2736; 1 to 10 per slot. Smaller iPhone slots scale down |
+| `ios/iphone-6.3/`     | iPhone with Dynamic Island, medium display (**required**) | 1206 × 2622 | 8 | Apple also accepts 1179 × 2556. Required slot for any iPhone app; 1 to 10 per slot |
+| `ios/iphone-6.9/`     | iPhone with Dynamic Island, large display (optional) | 1320 × 2868 | 8     | Apple also accepts 1290 × 2796 and 1260 × 2736. If omitted, App Store Connect scales the required set up |
 | `ios/ipad-13/`        | iPad, 13" (required for iPad)   | 2064 × 2752 | 8     | Apple also accepts 2048 × 2732; 1 to 10 per slot                                                  |
 | `android/phone/`      | Phone                           | 1080 × 1920 | 8     | 9:16 or 16:9, 320 to 3840 px a side, 2 to 8 shots. 1080 px or more keeps the listing promotable   |
 | `android/tablet/`     | 7" and 10" tablet (same files)  | 1440 × 2560 | 8     | 9:16 or 16:9, 1080 to 7680 px a side, up to 8 each                                                |
@@ -18,6 +19,8 @@ and Google's [preview assets help](https://support.google.com/googleplay/android
 
 Each set tells the same story in the same order: `01-browse`, `02-fan`, `03-recipes`, `04-browsing`, `05-usage`,
 `06-limits`, `07-byok`, `08-dark`.
+
+Not included yet: **Mac** (required for a Mac app: one of 1280 × 800, 1440 × 900, 2560 × 1600 or 2880 × 1800, 16:10) needs real captures of the macOS app, which could not be taken in this environment (no screen-recording access). Google Play also takes Chromebook and other large-screen sets if those platforms ship.
 
 ## Captures
 
