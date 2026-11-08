@@ -1,7 +1,10 @@
 use tauri::{AppHandle, Runtime, command};
 
 use crate::models::*;
-use crate::validate::{parse_profile_id, parse_session_id, parse_web_url, validate_rule_lists};
+use crate::validate::{
+    parse_profile_id, parse_session_id, parse_web_url, validate_notification_text,
+    validate_rule_lists,
+};
 use crate::{Result, SiteviewExt};
 
 #[command]
@@ -68,6 +71,13 @@ pub(crate) async fn set_color_scheme<R: Runtime>(
     request: SetColorSchemeRequest,
 ) -> Result<()> {
     app.siteview().set_color_scheme(request)
+}
+
+#[command]
+pub(crate) async fn notify<R: Runtime>(app: AppHandle<R>, request: NotifyRequest) -> Result<()> {
+    parse_session_id(&request.session)?;
+    validate_notification_text(&request.title, &request.body)?;
+    app.siteview().notify(request)
 }
 
 #[command]

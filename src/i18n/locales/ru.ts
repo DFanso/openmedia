@@ -303,4 +303,5 @@ export const ru: Messages = {
   "assistant.errorNothingMatched":
     "Предложенное изменение ничего не нашло на этой странице. Опишите, что скрыть, по-другому.",
   "assistant.errorOther": "Что-то пошло не так. Повторите.",
+  "notify.newActivity": "Новая активность",
 };

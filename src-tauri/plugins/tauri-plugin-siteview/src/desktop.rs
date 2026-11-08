@@ -52,6 +52,10 @@ impl<R: Runtime> Siteview<R> {
     pub fn reload(&self) -> Result<()> {
         Err(Error::DesktopUnsupported)
     }
+
+    pub fn notify(&self, _request: NotifyRequest) -> Result<()> {
+        Err(Error::DesktopUnsupported)
+    }
 }
 
 impl<R: Runtime> Siteview<R> {

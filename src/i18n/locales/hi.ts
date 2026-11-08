@@ -300,4 +300,5 @@ export const hi: Messages = {
   "assistant.errorOther": "कुछ गड़बड़ हो गई। फिर कोशिश करें।",
   "web.emptyHint": "बटन दबाएँ और पता टाइप करें, या पसंदीदा चुनने के लिए देर तक दबाएँ।",
   "web.loading": "साइट लोड हो रही है…",
+  "notify.newActivity": "नई गतिविधि",
 };

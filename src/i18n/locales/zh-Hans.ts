@@ -284,4 +284,5 @@ export const zhHans: Messages = {
   "assistant.errorNothingMatched":
     "建议的修改在这个页面上没有匹配到任何内容。可以试着换种说法描述要隐藏的内容。",
   "assistant.errorOther": "出了点问题。请重试。",
+  "notify.newActivity": "有新动态",
 };

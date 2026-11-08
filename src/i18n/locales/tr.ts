@@ -305,4 +305,5 @@ export const tr: Messages = {
   "assistant.errorNothingMatched":
     "Önerilen değişiklik bu sayfada hiçbir şeyle eşleşmedi. Neyi gizlemek istediğinizi farklı anlatmayı deneyin.",
   "assistant.errorOther": "Bir şeyler ters gitti. Yeniden deneyin.",
+  "notify.newActivity": "Yeni etkinlik",
 };

@@ -303,4 +303,5 @@ export const sv: Messages = {
   "assistant.errorNothingMatched":
     "Den föreslagna ändringen matchade ingenting på den här sidan. Försök beskriva vad som ska döljas på ett annat sätt.",
   "assistant.errorOther": "Något gick fel. Försök igen.",
+  "notify.newActivity": "Ny aktivitet",
 };

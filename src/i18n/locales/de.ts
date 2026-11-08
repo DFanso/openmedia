@@ -310,4 +310,5 @@ export const de: Messages = {
   "ai.previewNote": "Zeigt den genauen Text, der an den Anbieter geht, und wartet auf dich.",
   "ai.note":
     "Bring deinen eigenen Schlüssel mit. Er wird im iOS-Schlüsselbund gespeichert, nur vom Rust-Kern der App gelesen und nur an den Anbieter gesendet, den du wählst. Wähle einen als aktiv und beschreibe dann eine Änderung in der Befehlsleiste. Die Struktur der Seite (nicht deine Cookies, Passwörter oder eingegebenen Texte) geht nur an diesen Anbieter, wenn du auf Senden tippst.",
+  "notify.newActivity": "Neue Aktivität",
 };

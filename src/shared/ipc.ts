@@ -230,6 +230,9 @@ export const siteView = {
   goBack: () => command("plugin:siteview|go_back"),
   goForward: () => command("plugin:siteview|go_forward"),
   reload: () => command("plugin:siteview|reload"),
+  /** A local notification for a hidden session. The text is the app's own, never page text. */
+  notify: (session: string, title: string, body: string) =>
+    command("plugin:siteview|notify", { request: { session, title, body } }),
   onState: (handler: (state: SiteViewState) => void): Promise<UnlistenFn> =>
     listen<SiteViewState>("siteview:state", (event) => handler(event.payload)),
   /** A session the native side dropped by itself, for example after its web process died. */
@@ -237,6 +240,9 @@ export const siteView = {
     listen<string>("siteview:closed", (event) => handler(event.payload)),
   /** The OS asked the app to give memory back. */
   onMemoryWarning: (handler: () => void): Promise<UnlistenFn> => listen("siteview:memory", handler),
+  /** The user tapped a notification; the payload is the session it was raised for. */
+  onNotificationTap: (handler: (session: string) => void): Promise<UnlistenFn> =>
+    listen<string>("siteview:notification-tap", (event) => handler(event.payload)),
   onError: (handler: (message: string) => void): Promise<UnlistenFn> =>
     listen<string>("siteview:error", (event) => handler(event.payload)),
 };

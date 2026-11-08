@@ -12,6 +12,7 @@ const COMMANDS: &[&str] = &[
     "fetch_favicon",
     "set_content_rule_lists",
     "set_document_start_script",
+    "notify",
 ];
 
 fn main() {

@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { useApp } from "../../app/store";
+import { unreadByFavorite } from "../web/unreadWatch";
 import { useT } from "../../i18n/useT";
 import { quickAccess } from "../../shared/favorites";
 import { useInsets, useViewport } from "../../shared/viewport";
@@ -33,6 +34,17 @@ const HOLD_SCALE = 1.3;
 
 const monogram = (name: string) => name.trim().charAt(0).toUpperCase() || "·";
 
+function UnreadBadge({ count }: { count: number }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="pointer-events-none absolute -end-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full border-2 border-ink bg-accent px-1 text-[10px] leading-none font-semibold text-white"
+    >
+      {count > 99 ? "99+" : count}
+    </span>
+  );
+}
+
 interface FanStyle extends CSSProperties {
   "--dx": string;
   "--dy": string;
@@ -62,6 +74,13 @@ export function Fab() {
   const ignorePress = useRef(false);
 
   const list = useMemo(() => quickAccess(favorites ?? []), [favorites]);
+  const sessions = useApp((s) => s.sessions);
+  const activeId = useApp((s) => s.activeId);
+  const unread = useMemo(
+    () => unreadByFavorite(sessions, favorites ?? [], activeId),
+    [sessions, favorites, activeId],
+  );
+  const anyUnread = unread.some((count) => count > 0);
   const resting = fabCenter(position.edge, position.yRatio * viewport.height, viewport, insets);
   const layout = useMemo(
     () => fanLayout(resting, position.edge, viewport, insets, list.length),
@@ -180,7 +199,11 @@ export function Fab() {
           key={favorite.id}
           type="button"
           data-open={fanOpen}
-          aria-label={t("fab.openFavorite", { name: favorite.name })}
+          aria-label={
+            unread[index] > 0
+              ? `${t("fab.openFavorite", { name: favorite.name })}. ${t("notify.newActivity")}`
+              : t("fab.openFavorite", { name: favorite.name })
+          }
           tabIndex={fanOpen ? 0 : -1}
           onClick={() => {
             select({ kind: "favorite", index });
@@ -210,6 +233,7 @@ export function Fab() {
           >
             {favorite.name}
           </span>
+          {unread[index] > 0 && <UnreadBadge count={unread[index]} />}
         </button>
       ))}
 
@@ -303,6 +327,12 @@ export function Fab() {
         }`}
       >
         <img src={logoMark} alt="" draggable={false} className="fab-logo relative size-10" />
+        {anyUnread && !fanOpen && (
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -end-0.5 -top-0.5 size-3.5 rounded-full border-2 border-ink bg-accent"
+          />
+        )}
         <svg className="fab-ring" viewBox="0 0 64 64" aria-hidden="true">
           <circle cx="32" cy="32" r="31" pathLength="1" />
         </svg>

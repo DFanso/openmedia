@@ -299,4 +299,5 @@ export const bn: Messages = {
   "assistant.errorOther": "কিছু একটা ভুল হয়েছে। আবার চেষ্টা করুন।",
   "web.emptyHint": "বোতামে ট্যাপ করে ঠিকানা লিখুন, অথবা প্রিয় বেছে নিতে চেপে ধরে রাখুন।",
   "web.loading": "সাইট লোড হচ্ছে…",
+  "notify.newActivity": "নতুন কার্যকলাপ",
 };

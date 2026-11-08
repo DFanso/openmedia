@@ -310,4 +310,5 @@ export const it: Messages = {
   "assistant.errorNothingMatched":
     "La modifica proposta non corrisponde a nulla in questa pagina. Prova a descrivere in modo diverso cosa vuoi nascondere.",
   "assistant.errorOther": "Qualcosa è andato storto. Riprova.",
+  "notify.newActivity": "Nuova attività",
 };

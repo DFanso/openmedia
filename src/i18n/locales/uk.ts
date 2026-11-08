@@ -304,4 +304,5 @@ export const uk: Messages = {
   "assistant.errorNothingMatched":
     "Запропонована зміна нічого не знайшла на цій сторінці. Спробуйте описати, що приховати, інакше.",
   "assistant.errorOther": "Щось пішло не так. Спробуйте ще раз.",
+  "notify.newActivity": "Нова активність",
 };

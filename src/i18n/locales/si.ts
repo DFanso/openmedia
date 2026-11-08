@@ -303,4 +303,5 @@ export const si: Messages = {
   "assistant.errorNothingMatched":
     "යෝජනා කළ වෙනස මෙම පිටුවේ කිසිවකට ගැලපුණේ නැත. සඟවන දේ වෙනත් ලෙස විස්තර කර බලන්න.",
   "assistant.errorOther": "යමක් ගැටලුවක් පැමිණිය. නැවත උත්සාහ කරන්න.",
+  "notify.newActivity": "නව ක්‍රියාකාරකම්",
 };

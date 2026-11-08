@@ -300,4 +300,5 @@ export const id: Messages = {
   "assistant.errorOther": "Terjadi kesalahan. Coba lagi.",
   "web.emptyHint": "Ketuk tombol lalu ketik alamat, atau tahan untuk memilih favorit.",
   "web.loading": "Memuat situs…",
+  "notify.newActivity": "Aktivitas baru",
 };

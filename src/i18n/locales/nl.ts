@@ -305,4 +305,5 @@ export const nl: Messages = {
   "assistant.errorNothingMatched":
     "De voorgestelde wijziging kwam nergens op deze pagina overeen. Beschrijf anders wat je wilt verbergen.",
   "assistant.errorOther": "Er ging iets mis. Probeer het opnieuw.",
+  "notify.newActivity": "Nieuwe activiteit",
 };

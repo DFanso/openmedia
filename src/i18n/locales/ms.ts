@@ -300,4 +300,5 @@ export const ms: Messages = {
   "assistant.errorOther": "Ada sesuatu yang tidak kena. Cuba lagi.",
   "web.emptyHint": "Ketuk butang dan taip alamat, atau tekan lama untuk memilih kegemaran.",
   "web.loading": "Memuatkan laman…",
+  "notify.newActivity": "Aktiviti baharu",
 };

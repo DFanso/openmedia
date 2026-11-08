@@ -306,4 +306,5 @@ export const cs: Messages = {
   "assistant.errorNothingMatched":
     "Navržená změna se na této stránce s ničím neshodovala. Zkuste jinak popsat, co skrýt.",
   "assistant.errorOther": "Něco se nepovedlo. Zkuste to znovu.",
+  "notify.newActivity": "Nová aktivita",
 };

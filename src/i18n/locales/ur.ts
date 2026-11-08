@@ -302,4 +302,5 @@ export const ur: Messages = {
   "assistant.errorNothingMatched":
     "تجویز کردہ تبدیلی اس صفحے پر کسی چیز سے مطابقت نہیں رکھتی۔ کوشش کریں کہ چھپانے والی چیز کو مختلف انداز میں بیان کریں۔",
   "assistant.errorOther": "کچھ غلط ہو گیا۔ دوبارہ کوشش کریں۔",
+  "notify.newActivity": "نئی سرگرمی",
 };

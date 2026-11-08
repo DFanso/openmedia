@@ -10,6 +10,8 @@ pub const MAX_RULE_LISTS: usize = 8;
 pub const MAX_EVALUATE_SCRIPT_BYTES: usize = 128 * 1024;
 pub const MAX_EVALUATE_RESULT_BYTES: usize = 200_000;
 const MAX_RULE_LIST_ID_CHARS: usize = 64;
+pub const MAX_NOTIFICATION_TITLE_CHARS: usize = 40;
+pub const MAX_NOTIFICATION_BODY_CHARS: usize = 120;
 
 pub fn parse_web_url(input: &str) -> Result<Url> {
     let url = Url::parse(input).map_err(|e| Error::InvalidUrl(e.to_string()))?;
@@ -26,6 +28,20 @@ pub fn parse_profile_id(input: &str) -> Result<Uuid> {
 /// Session ids come from the shell; they are UUIDs so they are safe to log and to use as map keys.
 pub fn parse_session_id(input: &str) -> Result<Uuid> {
     Uuid::parse_str(input).map_err(|_| Error::InvalidSession)
+}
+
+/// Notification text comes from the shell, which builds it from a favorite's name and a fixed
+/// phrase; the limits keep it to that and out of control characters.
+pub fn validate_notification_text(title: &str, body: &str) -> Result<()> {
+    let fits = |text: &str, max: usize| {
+        let length = text.chars().count();
+        (1..=max).contains(&length) && !text.chars().any(char::is_control)
+    };
+    if fits(title, MAX_NOTIFICATION_TITLE_CHARS) && fits(body, MAX_NOTIFICATION_BODY_CHARS) {
+        Ok(())
+    } else {
+        Err(Error::InvalidNotification(MAX_NOTIFICATION_BODY_CHARS))
+    }
 }
 
 pub fn parse_bridge_body(body: &str) -> Result<serde_json::Value> {
@@ -83,6 +99,17 @@ pub fn validate_rule_lists(lists: &[ContentRuleList]) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn notification_text_is_short_and_plain() {
+        assert!(validate_notification_text("Messenger", "New activity").is_ok());
+        assert!(validate_notification_text("", "New activity").is_err());
+        assert!(validate_notification_text("Messenger", "").is_err());
+        assert!(validate_notification_text(&"a".repeat(41), "New activity").is_err());
+        assert!(validate_notification_text("Messenger", &"a".repeat(121)).is_err());
+        assert!(validate_notification_text("Mess\nenger", "New activity").is_err());
+        assert!(validate_notification_text("ماسنجر", "نشاط جديد").is_ok());
+    }
 
     #[test]
     fn accepts_http_and_https() {

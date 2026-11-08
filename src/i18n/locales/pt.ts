@@ -307,4 +307,5 @@ export const pt: Messages = {
   "assistant.errorNothingMatched":
     "A alteração proposta não correspondeu a nada nesta página. Tente descrever de outra forma o que deseja ocultar.",
   "assistant.errorOther": "Algo deu errado. Tente novamente.",
+  "notify.newActivity": "Nova atividade",
 };

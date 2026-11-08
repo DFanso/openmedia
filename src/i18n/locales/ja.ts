@@ -302,4 +302,5 @@ export const ja: Messages = {
   "assistant.errorNothingMatched":
     "提案された変更は、このページでは何も一致しませんでした。隠したい内容を別の言い方で説明してみてください。",
   "assistant.errorOther": "問題が発生しました。再試行してください。",
+  "notify.newActivity": "新しいアクティビティ",
 };

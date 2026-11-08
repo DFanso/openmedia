@@ -290,4 +290,5 @@ export const th: Messages = {
   "assistant.errorOther": "เกิดข้อผิดพลาดบางอย่าง ลองอีกครั้ง",
   "web.emptyHint": "แตะปุ่มแล้วพิมพ์ที่อยู่ หรือกดค้างเพื่อเลือกรายการโปรด",
   "web.loading": "กำลังโหลดไซต์…",
+  "notify.newActivity": "มีกิจกรรมใหม่",
 };

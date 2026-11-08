@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { library, siteView } from "../../shared/ipc";
+import { library, siteView, type SiteViewState } from "../../shared/ipc";
 import { appError, selectPage, useApp } from "../../app/store";
 import { pageShowing } from "../../app/splash";
 import { useT } from "../../i18n/useT";
 import { usePageMargin } from "./usePageMargin";
 import { readRect, useSiteViewRect } from "./useSiteViewRect";
+import { observeTitle, quickFavoriteOf, type Watch } from "./unreadWatch";
 
 /** How often idle and surplus hidden sessions are swept. */
 const SWEEP_MS = 60_000;
@@ -23,9 +24,14 @@ export function WebLayer() {
   const setSessionState = useApp((s) => s.setSessionState);
   const sessionOpenFailed = useApp((s) => s.sessionOpenFailed);
   const forgetSessions = useApp((s) => s.forgetSessions);
+  const openSession = useApp((s) => s.openSession);
   const trimSessions = useApp((s) => s.trimSessions);
   const reportError = useApp((s) => s.reportError);
   const t = useT();
+  const translate = useRef(t);
+  useEffect(() => {
+    translate.current = t;
+  }, [t]);
   /** Native events are only announced once, so no action may run before the listeners exist. */
   const [listening, setListening] = useState(false);
 
@@ -49,19 +55,42 @@ export function WebLayer() {
   }, [listening, profileId, action, sessionOpenFailed, reportError]);
 
   useEffect(() => {
+    const watches = new Map<string, Watch>();
+    const raiseNotification = (page: SiteViewState) => {
+      const { activeId, sessions, state } = useApp.getState();
+      const observation = observeTitle(
+        watches.get(page.session),
+        page.title,
+        activeId !== page.session,
+        Date.now(),
+      );
+      watches.set(page.session, observation.watch);
+      if (!observation.notify) return;
+      const favorite = quickFavoriteOf(sessions, state?.favorites ?? [], page.session);
+      if (favorite) {
+        void siteView
+          .notify(page.session, favorite.name, translate.current("notify.newActivity"))
+          .catch(() => {});
+      }
+    };
     let lastSaved = "";
     const unlisten = [
       siteView.onState((page) => {
         setSessionState(page);
+        raiseNotification(page);
         const visible = useApp.getState().activeId === page.session;
         if (visible && !page.loading && page.url && page.url !== lastSaved) {
           lastSaved = page.url;
           void library.setLastUrl(page.url).catch(() => {});
         }
       }),
-      siteView.onClosed((session) => forgetSessions([session])),
+      siteView.onClosed((session) => {
+        watches.delete(session);
+        forgetSessions([session]);
+      }),
       siteView.onMemoryWarning(() => trimSessions("memory")),
       siteView.onError(reportError),
+      siteView.onNotificationTap(openSession),
     ];
     const sweep = window.setInterval(() => trimSessions("routine"), SWEEP_MS);
     let cancelled = false;
@@ -73,7 +102,7 @@ export function WebLayer() {
       window.clearInterval(sweep);
       void Promise.all(unlisten).then((fns) => fns.forEach((fn) => fn()));
     };
-  }, [setSessionState, forgetSessions, trimSessions, reportError]);
+  }, [setSessionState, forgetSessions, trimSessions, openSession, reportError]);
 
   return (
     <>
