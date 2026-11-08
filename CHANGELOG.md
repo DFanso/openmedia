@@ -22,6 +22,14 @@ All notable changes to OpenMedia are documented here.
 
 **PR:** n/a
 
+### feat(usage): slider-based limits for favorites, and a clearer Usage page
+
+**Change:** Usage now has Activity and Limits tabs. Limits lists every favorite; tap one, pick a preset or drag a slider for "Pause the site after" and "Remind me at". Drags show a live meter against today's time and save on release; the reminder and limit can never cross, so there is no validation message. Other sites are added from suggestions or an address. Activity gains site icons, a daily average, a "Limits today" card and per-site meters. The in-page reminder and the limit-reached screen show the site icon, a live meter, time left and "Adjust limit" (opens Limits on that site); the block screen counts down to midnight. The old minutes form is removed. All new strings are in the i18n catalog (43 keys, 29 languages; the 28 non-English translations are machine-drafted and need native review), and the slider and meter lay out right to left. Limits storage, validation and native blocking are unchanged.
+
+**Verified:** TypeScript, ESLint, Prettier and the frontend suite, including new tests for stops, reconcile, presets, status and site lists. Real `StatsSheet` and `UsageGuard` driven in a browser with mocked IPC: presets, slider drags in both directions, both switches, removal, adding a site, reminder deep link, blocking and unblocking after raising the limit.
+
+**Unverified:** Touch dragging, slider look and the Limits tab on a physical iOS/Android device; light theme was not inspected.
+
 ### perf(web): keep quick-access sites warm after opening
 
 **Change:** Retain one reusable session per first-six favorite across routine idle sweeps and other browsing, so favorite taps switch pages rather than reload them. The usual five-session budget expands only as needed, to at most six quick-access pages plus the visible page; favorite edits reconcile retention immediately. Memory warnings still release every hidden page. No preloading or extra speculative requests.

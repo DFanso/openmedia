@@ -1,11 +1,16 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { selectPage, useApp } from "../../app/store";
 import { describeError } from "../../i18n/errors";
 import { useT } from "../../i18n/useT";
+import { primaryButton, quietButton } from "../settings/ui";
 import { formatDuration } from "./format";
+import { limitStatus, secondsUntilMidnight } from "./limits";
 import { limitReached, policyForHost, usageSeconds, useUsageControl } from "./policy";
 import { usageTargetOf } from "./section";
+import { nameForHost, SiteBadge, useFavorites } from "./SiteBadge";
+import { UsageMeter } from "./UsageMeter";
+import { openLimits } from "./view";
 
 function rememberWarning(day: string, host: string, threshold: number): boolean {
   const key = `${host}:${threshold}`;
@@ -22,6 +27,115 @@ function rememberWarning(day: string, host: string, threshold: number): boolean 
   return true;
 }
 
+function useNow(intervalMs: number): Date {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), intervalMs);
+    return () => window.clearInterval(timer);
+  }, [intervalMs]);
+  return now;
+}
+
+/** The heads-up shown over the page: how long today, how long is left, and a way to adjust it. */
+function TimeCheck({ host }: { host: string }) {
+  const t = useT();
+  const favorites = useFavorites();
+  const policies = useUsageControl((s) => s.policies);
+  const totals = useUsageControl((s) => s.seconds);
+  const policy = policyForHost(policies, host);
+  const spent = usageSeconds(totals, host);
+  const status = limitStatus(policy, spent);
+  const name = nameForHost(host, favorites);
+  return (
+    <div
+      data-hit=""
+      role="status"
+      className="usage-warning glass fixed inset-x-3 top-[calc(env(safe-area-inset-top)+12px)] z-30 rounded-2xl p-4"
+    >
+      <div className="flex items-center gap-3">
+        <SiteBadge host={host} name={name} />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-base font-semibold">{t("usage.timeCheck", { host: name })}</p>
+          <p className="text-sm text-paper/70 tabular-nums">
+            {status.untilLimit === null
+              ? t("usage.todayValue", { value: formatDuration(Math.floor(spent), t) })
+              : t("usage.pausesIn", {
+                  value: formatDuration(Math.floor(spent), t),
+                  left: formatDuration(status.untilLimit, t),
+                })}
+          </p>
+        </div>
+      </div>
+      {status.untilLimit !== null && (
+        <div className="mt-3">
+          <UsageMeter spentSeconds={spent} policy={policy} />
+        </div>
+      )}
+      <div className="mt-3 flex items-center gap-2">
+        <button type="button" onClick={() => openLimits(host)} className={primaryButton}>
+          {t("usage.adjust")}
+        </button>
+        <button
+          type="button"
+          onClick={() => useUsageControl.setState({ warning: null })}
+          className={quietButton}
+        >
+          {t("usage.dismiss")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** Covers the paused site's page and says when it opens again. */
+function LimitReached({ host, seconds }: { host: string; seconds: number }) {
+  const t = useT();
+  const favorites = useFavorites();
+  const openSheet = useApp((state) => state.openSheet);
+  const now = useNow(30_000);
+  const name = nameForHost(host, favorites);
+  return (
+    <div
+      data-hit=""
+      className="fixed inset-0 z-10 grid place-items-center bg-ink/45 p-8 backdrop-blur-xl"
+    >
+      <section
+        aria-label={t("usage.limitReachedLabel")}
+        role="status"
+        className="w-full max-w-sm rounded-3xl border border-hair bg-ink/90 p-6 text-center"
+      >
+        <div className="flex justify-center">
+          <SiteBadge host={host} name={name} />
+        </div>
+        <h1 className="mt-4 text-xl font-semibold">{t("usage.limitReached")}</h1>
+        <p className="mt-2 break-words text-sm leading-relaxed text-paper/70">
+          {t("usage.pausedNotice", {
+            name,
+            value: formatDuration(Math.floor(seconds), t),
+            left: formatDuration(secondsUntilMidnight(now), t),
+          })}
+        </p>
+        <div className="mt-5 flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={() => openLimits(host)}
+            className={`${primaryButton} py-3`}
+          >
+            {t("usage.adjust")}
+          </button>
+          <button
+            type="button"
+            onClick={() => openSheet("stats")}
+            className={`${quietButton} py-3`}
+          >
+            {t("usage.seeUsage")}
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 export function UsageGuard() {
   const control = useUsageControl();
   const page = useApp(selectPage);
@@ -29,7 +143,6 @@ export function UsageGuard() {
   const sheet = useApp((state) => state.sheet);
   const onboarding = useApp((state) => state.onboardingOpen);
   const reportError = useApp((state) => state.reportError);
-  const openSheet = useApp((state) => state.openSheet);
   const t = useT();
   const requested = useRef(new Map<string, boolean>());
   const queues = useRef(new Map<string, Promise<unknown>>());
@@ -90,63 +203,8 @@ export function UsageGuard() {
 
   return (
     <>
-      {control.warning && !blocked && sheet === "none" && (
-        <div
-          data-hit=""
-          role="status"
-          className="usage-warning glass fixed inset-x-3 top-[calc(env(safe-area-inset-top)+12px)] z-30 rounded-2xl p-4"
-        >
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold">
-                {t("usage.timeCheck", { host: control.warning.host })}
-              </p>
-              <p className="mt-1 text-sm text-paper/65">
-                {t("usage.spentToday", { value: formatDuration(control.warning.seconds, t) })}
-              </p>
-            </div>
-            <button
-              type="button"
-              aria-label={t("usage.dismissLabel")}
-              onClick={() => useUsageControl.setState({ warning: null })}
-              className="px-2 py-1 text-paper/65"
-            >
-              {t("usage.dismiss")}
-            </button>
-          </div>
-          <button
-            type="button"
-            onClick={() => openSheet("stats")}
-            className="mt-3 text-sm font-medium text-accent"
-          >
-            {t("usage.manage")}
-          </button>
-        </div>
-      )}
-      {blocked && sheet === "none" && (
-        <div
-          data-hit=""
-          className="fixed inset-0 z-10 grid place-items-center bg-ink/45 p-8 backdrop-blur-xl"
-        >
-          <section
-            aria-label={t("usage.limitReachedLabel")}
-            role="status"
-            className="max-w-sm rounded-3xl border border-hair bg-ink/90 p-6 text-center"
-          >
-            <h1 className="text-xl font-semibold">{t("usage.limitReached")}</h1>
-            <p className="mt-3 break-words text-sm text-paper/70">
-              {t("usage.paused", { host: host ?? "", value: formatDuration(seconds, t) })}
-            </p>
-            <button
-              type="button"
-              onClick={() => openSheet("stats")}
-              className="mt-5 rounded-full bg-accent px-5 py-3 text-sm font-semibold text-on-accent"
-            >
-              {t("usage.manage")}
-            </button>
-          </section>
-        </div>
-      )}
+      {control.warning && !blocked && sheet === "none" && <TimeCheck host={control.warning.host} />}
+      {blocked && sheet === "none" && host && <LimitReached host={host} seconds={seconds} />}
     </>
   );
 }
