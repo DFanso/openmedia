@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-08
 
+### chore(store): App Store and Google Play artwork from simulator captures
+
+**What:** The store listings needed screenshots and a feature graphic at the sizes Apple and Google accept.
+
+**Change:** `assets/store/` holds 8 portrait shots each for iPhone 6.9" (1320 × 2868), iPad 13" (2064 × 2752), Android phone (1080 × 1920) and Android tablet (1440 × 2560), plus the 1024 × 500 Play feature graphic, all alpha-free PNG. They are composed by `scripts/render-store-assets.mjs` from unedited iPhone 17 Pro Max and iPad Pro 13" (M5) Simulator captures kept in `assets/store/captures/`. Sizes, capture method and how to regenerate are in `assets/store/README.md`.
+
+**Limits:** Usage and Limits screens show synthetic sample data. The Android sets reuse the iOS captures in a neutral frame, because there is no Android build yet; recapture on Android before submitting to Google Play.
+
 ### fix(shell): disable pinch zoom on the app's own screens
 
 **What:** Settings, Usage, onboarding and the other shell screens could be pinched and zoomed like a web page.
