@@ -6,6 +6,7 @@ import android.net.Uri
 import android.util.Base64
 import java.io.ByteArrayOutputStream
 import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URL
 
 /**
@@ -25,7 +26,7 @@ object FaviconFetcher {
     fun fetch(page: Uri): String? {
         val scope = DomainScope.registrableDomain(page.host)
         val candidates = LinkedHashSet<String>()
-        val html = get(page.toString(), scope)
+        val html = get(page.toString(), scope)?.toString(Charsets.UTF_8)
         if (html != null) {
             for (link in iconLinks(html, page)) candidates.add(link)
         }
@@ -69,7 +70,8 @@ object FaviconFetcher {
                 val status = connection.responseCode
                 if (status in 300..399) {
                     val location = connection.getHeaderField("Location") ?: return null
-                    current = Uri.parse(current).resolve(location)?.toString() ?: return null
+                    current = runCatching { URI(current).resolve(location).toString() }.getOrNull()
+                        ?: return null
                     redirects += 1
                     continue
                 }
@@ -104,7 +106,8 @@ object FaviconFetcher {
             val rel = attribute("rel", tag)?.lowercase() ?: continue
             if (!rel.contains("icon")) continue
             val href = attribute("href", tag) ?: continue
-            val url = Uri.parse(href).resolve(base)?.toString() ?: continue
+            val url = runCatching { URI(base.toString()).resolve(href).toString() }.getOrNull()
+                ?: continue
             if (rel.contains("apple-touch-icon")) touch.add(url) else plain.add(url)
         }
         return touch + plain

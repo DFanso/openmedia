@@ -300,7 +300,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
             ContextCompat.checkSelfPermission(activity, POST_NOTIFICATIONS) !=
             PackageManager.PERMISSION_GRANTED
         ) {
-            requestPermissionForAlias(invoke, "notifications", "notificationPermission")
+            requestPermissionForAlias("notifications", invoke, "notificationPermission")
             return
         }
         postNotification(args.session, args.title, args.body)
@@ -693,14 +693,15 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
             }
 
             override fun onPageCommitVisible(view: WebView, url: String) {
-                reveal(view)
+                val session = sessionOf(view) ?: return
+                reveal(session)
             }
 
             override fun onPageFinished(view: WebView, url: String) {
                 val session = sessionOf(view) ?: return
                 session.loading = false
                 session.settled = true
-                reveal(view)
+                reveal(session)
                 sendState(session)
             }
 

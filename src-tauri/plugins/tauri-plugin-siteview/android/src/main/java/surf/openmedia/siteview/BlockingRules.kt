@@ -25,7 +25,7 @@ class BlockingRules {
         val isEmpty: Boolean get() = byHost.isEmpty() && general.isEmpty()
     }
 
-    private class Rule(
+    private inner class Rule(
         val pattern: Pattern,
         /** A literal the URL must contain for the pattern to have any chance of matching. */
         val literal: String?,
