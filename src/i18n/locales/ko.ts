@@ -300,4 +300,5 @@ export const ko: Messages = {
   "assistant.errorNothingMatched":
     "제안된 변경이 이 페이지에서 어느 것과도 일치하지 않았습니다. 숨길 내용을 다르게 표현해 보세요.",
   "assistant.errorOther": "문제가 발생했습니다. 다시 시도하세요.",
+  "notify.newActivity": "새로운 활동",
 };

@@ -300,4 +300,5 @@ export const vi: Messages = {
   "assistant.errorOther": "Đã xảy ra lỗi. Thử lại.",
   "web.emptyHint": "Chạm vào nút rồi nhập địa chỉ, hoặc nhấn giữ để chọn mục yêu thích.",
   "web.loading": "Đang tải trang…",
+  "notify.newActivity": "Có hoạt động mới",
 };

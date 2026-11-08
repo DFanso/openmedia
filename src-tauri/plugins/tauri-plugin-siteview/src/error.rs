@@ -12,6 +12,8 @@ pub enum Error {
     InvalidProfile,
     #[error("invalid session id")]
     InvalidSession,
+    #[error("the notification text is empty or longer than {0} characters")]
+    InvalidNotification(usize),
     #[error("invalid content rule list")]
     InvalidRuleList,
     #[error("bridge message is larger than {0} bytes")]

@@ -309,4 +309,5 @@ export const es: Messages = {
   "assistant.errorNothingMatched":
     "El cambio propuesto no coincidió con nada en esta página. Prueba a describir de otro modo qué quieres ocultar.",
   "assistant.errorOther": "Algo ha salido mal. Inténtalo de nuevo.",
+  "notify.newActivity": "Nueva actividad",
 };

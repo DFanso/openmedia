@@ -17,6 +17,19 @@ The web is the product. The screen is one full-bleed page, from under the status
 
 Defaults: Instagram, Facebook, Twitter, Reddit, YouTube. Each fan item shows the site's icon when known, otherwise a monogram. The command bar has back, forward, reload and a favorite star for the current page; History rows also have independent favorite stars. Browsing alone never changes favorites. The first six favorites (`QUICK_ACCESS_LIMIT`) form the quick-access menu; Settings can reorder an unlimited list.
 
+### Unread badges and notifications
+
+A page that has unread items usually says so in its title: `(3) Messenger`. For each quick-access favorite's live session the shell reads that leading `(N)` or `[N]` (`unreadCount`, `src/shared/unread.ts`; a generic title convention, not per-site code). The count appears as a badge on the fan item, and a dot on the floating button when any hidden favorite has one. The page on screen is never badged.
+
+When a hidden quick-access session's count rises, the shell asks the plugin for a local notification (`notify`): the favorite's name as title, "New activity" as body. Page text never reaches the notification, so a page can only choose *whether* to raise one, not what it says. Rules (`observeTitle`, `src/features/web/unreadWatch.ts`):
+
+- The first title a session reports is a baseline; a page that loads already showing `(3)` raises nothing.
+- Only a rise raises one, only while the user is on another page, and at most once per session per 30 seconds (a page controls its own title).
+- Tapping a notification shows that session (`siteview:notification-tap`, `openSession`) if it is still alive.
+- iOS asks for notification permission the first time one is due. If refused, nothing is posted.
+
+There is no setting to turn this off in the app; iOS Settings controls it. No push: see [Platform Support](./platform-support.md).
+
 **Opening a site:** a small accent spinner sits in the page area until the active session first paints or finishes loading. It uses the existing native page state, stays out of the touch router, and stops on errors; switching to a ready session shows no loader. Reduced-motion mode keeps the ring still. The startup splash still covers the first load.
 
 ## Settings

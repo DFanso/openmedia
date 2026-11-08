@@ -39,6 +39,15 @@ pub struct SessionRequest {
     pub session: String,
 }
 
+/// A local notification for a hidden session. The text is the app's own (a favorite's name and a
+/// fixed phrase), never taken from the page; tapping it reports `session` back to the shell.
+#[derive(Debug, Clone, Deserialize)]
+pub struct NotifyRequest {
+    pub session: String,
+    pub title: String,
+    pub body: String,
+}
+
 /// Replaces the rule lists on every open site view and reloads the visible one. An empty list turns
 /// blocking off.
 #[derive(Debug, Clone, Deserialize)]
@@ -97,6 +106,10 @@ pub enum SiteViewEvent {
     },
     /// The OS asked the app to release memory.
     MemoryWarning,
+    /// The user tapped a notification raised for this session.
+    NotificationTapped {
+        session: String,
+    },
     Error {
         message: String,
     },

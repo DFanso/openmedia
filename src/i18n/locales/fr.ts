@@ -313,4 +313,5 @@ export const fr: Messages = {
   "assistant.errorNothingMatched":
     "La modification proposée ne correspond à rien sur cette page. Essayez de décrire autrement ce qui doit être masqué.",
   "assistant.errorOther": "Une erreur est survenue. Réessayez.",
+  "notify.newActivity": "Nouvelle activité",
 };

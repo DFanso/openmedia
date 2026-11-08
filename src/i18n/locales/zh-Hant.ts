@@ -286,4 +286,5 @@ export const zhHant: Messages = {
   "assistant.errorNothingMatched":
     "建議的變更在這個頁面上沒有符合任何內容。可以換個說法描述要隱藏的內容。",
   "assistant.errorOther": "發生了一些問題。請再試一次。",
+  "notify.newActivity": "有新動態",
 };

@@ -307,4 +307,5 @@ export const ro: Messages = {
   "assistant.errorNothingMatched":
     "Modificarea propusă nu s-a potrivit cu nimic de pe această pagină. Încearcă să descrii altfel ce trebuie ascuns.",
   "assistant.errorOther": "Ceva nu a mers bine. Încearcă din nou.",
+  "notify.newActivity": "Activitate nouă",
 };

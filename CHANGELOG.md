@@ -8,6 +8,18 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-08
 
+### feat(fab): unread badges and local notifications for quick-access sites
+
+**What:** Quick-access sites (messages and the like) gave no sign of new activity while another page was showing.
+
+**Change:** The shell reads the leading `(N)` in each quick-access session's title. A badge shows the count on the fan item (and a dot on the floating button); when a hidden session's count rises the plugin posts a local notification (`notify`, title = favorite name, body = "New activity" in the user's language). Tapping it shows that session (`siteview:notification-tap`). Page text never enters a notification, and each session is limited to one per 30 s. iOS permission is requested when the first one is due.
+
+**Limits:** Local only: no push, so nothing arrives once iOS suspends the app; sites without a count in the title raise nothing; Android is not implemented. Non-English notification text is machine-drafted.
+
+**Verified:** Vitest (title parsing, rise/baseline/rate-limit rules, badge lookup), Rust validation test, all JS and Rust checks, and the plugin's Swift compiles for the iOS Simulator. **Not verified:** the permission prompt, banner and tap on a simulator or device, and real sites' titles.
+
+**PR:** n/a
+
 ### fix(settings): rename "Pre-made recipes" to "Recipes"
 
 **What:** The Settings section lists bundled recipes and the user's changed copies of them, but its name called them all pre-made.

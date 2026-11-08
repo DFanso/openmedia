@@ -13,6 +13,7 @@ Shell-only control of the native site view. `open` is deliberately absent: the a
 - `allow-go-forward`
 - `allow-reload`
 - `allow-set-color-scheme`
+- `allow-notify`
 
 ## Permission Table
 
@@ -201,6 +202,32 @@ Enables the navigate command without any pre-configured scope.
 <td>
 
 Denies the navigate command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`siteview:allow-notify`
+
+</td>
+<td>
+
+Enables the notify command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`siteview:deny-notify`
+
+</td>
+<td>
+
+Denies the notify command without any pre-configured scope.
 
 </td>
 </tr>

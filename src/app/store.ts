@@ -80,6 +80,8 @@ export interface AppStore {
   openFavorite: (url: string) => void;
   /** A history entry: switches to the live session typed with it, otherwise opens a new one. */
   openHistory: (url: string) => void;
+  /** Shows a live session by id, for example the one a notification was tapped for. */
+  openSession: (id: string) => void;
   setSessionState: (state: SiteViewState) => void;
   /** A native `open` failed: forget the session and go back to the one that was showing. */
   sessionOpenFailed: (id: string) => void;
@@ -343,6 +345,10 @@ export const useApp = create<AppStore>((set, get) => {
       if (live) void fetchIcons([url]);
       if (live) switchTo(live.id);
       else get().openAddress(url);
+    },
+
+    openSession: (id) => {
+      if (get().sessions.some((session) => session.id === id)) switchTo(id);
     },
 
     setSessionState: (page) =>

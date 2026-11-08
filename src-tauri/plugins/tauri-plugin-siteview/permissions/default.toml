@@ -10,4 +10,5 @@ permissions = [
   "allow-go-forward",
   "allow-reload",
   "allow-set-color-scheme",
+  "allow-notify",
 ]

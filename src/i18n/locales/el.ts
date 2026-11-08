@@ -311,4 +311,5 @@ export const el: Messages = {
   "assistant.errorNothingMatched":
     "Η προτεινόμενη αλλαγή δεν αντιστοίχισε τίποτα σε αυτή τη σελίδα. Δοκιμάστε να περιγράψετε διαφορετικά τι θέλετε να κρυφτεί.",
   "assistant.errorOther": "Κάτι πήγε στραβά. Δοκιμάστε ξανά.",
+  "notify.newActivity": "Νέα δραστηριότητα",
 };

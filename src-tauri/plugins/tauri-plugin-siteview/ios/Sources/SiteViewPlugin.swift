@@ -2,6 +2,7 @@ import SafariServices
 import SwiftRs
 import Tauri
 import UIKit
+import UserNotifications
 import WebKit
 
 private let bridgeHandlerName = "openmedia"
@@ -90,6 +91,12 @@ class SessionArgs: Decodable {
   let session: String
 }
 
+class NotifyArgs: Decodable {
+  let session: String
+  let title: String
+  let body: String
+}
+
 class SetRectArgs: Decodable {
   let rect: RectArgs
 }
@@ -146,6 +153,11 @@ struct ClosedEvent: Encodable {
 
 struct MemoryWarningEvent: Encodable {
   let type = "memoryWarning"
+}
+
+struct NotificationTappedEvent: Encodable {
+  let type = "notificationTapped"
+  let session: String
 }
 
 struct ErrorEvent: Encodable {
@@ -239,7 +251,7 @@ final class TouchRouter: UIView {
 /// A session never leaves its domain: a main-frame navigation outside it is cancelled and shown in
 /// a popup browser (`SFSafariViewController`, which shares nothing with the profile's data store).
 /// Which sessions to keep alive is the shell's decision; this class only opens, shows and closes.
-class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
+class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotificationCenterDelegate {
   private var shell: WKWebView?
   private var sessions: [String: Session] = [:]
   private var activeId: String?
@@ -272,6 +284,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
     NotificationCenter.default.addObserver(
       forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: .main
     ) { [weak self] _ in self?.send(MemoryWarningEvent()) }
+    UNUserNotificationCenter.current().delegate = self
     DispatchQueue.main.async { self.attachShell() }
   }
 
@@ -389,6 +402,55 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate {
 
   @objc public func reload(_ invoke: Invoke) {
     onActiveSession(invoke) { $0.view.reload() }
+  }
+
+  /// Posts a local notification for a hidden session. The system permission prompt appears the
+  /// first time one is due; if it is refused, notifications are silently skipped. A newer
+  /// notification for the same session replaces the one still showing.
+  @objc public func notify(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(NotifyArgs.self)
+    let center = UNUserNotificationCenter.current()
+    center.getNotificationSettings { settings in
+      switch settings.authorizationStatus {
+      case .notDetermined:
+        center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
+          if granted { self.post(args, to: center) }
+          invoke.resolve()
+        }
+      case .authorized, .provisional, .ephemeral:
+        self.post(args, to: center)
+        invoke.resolve()
+      default:
+        invoke.resolve()
+      }
+    }
+  }
+
+  private func post(_ args: NotifyArgs, to center: UNUserNotificationCenter) {
+    let content = UNMutableNotificationContent()
+    content.title = args.title
+    content.body = args.body
+    content.sound = .default
+    content.userInfo = ["session": args.session]
+    center.add(UNNotificationRequest(identifier: "unread-\(args.session)", content: content, trigger: nil))
+  }
+
+  /// The app is open and showing another page, which is exactly when these notifications are raised.
+  func userNotificationCenter(
+    _ center: UNUserNotificationCenter, willPresent notification: UNNotification,
+    withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+  ) {
+    completionHandler([.banner, .list, .sound])
+  }
+
+  func userNotificationCenter(
+    _ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse,
+    withCompletionHandler completionHandler: @escaping () -> Void
+  ) {
+    if let session = response.notification.request.content.userInfo["session"] as? String {
+      DispatchQueue.main.async { self.send(NotificationTappedEvent(session: session)) }
+    }
+    completionHandler()
   }
 
   @objc public func setColorScheme(_ invoke: Invoke) throws {

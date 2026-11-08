@@ -87,6 +87,8 @@ Usage stats (seconds per site and first path segment, per local day, 30 days) an
 
 The shell requests `set_usage_blocked` for a validated session UUID. It calls a Rust-only plugin method with no Tauri command, permission or capability of its own. iOS adds a native blur shield, stops loads, suspends media playback and refuses navigation/interaction; a website cannot remove the shield or lift its own block. Other sessions remain usable. Limits are user-editable self-management controls, not tamper-proof parental controls, and they do not suspend arbitrary page JavaScript.
 
+Unread notifications: the plugin command `notify` (granted to the shell in `siteview:default`) posts a local iOS notification for a session id. It takes a UUID, a title of 1 to 40 and a body of 1 to 120 characters, with no control characters. The shell builds both from the user's own favorite name and a fixed translated phrase; nothing from the page is in them. The page contributes only its title, which the shell parses for a leading count: a hostile page can make a notification appear for its own session (at most once per 30 s), not choose its text or reach other sessions. The native side adds one event, `siteview:notification-tap` (a session id, validated as a UUID in Rust, native to shell only).
+
 Custom/history favicons are fetched with an ephemeral, cookie-free native URLSession. Icon links and redirects must remain on the page's registrable domain; responses are capped at 400 KB, images at 4096 px per dimension and output at 96 px PNG. Bundled recipe icons are packaged assets, with no runtime icon-service requests.
 
 ## Privacy

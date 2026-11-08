@@ -6,7 +6,9 @@ use tauri::{
 };
 
 use crate::models::*;
-use crate::validate::{check_evaluate_result, parse_bridge_body, wrap_evaluate_script};
+use crate::validate::{
+    check_evaluate_result, parse_bridge_body, parse_session_id, wrap_evaluate_script,
+};
 use crate::{Error, Result};
 
 pub const STATE_EVENT: &str = "siteview:state";
@@ -14,6 +16,7 @@ pub const ERROR_EVENT: &str = "siteview:error";
 pub const BRIDGE_EVENT: &str = "siteview:bridge";
 pub const CLOSED_EVENT: &str = "siteview:closed";
 pub const MEMORY_EVENT: &str = "siteview:memory";
+pub const NOTIFICATION_TAP_EVENT: &str = "siteview:notification-tap";
 
 #[cfg(target_os = "android")]
 compile_error!("the Android site view is not implemented yet; see docs/wiki/platform-support.md");
@@ -45,6 +48,12 @@ fn dispatch_event<R: Runtime>(app: &AppHandle<R>, json: &str) {
         SiteViewEvent::State { .. } => app.emit(STATE_EVENT, event),
         SiteViewEvent::Closed { session } => app.emit(CLOSED_EVENT, session),
         SiteViewEvent::MemoryWarning => app.emit(MEMORY_EVENT, ()),
+        SiteViewEvent::NotificationTapped { session } => {
+            match parse_session_id(&session) {
+                Ok(_) => app.emit(NOTIFICATION_TAP_EVENT, session),
+                Err(_) => Ok(()),
+            }
+        }
         SiteViewEvent::Error { message } => app.emit(ERROR_EVENT, message),
         SiteViewEvent::Bridge { origin, body } => match parse_bridge_body(&body) {
             Ok(body) => app.emit(BRIDGE_EVENT, BridgeMessage { origin, body }),
@@ -119,6 +128,17 @@ impl<R: Runtime> Siteview<R> {
 
     pub fn reload(&self) -> Result<()> {
         self.run("reload", ())
+    }
+
+    pub fn notify(&self, request: NotifyRequest) -> Result<()> {
+        self.run(
+            "notify",
+            serde_json::json!({
+                "session": request.session,
+                "title": request.title,
+                "body": request.body,
+            }),
+        )
     }
 }
 

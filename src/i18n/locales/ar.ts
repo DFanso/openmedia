@@ -294,4 +294,5 @@ export const ar: Messages = {
   "assistant.errorNothingMatched":
     "لم تطابق التغيير المقترح أي شيء في هذه الصفحة. حاول وصف ما تريد إخفاءه بشكل مختلف.",
   "assistant.errorOther": "حدث خطأ ما. أعد المحاولة.",
+  "notify.newActivity": "نشاط جديد",
 };

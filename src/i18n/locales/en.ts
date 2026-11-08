@@ -301,4 +301,5 @@ export const en = {
   "assistant.errorNothingMatched":
     "The proposed change matched nothing on this page. Try describing what to hide differently.",
   "assistant.errorOther": "Something went wrong. Try again.",
+  "notify.newActivity": "New activity",
 } as const;
