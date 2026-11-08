@@ -14,7 +14,7 @@ Evidence tags used everywhere:
 
 ## How options and defaults work
 
-See [Recipe Format: Options](./recipe-format.md#options-user-facing-toggles). In short: Settings → Pre-made recipes shows one switch per option; ON means hidden. **Annoyances** (install prompts, pop-ups that block the page, scroll locks, ad slots) default ON; **content** (Reels, Shorts, Stories, suggestions, feeds) defaults OFF. A test enforces the policy for every bundled recipe. Changing a switch recompiles the script and reloads the page. The user's choices are stored as overrides, so a release can change a default without migrating anyone who never touched the switch.
+See [Recipe Format: Options](./recipe-format.md#options-user-facing-toggles). In short: Settings → Recipes shows one switch per option; ON means hidden. **Annoyances** (install prompts, pop-ups that block the page, scroll locks, ad slots) default ON; **content** (Reels, Shorts, Stories, suggestions, feeds) defaults OFF. A test enforces the policy for every bundled recipe. Changing a switch recompiles the script and reloads the page. The user's choices are stored as overrides, so a release can change a default without migrating anyone who never touched the switch.
 
 ## Rules for writing a selector (for the in-app assistant)
 

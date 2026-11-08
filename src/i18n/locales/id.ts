@@ -149,7 +149,7 @@ export const id: Messages = {
   "settings.themeDark": "Gelap",
   "settings.browsing": "Penjelajahan",
   "settings.browsingNote":
-    "Pemblokiran iklan memakai daftar yang sudah ada di dalam aplikasi; jika sebuah situs berhenti berfungsi, matikan saja dan halamannya akan dimuat ulang. Tombol kembali berada di seberang tombol utama, untuk situs yang tidak punya tombol sendiri. Resep siap pakai bisa mengatur margin bawahnya sendiri.",
+    "Pemblokiran iklan memakai daftar yang sudah ada di dalam aplikasi; jika sebuah situs berhenti berfungsi, matikan saja dan halamannya akan dimuat ulang. Tombol kembali berada di seberang tombol utama, untuk situs yang tidak punya tombol sendiri. Resep bisa mengatur margin bawahnya sendiri.",
   "settings.adBlock": "Blokir iklan dan pelacak",
   "settings.backButton": "Tombol kembali mengambang",
   "settings.backButtonNote": "Muncul saat halaman punya tempat untuk kembali.",
@@ -179,7 +179,7 @@ export const id: Messages = {
     "Simpan sebanyak yang Anda suka. {limit} pertama adalah menu akses cepat yang muncul saat menahan tombol; naikkan sebuah favorit untuk memindahkannya ke sana.",
   "favorites.quickAccess": "Akses cepat · {count} dari {limit}",
   "favorites.quickEmpty":
-    "Belum ada apa-apa di sini. Tambahkan favorit di bawah, atau beri bintang pada resep siap pakai.",
+    "Belum ada apa-apa di sini. Tambahkan favorit di bawah, atau beri bintang pada resep.",
   "favorites.more": "Favorit lainnya · {count}",
   "favorites.add": "Tambah favorit",
   "favorites.quickFull": "Akses cepat sudah penuh, jadi yang ini ditambahkan ke Favorit lainnya.",
@@ -192,9 +192,9 @@ export const id: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Favorit butuh nama dan alamat yang valid.",
 
-  "recipes.title": "Resep siap pakai",
+  "recipes.title": "Resep",
   "recipes.note":
-    "Resep siap pakai untuk situs populer. Ajakan memasang aplikasi dan pop-up yang menutupi halaman disembunyikan secara bawaan; Reels, Shorts, dan saran tetap ditampilkan sampai Anda menyembunyikannya. Halaman dimuat ulang saat Anda mengubah sakelar. Beri bintang pada resep untuk menambahkan situsnya ke favorit.",
+    "Resep untuk situs populer. Ajakan memasang aplikasi dan pop-up yang menutupi halaman disembunyikan secara bawaan; Reels, Shorts, dan saran tetap ditampilkan sampai Anda menyembunyikannya. Halaman dimuat ulang saat Anda mengubah sakelar. Beri bintang pada resep untuk menambahkan situsnya ke favorit.",
   "recipes.annoyances": "Gangguan · disembunyikan secara bawaan",
   "recipes.content": "Konten · ditampilkan sampai Anda menyembunyikannya",
   "recipes.groupAnnoyance": "Gangguan",
@@ -265,7 +265,7 @@ export const id: Messages = {
   "assistant.saving": "Menyimpan…",
   "assistant.turnedOn": "Menyalakan “{option}”.",
   "assistant.addedSwitch": "Menambahkan sakelar “{option}”.",
-  "assistant.findInSettings": "Temukan di Pengaturan > Resep siap pakai, di bawah {recipe}.",
+  "assistant.findInSettings": "Temukan di Pengaturan > Resep, di bawah {recipe}.",
   "assistant.openInSettings": "Buka di Pengaturan",
   "assistant.nothingChanged": "Tidak ada yang diubah. Pratinjaunya hilang.",
   "assistant.askAgain": "Tanya lagi",

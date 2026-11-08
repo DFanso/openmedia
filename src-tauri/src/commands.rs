@@ -49,7 +49,7 @@ pub fn set_favorites(
     library.set_favorites(favorites)
 }
 
-/// Adds a pre-made recipe's site to the favorites, or removes it; returns the new list.
+/// Adds a recipe's site to the favorites, or removes it; returns the new list.
 #[tauri::command]
 pub fn set_site_favorite(
     library: State<'_, Library>,

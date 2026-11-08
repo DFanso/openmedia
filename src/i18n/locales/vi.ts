@@ -150,7 +150,7 @@ export const vi: Messages = {
   "settings.themeDark": "Tối",
   "settings.browsing": "Duyệt web",
   "settings.browsingNote":
-    "Chặn quảng cáo dùng các danh sách có sẵn trong ứng dụng; nếu một trang ngừng hoạt động, hãy tắt và trang sẽ tải lại. Nút quay lại nằm đối diện với nút chính, dành cho các trang không có nút riêng. Một công thức có sẵn có thể đặt lề dưới riêng.",
+    "Chặn quảng cáo dùng các danh sách có sẵn trong ứng dụng; nếu một trang ngừng hoạt động, hãy tắt và trang sẽ tải lại. Nút quay lại nằm đối diện với nút chính, dành cho các trang không có nút riêng. Một công thức có thể đặt lề dưới riêng.",
   "settings.adBlock": "Chặn quảng cáo và trình theo dõi",
   "settings.backButton": "Nút quay lại nổi",
   "settings.backButtonNote": "Hiện khi trang có nơi để quay lại.",
@@ -180,7 +180,7 @@ export const vi: Messages = {
     "Thêm bao nhiêu cũng được. {limit} mục đầu là menu truy cập nhanh bạn mở bằng cách giữ nút; kéo một mục lên trên để đưa nó vào đó.",
   "favorites.quickAccess": "Truy cập nhanh · {count}/{limit}",
   "favorites.quickEmpty":
-    "Chưa có gì ở đây. Thêm một mục yêu thích bên dưới, hoặc đánh dấu sao một công thức có sẵn.",
+    "Chưa có gì ở đây. Thêm một mục yêu thích bên dưới, hoặc đánh dấu sao một công thức.",
   "favorites.more": "Yêu thích khác · {count}",
   "favorites.add": "Thêm mục yêu thích",
   "favorites.quickFull": "Truy cập nhanh đã đầy, nên mục này được thêm vào Yêu thích khác.",
@@ -193,9 +193,9 @@ export const vi: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Một mục yêu thích cần có tên và địa chỉ hợp lệ.",
 
-  "recipes.title": "Công thức dựng sẵn",
+  "recipes.title": "Công thức",
   "recipes.note":
-    "Công thức dựng sẵn cho các trang phổ biến. Các bảng nhắc cài ứng dụng và pop-up chặn trang mặc định bị ẩn; Reels, Shorts và gợi ý vẫn hiện cho tới khi bạn ẩn chúng. Trang tải lại khi bạn đổi công tắc. Đánh dấu sao một công thức để thêm trang đó vào yêu thích.",
+    "Công thức cho các trang phổ biến. Các bảng nhắc cài ứng dụng và pop-up chặn trang mặc định bị ẩn; Reels, Shorts và gợi ý vẫn hiện cho tới khi bạn ẩn chúng. Trang tải lại khi bạn đổi công tắc. Đánh dấu sao một công thức để thêm trang đó vào yêu thích.",
   "recipes.annoyances": "Phiền nhiễu · ẩn mặc định",
   "recipes.content": "Nội dung · hiện cho tới khi bạn ẩn",
   "recipes.groupAnnoyance": "Phiền nhiễu",
@@ -265,7 +265,7 @@ export const vi: Messages = {
   "assistant.saving": "Đang lưu…",
   "assistant.turnedOn": "Đã bật “{option}”.",
   "assistant.addedSwitch": "Đã thêm công tắc “{option}”.",
-  "assistant.findInSettings": "Tìm trong Cài đặt > Công thức dựng sẵn, ở mục {recipe}.",
+  "assistant.findInSettings": "Tìm trong Cài đặt > Công thức, ở mục {recipe}.",
   "assistant.openInSettings": "Mở trong Cài đặt",
   "assistant.nothingChanged": "Không có gì thay đổi. Bản xem trước đã bị bỏ.",
   "assistant.askAgain": "Hỏi lại",

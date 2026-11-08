@@ -8,7 +8,7 @@ import type { Theme } from "../../shared/ipc";
 import { AiSection } from "./AiSection";
 import { FavoritesSection } from "./FavoritesSection";
 import { MarginSlider } from "./MarginSlider";
-import { PremadeRecipesSection } from "./PremadeRecipesSection";
+import { RecipesSection } from "./RecipesSection";
 import { Switch } from "./Switch";
 import { Group, Section, field, primaryButton, quietButton } from "./ui";
 
@@ -24,7 +24,7 @@ export function SettingsScreen() {
         <AppearanceSection />
         <LanguageSection />
         <BrowsingSection />
-        <PremadeRecipesSection />
+        <RecipesSection />
         <FavoritesSection />
         <AiSection />
         <DataSection />

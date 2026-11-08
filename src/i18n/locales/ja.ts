@@ -152,7 +152,7 @@ export const ja: Messages = {
   "settings.themeDark": "ダーク",
   "settings.browsing": "ブラウジング",
   "settings.browsingNote":
-    "広告ブロックはアプリに内蔵されたリストを使います。サイトが表示されなくなった場合はオフにすると、ページが再読み込みされます。戻るボタンはメインボタンの反対側にあり、ページに元の戻る機能がないサイト向けのものです。プリセットのレシピには独自の下余白を設定できます。",
+    "広告ブロックはアプリに内蔵されたリストを使います。サイトが表示されなくなった場合はオフにすると、ページが再読み込みされます。戻るボタンはメインボタンの反対側にあり、ページに元の戻る機能がないサイト向けのものです。レシピには独自の下余白を設定できます。",
   "settings.adBlock": "広告とトラッカーをブロック",
   "settings.backButton": "フローティング戻るボタン",
   "settings.backButtonNote": "戻れるページがあるときに表示されます。",
@@ -182,7 +182,7 @@ export const ja: Messages = {
     "好きなだけ追加できます。最初の {limit} 件はボタンを長押しすると表示されるクイックメニューになります。お気に入りを上へ動かせばそこに入ります。",
   "favorites.quickAccess": "クイックアクセス · {limit} 件中 {count} 件",
   "favorites.quickEmpty":
-    "まだ何もありません。下からお気に入りを追加するか、プリセットのレシピに★を付けてください。",
+    "まだ何もありません。下からお気に入りを追加するか、レシピに★を付けてください。",
   "favorites.more": "その他のお気に入り · {count}",
   "favorites.add": "お気に入りを追加",
   "favorites.quickFull":
@@ -196,7 +196,7 @@ export const ja: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "お気に入りには名前と有効なアドレスが必要です。",
 
-  "recipes.title": "プリセットのレシピ",
+  "recipes.title": "レシピ",
   "recipes.note":
     "よく使うサイトのための、完成済みのレシピです。インストールを促す案内やページを妨げるポップアップは初期設定では非表示です。Reels、ショート、関連コンテンツは、非表示にするまで表示されます。スイッチを変えるとページが再読み込みされます。レシピに★を付けると、そのサイトがお気に入りに追加されます。",
   "recipes.annoyances": "邪魔するもの · 既定で非表示",
@@ -270,7 +270,7 @@ export const ja: Messages = {
   "assistant.saving": "保存しています…",
   "assistant.turnedOn": "「{option}」を有効にしました。",
   "assistant.addedSwitch": "スイッチ「{option}」を追加しました。",
-  "assistant.findInSettings": "設定 > プリセットのレシピの {recipe} の下にあります。",
+  "assistant.findInSettings": "設定 > レシピの {recipe} の下にあります。",
   "assistant.openInSettings": "設定で開く",
   "assistant.nothingChanged": "変更はありませんでした。プレビューを閉じました。",
   "assistant.askAgain": "もう一度聞く",

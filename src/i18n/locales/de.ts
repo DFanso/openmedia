@@ -148,7 +148,7 @@ export const de: Messages = {
   "settings.themeDark": "Dunkel",
   "settings.browsing": "Surfen",
   "settings.browsingNote":
-    "Der Werbeblocker verwendet Listen, die in der App integriert sind; wenn eine Website nicht mehr funktioniert, schalte ihn aus und die Seite wird neu geladen. Die Zurück-Taste befindet sich gegenüber der Haupttaste, für Websites ohne eigene Zurück-Schaltfläche. Ein vorgefertigtes Rezept kann einen eigenen unteren Rand festlegen.",
+    "Der Werbeblocker verwendet Listen, die in der App integriert sind; wenn eine Website nicht mehr funktioniert, schalte ihn aus und die Seite wird neu geladen. Die Zurück-Taste befindet sich gegenüber der Haupttaste, für Websites ohne eigene Zurück-Schaltfläche. Ein Rezept kann einen eigenen unteren Rand festlegen.",
   "settings.adBlock": "Werbung und Tracker blockieren",
   "settings.backButton": "Schwebende Zurück-Taste",
   "settings.backButtonNote": "Wird immer dann angezeigt, wenn du auf der Seite zurückgehen kannst.",
@@ -178,7 +178,7 @@ export const de: Messages = {
     "Behalte so viele, wie du möchtest. Die ersten {limit} erscheinen im Schnellzugriffsmenü, das du durch Gedrückt halten der Schaltfläche öffnest. Ziehe einen Favoriten nach oben, um ihn dort einzutragen.",
   "favorites.quickAccess": "Schnellzugriff · {count} von {limit}",
   "favorites.quickEmpty":
-    "Noch nichts hier. Füge unten einen Favoriten hinzu oder markiere ein vorgefertigtes Rezept mit einem Stern.",
+    "Noch nichts hier. Füge unten einen Favoriten hinzu oder markiere ein Rezept mit einem Stern.",
   "favorites.more": "Weitere Favoriten · {count}",
   "favorites.add": "Favorit hinzufügen",
   "favorites.quickFull":
@@ -192,7 +192,7 @@ export const de: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Ein Favorit benötigt einen Namen und eine gültige Adresse.",
 
-  "recipes.title": "Vorgefertigte Rezepte",
+  "recipes.title": "Rezepte",
   "recipes.note":
     "Fertige Rezepte für beliebte Websites. Installationshinweise und Pop-ups, die die Seite blockieren, werden standardmäßig ausgeblendet; Reels, Shorts und Vorschläge werden angezeigt, bis du sie ausblendest. Die Seite wird neu geladen, wenn du einen Schalter änderst. Markiere ein Rezept mit einem Stern, um die Website deinen Favoriten hinzuzufügen.",
   "recipes.annoyances": "Störungen · standardmäßig ausgeblendet",
@@ -258,7 +258,7 @@ export const de: Messages = {
   "assistant.saving": "Wird gespeichert …",
   "assistant.turnedOn": "„{option}“ wurde eingeschaltet.",
   "assistant.addedSwitch": "Der Schalter „{option}“ wurde hinzugefügt.",
-  "assistant.findInSettings": "Finde ihn in Einstellungen > Vorgefertigte Rezepte unter {recipe}.",
+  "assistant.findInSettings": "Finde ihn in Einstellungen > Rezepte unter {recipe}.",
   "assistant.openInSettings": "In Einstellungen öffnen",
   "assistant.nothingChanged": "Nichts wurde geändert. Die Vorschau ist verschwunden.",
   "assistant.askAgain": "Nochmal fragen",

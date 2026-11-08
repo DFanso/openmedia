@@ -156,7 +156,7 @@ export const en = {
   "settings.themeDark": "Dark",
   "settings.browsing": "Browsing",
   "settings.browsingNote":
-    "Ad blocking uses lists built into the app; if a site stops working, turn it off and the page reloads. The back button sits opposite the main button, for sites with none of their own. A pre-made recipe can set its own bottom margin.",
+    "Ad blocking uses lists built into the app; if a site stops working, turn it off and the page reloads. The back button sits opposite the main button, for sites with none of their own. A recipe can set its own bottom margin.",
   "settings.adBlock": "Block ads and trackers",
   "settings.backButton": "Floating back button",
   "settings.backButtonNote": "Shown whenever the page has somewhere to go back to.",
@@ -185,7 +185,7 @@ export const en = {
   "favorites.note":
     "Keep as many as you like. The first {limit} are the quick-access menu you get by holding the button; move a favorite up to put it there.",
   "favorites.quickAccess": "Quick access · {count} of {limit}",
-  "favorites.quickEmpty": "Nothing here yet. Add a favorite below, or star a pre-made recipe.",
+  "favorites.quickEmpty": "Nothing here yet. Add a favorite below, or star a recipe.",
   "favorites.more": "More favorites · {count}",
   "favorites.add": "Add favorite",
   "favorites.quickFull": "Quick access is full, so this one is added to More favorites.",
@@ -198,7 +198,7 @@ export const en = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "A favorite needs a name and a valid address.",
 
-  "recipes.title": "Pre-made recipes",
+  "recipes.title": "Recipes",
   "recipes.note":
     "Ready-made recipes for popular sites. Install prompts and pop-ups that block the page are hidden by default; Reels, Shorts and suggestions are shown until you hide them. The page reloads when you change a switch. Star a recipe to add its site to your favorites.",
   "recipes.annoyances": "Annoyances · hidden by default",
@@ -269,7 +269,7 @@ export const en = {
   "assistant.saving": "Saving…",
   "assistant.turnedOn": "Turned on “{option}”.",
   "assistant.addedSwitch": "Added the switch “{option}”.",
-  "assistant.findInSettings": "Find it in Settings > Pre-made recipes, under {recipe}.",
+  "assistant.findInSettings": "Find it in Settings > Recipes, under {recipe}.",
   "assistant.openInSettings": "Open in Settings",
   "assistant.nothingChanged": "Nothing was changed. The preview is gone.",
   "assistant.askAgain": "Ask again",

@@ -157,7 +157,7 @@ export const fr: Messages = {
   "settings.themeDark": "Sombre",
   "settings.browsing": "Navigation",
   "settings.browsingNote":
-    "Le blocage des publicités utilise des listes intégrées à l’application ; si un site cesse de fonctionner, désactivez-le et la page se rechargera. Le bouton de retour se place à l’opposé du bouton principal pour les sites qui n’en ont pas. Une recette prédéfinie peut définir sa propre marge inférieure.",
+    "Le blocage des publicités utilise des listes intégrées à l’application ; si un site cesse de fonctionner, désactivez-le et la page se rechargera. Le bouton de retour se place à l’opposé du bouton principal pour les sites qui n’en ont pas. Une recette peut définir sa propre marge inférieure.",
   "settings.adBlock": "Bloquer les publicités et les traceurs",
   "settings.backButton": "Bouton de retour flottant",
   "settings.backButtonNote": "Affiché chaque fois que la page peut revenir en arrière.",
@@ -187,7 +187,7 @@ export const fr: Messages = {
     "Gardez-en autant que vous voulez. Les {limit} premiers forment le menu d’accès rapide affiché en maintenant le bouton appuyé ; déplacez un favori vers le haut pour l’y placer.",
   "favorites.quickAccess": "Accès rapide · {count} sur {limit}",
   "favorites.quickEmpty":
-    "Rien ici pour le moment. Ajoutez un favori ci-dessous ou mettez une recette prédéfinie en favori.",
+    "Rien ici pour le moment. Ajoutez un favori ci-dessous ou mettez une recette en favori.",
   "favorites.more": "Autres favoris · {count}",
   "favorites.add": "Ajouter un favori",
   "favorites.quickFull": "L’accès rapide est plein : ce favori est ajouté aux autres favoris.",
@@ -200,7 +200,7 @@ export const fr: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Un favori doit avoir un nom et une adresse valide.",
 
-  "recipes.title": "Recettes prédéfinies",
+  "recipes.title": "Recettes",
   "recipes.note":
     "Des recettes prêtes à l’emploi pour les sites populaires. Les invites d’installation et les fenêtres contextuelles qui bloquent la page sont masquées par défaut ; Reels, Shorts et les suggestions restent visibles jusqu’à ce que vous les masquiez. La page se recharge lorsque vous changez un interrupteur. Mettez une recette en favori pour ajouter son site à vos favoris.",
   "recipes.annoyances": "Éléments gênants · masqués par défaut",
@@ -278,7 +278,7 @@ export const fr: Messages = {
   "assistant.saving": "Enregistrement…",
   "assistant.turnedOn": "« {option} » activé.",
   "assistant.addedSwitch": "Interrupteur « {option} » ajouté.",
-  "assistant.findInSettings": "Trouvez-la dans les réglages > Recettes prédéfinies, sous {recipe}.",
+  "assistant.findInSettings": "Trouvez-la dans les réglages > Recettes, sous {recipe}.",
   "assistant.openInSettings": "Ouvrir dans les réglages",
   "assistant.nothingChanged": "Rien n’a été modifié. L’aperçu a disparu.",
   "assistant.askAgain": "Demander à nouveau",

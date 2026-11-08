@@ -154,7 +154,7 @@ export const ro: Messages = {
   "settings.themeDark": "Întunecată",
   "settings.browsing": "Navigare",
   "settings.browsingNote":
-    "Blocarea reclamelor folosește liste integrate în aplicație; dacă un site nu mai funcționează, dezactivează-o și pagina se reîncarcă. Butonul Înapoi este plasat opus butonului principal, pentru site-urile care nu au unul propriu. O rețetă predefinită își poate seta propria margine inferioară.",
+    "Blocarea reclamelor folosește liste integrate în aplicație; dacă un site nu mai funcționează, dezactivează-o și pagina se reîncarcă. Butonul Înapoi este plasat opus butonului principal, pentru site-urile care nu au unul propriu. O rețetă își poate seta propria margine inferioară.",
   "settings.adBlock": "Blochează reclamele și trackerele",
   "settings.backButton": "Buton Înapoi plutitor",
   "settings.backButtonNote": "Apare ori de câte ori pagina are unde să se întoarcă.",
@@ -184,7 +184,7 @@ export const ro: Messages = {
     "Păstrează câte vrei. Primele {limit} formează meniul de acces rapid pe care îl obții ținând apăsat butonul; mută un favorit mai sus pentru a-l pune acolo.",
   "favorites.quickAccess": "Acces rapid · {count} din {limit}",
   "favorites.quickEmpty":
-    "Nimic aici încă. Adaugă mai jos un favorit sau marchează cu stea o rețetă predefinită.",
+    "Nimic aici încă. Adaugă mai jos un favorit sau marchează cu stea o rețetă.",
   "favorites.more": "Alte favorite · {count}",
   "favorites.add": "Adaugă favorit",
   "favorites.quickFull": "Accesul rapid este plin, așa că acesta este adăugat la Alte favorite.",
@@ -197,7 +197,7 @@ export const ro: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Un favorit are nevoie de un nume și de o adresă validă.",
 
-  "recipes.title": "Rețete predefinite",
+  "recipes.title": "Rețete",
   "recipes.note":
     "Rețete gata făcute pentru site-uri populare. Mesajele de instalare și ferestrele pop-up care blochează pagina sunt ascunse implicit; Reels, Shorts și sugestiile sunt afișate până când le ascunzi. Pagina se reîncarcă atunci când schimbi un comutator. Marchează o rețetă cu stea pentru a adăuga site-ul ei la favorite.",
   "recipes.annoyances": "Elemente deranjante · ascunse implicit",
@@ -273,7 +273,7 @@ export const ro: Messages = {
   "assistant.saving": "Se salvează…",
   "assistant.turnedOn": "S-a activat „{option}”.",
   "assistant.addedSwitch": "S-a adăugat comutatorul „{option}”.",
-  "assistant.findInSettings": "Îl găsești în Setări > Rețete predefinite, la {recipe}.",
+  "assistant.findInSettings": "Îl găsești în Setări > Rețete, la {recipe}.",
   "assistant.openInSettings": "Deschide în Setări",
   "assistant.nothingChanged": "Nu s-a modificat nimic. Previzualizarea a dispărut.",
   "assistant.askAgain": "Cere din nou",

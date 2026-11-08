@@ -152,7 +152,7 @@ export const sv: Messages = {
   "settings.themeDark": "Mörkt",
   "settings.browsing": "Surfning",
   "settings.browsingNote":
-    "Annonsblockering använder listor som är inbyggda i appen; om en webbplats slutar fungera, stäng av den så laddas sidan om. Bakåtknappen sitter mittemot huvudknappen, för webbplatser som saknar en egen. Ett färdigt recept kan ange sin egen nedre marginal.",
+    "Annonsblockering använder listor som är inbyggda i appen; om en webbplats slutar fungera, stäng av den så laddas sidan om. Bakåtknappen sitter mittemot huvudknappen, för webbplatser som saknar en egen. Ett recept kan ange sin egen nedre marginal.",
   "settings.adBlock": "Blockera annonser och spårare",
   "settings.backButton": "Flytande bakåtknapp",
   "settings.backButtonNote": "Visas så snart sidan har något att gå tillbaka till.",
@@ -182,7 +182,7 @@ export const sv: Messages = {
     "Spara så många du vill. De första {limit} är snabbmenyn du får genom att hålla in knappen; flytta en favorit uppåt för att lägga den där.",
   "favorites.quickAccess": "Snabbåtkomst · {count} av {limit}",
   "favorites.quickEmpty":
-    "Inget här ännu. Lägg till en favorit nedan, eller stjärnmärk ett färdigt recept.",
+    "Inget här ännu. Lägg till en favorit nedan, eller stjärnmärk ett recept.",
   "favorites.more": "Fler favoriter · {count}",
   "favorites.add": "Lägg till favorit",
   "favorites.quickFull": "Snabbåtkomst är full, så den här läggs till under Fler favoriter.",
@@ -195,9 +195,9 @@ export const sv: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "En favorit behöver ett namn och en giltig adress.",
 
-  "recipes.title": "Färdiga recept",
+  "recipes.title": "Recept",
   "recipes.note":
-    "Färdiga recept för populära webbplatser. Installationsuppmaningar och popup-fönster som blockerar sidan döljs som standard; Reels, Shorts och förslag visas tills du döljer dem. Sidan laddas om när du ändrar en omkopplare. Stjärnmärk ett recept för att lägga till dess webbplats bland dina favoriter.",
+    "Recept för populära webbplatser. Installationsuppmaningar och popup-fönster som blockerar sidan döljs som standard; Reels, Shorts och förslag visas tills du döljer dem. Sidan laddas om när du ändrar en omkopplare. Stjärnmärk ett recept för att lägga till dess webbplats bland dina favoriter.",
   "recipes.annoyances": "Störande inslag · dolda som standard",
   "recipes.content": "Innehåll · visas tills du döljer det",
   "recipes.groupAnnoyance": "Störande inslag",
@@ -270,7 +270,7 @@ export const sv: Messages = {
   "assistant.saving": "Sparar…",
   "assistant.turnedOn": "Slog på ”{option}”.",
   "assistant.addedSwitch": "Lade till omkopplaren ”{option}”.",
-  "assistant.findInSettings": "Hitta den i Inställningar > Färdiga recept, under {recipe}.",
+  "assistant.findInSettings": "Hitta den i Inställningar > Recept, under {recipe}.",
   "assistant.openInSettings": "Öppna i Inställningar",
   "assistant.nothingChanged": "Ingenting ändrades. Förhandsgranskningen är borta.",
   "assistant.askAgain": "Fråga igen",

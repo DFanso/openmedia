@@ -157,7 +157,7 @@ export const it: Messages = {
   "settings.themeDark": "Scuro",
   "settings.browsing": "Navigazione",
   "settings.browsingNote":
-    "Il blocco degli annunci usa elenchi integrati nell’app; se un sito smette di funzionare, disattivalo e la pagina si ricaricherà. Il pulsante Indietro si mette dalla parte opposta del pulsante principale, per i siti che non ne hanno uno. Una ricetta pronta può impostare il proprio margine inferiore.",
+    "Il blocco degli annunci usa elenchi integrati nell’app; se un sito smette di funzionare, disattivalo e la pagina si ricaricherà. Il pulsante Indietro si mette dalla parte opposta del pulsante principale, per i siti che non ne hanno uno. Una ricetta può impostare il proprio margine inferiore.",
   "settings.adBlock": "Blocca annunci e tracker",
   "settings.backButton": "Pulsante Indietro fluttuante",
   "settings.backButtonNote":
@@ -188,7 +188,7 @@ export const it: Messages = {
     "Tieni quanti preferisci. I primi {limit} compongono il menu di accesso rapido che compare tenendo premuto il pulsante; sposta un preferito in alto per inserirlo.",
   "favorites.quickAccess": "Accesso rapido · {count} di {limit}",
   "favorites.quickEmpty":
-    "Qui non c’è ancora nulla. Aggiungi un preferito qui sotto oppure metti una ricetta pronta tra i preferiti con la stella.",
+    "Qui non c’è ancora nulla. Aggiungi un preferito qui sotto oppure metti una ricetta tra i preferiti con la stella.",
   "favorites.more": "Altri preferiti · {count}",
   "favorites.add": "Aggiungi preferito",
   "favorites.quickFull":
@@ -202,9 +202,9 @@ export const it: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Un preferito richiede un nome e un indirizzo valido.",
 
-  "recipes.title": "Ricette pronte",
+  "recipes.title": "Ricette",
   "recipes.note":
-    "Ricette pronte per siti popolari. Gli inviti all’installazione e i pop-up che bloccano la pagina sono nascosti per impostazione predefinita; Reels, Shorts e i suggerimenti restano visibili finché non li nascondi. La pagina si ricarica quando cambi un interruttore. Metti una ricetta tra i preferiti con la stella per aggiungere il sito ai tuoi preferiti.",
+    "Ricette per siti popolari. Gli inviti all’installazione e i pop-up che bloccano la pagina sono nascosti per impostazione predefinita; Reels, Shorts e i suggerimenti restano visibili finché non li nascondi. La pagina si ricarica quando cambi un interruttore. Metti una ricetta tra i preferiti con la stella per aggiungere il sito ai tuoi preferiti.",
   "recipes.annoyances": "Fastidi · nascosti per impostazione predefinita",
   "recipes.content": "Contenuti · mostrati finché non li nascondi",
   "recipes.groupAnnoyance": "Fastidio",
@@ -277,7 +277,7 @@ export const it: Messages = {
   "assistant.saving": "Salvataggio…",
   "assistant.turnedOn": "“{option}” attivato.",
   "assistant.addedSwitch": "Interruttore “{option}” aggiunto.",
-  "assistant.findInSettings": "Trovalo in Impostazioni > Ricette pronte, in {recipe}.",
+  "assistant.findInSettings": "Trovalo in Impostazioni > Ricette, in {recipe}.",
   "assistant.openInSettings": "Apri in Impostazioni",
   "assistant.nothingChanged": "Non è stato modificato nulla. L’anteprima è scomparsa.",
   "assistant.askAgain": "Chiedi di nuovo",

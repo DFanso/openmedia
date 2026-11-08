@@ -89,7 +89,7 @@ export interface AppStore {
   trimSessions: (pressure: Pressure) => void;
   reportError: (message: string | null) => void;
   saveFavorites: (favorites: FavoriteInput[]) => Promise<boolean>;
-  /** Adds a pre-made recipe's site to the favorites, or removes every favorite that opens it. */
+  /** Adds a recipe's site to the favorites, or removes every favorite that opens it. */
   setSiteFavorite: (recipeId: string, favorite: boolean) => Promise<void>;
   clearHistory: () => Promise<void>;
   setTheme: (theme: Theme) => Promise<void>;

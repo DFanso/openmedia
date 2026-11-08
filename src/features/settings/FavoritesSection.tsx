@@ -15,7 +15,7 @@ const asInput = ({ name, url }: Favorite): FavoriteInput => ({ name, url });
 /**
  * The favorites list is as long as the user likes; the first few are the quick-access menu that
  * fans out from the floating button. Every change saves at once, so the list in Settings never
- * disagrees with the one a pre-made recipe's star edits.
+ * disagrees with the one a recipe's star edits.
  */
 export function FavoritesSection() {
   const favorites = useApp((s) => s.state?.favorites) ?? [];

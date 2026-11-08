@@ -153,7 +153,7 @@ export const tr: Messages = {
   "settings.themeDark": "Koyu",
   "settings.browsing": "Gezinme",
   "settings.browsingNote":
-    "Reklam engelleme, uygulamaya gömülü listeleri kullanır. Bir site çalışmaz hâle gelirse kapatın, sayfa yeniden yüklenir. Geri düğmesi, kendi geri düğmesi olmayan siteler için ana düğmenin karşısında durur. Hazır bir tarif kendi alt kenar boşluğunu ayarlayabilir.",
+    "Reklam engelleme, uygulamaya gömülü listeleri kullanır. Bir site çalışmaz hâle gelirse kapatın, sayfa yeniden yüklenir. Geri düğmesi, kendi geri düğmesi olmayan siteler için ana düğmenin karşısında durur. Bir tarif kendi alt kenar boşluğunu ayarlayabilir.",
   "settings.adBlock": "Reklamları ve izleyicileri engelle",
   "settings.backButton": "Yüzen geri düğmesi",
   "settings.backButtonNote": "Sayfanın geri dönülecek bir yeri olduğunda görünür.",
@@ -183,7 +183,7 @@ export const tr: Messages = {
     "İstediğiniz kadar ekleyin. İlk {limit} tanesi, düğmeye basılı tuttuğunuzda açılan hızlı erişim menüsüdür; bir favoriyi yukarı taşıyarak oraya koyun.",
   "favorites.quickAccess": "Hızlı erişim · {limit} içinden {count}",
   "favorites.quickEmpty":
-    "Burada henüz bir şey yok. Aşağıya bir favori ekleyin ya da hazır bir tarifi yıldızlayın.",
+    "Burada henüz bir şey yok. Aşağıya bir favori ekleyin ya da bir tarifi yıldızlayın.",
   "favorites.more": "Diğer favoriler · {count}",
   "favorites.add": "Favori ekle",
   "favorites.quickFull": "Hızlı erişim dolu, bu yüzden bu da Diğer favorilere eklendi.",
@@ -196,7 +196,7 @@ export const tr: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Bir favori için ad ve geçerli adres gerekir.",
 
-  "recipes.title": "Hazır tarifler",
+  "recipes.title": "Tarifler",
   "recipes.note":
     "Popüler siteler için hazır tarifler. Kurulum istemleri ve sayfayı engelleyen açılır pencereler varsayılan olarak gizlidir; Reels, Shorts ve öneriler siz gizlemedikçe gösterilir. Bir anahtarı değiştirdiğinizde sayfa yeniden yüklenir. Bir tarifi yıldızlayarak sitesini favorilerinize ekleyin.",
   "recipes.annoyances": "Rahatsız ediciler · varsayılan olarak gizli",
@@ -271,7 +271,7 @@ export const tr: Messages = {
   "assistant.saving": "Kaydediliyor…",
   "assistant.turnedOn": "“{option}” açıldı.",
   "assistant.addedSwitch": "“{option}” anahtarı eklendi.",
-  "assistant.findInSettings": "Ayarlar > Hazır tarifler bölümünde, {recipe} başlığı altında bulun.",
+  "assistant.findInSettings": "Ayarlar > Tarifler bölümünde, {recipe} başlığı altında bulun.",
   "assistant.openInSettings": "Ayarlarda aç",
   "assistant.nothingChanged": "Hiçbir şey değişmedi. Önizleme kaldırıldı.",
   "assistant.askAgain": "Yeniden sor",

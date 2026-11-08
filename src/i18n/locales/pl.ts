@@ -154,7 +154,7 @@ export const pl: Messages = {
   "settings.themeDark": "Ciemny",
   "settings.browsing": "Przeglądanie",
   "settings.browsingNote":
-    "Blokowanie reklam korzysta z list wbudowanych w aplikację; jeśli witryna przestanie działać, wyłącz je, a strona zostanie wczytana ponownie. Przycisk wstecz znajduje się naprzeciw głównego przycisku, dla witryn, które nie mają własnego. Gotowy przepis może ustawić własny dolny margines.",
+    "Blokowanie reklam korzysta z list wbudowanych w aplikację; jeśli witryna przestanie działać, wyłącz je, a strona zostanie wczytana ponownie. Przycisk wstecz znajduje się naprzeciw głównego przycisku, dla witryn, które nie mają własnego. Przepis może ustawić własny dolny margines.",
   "settings.adBlock": "Blokuj reklamy i skrypty śledzące",
   "settings.backButton": "Pływający przycisk wstecz",
   "settings.backButtonNote": "Widoczny zawsze, gdy strona ma dokąd się cofnąć.",
@@ -183,8 +183,7 @@ export const pl: Messages = {
   "favorites.note":
     "Możesz mieć ich dowolnie wiele. Pierwsze {limit} to menu szybkiego dostępu, które otwiera się po przytrzymaniu przycisku; przesuń ulubioną wyżej, aby się tam znalazła.",
   "favorites.quickAccess": "Szybki dostęp · {count} z {limit}",
-  "favorites.quickEmpty":
-    "Na razie pusto. Dodaj ulubioną poniżej lub oznacz gwiazdką gotowy przepis.",
+  "favorites.quickEmpty": "Na razie pusto. Dodaj ulubioną poniżej lub oznacz gwiazdką przepis.",
   "favorites.more": "Więcej ulubionych · {count}",
   "favorites.add": "Dodaj ulubioną",
   "favorites.quickFull":
@@ -198,9 +197,9 @@ export const pl: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Ulubiona wymaga nazwy i prawidłowego adresu.",
 
-  "recipes.title": "Gotowe przepisy",
+  "recipes.title": "Przepisy",
   "recipes.note":
-    "Gotowe przepisy dla popularnych witryn. Monity o instalację i wyskakujące okna zasłaniające stronę są domyślnie ukryte; Reels, Shorts i sugestie są widoczne, dopóki ich nie ukryjesz. Strona wczytuje się ponownie po zmianie przełącznika. Oznacz przepis gwiazdką, aby dodać jego witrynę do ulubionych.",
+    "Przepisy dla popularnych witryn. Monity o instalację i wyskakujące okna zasłaniające stronę są domyślnie ukryte; Reels, Shorts i sugestie są widoczne, dopóki ich nie ukryjesz. Strona wczytuje się ponownie po zmianie przełącznika. Oznacz przepis gwiazdką, aby dodać jego witrynę do ulubionych.",
   "recipes.annoyances": "Uciążliwości · domyślnie ukryte",
   "recipes.content": "Treści · widoczne, dopóki ich nie ukryjesz",
   "recipes.groupAnnoyance": "Uciążliwość",
@@ -272,7 +271,7 @@ export const pl: Messages = {
   "assistant.saving": "Zapisywanie…",
   "assistant.turnedOn": "Włączono „{option}”.",
   "assistant.addedSwitch": "Dodano przełącznik „{option}”.",
-  "assistant.findInSettings": "Znajdziesz go w Ustawieniach > Gotowe przepisy, w sekcji {recipe}.",
+  "assistant.findInSettings": "Znajdziesz go w Ustawieniach > Przepisy, w sekcji {recipe}.",
   "assistant.openInSettings": "Otwórz w Ustawieniach",
   "assistant.nothingChanged": "Nic nie zmieniono. Podgląd zniknął.",
   "assistant.askAgain": "Zapytaj ponownie",
