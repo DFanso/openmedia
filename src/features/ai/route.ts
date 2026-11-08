@@ -34,8 +34,3 @@ export function routeInput(text: string, context: RouteContext): Route {
   if (!isSitePage(context.pageUrl)) return { kind: "blocked", reason: "noPage" };
   return { kind: "request", request: trimmed.slice(0, MAX_REQUEST_LENGTH) };
 }
-
-export const BLOCKED_MESSAGES = {
-  noProvider: "Add an AI provider and key to ask for changes. Addresses still work.",
-  noPage: "Open a site first, then describe the change.",
-} as const;

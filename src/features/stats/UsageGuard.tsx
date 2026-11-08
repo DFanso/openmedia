@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { selectPage, useApp } from "../../app/store";
-import { errorMessage } from "../../shared/ipc";
+import { describeError } from "../../i18n/errors";
+import { useT } from "../../i18n/useT";
 import { formatDuration } from "./format";
 import { limitReached, policyForHost, usageSeconds, useUsageControl } from "./policy";
 import { usageTargetOf } from "./section";
@@ -29,6 +30,7 @@ export function UsageGuard() {
   const onboarding = useApp((state) => state.onboardingOpen);
   const reportError = useApp((state) => state.reportError);
   const openSheet = useApp((state) => state.openSheet);
+  const t = useT();
   const requested = useRef(new Map<string, boolean>());
   const queues = useRef(new Map<string, Promise<unknown>>());
   const warned = useRef(new Set<string>());
@@ -62,11 +64,11 @@ export function UsageGuard() {
         .catch((error: unknown) => {
           if (requested.current.get(session.id) === shouldBlock)
             requested.current.delete(session.id);
-          reportError(errorMessage(error));
+          reportError(describeError(error, t));
         });
       queues.current.set(session.id, queued);
     }
-  }, [control, sessions, reportError]);
+  }, [control, sessions, reportError, t]);
 
   useEffect(() => {
     const threshold = policy?.warnSeconds;
@@ -96,18 +98,20 @@ export function UsageGuard() {
         >
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold">Time check: {control.warning.host}</p>
+              <p className="text-sm font-semibold">
+                {t("usage.timeCheck", { host: control.warning.host })}
+              </p>
               <p className="mt-1 text-sm text-paper/65">
-                You have spent {formatDuration(control.warning.seconds)} here today.
+                {t("usage.spentToday", { value: formatDuration(control.warning.seconds, t) })}
               </p>
             </div>
             <button
               type="button"
-              aria-label="Dismiss usage warning"
+              aria-label={t("usage.dismissLabel")}
               onClick={() => useUsageControl.setState({ warning: null })}
               className="px-2 py-1 text-paper/65"
             >
-              Dismiss
+              {t("usage.dismiss")}
             </button>
           </div>
           <button
@@ -115,7 +119,7 @@ export function UsageGuard() {
             onClick={() => openSheet("stats")}
             className="mt-3 text-sm font-medium text-accent"
           >
-            Manage usage
+            {t("usage.manage")}
           </button>
         </div>
       )}
@@ -125,21 +129,20 @@ export function UsageGuard() {
           className="fixed inset-0 z-10 grid place-items-center bg-ink/45 p-8 backdrop-blur-xl"
         >
           <section
-            aria-label="Daily site limit reached"
+            aria-label={t("usage.limitReachedLabel")}
             role="status"
             className="max-w-sm rounded-3xl border border-hair bg-ink/90 p-6 text-center"
           >
-            <h1 className="text-xl font-semibold">Daily limit reached</h1>
+            <h1 className="text-xl font-semibold">{t("usage.limitReached")}</h1>
             <p className="mt-3 break-words text-sm text-paper/70">
-              {host} is paused after {formatDuration(seconds)} today. It unlocks at local midnight.
-              Other sites are still available.
+              {t("usage.paused", { host: host ?? "", value: formatDuration(seconds, t) })}
             </p>
             <button
               type="button"
               onClick={() => openSheet("stats")}
               className="mt-5 rounded-full bg-accent px-5 py-3 text-sm font-semibold text-on-accent"
             >
-              Manage usage
+              {t("usage.manage")}
             </button>
           </section>
         </div>

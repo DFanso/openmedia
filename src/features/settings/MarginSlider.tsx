@@ -45,7 +45,7 @@ export function MarginSlider({ label, value, onCommit }: MarginSliderProps) {
         onChange={(event) => setDragging(Number(event.target.value))}
         className="min-w-0 flex-1 accent-accent"
       />
-      <span className="w-14 text-right text-sm text-paper/70 tabular-nums">{shown} px</span>
+      <span className="w-14 text-end text-sm text-paper/70 tabular-nums">{shown} px</span>
     </div>
   );
 }

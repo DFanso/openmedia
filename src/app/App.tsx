@@ -9,8 +9,10 @@ import { UsageGuard } from "../features/stats/UsageGuard";
 import { WebLayer } from "../features/web/WebLayer";
 import { useApplyTheme } from "../shared/theme";
 import { hideSplash, hideSplashWhen, pageShowing } from "./splash";
-import { selectPage, useApp } from "./store";
+import { selectLocale, selectPage, useApp } from "./store";
 import { useHitRegions } from "./useHitRegions";
+import { localeInfo } from "../i18n/locales";
+import { useT } from "../i18n/useT";
 
 /** Heavy screens load after the first page shows; most launches never open them. */
 const loadSettings = () => import("../features/settings/SettingsScreen");
@@ -35,9 +37,17 @@ export function App() {
   const onboardingOpen = useApp((s) => s.onboardingOpen);
   const reportError = useApp((s) => s.reportError);
   const theme = useApp((s) => s.state?.theme ?? "system");
+  const locale = useApp(selectLocale);
+  const t = useT();
   const [idle, setIdle] = useState(false);
   useApplyTheme(theme);
   useHitRegions();
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.lang = locale;
+    root.dir = localeInfo(locale).dir;
+  }, [locale]);
 
   useEffect(() => startUsageTracking(), []);
 
@@ -70,10 +80,10 @@ export function App() {
           type="button"
           data-hit=""
           onClick={() => reportError(null)}
-          className="glass fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+12px)] z-20 rounded-2xl px-4 py-3 text-left text-sm text-accent"
+          className="glass fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+12px)] z-20 rounded-2xl px-4 py-3 text-start text-sm text-accent"
         >
           {error}
-          <span className="mt-1 block text-xs text-paper/50">Tap to dismiss</span>
+          <span className="mt-1 block text-xs text-paper/50">{t("app.dismiss")}</span>
         </button>
       )}
     </>

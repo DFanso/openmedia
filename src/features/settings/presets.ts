@@ -1,8 +1,11 @@
+import type { MessageKey } from "../../i18n/messages";
 import type { ProviderKind } from "../../shared/ipc";
 
 export interface Preset {
   id: string;
   label: string;
+  /** Set when the label is not a brand name and has to be translated. */
+  labelKey?: MessageKey;
   kind: ProviderKind;
   baseUrl: string;
   placeholder?: string;
@@ -33,6 +36,7 @@ export const PRESETS: Preset[] = [
   {
     id: "custom",
     label: "Custom (OpenAI-compatible)",
+    labelKey: "ai.presetCustom",
     kind: "openAiCompatible",
     baseUrl: "",
     placeholder: "http://localhost:11434/v1",

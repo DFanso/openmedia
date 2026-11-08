@@ -53,6 +53,7 @@ pub fn run() {
             commands::complete_onboarding,
             commands::reset_onboarding,
             commands::set_theme,
+            commands::set_locale,
             commands::refresh_icons,
             commands::get_icons,
             commands::open_site,

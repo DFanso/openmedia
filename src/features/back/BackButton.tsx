@@ -1,7 +1,9 @@
 import { useRef, useState, type PointerEvent } from "react";
 import { selectPage, useApp } from "../../app/store";
+import { describeError } from "../../i18n/errors";
+import { useT } from "../../i18n/useT";
 import { BackIcon } from "../../shared/icons";
-import { errorMessage, siteView } from "../../shared/ipc";
+import { siteView } from "../../shared/ipc";
 import { useInsets, useViewport } from "../../shared/viewport";
 import { EDGE_MARGIN, snapToEdge, type Point } from "../fab/geometry";
 import { loadBackPosition, saveBackPosition, type BackPosition } from "./position";
@@ -25,6 +27,7 @@ export function BackButton() {
   const sheet = useApp((s) => s.sheet);
   const onboardingOpen = useApp((s) => s.onboardingOpen);
   const reportError = useApp((s) => s.reportError);
+  const t = useT();
   const viewport = useViewport();
   const insets = useInsets();
   const [position, setPosition] = useState<BackPosition>(loadBackPosition);
@@ -64,7 +67,7 @@ export function BackButton() {
     if (!active || active.pointerId !== event.pointerId) return;
     drag.current = null;
     if (!active.moved) {
-      siteView.goBack().catch((error: unknown) => reportError(errorMessage(error)));
+      siteView.goBack().catch((error: unknown) => reportError(describeError(error, t)));
       return;
     }
     const snapped = snapToEdge({ x: event.clientX, y: event.clientY }, viewport, insets);
@@ -86,7 +89,7 @@ export function BackButton() {
     <button
       type="button"
       data-hit=""
-      aria-label="Back"
+      aria-label={t("common.back")}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}

@@ -13,7 +13,7 @@ export function Switch({ label, description, checked, onChange }: SwitchProps) {
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className="flex w-full items-center justify-between gap-4 px-4 py-3.5 text-left active:bg-paper/[0.05]"
+      className="flex w-full items-center justify-between gap-4 px-4 py-3.5 text-start active:bg-paper/[0.05]"
     >
       <span className="min-w-0">
         <span className="block text-base">{label}</span>
@@ -29,7 +29,7 @@ export function Switch({ label, description, checked, onChange }: SwitchProps) {
       >
         <span
           className={`absolute top-0.5 size-6 rounded-full transition-all ${
-            checked ? "left-[22px] bg-on-accent" : "left-0.5 bg-paper/70"
+            checked ? "start-[22px] bg-on-accent" : "start-0.5 bg-paper/70"
           }`}
         />
       </span>

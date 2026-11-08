@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useApp } from "../../app/store";
-import { errorMessage } from "../../shared/ipc";
+import { describeError } from "../../i18n/errors";
+import { useT } from "../../i18n/useT";
 import { normalizeWebUrl } from "../../shared/url";
 import { siteOf } from "../../shared/site";
 import { usagePolicies, type UsagePolicy, type UsagePolicies } from "./policy";
@@ -17,10 +18,6 @@ function hostFor(value: string): string | null {
   return siteOf(normalized);
 }
 
-function minutes(seconds: number): string {
-  return `${seconds / 60} min`;
-}
-
 export function UsagePoliciesForm() {
   const state = useApp((s) => s.state) ?? EMPTY_SITES;
   const reportError = useApp((s) => s.reportError);
@@ -30,6 +27,7 @@ export function UsagePoliciesForm() {
   const [limit, setLimit] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
+  const t = useT();
   const suggestions = useMemo(() => {
     const hosts = new Set<string>();
     for (const favorite of state.favorites) {
@@ -51,12 +49,12 @@ export function UsagePoliciesForm() {
         if (active) setPolicies(loaded);
       })
       .catch((cause: unknown) => {
-        if (active) reportError(errorMessage(cause));
+        if (active) reportError(describeError(cause, t));
       });
     return () => {
       active = false;
     };
-  }, [reportError]);
+  }, [reportError, t]);
 
   const clearForm = () => {
     setSite("");
@@ -69,7 +67,7 @@ export function UsagePoliciesForm() {
     setError("");
     const host = hostFor(site);
     if (!host) {
-      setError("Enter a valid website address.");
+      setError(t("usage.invalidAddress"));
       return;
     }
     const parseMinutes = (value: string): number | null | undefined => {
@@ -80,15 +78,15 @@ export function UsagePoliciesForm() {
     const warnSeconds = parseMinutes(warning);
     const limitSeconds = parseMinutes(limit);
     if (warnSeconds === undefined || limitSeconds === undefined) {
-      setError("Minutes must be a whole number from 1 to 1440.");
+      setError(t("usage.invalidMinutes"));
       return;
     }
     if (warnSeconds === null && limitSeconds === null) {
-      setError("Set a warning or a limit.");
+      setError(t("usage.needsOne"));
       return;
     }
     if (warnSeconds !== null && limitSeconds !== null && warnSeconds >= limitSeconds) {
-      setError("The warning must be shorter than the limit.");
+      setError(t("usage.warningTooLate"));
       return;
     }
     setPending(true);
@@ -97,7 +95,7 @@ export function UsagePoliciesForm() {
       setPolicies(updated);
       clearForm();
     } catch (cause) {
-      setError(errorMessage(cause));
+      setError(describeError(cause, t));
     } finally {
       setPending(false);
     }
@@ -109,7 +107,7 @@ export function UsagePoliciesForm() {
     try {
       setPolicies(await usagePolicies.set(host, EMPTY_POLICY));
     } catch (cause) {
-      setError(errorMessage(cause));
+      setError(describeError(cause, t));
     } finally {
       setPending(false);
     }
@@ -117,15 +115,13 @@ export function UsagePoliciesForm() {
 
   return (
     <section className="mt-8 rounded-2xl border border-hair p-4">
-      <h2 className="text-sm font-semibold">Daily warnings and limits</h2>
-      <p className="mt-1 text-sm leading-relaxed text-paper/60">
-        Counts foreground time. Resets at local midnight. Leave a field blank to disable it.
-      </p>
+      <h2 className="text-sm font-semibold">{t("usage.title")}</h2>
+      <p className="mt-1 text-sm leading-relaxed text-paper/60">{t("usage.note")}</p>
       <div className="mt-4 flex flex-col gap-3">
         <label className="flex flex-col gap-1 text-xs text-paper/60">
-          Site address
+          {t("usage.siteAddress")}
           <input
-            aria-label="Site address"
+            aria-label={t("usage.siteAddress")}
             list="usage-policy-sites"
             type="text"
             value={site}
@@ -142,9 +138,9 @@ export function UsagePoliciesForm() {
         </datalist>
         <div className="grid grid-cols-2 gap-3">
           <label className="flex flex-col gap-1 text-xs text-paper/60">
-            Warning (minutes)
+            {t("usage.warningMinutes")}
             <input
-              aria-label="Warning minutes"
+              aria-label={t("usage.warningMinutes")}
               type="number"
               min={1}
               max={1440}
@@ -156,9 +152,9 @@ export function UsagePoliciesForm() {
             />
           </label>
           <label className="flex flex-col gap-1 text-xs text-paper/60">
-            Limit (minutes)
+            {t("usage.limitMinutes")}
             <input
-              aria-label="Limit minutes"
+              aria-label={t("usage.limitMinutes")}
               type="number"
               min={1}
               max={1440}
@@ -176,7 +172,7 @@ export function UsagePoliciesForm() {
           onClick={() => void save()}
           className="self-start rounded-full border border-accent px-4 py-2 text-sm text-accent disabled:opacity-50"
         >
-          Save
+          {t("common.save")}
         </button>
         {error && (
           <p role="alert" className="text-sm text-red-400">
@@ -185,7 +181,7 @@ export function UsagePoliciesForm() {
         )}
       </div>
       {Object.keys(policies).length === 0 ? (
-        <p className="mt-4 text-sm text-paper/50">No limits configured.</p>
+        <p className="mt-4 text-sm text-paper/50">{t("usage.none")}</p>
       ) : (
         <ul className="mt-4 divide-y divide-hair">
           {Object.entries(policies).map(([host, policy]) => (
@@ -194,8 +190,16 @@ export function UsagePoliciesForm() {
                 <p className="truncate text-sm">{host}</p>
                 <p className="text-xs text-paper/55">
                   {[
-                    policy.warnSeconds !== null ? `Warn at ${minutes(policy.warnSeconds)}` : null,
-                    policy.limitSeconds !== null ? `Limit ${minutes(policy.limitSeconds)}` : null,
+                    policy.warnSeconds !== null
+                      ? t("usage.warnAt", {
+                          value: t("usage.minutes", { value: policy.warnSeconds / 60 }),
+                        })
+                      : null,
+                    policy.limitSeconds !== null
+                      ? t("usage.limitAt", {
+                          value: t("usage.minutes", { value: policy.limitSeconds / 60 }),
+                        })
+                      : null,
                   ]
                     .filter(Boolean)
                     .join(" · ")}
@@ -212,7 +216,7 @@ export function UsagePoliciesForm() {
                   }}
                   className="rounded-full px-3 py-2 text-sm text-paper/70 disabled:opacity-50"
                 >
-                  Edit
+                  {t("common.edit")}
                 </button>
                 <button
                   type="button"
@@ -220,7 +224,7 @@ export function UsagePoliciesForm() {
                   onClick={() => void remove(host)}
                   className="rounded-full px-3 py-2 text-sm text-paper/70 disabled:opacity-50"
                 >
-                  Remove
+                  {t("common.remove")}
                 </button>
               </div>
             </li>

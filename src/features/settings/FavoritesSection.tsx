@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useApp } from "../../app/store";
+import { useT } from "../../i18n/useT";
 import { QUICK_ACCESS_LIMIT } from "../../shared/favorites";
 import { DownIcon, PlusIcon, UpIcon } from "../../shared/icons";
 import type { Favorite, FavoriteInput } from "../../shared/ipc";
@@ -21,6 +22,7 @@ export function FavoritesSection() {
   const saveFavorites = useApp((s) => s.saveFavorites);
   const problem = useApp((s) => s.error);
   const [editing, setEditing] = useState<number | "new" | null>(null);
+  const t = useT();
 
   const quick = favorites.slice(0, QUICK_ACCESS_LIMIT);
   const more = favorites.slice(QUICK_ACCESS_LIMIT);
@@ -62,16 +64,13 @@ export function FavoritesSection() {
   );
 
   return (
-    <Section
-      title="Favorites"
-      note={`Keep as many as you like. The first ${QUICK_ACCESS_LIMIT} are the quick-access menu you get by holding the button; move a favorite up to put it there.`}
-    >
+    <Section title={t("favorites.title")} note={t("favorites.note", { limit: QUICK_ACCESS_LIMIT })}>
       <GroupLabel>
-        Quick access · {quick.length} of {QUICK_ACCESS_LIMIT}
+        {t("favorites.quickAccess", { count: quick.length, limit: QUICK_ACCESS_LIMIT })}
       </GroupLabel>
       {quick.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-hair px-4 py-5 text-sm text-paper/55">
-          Nothing here yet. Add a favorite below, or star a pre-made recipe.
+          {t("favorites.quickEmpty")}
         </p>
       ) : (
         <Group>{quick.map((favorite, index) => renderRow(favorite, index))}</Group>
@@ -80,7 +79,7 @@ export function FavoritesSection() {
       {more.length > 0 && (
         <details className="group/more mt-5">
           <summary className="flex cursor-pointer list-none items-center justify-between px-1 pt-1 pb-2 text-[13px] font-medium text-paper/60">
-            <span>More favorites · {more.length}</span>
+            <span>{t("favorites.more", { count: more.length })}</span>
             <span aria-hidden="true" className="text-paper/45 group-open/more:rotate-180">
               ⌄
             </span>
@@ -96,11 +95,7 @@ export function FavoritesSection() {
           <div className="overflow-hidden rounded-2xl border border-hair bg-paper/[0.04]">
             <FavoriteEditor
               initial={{ name: "", url: "" }}
-              hint={
-                favorites.length >= QUICK_ACCESS_LIMIT
-                  ? "Quick access is full, so this one is added to More favorites."
-                  : undefined
-              }
+              hint={favorites.length >= QUICK_ACCESS_LIMIT ? t("favorites.quickFull") : undefined}
               onCommit={(entry) => commit("new", entry)}
               onCancel={() => setEditing(null)}
             />
@@ -111,7 +106,7 @@ export function FavoritesSection() {
             onClick={() => setEditing("new")}
             className="flex items-center gap-2 px-1 py-1 text-sm font-medium text-accent"
           >
-            <PlusIcon /> Add favorite
+            <PlusIcon /> {t("favorites.add")}
           </button>
         )}
       </div>
@@ -144,16 +139,17 @@ function FavoriteRow({
 }: RowProps) {
   const { host } = describeAddress(favorite.url);
   const arrow = "grid size-10 place-items-center text-paper/65 disabled:opacity-20";
+  const t = useT();
 
   return (
     <div>
-      <div className="flex items-center pr-1">
+      <div className="flex items-center pe-1">
         <button
           type="button"
           aria-expanded={editing}
-          aria-label={`Edit ${favorite.name}`}
+          aria-label={t("favorites.edit", { name: favorite.name })}
           onClick={onEdit}
-          className="flex min-w-0 flex-1 items-center gap-3 py-2.5 pl-4 text-left"
+          className="flex min-w-0 flex-1 items-center gap-3 py-2.5 ps-4 text-start"
         >
           <SiteTile name={favorite.name} icon={favorite.icon} />
           <span className="min-w-0 flex-1">
@@ -163,7 +159,7 @@ function FavoriteRow({
         </button>
         <button
           type="button"
-          aria-label={`Move ${favorite.name} up`}
+          aria-label={t("favorites.moveUp", { name: favorite.name })}
           disabled={first}
           onClick={() => onMove(-1)}
           className={arrow}
@@ -172,7 +168,7 @@ function FavoriteRow({
         </button>
         <button
           type="button"
-          aria-label={`Move ${favorite.name} down`}
+          aria-label={t("favorites.moveDown", { name: favorite.name })}
           disabled={last}
           onClick={() => onMove(1)}
           className={arrow}
@@ -204,11 +200,12 @@ function FavoriteEditor({ initial, hint, onCommit, onCancel, onRemove }: EditorP
   const [name, setName] = useState(initial.name);
   const [url, setUrl] = useState(initial.url);
   const [problem, setProblem] = useState<string | null>(null);
+  const t = useT();
 
   const done = async () => {
     const address = normalizeWebUrl(url);
     if (!name.trim() || !address) {
-      setProblem("A favorite needs a name and a valid address.");
+      setProblem(t("favorites.invalid"));
       return;
     }
     await onCommit({ name: name.trim(), url: address });
@@ -217,10 +214,10 @@ function FavoriteEditor({ initial, hint, onCommit, onCancel, onRemove }: EditorP
   return (
     <div className="flex flex-col gap-2.5 border-t border-hair bg-paper/[0.03] px-4 py-3.5">
       <input
-        aria-label="Favorite name"
+        aria-label={t("favorites.nameLabel")}
         className={field}
         maxLength={MAX_FAVORITE_NAME}
-        placeholder="Name"
+        placeholder={t("favorites.namePlaceholder")}
         value={name}
         onChange={(event) => {
           setProblem(null);
@@ -228,12 +225,12 @@ function FavoriteEditor({ initial, hint, onCommit, onCancel, onRemove }: EditorP
         }}
       />
       <input
-        aria-label="Favorite address"
+        aria-label={t("favorites.addressLabel")}
         className={field}
         autoCapitalize="none"
         autoCorrect="off"
         inputMode="url"
-        placeholder="example.com"
+        placeholder={t("favorites.addressPlaceholder")}
         value={url}
         onChange={(event) => {
           setProblem(null);
@@ -245,18 +242,18 @@ function FavoriteEditor({ initial, hint, onCommit, onCancel, onRemove }: EditorP
       )}
       <div className="flex items-center gap-2">
         <button type="button" onClick={() => void done()} className={primaryButton}>
-          Save
+          {t("common.save")}
         </button>
         <button type="button" onClick={onCancel} className={quietButton}>
-          Cancel
+          {t("common.cancel")}
         </button>
         {onRemove && (
           <button
             type="button"
             onClick={onRemove}
-            className={`${quietButton} ml-auto text-red-400`}
+            className={`${quietButton} ms-auto text-red-400`}
           >
-            Remove
+            {t("common.remove")}
           </button>
         )}
       </div>

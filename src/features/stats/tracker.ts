@@ -1,5 +1,5 @@
-import { useApp, selectPage, type AppStore } from "../../app/store";
-import { errorMessage, usage } from "../../shared/ipc";
+import { appError, useApp, selectPage, type AppStore } from "../../app/store";
+import { usage } from "../../shared/ipc";
 import { advance, createAccumulator, drain, type UsageEntry } from "./accumulator";
 import { localDay } from "./format";
 import { isUsageBlocked, usagePolicies, useUsageControl } from "./policy";
@@ -34,7 +34,7 @@ export function startUsageTracking(): () => void {
     useUsageControl.getState().ready
       ? currentTarget(useApp.getState(), document.visibilityState === "visible")
       : null;
-  const fail = (error: unknown) => useApp.getState().reportError(errorMessage(error));
+  const fail = (error: unknown) => useApp.getState().reportError(appError(error));
 
   const load = async () => {
     if (loading) return;

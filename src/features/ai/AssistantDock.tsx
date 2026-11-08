@@ -1,4 +1,5 @@
 import { useApp } from "../../app/store";
+import { useT } from "../../i18n/useT";
 import { AssistantPanel } from "./AssistantPanel";
 
 /**
@@ -10,6 +11,7 @@ export function AssistantDock() {
   const sheet = useApp((s) => s.sheet);
   const openSheet = useApp((s) => s.openSheet);
   const cancel = useApp((s) => s.cancelAssistant);
+  const t = useT();
   if (sheet !== "none" || assistant.status === "idle") return null;
 
   const card =
@@ -20,7 +22,7 @@ export function AssistantDock() {
 
   return (
     <section
-      aria-label="AI assistant"
+      aria-label={t("assistant.label")}
       data-hit=""
       className="assistant-dock glass fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+12px)] z-40 max-h-[70vh] overflow-y-auto rounded-3xl p-3"
     >
@@ -30,8 +32,8 @@ export function AssistantDock() {
         <div className="flex items-center justify-between gap-3 px-2 text-sm text-paper/80">
           <span>
             {assistant.status === "preparing" || assistant.status === "sending"
-              ? "The assistant is working…"
-              : "The assistant needs you."}
+              ? t("assistant.working")
+              : t("assistant.needsYou")}
           </span>
           <span className="flex gap-2">
             <button
@@ -39,7 +41,7 @@ export function AssistantDock() {
               onClick={() => cancel()}
               className="rounded-full border border-hair px-4 py-2 text-sm font-medium text-paper/85"
             >
-              Cancel
+              {t("common.cancel")}
             </button>
             {(assistant.status === "preview" || assistant.status === "error") && (
               <button
@@ -47,7 +49,7 @@ export function AssistantDock() {
                 onClick={() => openSheet("assistant")}
                 className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-on-accent"
               >
-                Review
+                {t("assistant.review")}
               </button>
             )}
           </span>

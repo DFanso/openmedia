@@ -19,11 +19,13 @@ describe("classifyError", () => {
 
   it("never echoes unknown long text", () => {
     const long = "x".repeat(500);
-    expect(classifyError(long).message).toBe("Something went wrong. Try again.");
-    expect(classifyError(new Error("boom")).message).toBe("boom");
+    expect(classifyError(long).key).toBe("assistant.errorOther");
+    expect(classifyError(long).text).toBeNull();
+    expect(classifyError(new Error("boom")).text).toBe("boom");
   });
 
-  it("uses shell-written text for known kinds", () => {
-    expect(classifyError("The provider rejected the key.").message).toContain("Settings");
+  it("names the fixed line for known kinds", () => {
+    expect(classifyError("The provider rejected the key.").key).toBe("assistant.errorMissingKey");
+    expect(classifyError("quux").text).toBe("quux");
   });
 });

@@ -20,7 +20,6 @@ import {
 } from "../features/web/sessions";
 import {
   ai,
-  errorMessage,
   library,
   siteView,
   type AiState,
@@ -31,6 +30,9 @@ import {
   type SiteViewState,
   type Theme,
 } from "../shared/ipc";
+import { detectLocale, resolveLocale, type Locale } from "../i18n/locales";
+import { describeError } from "../i18n/errors";
+import { createTranslator } from "../i18n/translate";
 import type { Edge } from "../features/fab/geometry";
 import { loadPosition } from "../features/fab/position";
 import {
@@ -91,6 +93,8 @@ export interface AppStore {
   setSiteFavorite: (recipeId: string, favorite: boolean) => Promise<void>;
   clearHistory: () => Promise<void>;
   setTheme: (theme: Theme) => Promise<void>;
+  /** Picks the language the app is in; null puts it back on the device's language. */
+  setLocale: (locale: string | null) => Promise<void>;
   setAdBlock: (enabled: boolean) => Promise<void>;
   loadSites: () => Promise<void>;
   setSiteOption: (recipeId: string, optionId: string, enabled: boolean) => Promise<void>;
@@ -137,6 +141,18 @@ function withOption(site: SiteSettings, optionId: string, enabled: boolean): Sit
 /** The page the user is looking at. */
 export const selectPage = (store: AppStore): Session | null =>
   store.sessions.find((session) => session.id === store.activeId) ?? null;
+
+/** The language the device is set to, read once: it cannot change while the app runs. */
+const DEVICE_LOCALE = detectLocale();
+
+/** The language the app is in: the one the user picked, else the device's. */
+export const selectLocale = (store: AppStore): Locale =>
+  resolveLocale(store.state?.locale) ?? DEVICE_LOCALE;
+
+/** The message for something that went wrong, in the language the app is in. */
+export function appError(error: unknown): string {
+  return describeError(error, createTranslator(selectLocale(useApp.getState())));
+}
 
 let nonce = 0;
 
@@ -265,7 +281,7 @@ export const useApp = create<AppStore>((set, get) => {
           );
         }
       } catch (error) {
-        set({ error: errorMessage(error) });
+        set({ error: appError(error) });
       }
     },
 
@@ -291,7 +307,7 @@ export const useApp = create<AppStore>((set, get) => {
           state: current.state && { ...current.state, onboarded: false },
         }));
       } catch (error) {
-        set({ error: errorMessage(error) });
+        set({ error: appError(error) });
       }
     },
 
@@ -301,7 +317,7 @@ export const useApp = create<AppStore>((set, get) => {
         await library.completeOnboarding();
         set((current) => ({ state: current.state && { ...current.state, onboarded: true } }));
       } catch (error) {
-        set({ error: errorMessage(error) });
+        set({ error: appError(error) });
       }
     },
 
@@ -313,7 +329,7 @@ export const useApp = create<AppStore>((set, get) => {
           set((current) => ({ state: current.state && { ...current.state, history } }));
           void fetchIcons([url]);
         })
-        .catch((error: unknown) => set({ error: errorMessage(error) }));
+        .catch((error: unknown) => set({ error: appError(error) }));
     },
 
     openFavorite: (url) => {
@@ -379,7 +395,7 @@ export const useApp = create<AppStore>((set, get) => {
         adoptFavorites(await library.setFavorites(favorites));
         return true;
       } catch (error) {
-        set({ error: errorMessage(error) });
+        set({ error: appError(error) });
         return false;
       }
     },
@@ -390,7 +406,7 @@ export const useApp = create<AppStore>((set, get) => {
       try {
         adoptFavorites(await library.setSiteFavorite(recipeId, favorite));
       } catch (error) {
-        set({ sites: before, error: errorMessage(error) });
+        set({ sites: before, error: appError(error) });
       }
     },
 
@@ -401,7 +417,7 @@ export const useApp = create<AppStore>((set, get) => {
           state: current.state && { ...current.state, history: [], lastUrl: null },
         }));
       } catch (error) {
-        set({ error: errorMessage(error) });
+        set({ error: appError(error) });
       }
     },
 
@@ -414,7 +430,23 @@ export const useApp = create<AppStore>((set, get) => {
       } catch (error) {
         set((current) => ({
           state: current.state && previous ? { ...current.state, theme: previous } : current.state,
-          error: errorMessage(error),
+          error: appError(error),
+        }));
+      }
+    },
+
+    setLocale: async (locale) => {
+      const previous = get().state?.locale ?? null;
+      set((current) => ({ state: current.state && { ...current.state, locale } }));
+      try {
+        await library.setLocale(locale);
+      } catch (error) {
+        set((current) => ({
+          state:
+            current.state && previous !== undefined
+              ? { ...current.state, locale: previous }
+              : current.state,
+          error: appError(error),
         }));
       }
     },
@@ -430,7 +462,7 @@ export const useApp = create<AppStore>((set, get) => {
             current.state && previous !== undefined
               ? { ...current.state, adBlock: previous }
               : current.state,
-          error: errorMessage(error),
+          error: appError(error),
         }));
       }
     },
@@ -439,7 +471,7 @@ export const useApp = create<AppStore>((set, get) => {
       try {
         set({ sites: await library.getSites() });
       } catch (error) {
-        set({ error: errorMessage(error) });
+        set({ error: appError(error) });
       }
     },
 
@@ -449,7 +481,7 @@ export const useApp = create<AppStore>((set, get) => {
       try {
         await library.setSiteOption(recipeId, optionId, enabled);
       } catch (error) {
-        set({ sites: before, error: errorMessage(error) });
+        set({ sites: before, error: appError(error) });
       }
     },
 
@@ -458,7 +490,7 @@ export const useApp = create<AppStore>((set, get) => {
         await library.restoreRecipeOriginal(recipeId);
         set({ sites: await library.getSites() });
       } catch (error) {
-        set({ error: errorMessage(error) });
+        set({ error: appError(error) });
       }
     },
 
@@ -475,7 +507,7 @@ export const useApp = create<AppStore>((set, get) => {
             current.state && previous !== undefined
               ? { ...current.state, bottomMargin: previous }
               : current.state,
-          error: errorMessage(error),
+          error: appError(error),
         }));
       }
     },
@@ -491,7 +523,7 @@ export const useApp = create<AppStore>((set, get) => {
             current.state && previous !== undefined
               ? { ...current.state, backButton: previous }
               : current.state,
-          error: errorMessage(error),
+          error: appError(error),
         }));
       }
     },
@@ -502,7 +534,7 @@ export const useApp = create<AppStore>((set, get) => {
       try {
         await library.setSiteBottomMargin(recipeId, pixels);
       } catch (error) {
-        set({ sites: before, error: errorMessage(error) });
+        set({ sites: before, error: appError(error) });
       }
     },
     setFabEdge: (fabEdge) => set({ fabEdge }),
@@ -518,7 +550,7 @@ export const useApp = create<AppStore>((set, get) => {
             current.state && previous !== undefined
               ? { ...current.state, aiPreview: previous }
               : current.state,
-          error: errorMessage(error),
+          error: appError(error),
         }));
       }
     },

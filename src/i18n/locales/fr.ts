@@ -1,0 +1,284 @@
+import type { Messages } from "../messages";
+
+/** French. */
+export const fr: Messages = {
+  "app.dismiss": "Appuyez pour fermer",
+  "app.unknownError": "Erreur inconnue",
+
+  "web.emptyHint":
+    "Appuyez sur le bouton et saisissez une adresse, ou maintenez-le pour choisir un favori.",
+  "web.loading": "Chargement du site…",
+
+  "common.back": "Retour",
+  "common.cancel": "Annuler",
+  "common.done": "Terminé",
+  "common.edit": "Modifier",
+  "common.delete": "Supprimer",
+  "common.openSettings": "Ouvrir les réglages",
+  "common.remove": "Retirer",
+  "common.retry": "Réessayer",
+  "common.save": "Enregistrer",
+
+  "commandBar.addressLabel": "Adresse ou requête",
+  "commandBar.placeholder": "Adresse, ou demandez une modification",
+  "commandBar.go": "Aller",
+  "commandBar.forward": "Suivant",
+  "commandBar.reload": "Recharger",
+  "commandBar.close": "Fermer",
+  "commandBar.addFavorite": "Ajouter {site} aux favoris",
+  "commandBar.removeFavorite": "Retirer {site} des favoris",
+  "commandBar.openAiSettings": "Ouvrir les réglages > Assistant IA",
+
+  "fab.openFavorite": "Ouvrir {name}",
+  "fab.history": "Historique",
+  "fab.usage": "Utilisation",
+  "fab.settings": "Réglages",
+  "fab.assistant": "Assistant. Maintenez pour afficher les favoris.",
+
+  "history.title": "Historique",
+  "history.close": "Fermer l’historique",
+  "history.empty": "Aucune recherche pour le moment",
+  "history.subtitle":
+    "{count} site, du plus récent au plus ancien | {count} sites, du plus récent au plus ancien",
+  "history.emptyBody":
+    "Les sites que vous recherchez apparaissent ici. Vous pouvez les effacer à tout moment dans les réglages.",
+
+  "stats.title": "Utilisation",
+  "stats.close": "Fermer l’utilisation",
+  "stats.rangeLabel": "Période",
+  "stats.today": "Aujourd’hui",
+  "stats.days7": "7 jours",
+  "stats.days30": "30 jours",
+  "stats.timeOnSites": "Temps passé sur les sites",
+  "stats.empty":
+    "Rien n’est encore enregistré pour cette période. Le temps passé sur une page de site apparaît ici.",
+  "stats.privateTitle": "Privé sur ce téléphone",
+  "stats.privateBody":
+    "Ces informations restent sur ce téléphone et ne sont jamais envoyées ailleurs. OpenMedia n’a pas de serveur et n’en conserve aucune copie. Seuls les noms des sites, des sections (comme « Regarder » ou « Shorts ») et le temps en secondes sont enregistrés : jamais les adresses complètes, les recherches ni les titres de page. Touchez un site pour voir quelles parties vous avez utilisées.",
+  "stats.clearAll": "Effacer toutes les statistiques",
+  "stats.clear": "Effacer les statistiques",
+  "stats.durationSeconds": "{value} s",
+  "stats.durationMinutes": "{value} min",
+  "stats.durationHours": "{value} h",
+  "stats.durationHoursMinutes": "{value} h {rest} min",
+  "stats.sectionHome": "Accueil",
+  "stats.sectionOther": "Autres",
+  "stats.sectionWatch": "Regarder",
+  "stats.sectionShorts": "Shorts",
+  "stats.sectionLive": "En direct",
+  "stats.sectionExplore": "Explorer",
+  "stats.sectionSearch": "Recherche",
+  "stats.sectionNotifications": "Notifications",
+  "stats.sectionMessages": "Messages",
+  "stats.sectionFeed": "Fil",
+
+  "usage.title": "Avertissements et limites quotidiens",
+  "usage.note":
+    "Le temps passé au premier plan est comptabilisé. La remise à zéro a lieu à minuit, heure locale. Laissez un champ vide pour désactiver l’avertissement ou la limite.",
+  "usage.siteAddress": "Adresse du site",
+  "usage.warningMinutes": "Avertissement (minutes)",
+  "usage.limitMinutes": "Limite (minutes)",
+  "usage.minutes": "{value} min",
+  "usage.invalidAddress": "Saisissez une adresse de site web valide.",
+  "usage.invalidMinutes": "Les minutes doivent être un nombre entier compris entre 1 et 1440.",
+  "usage.needsOne": "Définissez un avertissement ou une limite.",
+  "usage.warningTooLate": "L’avertissement doit être plus court que la limite.",
+  "usage.none": "Aucune limite configurée.",
+  "usage.warnAt": "Avertir à {value}",
+  "usage.limitAt": "Limiter à {value}",
+  "usage.timeCheck": "Vérification du temps : {host}",
+  "usage.spentToday": "Vous avez passé {value} ici aujourd’hui.",
+  "usage.dismissLabel": "Fermer l’avertissement d’utilisation",
+  "usage.dismiss": "Fermer",
+  "usage.manage": "Gérer l’utilisation",
+  "usage.limitReachedLabel": "Limite quotidienne du site atteinte",
+  "usage.limitReached": "Limite quotidienne atteinte",
+  "usage.paused":
+    "{host} est suspendu après {value} aujourd’hui. Il redevient accessible à minuit, heure locale. Les autres sites restent accessibles.",
+
+  "onboarding.label": "Comment fonctionne OpenMedia",
+  "onboarding.skip": "Passer",
+  "onboarding.next": "Suivant",
+  "onboarding.start": "Commencer à naviguer",
+  "onboarding.tap": "Appuyez",
+  "onboarding.step1Title": "Le web, sans le bruit.",
+  "onboarding.step1Body":
+    "OpenMedia ouvre de vrais sites web et masque discrètement les éléments que vous n’avez pas demandés, comme les invites « ouvrir l’application » qui gênent.",
+  "onboarding.step2Title": "Un bouton.",
+  "onboarding.step2Body":
+    "Appuyez pour saisir une adresse et y aller. Bientôt, vous pourrez demander à l’assistant IA de modifier un site pour vous.",
+  "onboarding.step3Title": "Maintenez pour les favoris.",
+  "onboarding.step3Body":
+    "Appuyez et maintenez. Glissez jusqu’à un favori et relâchez pour l’ouvrir. Les réglages sont le petit bouton situé à l’écart des autres.",
+  "onboarding.step4Title": "Faites-le vôtre.",
+  "onboarding.step4Body":
+    "Faites glisser le bouton vers l’un des bords : il y restera. Modifiez vos favoris dans les réglages et revenez sur ce guide à tout moment.",
+
+  "settings.title": "Réglages",
+  "settings.close": "Fermer les réglages",
+  "settings.appearance": "Apparence",
+  "settings.appearanceNote":
+    "S’applique à l’application et aux sites qui suivent le mode de couleur du système.",
+  "settings.themeLabel": "Thème",
+  "settings.themeSystem": "Système",
+  "settings.themeLight": "Clair",
+  "settings.themeDark": "Sombre",
+  "settings.browsing": "Navigation",
+  "settings.browsingNote":
+    "Le blocage des publicités utilise des listes intégrées à l’application ; si un site cesse de fonctionner, désactivez-le et la page se rechargera. Le bouton de retour se place à l’opposé du bouton principal pour les sites qui n’en ont pas. Une recette prédéfinie peut définir sa propre marge inférieure.",
+  "settings.adBlock": "Bloquer les publicités et les traceurs",
+  "settings.backButton": "Bouton de retour flottant",
+  "settings.backButtonNote": "Affiché chaque fois que la page peut revenir en arrière.",
+  "settings.bottomMargin": "Marge inférieure",
+  "settings.bottomMarginNote":
+    "Garde le bas de chaque page dégagé, pour les menus qui glissent sous le bord de l’écran.",
+  "settings.bottomMarginLabel": "Marge inférieure pour tous les sites",
+  "settings.data": "Données et aide",
+  "settings.dataNote":
+    "L’historique contient les adresses que vous avez recherchées et reste uniquement sur cet appareil. L’effacer oublie aussi la dernière page : l’application démarre donc sur votre premier favori. Les pages ouvertes, les favoris et les connexions sont conservés.",
+  "settings.history": "Historique",
+  "settings.historyEmpty": "Vide",
+  "settings.historyCount": "{count} site | {count} sites",
+  "settings.clearHistory": "Effacer l’historique",
+  "settings.clearHistoryCount": "Effacer {count}",
+  "settings.guide": "Guide de première utilisation",
+  "settings.guideNote": "La marque comme non vue et l’affiche de nouveau maintenant.",
+  "settings.replay": "Revoir",
+  "settings.language": "Langue",
+  "settings.languageNote":
+    "La langue du texte de l’application et le sens d’écriture. Laissez-la sur la langue du système pour suivre l’appareil.",
+  "settings.languageLabel": "Langue de l’application",
+  "settings.languageSystem": "Langue du système",
+
+  "favorites.title": "Favoris",
+  "favorites.note":
+    "Gardez-en autant que vous voulez. Les {limit} premiers forment le menu d’accès rapide affiché en maintenant le bouton appuyé ; déplacez un favori vers le haut pour l’y placer.",
+  "favorites.quickAccess": "Accès rapide · {count} sur {limit}",
+  "favorites.quickEmpty":
+    "Rien ici pour le moment. Ajoutez un favori ci-dessous ou mettez une recette prédéfinie en favori.",
+  "favorites.more": "Autres favoris · {count}",
+  "favorites.add": "Ajouter un favori",
+  "favorites.quickFull": "L’accès rapide est plein : ce favori est ajouté aux autres favoris.",
+  "favorites.edit": "Modifier {name}",
+  "favorites.moveUp": "Déplacer {name} vers le haut",
+  "favorites.moveDown": "Déplacer {name} vers le bas",
+  "favorites.nameLabel": "Nom du favori",
+  "favorites.addressLabel": "Adresse du favori",
+  "favorites.namePlaceholder": "Nom",
+  "favorites.addressPlaceholder": "example.com",
+  "favorites.invalid": "Un favori doit avoir un nom et une adresse valide.",
+
+  "recipes.title": "Recettes prédéfinies",
+  "recipes.note":
+    "Des recettes prêtes à l’emploi pour les sites populaires. Les invites d’installation et les fenêtres contextuelles qui bloquent la page sont masquées par défaut ; Reels, Shorts et les suggestions restent visibles jusqu’à ce que vous les masquiez. La page se recharge lorsque vous changez un interrupteur. Mettez une recette en favori pour ajouter son site à vos favoris.",
+  "recipes.annoyances": "Éléments gênants · masqués par défaut",
+  "recipes.content": "Contenu · visible jusqu’à ce que vous le masquiez",
+  "recipes.groupAnnoyance": "Élément gênant",
+  "recipes.groupContent": "Contenu",
+  "recipes.nothingHidden": "Rien n’est masqué",
+  "recipes.hiddenCount": "Masqués : {count} sur {total}",
+  "recipes.options": "Options de {name}",
+  "recipes.addFavorite": "Ajouter {name} aux favoris",
+  "recipes.removeFavorite": "Retirer {name} des favoris",
+  "recipes.customized":
+    "Cette recette est votre copie modifiée : les mises à jour de l’application la laissent intacte.",
+  "recipes.originalUpdated":
+    "L’original de l’application a été mis à jour depuis votre modification.",
+  "recipes.restore": "Restaurer l’original",
+  "recipes.bottomMargin": "Marge inférieure",
+  "recipes.sharedMargin":
+    "Utilise la marge partagée. Déplacez le curseur pour donner à ce site sa propre marge.",
+  "recipes.ownMargin": "Ce site a sa propre marge.",
+  "recipes.siteMarginLabel": "Marge inférieure de {name}",
+  "recipes.useSharedMargin": "Utiliser la marge partagée",
+
+  "ai.title": "Assistant IA",
+  "ai.note":
+    "Utilisez votre propre clé. Elle est conservée dans le Keychain iOS, lisible uniquement par le cœur Rust de l’application, et envoyée uniquement au fournisseur que vous choisissez. Choisissez-en un comme fournisseur actif, puis décrivez une modification dans la barre de commande. La structure de la page (pas vos cookies, vos mots de passe ni le texte que vous saisissez) n’est envoyée à ce fournisseur que lorsque vous appuyez sur Envoyer.",
+  "ai.noProviderYet":
+    "Aucun fournisseur pour l’instant. La barre de commande ouvre uniquement les adresses.",
+  "ai.noProviderActive":
+    "Aucun fournisseur actif. La barre de commande ouvre uniquement les adresses.",
+  "ai.providerNoKey":
+    "{name} est actif mais n’a pas encore de clé. La barre de commande ouvre uniquement les adresses.",
+  "ai.providerReady": "Prêt : {name}{model} répond aux demandes dans la barre de commande.",
+  "ai.previewToggle": "Aperçu avant l’envoi",
+  "ai.previewNote":
+    "Affiche le texte exact qui serait envoyé au fournisseur et attend votre validation.",
+  "ai.keySaved": "Clé enregistrée",
+  "ai.noKey": "Aucune clé",
+  "ai.use": "Utiliser {name}",
+  "ai.addProvider": "Ajouter un fournisseur",
+  "ai.whereToGetKey": "Où obtenir une clé",
+  "ai.openrouter":
+    "OpenRouter (openrouter.ai) : variantes gratuites et modèles payants de nombreux fournisseurs. Les modèles indiqués avec :free ne génèrent aucun coût de modèle, sous réserve des limites de débit et de la disponibilité.",
+  "ai.opencode":
+    "OpenCode Zen / Console (opencode.ai/console) : modèles sélectionnés, facturés à l’usage. Ses modèles de chat gratuits nécessitent OpenCode lui-même, pas OpenMedia.",
+  "ai.local":
+    "Ollama (ollama.com) ou LM Studio (lmstudio.ai) : modèles locaux sans frais d’API de modèle ; matériel adapté requis. Choisissez Personnalisé et saisissez l’adresse de votre serveur, accessible depuis cet appareil.",
+  "ai.pricingNote":
+    "Vérifiez les tarifs, les limites d’utilisation et les politiques de confidentialité en vigueur. Les listes de modèles ne garantissent ni l’accès gratuit ni la prise en charge des sorties structurées.",
+  "ai.providerLabel": "Fournisseur",
+  "ai.providerName": "Nom du fournisseur",
+  "ai.namePlaceholder": "Nom",
+  "ai.baseUrl": "URL de base",
+  "ai.apiKey": "Clé API",
+  "ai.hide": "Masquer",
+  "ai.show": "Afficher",
+  "ai.keyInKeychain": "Une clé est enregistrée dans le Keychain.",
+  "ai.replace": "Remplacer",
+  "ai.model": "Modèle",
+  "ai.chooseModel": "Choisissez un modèle",
+  "ai.modelPlaceholder": "Modèle (testez la connexion pour les afficher)",
+  "ai.connected": "Connecté. {count} modèle disponible. | Connecté. {count} modèles disponibles.",
+  "ai.testConnection": "Tester la connexion",
+  "ai.presetCustom": "Personnalisé (compatible OpenAI)",
+
+  "assistant.label": "Assistant IA",
+  "assistant.reading": "Lecture de la page…",
+  "assistant.working": "L’assistant travaille…",
+  "assistant.needsYou": "L’assistant a besoin de vous.",
+  "assistant.payloadIntro": "Voici exactement ce qui sera envoyé à {provider}",
+  "assistant.payloadNote":
+    "Environ {count} jetons. Seule la structure de la page est transmise, sans les informations personnelles : ni cookies, ni mots de passe, ni texte saisi.",
+  "assistant.payloadLabel": "Charge utile exacte",
+  "assistant.asking": "Question à {provider}…",
+  "assistant.saving": "Enregistrement…",
+  "assistant.turnedOn": "« {option} » activé.",
+  "assistant.addedSwitch": "Interrupteur « {option} » ajouté.",
+  "assistant.findInSettings": "Trouvez-la dans les réglages > Recettes prédéfinies, sous {recipe}.",
+  "assistant.openInSettings": "Ouvrir dans les réglages",
+  "assistant.nothingChanged": "Rien n’a été modifié. L’aperçu a disparu.",
+  "assistant.askAgain": "Demander à nouveau",
+  "assistant.editRequest": "Modifier la demande",
+  "assistant.review": "Vérifier",
+  "assistant.send": "Envoyer",
+  "assistant.reject": "Refuser",
+  "assistant.accept": "Accepter",
+  "assistant.switchExists": "Cet interrupteur existe déjà",
+  "assistant.savedAsCopy": "enregistrée comme votre copie modifiée",
+  "assistant.matched": "{count} correspondances",
+  "assistant.requestQuote": "« {request} »",
+  "assistant.unmatched":
+    "{count} règle ne correspond à rien sur cette page. | {count} règles ne correspondent à rien sur cette page.",
+  "assistant.unmatchedHint":
+    "Il se peut que rien ne soit masqué à cet endroit ; vous pouvez toujours accepter le reste.",
+  "assistant.resultLive": "La page affiche maintenant le résultat. Accepter active l’interrupteur.",
+  "assistant.resultPreview":
+    "La page affiche maintenant le résultat, sans l’avoir encore enregistré.",
+  "assistant.blockedNoProvider":
+    "Ajoutez un fournisseur d’IA et une clé pour demander des modifications. La saisie d’adresses fonctionne toujours.",
+  "assistant.blockedNoPage": "Ouvrez d’abord un site, puis décrivez la modification.",
+  "assistant.errorMissingKey":
+    "Le fournisseur a besoin d’une clé valide. Vérifiez-la dans les réglages > Assistant IA.",
+  "assistant.errorRateLimit":
+    "Le fournisseur limite le débit de cette clé. Réessayez dans un instant.",
+  "assistant.errorNetwork": "Impossible de joindre le fournisseur. Vérifiez votre connexion.",
+  "assistant.errorProvider":
+    "Le fournisseur a renvoyé une erreur. Réessayez ou choisissez un autre modèle dans les réglages.",
+  "assistant.errorInvalid":
+    "La réponse du modèle n’était pas exploitable. Réessayez ou formulez la demande autrement.",
+  "assistant.errorNothingMatched":
+    "La modification proposée ne correspond à rien sur cette page. Essayez de décrire autrement ce qui doit être masqué.",
+  "assistant.errorOther": "Une erreur est survenue. Réessayez.",
+};

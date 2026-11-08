@@ -1,6 +1,8 @@
 import { useState, type CSSProperties, type ReactNode } from "react";
 import { useApp } from "../../app/store";
 import logoMark from "../../assets/logo-mark.svg";
+import { useT } from "../../i18n/useT";
+import type { MessageKey } from "../../i18n/messages";
 import { SlidersIcon } from "../../shared/icons";
 
 interface DemoItemStyle extends CSSProperties {
@@ -31,12 +33,13 @@ function BrandVisual() {
 }
 
 function TapVisual() {
+  const t = useT();
   return (
     <div className="relative grid size-56 place-items-center">
       <span className="demo-tap absolute size-14 rounded-full border-2 border-accent" />
       <MiniButton />
       <span className="absolute bottom-6 rounded-full border border-hair px-3 py-1 text-xs tracking-[0.14em] text-paper/70 uppercase">
-        Tap
+        {t("onboarding.tap")}
       </span>
     </div>
   );
@@ -92,30 +95,30 @@ function DragVisual() {
 }
 
 interface Step {
-  title: string;
-  body: ReactNode;
+  title: MessageKey;
+  body: MessageKey;
   visual: ReactNode;
 }
 
 const STEPS: Step[] = [
   {
-    title: "The web, minus the noise.",
-    body: "OpenMedia opens real websites and quietly hides the parts you did not ask for, like the “open the app” prompts that get in the way.",
+    title: "onboarding.step1Title",
+    body: "onboarding.step1Body",
     visual: <BrandVisual />,
   },
   {
-    title: "One button.",
-    body: "Tap to open an address, or ask for a change to the current site. Connect your own AI provider in Settings; you can preview what is sent before sending it.",
+    title: "onboarding.step2Title",
+    body: "onboarding.step2Body",
     visual: <TapVisual />,
   },
   {
-    title: "Hold for favorites.",
-    body: "Press and hold. Slide onto a favorite and let go to open it. Settings is the small button set apart from the rest.",
+    title: "onboarding.step3Title",
+    body: "onboarding.step3Body",
     visual: <HoldVisual />,
   },
   {
-    title: "Make it yours.",
-    body: "Drag the button to either edge and it stays there. Change your favorites in Settings, and replay this guide there any time.",
+    title: "onboarding.step4Title",
+    body: "onboarding.step4Body",
     visual: <DragVisual />,
   },
 ];
@@ -124,6 +127,7 @@ const STEPS: Step[] = [
 export function Onboarding() {
   const open = useApp((s) => s.onboardingOpen);
   const finishGuide = useApp((s) => s.finishGuide);
+  const t = useT();
   const [index, setIndex] = useState(0);
 
   if (!open) return null;
@@ -135,7 +139,7 @@ export function Onboarding() {
       data-hit=""
       role="dialog"
       aria-modal="true"
-      aria-label="How OpenMedia works"
+      aria-label={t("onboarding.label")}
       className="fixed inset-0 z-[60] flex flex-col bg-ink px-6 pt-[calc(env(safe-area-inset-top)+12px)] pb-[calc(env(safe-area-inset-bottom)+20px)]"
     >
       <div className="flex justify-end">
@@ -144,7 +148,7 @@ export function Onboarding() {
           onClick={() => void finishGuide()}
           className="px-2 py-3 text-xs tracking-[0.2em] text-paper/60 uppercase"
         >
-          Skip
+          {t("onboarding.skip")}
         </button>
       </div>
 
@@ -154,8 +158,10 @@ export function Onboarding() {
         <p className="text-xs tracking-[0.22em] text-accent uppercase">
           {index + 1} / {STEPS.length}
         </p>
-        <h1 className="mt-2 text-4xl leading-[1.05] font-semibold tracking-tight">{step.title}</h1>
-        <p className="mt-3 max-w-sm text-base leading-relaxed text-paper/65">{step.body}</p>
+        <h1 className="mt-2 text-4xl leading-[1.05] font-semibold tracking-tight">
+          {t(step.title)}
+        </h1>
+        <p className="mt-3 max-w-sm text-base leading-relaxed text-paper/65">{t(step.body)}</p>
       </div>
 
       <div className="mt-6 flex items-center justify-between">
@@ -176,7 +182,7 @@ export function Onboarding() {
               onClick={() => setIndex(index - 1)}
               className="rounded-full border border-hair px-5 py-3 text-base text-paper/80"
             >
-              Back
+              {t("common.back")}
             </button>
           )}
           <button
@@ -184,7 +190,7 @@ export function Onboarding() {
             onClick={() => (last ? void finishGuide() : setIndex(index + 1))}
             className="rounded-full bg-accent px-6 py-3 text-base font-semibold text-on-accent"
           >
-            {last ? "Start browsing" : "Next"}
+            {last ? t("onboarding.start") : t("onboarding.next")}
           </button>
         </div>
       </div>

@@ -74,6 +74,8 @@ pub struct AppState {
     pub back_button: bool,
     /// Show the exact AI payload and ask before sending it.
     pub ai_preview: bool,
+    /// The language the user picked, as a BCP 47 tag. `None` follows the device's language.
+    pub locale: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -114,6 +116,10 @@ struct LibraryData {
     /// Provider settings without keys; keys live in the OS secure store.
     #[serde(default)]
     ai: AiSettings,
+    /// The language the user picked, as a BCP 47 tag. `None` follows the device's language.
+    /// The shell owns the list of languages, so an unknown tag is kept but never used.
+    #[serde(default)]
+    locale: Option<String>,
 }
 
 /// The user's favorites, page, theme and provider settings, persisted as one JSON file. Holds no
@@ -171,7 +177,15 @@ impl Library {
             bottom_margin: data.bottom_margin,
             back_button: data.back_button,
             ai_preview: data.ai_preview,
+            locale: data.locale.clone(),
         })
+    }
+
+    /// Remembers the language the user picked. `None` puts the app back on the device's language.
+    pub fn set_locale(&self, locale: Option<String>) -> Result<()> {
+        let mut data = self.lock()?;
+        data.locale = locale;
+        self.save(&data)
     }
 
     pub fn set_favorites(&self, inputs: Vec<FavoriteInput>) -> Result<Vec<Favorite>> {
@@ -546,6 +560,7 @@ fn default_data() -> LibraryData {
         icons: BTreeMap::new(),
         history: Vec::new(),
         ai: AiSettings::default(),
+        locale: None,
     }
 }
 
@@ -820,6 +835,16 @@ mod tests {
         assert_eq!(library.state().unwrap().theme, Theme::System);
         library.set_theme(Theme::Dark).unwrap();
         assert_eq!(reload(&dir).state().unwrap().theme, Theme::Dark);
+    }
+
+    #[test]
+    fn the_language_persists_and_defaults_to_the_device_language() {
+        let (dir, library) = library();
+        assert_eq!(library.state().unwrap().locale, None);
+        library.set_locale(Some("si".to_owned())).unwrap();
+        assert_eq!(reload(&dir).state().unwrap().locale.as_deref(), Some("si"));
+        library.set_locale(None).unwrap();
+        assert_eq!(reload(&dir).state().unwrap().locale, None);
     }
 
     #[test]

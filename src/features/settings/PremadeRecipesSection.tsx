@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useApp } from "../../app/store";
+import type { MessageKey } from "../../i18n/messages";
+import { useT } from "../../i18n/useT";
 import { useIconForUrl } from "../../shared/siteIcons";
 import { DownIcon, StarIcon } from "../../shared/icons";
 import type { OptionGroup, SiteSettings } from "../../shared/ipc";
@@ -8,21 +10,18 @@ import { MarginSlider } from "./MarginSlider";
 import { Switch } from "./Switch";
 import { Group, GroupLabel, Section, quietButton } from "./ui";
 
-const GROUPS: { group: OptionGroup; title: string }[] = [
-  { group: "annoyance", title: "Annoyances · hidden by default" },
-  { group: "content", title: "Content · shown until you hide it" },
+const GROUPS: { group: OptionGroup; title: MessageKey }[] = [
+  { group: "annoyance", title: "recipes.annoyances" },
+  { group: "content", title: "recipes.content" },
 ];
 
 /** Ready-made tweaks for popular sites. The page reloads when a switch changes. */
 export function PremadeRecipesSection() {
   const sites = useApp((s) => s.sites);
+  const t = useT();
 
   return (
-    <Section
-      title="Pre-made recipes"
-      defaultOpen={false}
-      note="Ready-made recipes for popular sites. Install prompts and pop-ups that block the page are hidden by default; Reels, Shorts and suggestions are shown until you hide them. The page reloads when you change a switch. Star a recipe to add its site to your favorites."
-    >
+    <Section title={t("recipes.title")} defaultOpen={false} note={t("recipes.note")}>
       <div className="flex flex-col gap-3">
         {sites.map((site) => (
           <SiteCard key={site.recipeId} site={site} />
@@ -38,6 +37,7 @@ function SiteCard({ site }: { site: SiteSettings }) {
   const setSiteFavorite = useApp((s) => s.setSiteFavorite);
   const icon = useIconForUrl(site.homepage ?? "", favorites ?? []);
   const hidden = site.options.filter((option) => option.enabled).length;
+  const t = useT();
 
   return (
     <div className="overflow-hidden rounded-2xl border border-hair bg-paper/[0.04]">
@@ -45,15 +45,17 @@ function SiteCard({ site }: { site: SiteSettings }) {
         <button
           type="button"
           aria-expanded={open}
-          aria-label={`${site.name} options`}
+          aria-label={t("recipes.options", { name: site.name })}
           onClick={() => setOpen(!open)}
-          className="flex min-w-0 flex-1 items-center gap-3 py-3 pr-2 pl-4 text-left active:bg-paper/[0.05]"
+          className="flex min-w-0 flex-1 items-center gap-3 py-3 pe-2 ps-4 text-start active:bg-paper/[0.05]"
         >
           <SiteTile name={site.name} icon={icon} />
           <span className="min-w-0 flex-1">
             <span className="block truncate text-base font-medium">{site.name}</span>
             <span className="block text-sm text-paper/55">
-              {hidden === 0 ? "Nothing hidden" : `${hidden} of ${site.options.length} hidden`}
+              {hidden === 0
+                ? t("recipes.nothingHidden")
+                : t("recipes.hiddenCount", { count: hidden, total: site.options.length })}
             </span>
           </span>
           <span
@@ -66,9 +68,9 @@ function SiteCard({ site }: { site: SiteSettings }) {
           <button
             type="button"
             aria-pressed={site.favorite}
-            aria-label={
-              site.favorite ? `Remove ${site.name} from favorites` : `Add ${site.name} to favorites`
-            }
+            aria-label={t(site.favorite ? "recipes.removeFavorite" : "recipes.addFavorite", {
+              name: site.name,
+            })}
             onClick={() => void setSiteFavorite(site.recipeId, !site.favorite)}
             className={`grid size-12 shrink-0 place-items-center active:bg-paper/[0.05] ${
               site.favorite ? "text-accent" : "text-paper/55"
@@ -88,21 +90,22 @@ function SiteOptions({ site }: { site: SiteSettings }) {
   const setSiteBottomMargin = useApp((s) => s.setSiteBottomMargin);
   const sharedMargin = useApp((s) => s.state?.bottomMargin ?? 0);
   const restoreRecipeOriginal = useApp((s) => s.restoreRecipeOriginal);
+  const t = useT();
 
   return (
     <div className="flex flex-col gap-5 border-t border-hair px-3 py-4">
       {site.customized && (
         <div className="flex flex-col gap-2 rounded-2xl border border-hair px-4 py-3">
           <p className="text-sm leading-snug text-paper/55">
-            This recipe is your changed copy, so app updates leave it alone.
-            {site.originalUpdated && " The app's original has been updated since you changed it."}
+            {t("recipes.customized")}
+            {site.originalUpdated && ` ${t("recipes.originalUpdated")}`}
           </p>
           <button
             type="button"
             onClick={() => void restoreRecipeOriginal(site.recipeId)}
             className="self-start text-sm font-medium text-accent"
           >
-            Restore the original
+            {t("recipes.restore")}
           </button>
         </div>
       )}
@@ -111,7 +114,7 @@ function SiteOptions({ site }: { site: SiteSettings }) {
         if (options.length === 0) return null;
         return (
           <div key={group}>
-            <GroupLabel>{title}</GroupLabel>
+            <GroupLabel>{t(title)}</GroupLabel>
             <Group>
               {options.map((option) => (
                 <Switch
@@ -127,16 +130,14 @@ function SiteOptions({ site }: { site: SiteSettings }) {
         );
       })}
       <div>
-        <GroupLabel>Bottom margin</GroupLabel>
+        <GroupLabel>{t("recipes.bottomMargin")}</GroupLabel>
         <Group>
           <div className="flex flex-col gap-3 px-4 py-3.5">
             <p className="text-sm leading-snug text-paper/55">
-              {site.bottomMargin === null
-                ? "Uses the shared margin. Move the slider to give this site its own."
-                : "This site has its own margin."}
+              {site.bottomMargin === null ? t("recipes.sharedMargin") : t("recipes.ownMargin")}
             </p>
             <MarginSlider
-              label={`${site.name} bottom margin`}
+              label={t("recipes.siteMarginLabel", { name: site.name })}
               value={site.bottomMargin ?? sharedMargin}
               onCommit={(pixels) => void setSiteBottomMargin(site.recipeId, pixels)}
             />
@@ -146,7 +147,7 @@ function SiteOptions({ site }: { site: SiteSettings }) {
                 onClick={() => void setSiteBottomMargin(site.recipeId, null)}
                 className={`self-start ${quietButton}`}
               >
-                Use the shared margin
+                {t("recipes.useSharedMargin")}
               </button>
             )}
           </div>
