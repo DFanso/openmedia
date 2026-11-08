@@ -192,6 +192,20 @@ export const id: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Favorit butuh nama dan alamat yang valid.",
 
+  "fab.incognito": "Penyamaran",
+  "fab.leaveIncognito": "Keluar dari penyamaran",
+  "fab.leaveIncognitoHint": "Penyamaran · ketuk untuk keluar",
+  "incognito.authReason": "Beralih ke favorit penyamaran",
+  "incognito.unlockReason": "Tampilkan pengaturan penyamaran",
+  "incognito.favoritesTitle": "Favorit penyamaran",
+  "incognito.favoritesNote":
+    "Ditampilkan menggantikan favorit Anda selama penyamaran aktif. {limit} pertama menjadi menu akses cepat. Membuka bagian ini meminta Face ID, Touch ID, atau kode sandi setiap kali.",
+  "incognito.favoritesEmpty": "Belum ada apa pun. Tambahkan favorit di bawah.",
+  "incognito.recipesTitle": "Resep penyamaran",
+  "incognito.recipesNote":
+    "Sakelar ini hanya berlaku saat penyamaran aktif. Dimulai dari bawaan tiap resep dan tidak pernah mengubah resep biasa Anda.",
+  "incognito.locked": "Terkunci. Ketuk untuk membuka dengan Face ID, Touch ID, atau kode sandi.",
+
   "recipes.title": "Resep",
   "recipes.note":
     "Resep untuk situs populer. Ajakan memasang aplikasi dan pop-up yang menutupi halaman disembunyikan secara bawaan; Reels, Shorts, dan saran tetap ditampilkan sampai Anda menyembunyikannya. Halaman dimuat ulang saat Anda mengubah sakelar. Beri bintang pada resep untuk menambahkan situsnya ke favorit.",

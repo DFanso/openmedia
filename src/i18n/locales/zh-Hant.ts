@@ -187,6 +187,20 @@ export const zhHant: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "我的最愛需要名稱與有效的網址。",
 
+  "fab.incognito": "無痕模式",
+  "fab.leaveIncognito": "離開無痕模式",
+  "fab.leaveIncognitoHint": "無痕模式 · 點一下離開",
+  "incognito.authReason": "切換到無痕最愛",
+  "incognito.unlockReason": "顯示你的無痕設定",
+  "incognito.favoritesTitle": "無痕最愛",
+  "incognito.favoritesNote":
+    "無痕模式開啟期間，這裡的內容會取代你的最愛顯示。前 {limit} 個組成快速存取選單。每次開啟此部分都需要 Face ID、Touch ID 或密碼。",
+  "incognito.favoritesEmpty": "這裡還沒有內容。請在下方新增最愛。",
+  "incognito.recipesTitle": "無痕配方",
+  "incognito.recipesNote":
+    "這些開關僅在無痕模式下生效。它們從每個配方的預設值開始，絕不會更改你的一般配方。",
+  "incognito.locked": "已鎖定。點一下並使用 Face ID、Touch ID 或密碼解鎖。",
+
   "recipes.title": "配方",
   "recipes.note":
     "為常見網站準備好的配方。安裝提示與擋住頁面的彈出視窗預設會隱藏；Reels、Shorts 與相關內容會一直顯示，直到你把它們隱藏。切換開關後頁面會重新載入。替配方加上星號即可把它的網站加入我的最愛。",

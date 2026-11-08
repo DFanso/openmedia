@@ -149,10 +149,14 @@ export const library = {
   setLocale: (locale: string | null) => command("set_locale", { locale }),
   /** Persists the choice and reloads the open page under it; see `set_ad_block` in Rust. */
   setAdBlock: (enabled: boolean) => command("set_ad_block", { enabled }),
-  getSites: () => invoke<SiteSettings[]>("get_sites"),
-  /** Saves the toggle and reloads the open page under it; see `set_site_option` in Rust. */
-  setSiteOption: (recipeId: string, optionId: string, enabled: boolean) =>
-    command("set_site_option", { recipeId, optionId, enabled }),
+  /** The recipes with their toggles, from the normal choices or the incognito ones. */
+  getSites: (incognito: boolean) => invoke<SiteSettings[]>("get_sites", { incognito }),
+  /**
+   * Saves the toggle in the normal or the incognito set; the open page reloads under it only when
+   * that set is the one in play. See `set_site_option` in Rust.
+   */
+  setSiteOption: (recipeId: string, optionId: string, enabled: boolean, incognito: boolean) =>
+    command("set_site_option", { recipeId, optionId, enabled, incognito }),
   /** Drops the changed copy so the bundled recipe applies again; see `restore_recipe_original`. */
   restoreRecipeOriginal: (recipeId: string) => command("restore_recipe_original", { recipeId }),
   setBottomMargin: (pixels: number) => command("set_bottom_margin", { pixels }),

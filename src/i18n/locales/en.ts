@@ -198,6 +198,20 @@ export const en = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "A favorite needs a name and a valid address.",
 
+  "fab.incognito": "Incognito",
+  "fab.leaveIncognito": "Leave incognito",
+  "fab.leaveIncognitoHint": "Incognito · tap to leave",
+  "incognito.authReason": "Switch to incognito favorites",
+  "incognito.unlockReason": "Show your incognito settings",
+  "incognito.favoritesTitle": "Incognito favorites",
+  "incognito.favoritesNote":
+    "Shown instead of your favorites while incognito is on. The first {limit} are its quick-access menu. Opening this section asks for Face ID, Touch ID or your passcode each time.",
+  "incognito.favoritesEmpty": "Nothing here yet. Add a favorite below.",
+  "incognito.recipesTitle": "Incognito recipes",
+  "incognito.recipesNote":
+    "These switches apply only while incognito is on. They start from each recipe's defaults and never change your normal recipes.",
+  "incognito.locked": "Locked. Tap to unlock with Face ID, Touch ID or your passcode.",
+
   "recipes.title": "Recipes",
   "recipes.note":
     "Ready-made recipes for popular sites. Install prompts and pop-ups that block the page are hidden by default; Reels, Shorts and suggestions are shown until you hide them. The page reloads when you change a switch. Star a recipe to add its site to your favorites.",

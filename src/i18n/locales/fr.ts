@@ -200,6 +200,21 @@ export const fr: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Un favori doit avoir un nom et une adresse valide.",
 
+  "fab.incognito": "Navigation privée",
+  "fab.leaveIncognito": "Quitter la navigation privée",
+  "fab.leaveIncognitoHint": "Navigation privée · touchez pour quitter",
+  "incognito.authReason": "Passer aux favoris privés",
+  "incognito.unlockReason": "Afficher vos réglages privés",
+  "incognito.favoritesTitle": "Favoris privés",
+  "incognito.favoritesNote":
+    "Affichés à la place de vos favoris tant que la navigation privée est active. Les {limit} premiers forment son menu d'accès rapide. L'ouverture de cette section demande Face ID, Touch ID ou votre code à chaque fois.",
+  "incognito.favoritesEmpty": "Rien ici pour le moment. Ajoutez un favori ci-dessous.",
+  "incognito.recipesTitle": "Recettes privées",
+  "incognito.recipesNote":
+    "Ces interrupteurs ne s'appliquent que pendant la navigation privée. Ils partent des valeurs par défaut de chaque recette et ne modifient jamais vos recettes habituelles.",
+  "incognito.locked":
+    "Verrouillé. Touchez pour déverrouiller avec Face ID, Touch ID ou votre code.",
+
   "recipes.title": "Recettes",
   "recipes.note":
     "Des recettes prêtes à l’emploi pour les sites populaires. Les invites d’installation et les fenêtres contextuelles qui bloquent la page sont masquées par défaut ; Reels, Shorts et les suggestions restent visibles jusqu’à ce que vous les masquiez. La page se recharge lorsque vous changez un interrupteur. Mettez une recette en favori pour ajouter son site à vos favoris.",

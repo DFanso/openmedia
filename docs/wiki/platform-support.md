@@ -100,6 +100,8 @@ A single black or white frame at the moment a new page is revealed remained afte
 
 **Usage controls (iOS):** daily blocking is a native blur shield attached to each affected session. It stops loading, persistently suspends media playback, blocks navigation and touch interaction, and preserves deferred recipe reloads until the session is unblocked. The Rust-only plugin method adds no webview capability. Native Swift compilation and standalone domain checks are automated; physical-device behavior remains unverified.
 
+**Incognito (iOS):** the biometric check is a Rust-only plugin method (`authenticate` in `SiteViewPlugin.swift`) on `LocalAuthentication`. `.deviceOwnerAuthentication` tries Face ID or Touch ID first and lets the system offer the passcode after failures or when nothing is enrolled; a device with neither fails closed. The Swift code compiles for `aarch64-apple-ios-sim` and the shell flow was exercised in a browser with a mocked `invoke`; the real Face ID prompt has not been run on a simulator or device. Desktop and Android return an unsupported error.
+
 **Decisions that follow:**
 
 - **iOS 17 is the minimum.** `forIdentifier:` is iOS 17+, and the Tauri iOS template defaults to 15, so `tauri.conf.json` sets `bundle.iOS.minimumSystemVersion` to 17.0. This resolves the roadmap's open question on older iOS versions.

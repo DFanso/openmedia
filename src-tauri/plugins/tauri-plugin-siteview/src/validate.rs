@@ -12,6 +12,7 @@ pub const MAX_EVALUATE_RESULT_BYTES: usize = 200_000;
 const MAX_RULE_LIST_ID_CHARS: usize = 64;
 pub const MAX_NOTIFICATION_TITLE_CHARS: usize = 40;
 pub const MAX_NOTIFICATION_BODY_CHARS: usize = 120;
+pub const MAX_AUTH_REASON_CHARS: usize = 120;
 
 pub fn parse_web_url(input: &str) -> Result<Url> {
     let url = Url::parse(input).map_err(|e| Error::InvalidUrl(e.to_string()))?;
@@ -71,6 +72,16 @@ pub fn check_evaluate_result(json: String) -> Result<String> {
         return Err(Error::BridgeMessageInvalid);
     }
     Ok(json)
+}
+
+/// The text of the system's authentication prompt: short, one line, and not blank.
+pub fn check_auth_reason(reason: &str) -> Result<&str> {
+    let reason = reason.trim();
+    let length = reason.chars().count();
+    if length == 0 || length > MAX_AUTH_REASON_CHARS || reason.chars().any(char::is_control) {
+        return Err(Error::InvalidAuthReason(MAX_AUTH_REASON_CHARS));
+    }
+    Ok(reason)
 }
 
 /// Rule lists come from Rust, never from a page, but the native side reads `path` and hands it to
@@ -237,6 +248,26 @@ mod tests {
             wrap_evaluate_script(&huge),
             Err(Error::InvalidScript(_))
         ));
+    }
+
+    #[test]
+    fn the_prompt_reason_is_one_short_line() {
+        assert_eq!(
+            check_auth_reason("  Unlock incognito ").unwrap(),
+            "Unlock incognito"
+        );
+        for bad in [
+            "",
+            "   ",
+            "two\nlines",
+            &"x".repeat(MAX_AUTH_REASON_CHARS + 1),
+        ] {
+            assert!(
+                matches!(check_auth_reason(bad), Err(Error::InvalidAuthReason(_))),
+                "{bad:?}"
+            );
+        }
+        assert!(check_auth_reason(&"é".repeat(MAX_AUTH_REASON_CHARS)).is_ok());
     }
 
     #[test]

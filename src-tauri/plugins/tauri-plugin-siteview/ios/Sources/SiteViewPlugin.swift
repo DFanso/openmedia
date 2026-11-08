@@ -1,3 +1,4 @@
+import LocalAuthentication
 import SafariServices
 import SwiftRs
 import Tauri
@@ -128,6 +129,10 @@ class SetDocumentStartScriptArgs: Decodable {
 class SetBlockedArgs: Decodable {
   let session: String
   let blocked: Bool
+}
+
+class AuthenticateArgs: Decodable {
+  let reason: String
 }
 
 class EvaluateArgs: Decodable {
@@ -544,6 +549,35 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       }
       self.applyBlocked(args.blocked, to: session)
       invoke.resolve()
+    }
+  }
+
+  /// Asks the device owner for Face ID or Touch ID, and the device passcode when the system
+  /// offers it as the fallback. Resolves `authenticated: false` when the person cancels or fails
+  /// the check, and rejects only when the check cannot run at all (no passcode set, no
+  /// biometrics enrolled). Rust-only: the plugin registers no command for it, so neither the
+  /// shell nor a site view can raise or answer the prompt.
+  @objc public func authenticate(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(AuthenticateArgs.self)
+    let context = LAContext()
+    var unavailable: NSError?
+    guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &unavailable) else {
+      invoke.reject(
+        unavailable?.localizedDescription ?? "this device cannot check who is holding it")
+      return
+    }
+    context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: args.reason) {
+      success, error in
+      if success {
+        invoke.resolve(["authenticated": true])
+        return
+      }
+      let declined: [LAError.Code] = [.userCancel, .systemCancel, .appCancel, .authenticationFailed]
+      if let code = (error as? LAError)?.code, declined.contains(code) {
+        invoke.resolve(["authenticated": false])
+        return
+      }
+      invoke.reject(error?.localizedDescription ?? "the check could not run")
     }
   }
 

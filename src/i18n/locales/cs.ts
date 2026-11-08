@@ -199,6 +199,20 @@ export const cs: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Oblíbená stránka potřebuje název a platnou adresu.",
 
+  "fab.incognito": "Anonymní režim",
+  "fab.leaveIncognito": "Opustit anonymní režim",
+  "fab.leaveIncognitoHint": "Anonymní režim · klepnutím opustíte",
+  "incognito.authReason": "Přepnout na anonymní oblíbené",
+  "incognito.unlockReason": "Zobrazit anonymní nastavení",
+  "incognito.favoritesTitle": "Anonymní oblíbené",
+  "incognito.favoritesNote":
+    "Zobrazují se místo vašich oblíbených, dokud je anonymní režim zapnutý. Prvních {limit} tvoří nabídku rychlého přístupu. Otevření této sekce pokaždé vyžaduje Face ID, Touch ID nebo kód.",
+  "incognito.favoritesEmpty": "Zatím nic. Níže přidejte oblíbenou.",
+  "incognito.recipesTitle": "Anonymní recepty",
+  "incognito.recipesNote":
+    "Tyto přepínače platí jen při zapnutém anonymním režimu. Vycházejí z výchozích hodnot každého receptu a nikdy nemění vaše běžné recepty.",
+  "incognito.locked": "Zamčeno. Klepnutím odemknete pomocí Face ID, Touch ID nebo kódu.",
+
   "recipes.title": "Recepty",
   "recipes.note":
     "Recepty pro oblíbené weby. Výzvy k instalaci a vyskakovací okna, které blokují stránku, jsou ve výchozím stavu skryté; Reels, Shorts a návrhy se zobrazují, dokud je neskryjete. Při změně přepínače se stránka znovu načte. Hvězdičkou u receptu přidáte jeho web do oblíbených.",

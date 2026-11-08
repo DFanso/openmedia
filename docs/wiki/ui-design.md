@@ -9,8 +9,8 @@ The web is the product. The screen is one full-bleed page, from under the status
 | Gesture | Result |
 |---------|--------|
 | Tap the button | Command bar slides in from the top. Addresses open directly; requests use the active AI provider with a redacted payload preview before sending |
-| Hold the button (about 380 ms) | The favorites fan out with Usage, History and Settings in the edge column: Usage directly above History, Settings below |
-| Hold, slide onto an item, lift | Opens that favorite, Usage, History, or Settings |
+| Hold the button (about 380 ms) | The favorites fan out with Incognito, Usage, History and Settings in the edge column, top to bottom: Incognito directly above Usage, Usage directly above History, Settings last |
+| Hold, slide onto an item, lift | Opens that favorite, Usage, History or Settings, or toggles Incognito |
 | Hold, lift, then tap an item | Same, in two steps |
 | Drag the button | Moves it; on release it snaps to the nearer left or right edge and remembers its place |
 | Pull the page down from the top | Native pull-to-refresh (`UIRefreshControl`); only where the page's own scroll view is at the top |
@@ -34,14 +34,26 @@ There is no setting to turn this off in the app; iOS Settings controls it. No pu
 
 ## Settings
 
-Six collapsed-by-default disclosure sections in one scrolling screen. Settings and History share the `shared/Screen.tsx` page frame. Expand a section by tapping its heading or using the keyboard. Closing and reopening Settings restores the compact default.
+Collapsible sections in one scrolling screen, plus two locked incognito sections that start collapsed. Settings and History share the `shared/Screen.tsx` page frame. Expand a section by tapping its heading or using the keyboard. Closing and reopening Settings restores the compact default.
 
 - **Appearance:** System, Light or Dark. Stored in `library.json` and applied to the app and, through the native view's `overrideUserInterfaceStyle`, to sites that follow `prefers-color-scheme`.
 - **Browsing:** the global ad-blocking switch for the bundled EasyList and EasyPrivacy rules (changing it reloads the open pages); the floating back button switch; and the shared bottom margin, a slider (0 to 200 px, saved when released) that keeps the bottom of every page clear, for sites whose menus slide under the screen edge. A recipe can override the margin; "Use the shared margin" removes the override. The shell asks Rust which site the current page belongs to (`bottom_margin_for`) and shrinks the native view's rectangle from the bottom; the strip underneath shows the app background.
 - **Recipes:** one collapsible card per bundled recipe (18: Instagram, Facebook, X (Twitter), Reddit, YouTube, Threads, Telegram, Douyin, Messenger, Discord, Kuaishou, LinkedIn, WhatsApp, Snapchat, Pinterest, Weibo, TikTok, Twitch; WeChat and QQ have none because their logged-out pages offer nothing to hide). Each card lists its options as switches, annoyances first and then content, each with a one-line description. A switch ON means the thing is hidden. Annoyances (install prompts, pop-ups that block the page, ad slots) start ON; content (Reels, Shorts, Stories, suggestions, whole feeds) starts OFF. Changing a switch saves it and reloads the open page under the recompiled recipe script. The card also holds the recipe's bottom margin; a recipe that runs on the user's own changed copy (a [fork](./recipe-format.md#forks)) says so and offers "Restore the original". A star on each card adds the recipe's site (its `meta.homepage`) to the favorites or removes every favorite that opens it (`set_site_favorite`); a site counts as favorited when any favorite matches the recipe's `match` patterns. See [Site Playbooks](./site-playbooks.md) for what each option covers.
 - **Favorites:** a "Quick access" group (the first six) and a "More favorites" group below it. Tap a row to edit its name and address or remove it; arrows reorder, and moving across the boundary moves a favorite in or out of quick access. Every change saves at once, so the list never disagrees with the stars above it.
+- **Incognito favorites** and **Incognito recipes:** see [Incognito](#incognito). Always collapsed and locked until a biometric check passes.
 - **AI assistant:** bring-your-own-key providers. See [AI Assistant](./ai-assistant.md#implemented-provider-settings).
 - **Data and help:** "Clear history" (with a confirm step) empties the searched addresses and forgets the last page, like a browser; favorites, open sessions and logins are untouched. "Replay" marks the first-run guide unseen and shows it again.
+
+## Incognito
+
+The Incognito button (hat-and-glasses icon) is the top item of the edge column, directly above Usage. It swaps the whole quick-access set for a second, separate one and the recipe switches for a second, separate set.
+
+- **Entering** asks for Face ID, Touch ID or, when the system offers it, the device passcode. A cancelled or failed check changes nothing. Only the check's success turns incognito on (`enter_incognito`).
+- **While on:** the fan lists the incognito favorites (the first six, like the normal set); every icon in the shell turns gray (`html[data-incognito="true"]`, a CSS `grayscale(1)` on `img` and `svg`; pages are native views and are untouched); the floating button wears a small dark badge with the filled hat-and-glasses icon; and in the fan the toggle turns solid white, its lenses fill, `aria-pressed` is set, and a label reads "Incognito · tap to leave". The color is never the only cue.
+- **Leaving** is the same button again, with no check, since leaving only returns to the normal set. The state is not saved: every launch starts in the normal set, and an incognito page is never remembered as the last page. While on, typed addresses are not added to History either.
+- **Settings:** "Incognito favorites" (the same editor as Favorites) and "Incognito recipes" (the same switches as Recipes, without the star, margin and changed-copy controls). Both start collapsed with a lock icon. Expanding one asks for the check; collapsing it, closing Settings or sending the app to the background locks it again, and the next look asks again. A failed check leaves it collapsed. The incognito favorites live in the shell only while incognito is on or a section is unlocked.
+- **Recipes in incognito:** choices are kept apart (`incognitoSiteOptions` in `library.json`) and start from each recipe's defaults. Entering or leaving recompiles the page script from the set now in play; open pages reload only when the two sets compile to different scripts. A change made in one set never touches the other, and the assistant's accepted switches go to the set in play.
+- **Not private storage:** the incognito favorites and choices are plain fields in `library.json`, like everything else, and their icons share the site-icon cache. The check is a screen lock for whoever is holding the phone, not encryption. Incognito does not isolate cookies or logins: sessions still use the profile's data store. Usage time is still counted, so daily limits still apply.
 
 ## Usage
 

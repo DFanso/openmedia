@@ -196,6 +196,20 @@ export const tr: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Bir favori için ad ve geçerli adres gerekir.",
 
+  "fab.incognito": "Gizli",
+  "fab.leaveIncognito": "Gizli moddan çık",
+  "fab.leaveIncognitoHint": "Gizli · çıkmak için dokunun",
+  "incognito.authReason": "Gizli favorilere geç",
+  "incognito.unlockReason": "Gizli ayarlarınızı göster",
+  "incognito.favoritesTitle": "Gizli favoriler",
+  "incognito.favoritesNote":
+    "Gizli mod açıkken favorilerinizin yerine gösterilir. İlk {limit} tanesi hızlı erişim menüsünü oluşturur. Bu bölümü açmak her seferinde Face ID, Touch ID veya şifrenizi ister.",
+  "incognito.favoritesEmpty": "Henüz bir şey yok. Aşağıdan bir favori ekleyin.",
+  "incognito.recipesTitle": "Gizli tarifler",
+  "incognito.recipesNote":
+    "Bu anahtarlar yalnızca gizli mod açıkken geçerlidir. Her tarifin varsayılanlarından başlar ve normal tariflerinizi asla değiştirmez.",
+  "incognito.locked": "Kilitli. Face ID, Touch ID veya şifrenizle açmak için dokunun.",
+
   "recipes.title": "Tarifler",
   "recipes.note":
     "Popüler siteler için hazır tarifler. Kurulum istemleri ve sayfayı engelleyen açılır pencereler varsayılan olarak gizlidir; Reels, Shorts ve öneriler siz gizlemedikçe gösterilir. Bir anahtarı değiştirdiğinizde sayfa yeniden yüklenir. Bir tarifi yıldızlayarak sitesini favorilerinize ekleyin.",

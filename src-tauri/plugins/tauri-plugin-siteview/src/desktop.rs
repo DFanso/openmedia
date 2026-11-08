@@ -79,6 +79,10 @@ impl<R: Runtime> Siteview<R> {
         Err(Error::DesktopUnsupported)
     }
 
+    pub fn authenticate(&self, _request: AuthenticateRequest) -> Result<bool> {
+        Err(Error::DesktopUnsupported)
+    }
+
     pub fn evaluate(&self, _request: EvaluateRequest) -> Result<String> {
         Err(Error::DesktopUnsupported)
     }

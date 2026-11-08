@@ -197,6 +197,20 @@ export const nl: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Een favoriet heeft een naam en een geldig adres nodig.",
 
+  "fab.incognito": "Incognito",
+  "fab.leaveIncognito": "Incognito verlaten",
+  "fab.leaveIncognitoHint": "Incognito · tik om te verlaten",
+  "incognito.authReason": "Naar incognitofavorieten wisselen",
+  "incognito.unlockReason": "Je incognito-instellingen tonen",
+  "incognito.favoritesTitle": "Incognitofavorieten",
+  "incognito.favoritesNote":
+    "Worden getoond in plaats van je favorieten zolang incognito aan staat. De eerste {limit} vormen het snelmenu. Bij het openen van dit onderdeel wordt elke keer Face ID, Touch ID of je code gevraagd.",
+  "incognito.favoritesEmpty": "Nog niets hier. Voeg hieronder een favoriet toe.",
+  "incognito.recipesTitle": "Incognitorecepten",
+  "incognito.recipesNote":
+    "Deze schakelaars gelden alleen als incognito aan staat. Ze beginnen bij de standaardwaarden van elk recept en wijzigen je gewone recepten nooit.",
+  "incognito.locked": "Vergrendeld. Tik om te ontgrendelen met Face ID, Touch ID of je code.",
+
   "recipes.title": "Recepten",
   "recipes.note":
     "Recepten voor populaire sites. Installatiemeldingen en pop-ups die de pagina blokkeren, zijn standaard verborgen; Reels, Shorts en suggesties worden getoond tot je ze verbergt. De pagina wordt opnieuw geladen als je een schakelaar wijzigt. Markeer een recept met een ster om de site aan je favorieten toe te voegen.",

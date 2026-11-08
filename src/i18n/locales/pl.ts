@@ -197,6 +197,20 @@ export const pl: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Ulubiona wymaga nazwy i prawidłowego adresu.",
 
+  "fab.incognito": "Incognito",
+  "fab.leaveIncognito": "Wyjdź z incognito",
+  "fab.leaveIncognitoHint": "Incognito · dotknij, aby wyjść",
+  "incognito.authReason": "Przełącz na ulubione incognito",
+  "incognito.unlockReason": "Pokaż ustawienia incognito",
+  "incognito.favoritesTitle": "Ulubione incognito",
+  "incognito.favoritesNote":
+    "Pokazywane zamiast zwykłych ulubionych, gdy incognito jest włączone. Pierwsze {limit} tworzą menu szybkiego dostępu. Otwarcie tej sekcji za każdym razem wymaga Face ID, Touch ID lub kodu.",
+  "incognito.favoritesEmpty": "Na razie pusto. Dodaj ulubioną poniżej.",
+  "incognito.recipesTitle": "Przepisy incognito",
+  "incognito.recipesNote":
+    "Te przełączniki działają tylko przy włączonym incognito. Zaczynają od ustawień domyślnych każdego przepisu i nigdy nie zmieniają zwykłych przepisów.",
+  "incognito.locked": "Zablokowane. Dotknij, aby odblokować przez Face ID, Touch ID lub kod.",
+
   "recipes.title": "Przepisy",
   "recipes.note":
     "Przepisy dla popularnych witryn. Monity o instalację i wyskakujące okna zasłaniające stronę są domyślnie ukryte; Reels, Shorts i sugestie są widoczne, dopóki ich nie ukryjesz. Strona wczytuje się ponownie po zmianie przełącznika. Oznacz przepis gwiazdką, aby dodać jego witrynę do ulubionych.",

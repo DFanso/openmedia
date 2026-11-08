@@ -20,6 +20,25 @@ const asInput = ({ name, url }: Favorite): FavoriteInput => ({ name, url });
 export function FavoritesSection() {
   const favorites = useApp((s) => s.state?.favorites) ?? [];
   const saveFavorites = useApp((s) => s.saveFavorites);
+  const t = useT();
+
+  return (
+    <Section title={t("favorites.title")} note={t("favorites.note", { limit: QUICK_ACCESS_LIMIT })}>
+      <FavoritesEditor favorites={favorites} save={saveFavorites} />
+    </Section>
+  );
+}
+
+interface EditorListProps {
+  favorites: Favorite[];
+  /** Replaces the whole list; resolves true when it was saved. */
+  save: (favorites: FavoriteInput[]) => Promise<boolean>;
+  /** Shown when quick access is empty; the default points at starring a recipe. */
+  emptyText?: string;
+}
+
+/** The quick-access group, the rest, and the add button, for whichever list it is given. */
+export function FavoritesEditor({ favorites, save, emptyText }: EditorListProps) {
   const problem = useApp((s) => s.error);
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const t = useT();
@@ -29,7 +48,7 @@ export function FavoritesSection() {
 
   const replaceAll = (next: FavoriteInput[]) => {
     setEditing(null);
-    return saveFavorites(next);
+    return save(next);
   };
 
   const move = (index: number, by: -1 | 1) => {
@@ -64,13 +83,13 @@ export function FavoritesSection() {
   );
 
   return (
-    <Section title={t("favorites.title")} note={t("favorites.note", { limit: QUICK_ACCESS_LIMIT })}>
+    <>
       <GroupLabel>
         {t("favorites.quickAccess", { count: quick.length, limit: QUICK_ACCESS_LIMIT })}
       </GroupLabel>
       {quick.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-hair px-4 py-5 text-sm text-paper/55">
-          {t("favorites.quickEmpty")}
+          {emptyText ?? t("favorites.quickEmpty")}
         </p>
       ) : (
         <Group>{quick.map((favorite, index) => renderRow(favorite, index))}</Group>
@@ -112,7 +131,7 @@ export function FavoritesSection() {
       </div>
 
       {problem && <p className="mt-3 px-1 text-sm text-accent">{problem}</p>}
-    </Section>
+    </>
   );
 }
 

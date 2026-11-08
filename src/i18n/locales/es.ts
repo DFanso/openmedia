@@ -199,6 +199,20 @@ export const es: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Un favorito necesita un nombre y una dirección válida.",
 
+  "fab.incognito": "Incógnito",
+  "fab.leaveIncognito": "Salir de incógnito",
+  "fab.leaveIncognitoHint": "Incógnito · toca para salir",
+  "incognito.authReason": "Cambiar a favoritos incógnito",
+  "incognito.unlockReason": "Mostrar tus ajustes incógnito",
+  "incognito.favoritesTitle": "Favoritos incógnito",
+  "incognito.favoritesNote":
+    "Se muestran en lugar de tus favoritos mientras el modo incógnito está activo. Los primeros {limit} forman su menú de acceso rápido. Abrir esta sección pide Face ID, Touch ID o tu código cada vez.",
+  "incognito.favoritesEmpty": "Aún no hay nada. Añade un favorito abajo.",
+  "incognito.recipesTitle": "Recetas incógnito",
+  "incognito.recipesNote":
+    "Estos interruptores solo se aplican con el modo incógnito activo. Parten de los valores predeterminados de cada receta y nunca cambian tus recetas normales.",
+  "incognito.locked": "Bloqueado. Toca para desbloquear con Face ID, Touch ID o tu código.",
+
   "recipes.title": "Recetas",
   "recipes.note":
     "Recetas listas para usar de sitios populares. Los avisos de instalación y los pop-ups que bloquean la página están ocultos de forma predeterminada; Reels, Shorts y las sugerencias se muestran hasta que los ocultes. La página se recarga cuando cambias un interruptor. Marca una receta con una estrella para añadir su sitio a tus favoritos.",

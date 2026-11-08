@@ -191,6 +191,20 @@ export const ar: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "تحتاج المفضلة إلى اسم وعنوان صالح.",
 
+  "fab.incognito": "التصفح الخفي",
+  "fab.leaveIncognito": "الخروج من التصفح الخفي",
+  "fab.leaveIncognitoHint": "التصفح الخفي · المس للخروج",
+  "incognito.authReason": "التبديل إلى المفضلة الخفية",
+  "incognito.unlockReason": "عرض إعداداتك الخفية",
+  "incognito.favoritesTitle": "المفضلة الخفية",
+  "incognito.favoritesNote":
+    "تظهر بدلًا من مفضلتك ما دام التصفح الخفي مفعّلًا. أول {limit} منها تشكّل قائمة الوصول السريع. يطلب فتح هذا القسم Face ID أو Touch ID أو رمز المرور في كل مرة.",
+  "incognito.favoritesEmpty": "لا شيء هنا بعد. أضف مفضلة أدناه.",
+  "incognito.recipesTitle": "وصفات خفية",
+  "incognito.recipesNote":
+    "تسري هذه المفاتيح فقط أثناء التصفح الخفي. تبدأ من القيم الافتراضية لكل وصفة ولا تغيّر وصفاتك العادية أبدًا.",
+  "incognito.locked": "مقفل. المس للفتح باستخدام Face ID أو Touch ID أو رمز المرور.",
+
   "recipes.title": "وصفات",
   "recipes.note":
     "وصفات للمواقع الشائعة. تُخفى مطالبات التثبيت والنوافذ المنبثقة التي تعترض الصفحة افتراضيًا؛ أما Reels وShorts والاقتراحات فتظهر حتى تخفيها. تُعاد تحميل الصفحة عند تغيير أي مفتاح. ضع نجمة على وصفة لإضافة موقعها إلى مفضلتك.",

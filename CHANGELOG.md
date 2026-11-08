@@ -18,6 +18,14 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** Vitest (title parsing, rise/baseline/rate-limit rules, badge lookup), Rust validation test, all JS and Rust checks, and the plugin's Swift compiles for the iOS Simulator. **Not verified:** the permission prompt, banner and tap on a simulator or device, and real sites' titles.
 
+### feat(incognito): second quick-access set behind a biometric check
+
+**What:** A new Incognito button sits above Usage in the fan. Pressing it asks for Face ID, Touch ID or the passcode, then swaps the quick-access favorites and the recipe switches for a separate incognito set and grays every icon in the app. Pressing it again leaves, with no check.
+
+**Change:** Settings gains collapsed, locked "Incognito favorites" and "Incognito recipes" sections that ask for the check each time they open. The incognito set is never persisted as active, is kept out of `get_state`, and while on it records neither history nor the last page. The check is a Rust-only plugin method (`authenticate`), with no capability reachable from a site. See [UI Design](docs/wiki/ui-design.md#incognito) and [Security](docs/wiki/security.md).
+
+**Unverified:** The real Face ID prompt and passcode fallback on a simulator or device (the Swift builds for `aarch64-apple-ios-sim`; the shell flow ran against a mocked `invoke`); native-speaker review of the new strings. Incognito does not isolate cookies.
+
 **PR:** n/a
 
 ### fix(settings): rename "Pre-made recipes" to "Recipes"

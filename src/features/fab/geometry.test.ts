@@ -3,6 +3,7 @@ import {
   FAB_SIZE,
   FAVORITE_SIZE,
   HISTORY_SIZE,
+  INCOGNITO_SIZE,
   SETTINGS_SIZE,
   STATS_SIZE,
   fabCenter,
@@ -52,12 +53,14 @@ describe("fanLayout", () => {
             { center: layout.settings, size: SETTINGS_SIZE },
             { center: layout.history, size: HISTORY_SIZE },
             { center: layout.stats, size: STATS_SIZE },
+            { center: layout.incognito, size: INCOGNITO_SIZE },
           ];
           for (const { center, size } of items) {
             expect(center.x - size / 2).toBeGreaterThanOrEqual(0);
             expect(center.x + size / 2).toBeLessThanOrEqual(phone.width);
             expect(center.y - size / 2).toBeGreaterThanOrEqual(insets.top);
             expect(center.y + size / 2).toBeLessThanOrEqual(phone.height - insets.bottom);
+            expect(distance(center, origin)).toBeGreaterThanOrEqual((FAB_SIZE + size) / 2);
           }
           for (let i = 0; i < items.length; i++) {
             for (let j = i + 1; j < items.length; j++) {
@@ -118,6 +121,19 @@ describe("fanLayout", () => {
       }
     }
   });
+
+  it("puts incognito at the top of the column, directly above usage", () => {
+    for (const edge of edges) {
+      for (const y of heights) {
+        for (const count of [0, 6]) {
+          const origin = fabCenter(edge, y, phone, insets);
+          const layout = fanLayout(origin, edge, phone, insets, count);
+          expect(layout.incognito.x).toBe(layout.stats.x);
+          expect(layout.incognito.y).toBeLessThan(layout.stats.y);
+        }
+      }
+    }
+  });
 });
 
 describe("fanTargetAt", () => {
@@ -129,6 +145,7 @@ describe("fanTargetAt", () => {
     expect(fanTargetAt(layout.settings, layout)).toEqual({ kind: "settings" });
     expect(fanTargetAt(layout.history, layout)).toEqual({ kind: "history" });
     expect(fanTargetAt(layout.stats, layout)).toEqual({ kind: "stats" });
+    expect(fanTargetAt(layout.incognito, layout)).toEqual({ kind: "incognito" });
   });
 
   it("returns null away from every item", () => {

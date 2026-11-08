@@ -21,14 +21,19 @@ export const FAVORITE_SIZE = 52;
 export const SETTINGS_SIZE = 44;
 export const HISTORY_SIZE = 44;
 export const STATS_SIZE = 44;
+export const INCOGNITO_SIZE = 44;
 /** Centre-to-centre distance between neighbouring buttons in the settings column. */
 const COLUMN_OFFSET = 52;
+/** From the settings button up to the incognito button at the top of the column. */
+const COLUMN_REACH = 3 * COLUMN_OFFSET;
 
 const MIN_FAN_RADIUS = 108;
 const MAX_ARC_DEGREES = 120;
 const MAX_STEP_DEGREES = 30;
 const SETTINGS_DISTANCE = 132;
 const ITEM_GAP = 6;
+/** Centre-to-centre distance that keeps the column's top button clear of the floating button. */
+const COLUMN_CLEARANCE = (FAB_SIZE + INCOGNITO_SIZE) / 2 + ITEM_GAP;
 const SCREEN_PADDING = 6;
 const ARC_SCALES = [1, 0.8, 0.65, 0.5, 0.35];
 const SHIFTS = [0, ...Array.from({ length: 16 }, (_, i) => [(i + 1) * 5, -(i + 1) * 5]).flat()];
@@ -61,10 +66,12 @@ export interface FanLayout {
   settings: Point;
   history: Point;
   stats: Point;
+  incognito: Point;
 }
 
 export type FanTarget =
   | { kind: "favorite"; index: number }
+  | { kind: "incognito" }
   | { kind: "stats" }
   | { kind: "history" }
   | { kind: "settings" };
@@ -112,9 +119,11 @@ function isValid(items: FanItem[], origin: Point, viewport: Size, insets: Insets
 /**
  * Favorites sit on an arc opening away from the edge, listed top to bottom. Settings is tucked
  * on the edge column above or below the button, farther out than the arc, so it never reads as
- * a favorite, history sits directly above it in the same column and stats directly above that. When the button is near the
- * top or bottom the arc rotates, the column may flip sides, and finally the arc compacts
- * (smaller steps, larger radius) until everything fits.
+ * a favorite. History sits directly above it in the same column, usage directly above that and
+ * incognito at the top. Below the button the whole column is pushed out far enough that its top
+ * item clears the button. When the button is near the top or bottom the arc rotates, the column
+ * may flip sides, and finally the arc compacts (smaller steps, larger radius) until everything
+ * fits.
  */
 export function fanLayout(
   origin: Point,
@@ -134,9 +143,10 @@ export function fanLayout(
   const place = (scale: number, shift: number, side: number): FanLayout => {
     const step = nominalStep * scale;
     const radius = radiusFor(step);
+    const distance = Math.max(SETTINGS_DISTANCE, radius + 30);
     const settings = {
       x: origin.x,
-      y: origin.y + side * Math.max(SETTINGS_DISTANCE, radius + 30),
+      y: origin.y + (side > 0 ? Math.max(distance, COLUMN_REACH + COLUMN_CLEARANCE) : -distance),
     };
     return {
       favorites: Array.from({ length: favoriteCount }, (_, i) =>
@@ -145,6 +155,7 @@ export function fanLayout(
       settings,
       history: { x: settings.x, y: settings.y - COLUMN_OFFSET },
       stats: { x: settings.x, y: settings.y - 2 * COLUMN_OFFSET },
+      incognito: { x: settings.x, y: settings.y - 3 * COLUMN_OFFSET },
     };
   };
   const items = (layout: FanLayout): FanItem[] => [
@@ -152,6 +163,7 @@ export function fanLayout(
     { center: layout.settings, size: SETTINGS_SIZE },
     { center: layout.history, size: HISTORY_SIZE },
     { center: layout.stats, size: STATS_SIZE },
+    { center: layout.incognito, size: INCOGNITO_SIZE },
   ];
 
   for (const scale of favoriteCount > 1 ? ARC_SCALES : [1]) {
@@ -173,6 +185,7 @@ export function fanTargetAt(point: Point, layout: FanLayout): FanTarget | null {
     Math.hypot(point.x - center.x, point.y - center.y) <= size / 2 + TOUCH_SLACK;
   const index = layout.favorites.findIndex((p) => near(p, FAVORITE_SIZE));
   if (index >= 0) return { kind: "favorite", index };
+  if (near(layout.incognito, INCOGNITO_SIZE)) return { kind: "incognito" };
   if (near(layout.stats, STATS_SIZE)) return { kind: "stats" };
   if (near(layout.history, HISTORY_SIZE)) return { kind: "history" };
   return near(layout.settings, SETTINGS_SIZE) ? { kind: "settings" } : null;

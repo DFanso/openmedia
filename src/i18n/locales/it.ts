@@ -202,6 +202,20 @@ export const it: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Un preferito richiede un nome e un indirizzo valido.",
 
+  "fab.incognito": "Incognito",
+  "fab.leaveIncognito": "Esci da incognito",
+  "fab.leaveIncognitoHint": "Incognito · tocca per uscire",
+  "incognito.authReason": "Passa ai preferiti incognito",
+  "incognito.unlockReason": "Mostra le tue impostazioni incognito",
+  "incognito.favoritesTitle": "Preferiti incognito",
+  "incognito.favoritesNote":
+    "Mostrati al posto dei tuoi preferiti mentre incognito è attivo. I primi {limit} formano il menu di accesso rapido. Aprire questa sezione richiede ogni volta Face ID, Touch ID o il codice.",
+  "incognito.favoritesEmpty": "Ancora niente. Aggiungi un preferito qui sotto.",
+  "incognito.recipesTitle": "Ricette incognito",
+  "incognito.recipesNote":
+    "Questi interruttori valgono solo con incognito attivo. Partono dai valori predefiniti di ogni ricetta e non modificano mai le ricette normali.",
+  "incognito.locked": "Bloccato. Tocca per sbloccare con Face ID, Touch ID o il codice.",
+
   "recipes.title": "Ricette",
   "recipes.note":
     "Ricette per siti popolari. Gli inviti all’installazione e i pop-up che bloccano la pagina sono nascosti per impostazione predefinita; Reels, Shorts e i suggerimenti restano visibili finché non li nascondi. La pagina si ricarica quando cambi un interruttore. Metti una ricetta tra i preferiti con la stella per aggiungere il sito ai tuoi preferiti.",

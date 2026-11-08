@@ -7,6 +7,7 @@ import {
   type AssistantState,
 } from "../features/ai/flow";
 import { assistant as assistantIpc, type PreparedRequest } from "../features/ai/ipc";
+import { incognito as incognitoIpc } from "../features/incognito/ipc";
 import {
   applyState,
   findFavoriteSession,
@@ -51,6 +52,17 @@ export type SessionAction = { nonce: number } & (
   | { type: "activate"; id: string }
 );
 
+export interface IncognitoState {
+  active: boolean;
+  /**
+   * The incognito favorites. Held only while incognito is on or its Settings section is
+   * unlocked, and dropped again when both end.
+   */
+  favorites: Favorite[];
+  /** A biometric check or a switch of mode is in flight. */
+  busy: boolean;
+}
+
 export interface AppStore {
   state: AppState | null;
   error: string | null;
@@ -62,6 +74,9 @@ export interface AppStore {
   /** Edge the floating button rests on; the back button takes the other one. */
   fabEdge: Edge;
   sites: SiteSettings[];
+  incognito: IncognitoState;
+  /** The recipes with the incognito choices applied; filled while their Settings section is unlocked. */
+  incognitoSites: SiteSettings[];
   /** Provider settings, for routing the command bar; refreshed whenever the bar opens. */
   aiState: AiState | null;
   /** The assistant's step: what the user asked, what was sent, what came back. */
@@ -121,6 +136,20 @@ export interface AppStore {
   /** Drops whatever is pending (and its page preview) and returns to the empty bar. */
   cancelAssistant: (keepText?: boolean) => void;
   retryAssistant: () => Promise<void>;
+  /** Checks Face ID, Touch ID or the passcode, then switches the quick-access set to incognito. */
+  enterIncognito: () => Promise<void>;
+  /** Back to the normal set. No check. */
+  exitIncognito: () => Promise<void>;
+  /** A biometric check that changes nothing; false when cancelled or failed. */
+  unlockIncognito: () => Promise<boolean>;
+  /** Drops the incognito favorites an unlocked Settings section loaded, unless incognito is on. */
+  forgetIncognitoFavorites: () => void;
+  /** Drops the incognito recipes an unlocked Settings section loaded. */
+  forgetIncognitoSites: () => void;
+  loadIncognitoFavorites: () => Promise<void>;
+  saveIncognitoFavorites: (favorites: FavoriteInput[]) => Promise<boolean>;
+  loadIncognitoSites: () => Promise<void>;
+  setIncognitoSiteOption: (recipeId: string, optionId: string, enabled: boolean) => Promise<void>;
 }
 
 function updateSite(
@@ -144,6 +173,12 @@ function withOption(site: SiteSettings, optionId: string, enabled: boolean): Sit
 export const selectPage = (store: AppStore): Session | null =>
   store.sessions.find((session) => session.id === store.activeId) ?? null;
 
+const NO_FAVORITES: readonly Favorite[] = [];
+
+/** The favorites the floating button fans out: the incognito set while incognito, else the normal one. */
+export const selectQuickFavorites = (store: AppStore): readonly Favorite[] =>
+  store.incognito.active ? store.incognito.favorites : (store.state?.favorites ?? NO_FAVORITES);
+
 /** The language the device is set to, read once: it cannot change while the app runs. */
 const DEVICE_LOCALE = detectLocale();
 
@@ -166,6 +201,13 @@ export const useApp = create<AppStore>((set, get) => {
         favorites: current.state.favorites.map((favorite) => ({
           ...favorite,
           icon: iconForUrl(favorite.url, current.state?.favorites ?? []),
+        })),
+      },
+      incognito: {
+        ...current.incognito,
+        favorites: current.incognito.favorites.map((favorite) => ({
+          ...favorite,
+          icon: iconForUrl(favorite.url, current.incognito.favorites),
         })),
       },
     }));
@@ -194,6 +236,23 @@ export const useApp = create<AppStore>((set, get) => {
     );
     void get().loadSites();
   };
+
+  /** Takes the saved incognito favorites and fetches the icons they are missing. */
+  const adoptIncognitoFavorites = (favorites: Favorite[]) => {
+    const previous = new Set(get().incognito.favorites.map((favorite) => favorite.url));
+    set((current) => ({ incognito: { ...current.incognito, favorites }, error: null }));
+    get().trimSessions("routine");
+    applyIcons();
+    void fetchIcons(
+      favorites.filter((favorite) => !previous.has(favorite.url)).map((favorite) => favorite.url),
+    );
+    void get().loadIncognitoSites();
+  };
+
+  const setIncognitoBusy = (busy: boolean) =>
+    set((current) => ({ incognito: { ...current.incognito, busy } }));
+
+  const translate = () => createTranslator(selectLocale(get()));
 
   const markUsed = (sessions: Session[], id: string | null, now: number) =>
     sessions.map((session) => (session.id === id ? { ...session, lastUsed: now } : session));
@@ -266,6 +325,8 @@ export const useApp = create<AppStore>((set, get) => {
     action: null,
     fabEdge: loadPosition().edge,
     sites: [],
+    incognito: { active: false, favorites: [], busy: false },
+    incognitoSites: [],
     aiState: null,
     assistant: initialAssistant,
 
@@ -381,13 +442,13 @@ export const useApp = create<AppStore>((set, get) => {
       })),
 
     trimSessions: (pressure) => {
-      const { sessions, activeId, state } = get();
+      const { sessions, activeId } = get();
       const doomed = sessionsToClose(
         sessions,
         activeId,
         Date.now(),
         pressure,
-        state?.favorites ?? [],
+        selectQuickFavorites(get()),
       );
       if (doomed.length === 0) return;
       doomed.forEach((id) => void siteView.close(id).catch(() => {}));
@@ -475,7 +536,7 @@ export const useApp = create<AppStore>((set, get) => {
 
     loadSites: async () => {
       try {
-        set({ sites: await library.getSites() });
+        set({ sites: await library.getSites(false) });
       } catch (error) {
         set({ error: appError(error) });
       }
@@ -485,7 +546,7 @@ export const useApp = create<AppStore>((set, get) => {
       const before = get().sites;
       set({ sites: updateSite(before, recipeId, (site) => withOption(site, optionId, enabled)) });
       try {
-        await library.setSiteOption(recipeId, optionId, enabled);
+        await library.setSiteOption(recipeId, optionId, enabled, false);
       } catch (error) {
         set({ sites: before, error: appError(error) });
       }
@@ -494,7 +555,7 @@ export const useApp = create<AppStore>((set, get) => {
     restoreRecipeOriginal: async (recipeId) => {
       try {
         await library.restoreRecipeOriginal(recipeId);
-        set({ sites: await library.getSites() });
+        set({ sites: await library.getSites(false) });
       } catch (error) {
         set({ error: appError(error) });
       }
@@ -631,6 +692,95 @@ export const useApp = create<AppStore>((set, get) => {
       if (current.status !== "error") return;
       dropJob(current.jobId);
       await get().submitRequest(current.request);
+    },
+
+    enterIncognito: async () => {
+      if (get().incognito.busy) return;
+      setIncognitoBusy(true);
+      try {
+        const favorites = await incognitoIpc.enter(translate()("incognito.authReason"));
+        if (!favorites) {
+          setIncognitoBusy(false);
+          return;
+        }
+        set({ incognito: { active: true, favorites, busy: false }, error: null });
+        get().trimSessions("routine");
+        applyIcons();
+        void fetchIcons(favorites.map((favorite) => favorite.url));
+      } catch (error) {
+        setIncognitoBusy(false);
+        set({ error: appError(error) });
+      }
+    },
+
+    exitIncognito: async () => {
+      if (get().incognito.busy) return;
+      setIncognitoBusy(true);
+      try {
+        await incognitoIpc.exit();
+        set({ incognito: { active: false, favorites: [], busy: false }, incognitoSites: [] });
+        get().trimSessions("routine");
+      } catch (error) {
+        setIncognitoBusy(false);
+        set({ error: appError(error) });
+      }
+    },
+
+    unlockIncognito: async () => {
+      try {
+        return await incognitoIpc.unlock(translate()("incognito.unlockReason"));
+      } catch (error) {
+        set({ error: appError(error) });
+        return false;
+      }
+    },
+
+    forgetIncognitoFavorites: () =>
+      set((current) =>
+        current.incognito.active ? current : { incognito: { ...current.incognito, favorites: [] } },
+      ),
+
+    forgetIncognitoSites: () => set({ incognitoSites: [] }),
+
+    loadIncognitoFavorites: async () => {
+      try {
+        const favorites = await incognitoIpc.favorites();
+        set((current) => ({ incognito: { ...current.incognito, favorites } }));
+        applyIcons();
+        void fetchIcons(favorites.map((favorite) => favorite.url));
+      } catch (error) {
+        set({ error: appError(error) });
+      }
+    },
+
+    saveIncognitoFavorites: async (favorites) => {
+      try {
+        adoptIncognitoFavorites(await incognitoIpc.setFavorites(favorites));
+        return true;
+      } catch (error) {
+        set({ error: appError(error) });
+        return false;
+      }
+    },
+
+    loadIncognitoSites: async () => {
+      try {
+        set({ incognitoSites: await library.getSites(true) });
+      } catch (error) {
+        set({ error: appError(error) });
+      }
+    },
+
+    setIncognitoSiteOption: async (recipeId, optionId, enabled) => {
+      const before = get().incognitoSites;
+      set({
+        incognitoSites: updateSite(before, recipeId, (site) => withOption(site, optionId, enabled)),
+      });
+      try {
+        await library.setSiteOption(recipeId, optionId, enabled, true);
+      } catch (error) {
+        set({ incognitoSites: before, error: appError(error) });
+      }
     },
   };
 });

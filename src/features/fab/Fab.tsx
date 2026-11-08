@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import { useApp } from "../../app/store";
+import { selectQuickFavorites, useApp } from "../../app/store";
 import { unreadByFavorite } from "../web/unreadWatch";
 import { useT } from "../../i18n/useT";
 import { quickAccess } from "../../shared/favorites";
@@ -8,6 +8,7 @@ import {
   FAB_SIZE,
   FAVORITE_SIZE,
   HISTORY_SIZE,
+  INCOGNITO_SIZE,
   SETTINGS_SIZE,
   STATS_SIZE,
   fabCenter,
@@ -25,7 +26,7 @@ import {
   type GestureState,
 } from "./gesture";
 import { loadPosition, savePosition, type FabPosition } from "./position";
-import { HistoryIcon, SlidersIcon, StatsIcon } from "../../shared/icons";
+import { HistoryIcon, IncognitoIcon, SlidersIcon, StatsIcon } from "../../shared/icons";
 import logoMark from "../../assets/logo-mark.svg";
 
 const idle: GestureState = { phase: "idle" };
@@ -57,7 +58,10 @@ interface FanStyle extends CSSProperties {
  * the favorites and settings; slide onto one and lift, or lift and tap.
  */
 export function Fab() {
-  const favorites = useApp((s) => s.state?.favorites);
+  const favorites = useApp(selectQuickFavorites);
+  const incognito = useApp((s) => s.incognito);
+  const enterIncognito = useApp((s) => s.enterIncognito);
+  const exitIncognito = useApp((s) => s.exitIncognito);
   const sheet = useApp((s) => s.sheet);
   const openSheet = useApp((s) => s.openSheet);
   const openFavorite = useApp((s) => s.openFavorite);
@@ -73,11 +77,11 @@ export function Fab() {
   const holdTimer = useRef(0);
   const ignorePress = useRef(false);
 
-  const list = useMemo(() => quickAccess(favorites ?? []), [favorites]);
+  const list = useMemo(() => quickAccess(favorites), [favorites]);
   const sessions = useApp((s) => s.sessions);
   const activeId = useApp((s) => s.activeId);
   const unread = useMemo(
-    () => unreadByFavorite(sessions, favorites ?? [], activeId),
+    () => unreadByFavorite(sessions, favorites, activeId),
     [sessions, favorites, activeId],
   );
   const anyUnread = unread.some((count) => count > 0);
@@ -97,6 +101,8 @@ export function Fab() {
     if (target.kind === "settings") openSheet("settings");
     else if (target.kind === "history") openSheet("history");
     else if (target.kind === "stats") openSheet("stats");
+    else if (target.kind === "incognito")
+      void (incognito.active ? exitIncognito() : enterIncognito());
     else if (list[target.index]) openFavorite(list[target.index].url);
   };
 
@@ -177,7 +183,7 @@ export function Fab() {
     "--dx": `${center.x - target.x}px`,
     "--dy": `${center.y - target.y}px`,
     "--i": index,
-    "--n": list.length + 3,
+    "--n": list.length + 4,
   });
 
   const hidden = sheet !== "none" || onboardingOpen;
@@ -284,6 +290,43 @@ export function Fab() {
       <button
         type="button"
         data-open={fanOpen}
+        data-active={incognito.active}
+        aria-label={t(incognito.active ? "fab.leaveIncognito" : "fab.incognito")}
+        aria-pressed={incognito.active}
+        aria-busy={incognito.busy}
+        disabled={incognito.busy}
+        tabIndex={fanOpen ? 0 : -1}
+        onClick={() => {
+          select({ kind: "incognito" });
+          dispatch({ type: "dismiss" });
+        }}
+        style={{
+          ...fanStyle(layout.incognito, list.length + 3),
+          width: INCOGNITO_SIZE,
+          height: INCOGNITO_SIZE,
+          margin: -INCOGNITO_SIZE / 2,
+        }}
+        className={`fan-item fab-glass fixed z-20 grid place-items-center rounded-full ${
+          hover?.kind === "incognito" ? "border-accent!" : ""
+        } ${incognito.active ? "" : "text-white"} ${incognito.busy ? "animate-pulse" : ""}`}
+      >
+        <IncognitoIcon active={incognito.active} />
+        {incognito.active && (
+          <span
+            className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-[11px] font-medium tracking-[0.14em] whitespace-nowrap text-white uppercase [text-shadow:0_1px_6px_rgb(0_0_0/0.7)] ${
+              position.edge === "left"
+                ? "left-full ml-3 text-start rtl:text-end"
+                : "right-full mr-3 text-end rtl:text-start"
+            }`}
+          >
+            {t("fab.leaveIncognitoHint")}
+          </span>
+        )}
+      </button>
+
+      <button
+        type="button"
+        data-open={fanOpen}
         aria-label={t("fab.settings")}
         tabIndex={fanOpen ? 0 : -1}
         onClick={() => {
@@ -332,6 +375,14 @@ export function Fab() {
             aria-hidden="true"
             className="pointer-events-none absolute -end-0.5 -top-0.5 size-3.5 rounded-full border-2 border-ink bg-accent"
           />
+        )}
+        {incognito.active && (
+          <span
+            aria-hidden="true"
+            className="incognito-badge absolute -bottom-1 -end-1 grid size-6 place-items-center rounded-full border border-white/70 bg-black/80 text-white"
+          >
+            <IncognitoIcon active size={14} />
+          </span>
         )}
         <svg className="fab-ring" viewBox="0 0 64 64" aria-hidden="true">
           <circle cx="32" cy="32" r="31" pathLength="1" />
