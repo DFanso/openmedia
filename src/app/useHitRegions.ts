@@ -4,7 +4,7 @@ import { siteView, type Rect } from "../shared/ipc";
 const TOUCH_PADDING = 8;
 
 function measureRegions(): Rect[] {
-  return [...document.querySelectorAll<HTMLElement>("[data-hit]")]
+  return Array.from(document.querySelectorAll<HTMLElement>("[data-hit]"))
     .map((element) => element.getBoundingClientRect())
     .filter((box) => box.width > 0 && box.height > 0)
     .map((box) => ({
