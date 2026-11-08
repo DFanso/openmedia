@@ -11,7 +11,12 @@ const run = (cmd, args) => {
 if (!target) run("yarn", ["build:web"]);
 else if (target === "ios") {
   const production = flags.includes("--production");
-  run("yarn", ["tauri", "ios", "build", ...(production ? ["--export-method", "app-store-connect"] : [])]);
+  run("yarn", [
+    "tauri",
+    "ios",
+    "build",
+    ...(production ? ["--export-method", "app-store-connect"] : []),
+  ]);
 } else {
   console.error(`Unknown target "${target}". Use: yarn build [ios [--production]]`);
   process.exit(1);
