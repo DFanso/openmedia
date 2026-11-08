@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### fix(build): avoid DOM.Iterable requirement for hit regions
+
+**Change:** Use `Array.from` to iterate DOM query results without depending on the `DOM.Iterable` TypeScript library.
+
+**Verified:** `yarn build:web`, `yarn tauri android build --aab --ci` (universal AAB across four ABIs), and `jarsigner -verify` (`jar verified`).
+
 ### fix(store): add iPhone 6.1-inch screenshots
 
 **Change:** Render the eight existing App Store screens at 1179 × 2556, accepted for iPhone 6.1-inch uploads. The screenshots use the existing simulator captures and are reproducible with `scripts/render-store-assets.mjs`.
