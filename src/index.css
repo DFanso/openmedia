@@ -287,3 +287,59 @@ input {
     animation: none;
   }
 }
+
+/* Duration sliders: a filled track and a thumb big enough for a finger. `--fill` is set inline. */
+.range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 36px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.range:focus-visible {
+  outline: none;
+}
+
+.range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--color-accent) var(--fill),
+    color-mix(in srgb, var(--color-paper) 18%, transparent) var(--fill)
+  );
+}
+
+/* Right to left reverses the native slider, so the fill must grow from the right. */
+.range:dir(rtl)::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    to left,
+    var(--color-accent) var(--fill),
+    color-mix(in srgb, var(--color-paper) 18%, transparent) var(--fill)
+  );
+}
+
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -11px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--color-accent);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.35);
+  transition: transform 120ms ease-out;
+}
+
+.range:active::-webkit-slider-thumb {
+  transform: scale(1.12);
+}
+
+.range:focus-visible::-webkit-slider-thumb {
+  box-shadow:
+    0 0 0 4px rgb(6 175 248 / 0.35),
+    0 2px 6px rgb(0 0 0 / 0.35);
+}
