@@ -13,13 +13,15 @@ interface SectionProps {
   title: string;
   /** Explains the group below it, in small print. */
   note?: ReactNode;
+  /** Sections start open; a long one can start collapsed. */
+  defaultOpen?: boolean;
   children: ReactNode;
 }
 
 /** A titled block of settings. The title is small and quiet; the controls carry the weight. */
-export function Section({ title, note, children }: SectionProps) {
+export function Section({ title, note, defaultOpen = true, children }: SectionProps) {
   return (
-    <details className="group">
+    <details className="group" open={defaultOpen}>
       <summary className="flex cursor-pointer list-none items-center justify-between px-1 py-2 text-sm font-semibold text-paper">
         <span>{title}</span>
         <span aria-hidden="true" className="text-paper/45 group-open:rotate-180">
