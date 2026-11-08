@@ -41,6 +41,8 @@ body,
   color: var(--color-paper);
   font-family: var(--font-sans);
   overscroll-behavior: none;
+  /* The shell is app chrome, not a page: no pinch or double-tap zoom. */
+  touch-action: pan-x pan-y;
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
