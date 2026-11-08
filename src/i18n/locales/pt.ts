@@ -156,7 +156,7 @@ export const pt: Messages = {
   "settings.themeDark": "Escuro",
   "settings.browsing": "Navegação",
   "settings.browsingNote":
-    "O bloqueio de anúncios usa listas incorporadas ao app; se um site parar de funcionar, desative-o e a página será recarregada. O botão de voltar fica oposto ao botão principal, para sites que não têm o próprio. Uma receita pronta pode definir sua própria margem inferior.",
+    "O bloqueio de anúncios usa listas incorporadas ao app; se um site parar de funcionar, desative-o e a página será recarregada. O botão de voltar fica oposto ao botão principal, para sites que não têm o próprio. Uma receita pode definir sua própria margem inferior.",
   "settings.adBlock": "Bloquear anúncios e rastreadores",
   "settings.backButton": "Botão de voltar flutuante",
   "settings.backButtonNote": "Aparece quando a página tem para onde voltar.",
@@ -186,7 +186,7 @@ export const pt: Messages = {
     "Mantenha quantos quiser. Os primeiros {limit} formam o menu de acesso rápido que aparece ao manter o botão pressionado; mova um favorito para cima para colocá-lo ali.",
   "favorites.quickAccess": "Acesso rápido · {count} de {limit}",
   "favorites.quickEmpty":
-    "Ainda não há nada aqui. Adicione um favorito abaixo ou marque uma receita pronta com uma estrela.",
+    "Ainda não há nada aqui. Adicione um favorito abaixo ou marque uma receita com uma estrela.",
   "favorites.more": "Mais favoritos · {count}",
   "favorites.add": "Adicionar favorito",
   "favorites.quickFull": "O acesso rápido está cheio, então este foi adicionado a Mais favoritos.",
@@ -199,9 +199,9 @@ export const pt: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Um favorito precisa de nome e endereço válido.",
 
-  "recipes.title": "Receitas prontas",
+  "recipes.title": "Receitas",
   "recipes.note":
-    "Receitas prontas para sites populares. Os prompts de instalação e os pop-ups que bloqueiam a página ficam ocultos por padrão; Reels, Shorts e as sugestões aparecem até você ocultá-los. A página é recarregada quando você muda um interruptor. Marque uma receita com uma estrela para adicionar o site aos seus favoritos.",
+    "Receitas para sites populares. Os prompts de instalação e os pop-ups que bloqueiam a página ficam ocultos por padrão; Reels, Shorts e as sugestões aparecem até você ocultá-los. A página é recarregada quando você muda um interruptor. Marque uma receita com uma estrela para adicionar o site aos seus favoritos.",
   "recipes.annoyances": "Irritações · ocultas por padrão",
   "recipes.content": "Conteúdo · aparece até você ocultá-lo",
   "recipes.groupAnnoyance": "Irritação",
@@ -273,7 +273,7 @@ export const pt: Messages = {
   "assistant.saving": "Salvando…",
   "assistant.turnedOn": "“{option}” ativado.",
   "assistant.addedSwitch": "O interruptor “{option}” foi adicionado.",
-  "assistant.findInSettings": "Encontre em Configurações > Receitas prontas, em {recipe}.",
+  "assistant.findInSettings": "Encontre em Configurações > Receitas, em {recipe}.",
   "assistant.openInSettings": "Abrir nas Configurações",
   "assistant.nothingChanged": "Nada foi alterado. A pré-visualização desapareceu.",
   "assistant.askAgain": "Perguntar novamente",

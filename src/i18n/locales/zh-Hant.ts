@@ -146,7 +146,7 @@ export const zhHant: Messages = {
   "settings.themeDark": "深色",
   "settings.browsing": "瀏覽",
   "settings.browsingNote":
-    "廣告阻擋使用 App 內建的清單；若某個網站無法運作，關閉後頁面會重新載入。返回按鈕位於主要按鈕的對面，供沒有自己返回功能的網站使用。預先設定的配方可以有自己的底部邊距。",
+    "廣告阻擋使用 App 內建的清單；若某個網站無法運作，關閉後頁面會重新載入。返回按鈕位於主要按鈕的對面，供沒有自己返回功能的網站使用。配方可以有自己的底部邊距。",
   "settings.adBlock": "阻擋廣告與追蹤程式",
   "settings.backButton": "浮動返回按鈕",
   "settings.backButtonNote": "只要頁面有地方可以返回，就會顯示。",
@@ -174,7 +174,7 @@ export const zhHant: Messages = {
   "favorites.note":
     "想加多少都可以。前 {limit} 個會組成你長按按鈕時出現的快速選單；把某個我的最愛往上移就能放進去。",
   "favorites.quickAccess": "快速存取 · {limit} 個中的 {count} 個",
-  "favorites.quickEmpty": "這裡還沒有任何項目。在下方加入我的最愛，或替預先設定的配方加上星號。",
+  "favorites.quickEmpty": "這裡還沒有任何項目。在下方加入我的最愛，或替配方加上星號。",
   "favorites.more": "更多我的最愛 · {count}",
   "favorites.add": "加入我的最愛",
   "favorites.quickFull": "快速存取已滿，因此這個項目被加到「更多我的最愛」。",
@@ -187,7 +187,7 @@ export const zhHant: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "我的最愛需要名稱與有效的網址。",
 
-  "recipes.title": "預先設定的配方",
+  "recipes.title": "配方",
   "recipes.note":
     "為常見網站準備好的配方。安裝提示與擋住頁面的彈出視窗預設會隱藏；Reels、Shorts 與相關內容會一直顯示，直到你把它們隱藏。切換開關後頁面會重新載入。替配方加上星號即可把它的網站加入我的最愛。",
   "recipes.annoyances": "惱人的元素 · 預設隱藏",
@@ -258,7 +258,7 @@ export const zhHant: Messages = {
   "assistant.saving": "正在儲存…",
   "assistant.turnedOn": "已開啟「{option}」。",
   "assistant.addedSwitch": "已新增開關「{option}」。",
-  "assistant.findInSettings": "在「設定 > 預先設定的配方」中的 {recipe} 底下可以找到它。",
+  "assistant.findInSettings": "在「設定 > 配方」中的 {recipe} 底下可以找到它。",
   "assistant.openInSettings": "在設定中開啟",
   "assistant.nothingChanged": "沒有變更任何內容。預覽已關閉。",
   "assistant.askAgain": "再問一次",

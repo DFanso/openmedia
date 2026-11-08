@@ -136,7 +136,7 @@ export const library = {
     return request;
   },
   setFavorites: (favorites: FavoriteInput[]) => invoke<Favorite[]>("set_favorites", { favorites }),
-  /** Adds a pre-made recipe's site to the favorites, or removes the site's favorites. */
+  /** Adds a recipe's site to the favorites, or removes the site's favorites. */
   setSiteFavorite: (recipeId: string, favorite: boolean) =>
     invoke<Favorite[]>("set_site_favorite", { recipeId, favorite }),
   icons: () => invoke<Record<string, string>>("get_icons"),

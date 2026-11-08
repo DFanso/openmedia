@@ -8,6 +8,16 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-08
 
+### fix(settings): rename "Pre-made recipes" to "Recipes"
+
+**What:** The Settings section lists bundled recipes and the user's changed copies of them, but its name called them all pre-made.
+
+**Change:** The section is now "Recipes" in every language (title, the assistant's "Find it in Settings" hint, and the sentences that mention it); `PremadeRecipesSection` is now `RecipesSection`. README, wiki pages and code comments follow.
+
+**Unverified:** Native-speaker review of the 28 non-English strings; rendering in the running app.
+
+**PR:** n/a
+
 ### feat(i18n): app-wide translations
 
 **Change:** The shell UI is translated into 29 languages: English plus German, French, Spanish, Portuguese, Italian, Dutch, Swedish, Polish, Czech, Romanian, Greek, Russian, Ukrainian, Turkish, Arabic, Urdu, Chinese (Simplified and Traditional), Japanese, Korean, Thai, Vietnamese, Indonesian, Malay, Hindi, Bengali, Tamil and Sinhala. Settings > Language picks one or follows the device; the choice persists as `locale` in `library.json`. Arabic and Urdu lay out right to left.

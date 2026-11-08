@@ -16,7 +16,7 @@ const GROUPS: { group: OptionGroup; title: MessageKey }[] = [
 ];
 
 /** Ready-made tweaks for popular sites. The page reloads when a switch changes. */
-export function PremadeRecipesSection() {
+export function RecipesSection() {
   const sites = useApp((s) => s.sites);
   const t = useT();
 

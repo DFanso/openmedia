@@ -146,7 +146,7 @@ export const zhHans: Messages = {
   "settings.themeDark": "深色",
   "settings.browsing": "浏览",
   "settings.browsingNote":
-    "广告拦截使用应用内置的拦截列表；如果某个网站无法正常工作，可以将其关闭，页面会重新加载。返回按钮位于主按钮的对面，供那些自己没有返回按钮的网站使用。预置配方可以设置自己的底部边距。",
+    "广告拦截使用应用内置的拦截列表；如果某个网站无法正常工作，可以将其关闭，页面会重新加载。返回按钮位于主按钮的对面，供那些自己没有返回按钮的网站使用。配方可以设置自己的底部边距。",
   "settings.adBlock": "屏蔽广告和跟踪器",
   "settings.backButton": "悬浮返回按钮",
   "settings.backButtonNote": "只要页面有地方可以返回，就会显示。",
@@ -173,7 +173,7 @@ export const zhHans: Messages = {
   "favorites.note":
     "想存多少就存多少。前 {limit} 个会组成你长按按钮时出现的快捷菜单；把某个收藏上移即可放进这个菜单。",
   "favorites.quickAccess": "快捷访问 · {limit} 个中的 {count} 个",
-  "favorites.quickEmpty": "这里还什么都没有。在下方添加收藏，或给预置配方加星标。",
+  "favorites.quickEmpty": "这里还什么都没有。在下方添加收藏，或给配方加星标。",
   "favorites.more": "更多收藏 · {count}",
   "favorites.add": "添加收藏",
   "favorites.quickFull": "快捷访问已满，因此这个收藏被添加到“更多收藏”。",
@@ -186,7 +186,7 @@ export const zhHans: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "收藏需要名称和有效的网址。",
 
-  "recipes.title": "预置配方",
+  "recipes.title": "配方",
   "recipes.note":
     "为热门网站准备好的配方。默认会隐藏安装提示和遮挡页面的弹窗；Reels、Shorts 和推荐内容会一直显示，直到你把它们隐藏。切换开关后页面会重新加载。给配方加星标即可把它的网站加入收藏。",
   "recipes.annoyances": "干扰项 · 默认隐藏",
@@ -257,7 +257,7 @@ export const zhHans: Messages = {
   "assistant.saving": "正在保存…",
   "assistant.turnedOn": "已开启“{option}”。",
   "assistant.addedSwitch": "已添加开关“{option}”。",
-  "assistant.findInSettings": "在“设置 > 预置配方”中的 {recipe} 下可以找到它。",
+  "assistant.findInSettings": "在“设置 > 配方”中的 {recipe} 下可以找到它。",
   "assistant.openInSettings": "在设置中打开",
   "assistant.nothingChanged": "没有做任何更改。预览已关闭。",
   "assistant.askAgain": "再问一次",

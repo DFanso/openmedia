@@ -155,7 +155,7 @@ export const cs: Messages = {
   "settings.themeDark": "Tmavý",
   "settings.browsing": "Procházení",
   "settings.browsingNote":
-    "Blokování reklam používá seznamy zabudované v aplikaci; pokud web přestane fungovat, vypněte je a stránka se znovu načte. Tlačítko Zpět je naproti hlavnímu tlačítku, pro weby, které žádné vlastní nemají. Hotový recept může mít vlastní spodní okraj.",
+    "Blokování reklam používá seznamy zabudované v aplikaci; pokud web přestane fungovat, vypněte je a stránka se znovu načte. Tlačítko Zpět je naproti hlavnímu tlačítku, pro weby, které žádné vlastní nemají. Recept může mít vlastní spodní okraj.",
   "settings.adBlock": "Blokovat reklamy a sledovače",
   "settings.backButton": "Plovoucí tlačítko Zpět",
   "settings.backButtonNote": "Zobrazí se vždy, když je na stránce kam se vrátit.",
@@ -185,7 +185,7 @@ export const cs: Messages = {
     "Můžete mít, kolik chcete. Prvních {limit} tvoří nabídku rychlého přístupu, kterou zobrazíte podržením tlačítka; chcete-li oblíbenou stránku přidat do nabídky, posuňte ji nahoru.",
   "favorites.quickAccess": "Rychlý přístup · {count} z {limit}",
   "favorites.quickEmpty":
-    "Zatím tu nic není. Přidejte oblíbenou stránku níže, nebo označte hvězdičkou hotový recept.",
+    "Zatím tu nic není. Přidejte oblíbenou stránku níže, nebo označte hvězdičkou recept.",
   "favorites.more": "Další oblíbené · {count}",
   "favorites.add": "Přidat oblíbenou",
   "favorites.quickFull":
@@ -199,9 +199,9 @@ export const cs: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Oblíbená stránka potřebuje název a platnou adresu.",
 
-  "recipes.title": "Hotové recepty",
+  "recipes.title": "Recepty",
   "recipes.note":
-    "Hotové recepty pro oblíbené weby. Výzvy k instalaci a vyskakovací okna, které blokují stránku, jsou ve výchozím stavu skryté; Reels, Shorts a návrhy se zobrazují, dokud je neskryjete. Při změně přepínače se stránka znovu načte. Hvězdičkou u receptu přidáte jeho web do oblíbených.",
+    "Recepty pro oblíbené weby. Výzvy k instalaci a vyskakovací okna, které blokují stránku, jsou ve výchozím stavu skryté; Reels, Shorts a návrhy se zobrazují, dokud je neskryjete. Při změně přepínače se stránka znovu načte. Hvězdičkou u receptu přidáte jeho web do oblíbených.",
   "recipes.annoyances": "Rušivé prvky · ve výchozím stavu skryté",
   "recipes.content": "Obsah · zobrazený, dokud ho neskryjete",
   "recipes.groupAnnoyance": "Rušivý prvek",
@@ -273,7 +273,7 @@ export const cs: Messages = {
   "assistant.saving": "Ukládání…",
   "assistant.turnedOn": "Zapnuto „{option}“.",
   "assistant.addedSwitch": "Přidán přepínač „{option}“.",
-  "assistant.findInSettings": "Najdete ho v Nastavení > Hotové recepty, u položky {recipe}.",
+  "assistant.findInSettings": "Najdete ho v Nastavení > Recepty, u položky {recipe}.",
   "assistant.openInSettings": "Otevřít v Nastavení",
   "assistant.nothingChanged": "Nic se nezměnilo. Náhled zmizel.",
   "assistant.askAgain": "Zeptat se znovu",

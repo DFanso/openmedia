@@ -150,7 +150,7 @@ export const ms: Messages = {
   "settings.themeDark": "Gelap",
   "settings.browsing": "Pelayaran",
   "settings.browsingNote":
-    "Pemblokiran iklan guna senarai yang dibina dalam aplikasi; jika sesebuah laman terhenti berfungsi, matikan sahaja dan halaman itu akan dimuat semula. Butang kembali terletak di seberang butang utama, untuk laman yang tiada butang sendiri. Resipi siap sedia boleh menetapkan margin bawahnya sendiri.",
+    "Pemblokiran iklan guna senarai yang dibina dalam aplikasi; jika sesebuah laman terhenti berfungsi, matikan sahaja dan halaman itu akan dimuat semula. Butang kembali terletak di seberang butang utama, untuk laman yang tiada butang sendiri. Resipi boleh menetapkan margin bawahnya sendiri.",
   "settings.adBlock": "Blokir iklan dan penjejak",
   "settings.backButton": "Butang kembali terapung",
   "settings.backButtonNote": "Dipaparkan apabila halaman ada tempat untuk kembali.",
@@ -180,7 +180,7 @@ export const ms: Messages = {
     "Simpan sebanyak mana yang anda suka. {limit} yang pertama ialah menu akses pantas yang anda dapat dengan menekan butang; naikkan kegemaran untuk memindahkannya ke sana.",
   "favorites.quickAccess": "Akses pantas · {count} daripada {limit}",
   "favorites.quickEmpty":
-    "Belum ada apa-apa di sini. Tambah kegemaran di bawah, atau tandakan bintang pada resipi siap sedia.",
+    "Belum ada apa-apa di sini. Tambah kegemaran di bawah, atau tandakan bintang pada resipi.",
   "favorites.more": "Kegemaran lain · {count}",
   "favorites.add": "Tambah kegemaran",
   "favorites.quickFull": "Akses pantas sudah penuh, jadi yang ini ditambah ke Kegemaran lain.",
@@ -193,9 +193,9 @@ export const ms: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Kegemaran memerlukan nama dan alamat yang sah.",
 
-  "recipes.title": "Resipi siap sedia",
+  "recipes.title": "Resipi",
   "recipes.note":
-    "Resipi siap sedia untuk laman popular. undangan memasang aplikasi dan pop-up yang menyekat halaman disembunyikan secara lalai; Reels, Shorts dan cadangan ditunjukkan sehingga anda menyembunyikannya. Halaman dimuat semula apabila anda menukar suis. Tandakan bintang pada resipi untuk menambahkan laman itu ke kegemaran.",
+    "Resipi untuk laman popular. undangan memasang aplikasi dan pop-up yang menyekat halaman disembunyikan secara lalai; Reels, Shorts dan cadangan ditunjukkan sehingga anda menyembunyikannya. Halaman dimuat semula apabila anda menukar suis. Tandakan bintang pada resipi untuk menambahkan laman itu ke kegemaran.",
   "recipes.annoyances": "Gangguan · disembunyikan secara lalai",
   "recipes.content": "Kandungan · ditunjukkan sehingga anda menyembunyikannya",
   "recipes.groupAnnoyance": "Gangguan",
@@ -266,7 +266,7 @@ export const ms: Messages = {
   "assistant.saving": "Menyimpan…",
   "assistant.turnedOn": "Menghidupkan “{option}”.",
   "assistant.addedSwitch": "Menambah suis “{option}”.",
-  "assistant.findInSettings": "Cari dalam Tetapan > Resipi siap sedia, di bawah {recipe}.",
+  "assistant.findInSettings": "Cari dalam Tetapan > Resipi, di bawah {recipe}.",
   "assistant.openInSettings": "Buka dalam Tetapan",
   "assistant.nothingChanged": "Tiada apa-apa berubah. Pratonton telah hilang.",
   "assistant.askAgain": "Tanya lagi",

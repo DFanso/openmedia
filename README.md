@@ -27,8 +27,8 @@
 ## Highlights
 
 - **Floating button:** tap to type an address, hold to fan out your favorites (Instagram, Facebook, Twitter, Reddit, YouTube by default, with their site icons) and settings, drag it to either edge. A thin progress ring hugs its edge while held.
-- **Favorites:** star the current page, a history entry or a pre-made recipe. Edit and reorder in Settings; the first six form quick access.
-- **Pre-made recipes:** bundled site icons and per-site switches for 18 sites; hide Reels, Shorts, Stories, app prompts and more. Long Settings sections start collapsed.
+- **Favorites:** star the current page, a history entry or a recipe. Edit and reorder in Settings; the first six form quick access.
+- **Recipes:** bundled site icons and per-site switches for 18 sites; hide Reels, Shorts, Stories, app prompts and more. Long Settings sections start collapsed.
 - **Usage:** per-site foreground time with optional daily warnings and limits for any site. Top notices warn; exhausted sites are blurred, with interaction, navigation and media stopped until midnight or a policy change.
 - **Pull to refresh** on the page, and **light, dark or system** theme that sites can follow.
 - **Ad and tracker blocking:** EasyList and EasyPrivacy are built into the app and compiled to WebKit content rules, so ads and trackers are blocked before they load, with no list downloads. One switch in Settings.

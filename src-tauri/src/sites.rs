@@ -20,7 +20,7 @@ pub struct OptionView {
     pub enabled_by_default: bool,
 }
 
-/// A pre-made recipe as Settings shows it: its toggles with the user's choices applied, its
+/// A recipe as Settings shows it: its toggles with the user's choices applied, its
 /// own bottom margin if it has one, and whether the user has it among their favorites.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -90,7 +90,7 @@ fn is_favorite_of(recipes: &Recipes, recipe_id: &str, favorite: &Favorite) -> bo
         .unwrap_or(false)
 }
 
-/// The favorites after adding or removing a pre-made recipe's site. Adding appends the site's
+/// The favorites after adding or removing a recipe's site. Adding appends the site's
 /// homepage unless it is already there; removing drops every favorite that opens this site.
 pub fn with_site_favorite(
     recipes: &Recipes,

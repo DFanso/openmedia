@@ -151,7 +151,7 @@ export const ko: Messages = {
   "settings.themeDark": "어둡게",
   "settings.browsing": "탐색",
   "settings.browsingNote":
-    "광고 차단은 앱에 내장된 목록을 사용합니다. 사이트가 동작하지 않으면 끄면 페이지가 새로 고쳐집니다. 뒤로 가기 버튼은 메인 버튼의 반대편에 있으며, 자체 뒤로 가기가 없는 사이트를 위한 것입니다. 미리 준비된 레시피는 자체 하단 여백을 지정할 수 있습니다.",
+    "광고 차단은 앱에 내장된 목록을 사용합니다. 사이트가 동작하지 않으면 끄면 페이지가 새로 고쳐집니다. 뒤로 가기 버튼은 메인 버튼의 반대편에 있으며, 자체 뒤로 가기가 없는 사이트를 위한 것입니다. 레시피는 자체 하단 여백을 지정할 수 있습니다.",
   "settings.adBlock": "광고 및 추적기 차단",
   "settings.backButton": "플로팅 뒤로 가기 버튼",
   "settings.backButtonNote": "페이지에 돌아갈 곳이 있을 때 표시됩니다.",
@@ -181,7 +181,7 @@ export const ko: Messages = {
     "원하는 만큼 담아 두세요. 처음 {limit}개는 버튼을 길게 누를 때 나오는 빠른 메뉴가 됩니다. 즐겨찾기를 위로 옮기면 그 자리에 들어갑니다.",
   "favorites.quickAccess": "빠른 메뉴 · {limit}개 중 {count}개",
   "favorites.quickEmpty":
-    "아직 아무것도 없습니다. 아래에서 즐겨찾기를 추가하거나, 미리 준비된 레시피에 별을 붙이세요.",
+    "아직 아무것도 없습니다. 아래에서 즐겨찾기를 추가하거나, 레시피에 별을 붙이세요.",
   "favorites.more": "즐겨찾기 더 보기 · {count}",
   "favorites.add": "즐겨찾기 추가",
   "favorites.quickFull": "빠른 메뉴가 가득 차 이 항목은 즐겨찾기 더 보기로 추가되었습니다.",
@@ -194,7 +194,7 @@ export const ko: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "즐겨찾기에는 이름과 올바른 주소가 필요합니다.",
 
-  "recipes.title": "미리 준비된 레시피",
+  "recipes.title": "레시피",
   "recipes.note":
     "인기 사이트를 위해 만들어 둔 레시피입니다. 설치 안내와 페이지를 막는 팝업은 기본적으로 숨겨집니다. Reels와 Shorts, 추천 콘텐츠는 숨기기 전까지 표시됩니다. 스위치를 바꾸면 페이지가 새로 고쳐집니다. 레시피에 별을 붙이면 해당 사이트가 즐겨찾기에 추가됩니다.",
   "recipes.annoyances": "방해 요소 · 기본으로 숨김",
@@ -267,7 +267,7 @@ export const ko: Messages = {
   "assistant.saving": "저장하는 중…",
   "assistant.turnedOn": "“{option}”을 켰습니다.",
   "assistant.addedSwitch": "“{option}” 스위치를 추가했습니다.",
-  "assistant.findInSettings": "설정 > 미리 준비된 레시피의 {recipe} 항목에서 찾을 수 있습니다.",
+  "assistant.findInSettings": "설정 > 레시피의 {recipe} 항목에서 찾을 수 있습니다.",
   "assistant.openInSettings": "설정에서 열기",
   "assistant.nothingChanged": "변경된 내용이 없습니다. 미리보기를 닫았습니다.",
   "assistant.askAgain": "다시 묻기",

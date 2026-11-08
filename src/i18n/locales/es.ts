@@ -156,7 +156,7 @@ export const es: Messages = {
   "settings.themeDark": "Oscuro",
   "settings.browsing": "Navegación",
   "settings.browsingNote":
-    "El bloqueo de anuncios usa listas integradas en la app; si un sitio deja de funcionar, desactívalo y la página se recargará. El botón de retroceso se sitúa frente al botón principal para los sitios que no tienen uno propio. Una receta predefinida puede fijar su propio margen inferior.",
+    "El bloqueo de anuncios usa listas integradas en la app; si un sitio deja de funcionar, desactívalo y la página se recargará. El botón de retroceso se sitúa frente al botón principal para los sitios que no tienen uno propio. Una receta puede fijar su propio margen inferior.",
   "settings.adBlock": "Bloquear anuncios y rastreadores",
   "settings.backButton": "Botón de retroceso flotante",
   "settings.backButtonNote": "Se muestra cuando la página tiene a dónde volver.",
@@ -186,7 +186,7 @@ export const es: Messages = {
     "Guarda todos los que quieras. Los primeros {limit} forman el menú de acceso rápido que aparece al mantener pulsado el botón; mueve un favorito hacia arriba para incluirlo.",
   "favorites.quickAccess": "Acceso rápido · {count} de {limit}",
   "favorites.quickEmpty":
-    "Aquí no hay nada todavía. Añade un favorito abajo o marca una receta predefinida con una estrella.",
+    "Aquí no hay nada todavía. Añade un favorito abajo o marca una receta con una estrella.",
   "favorites.more": "Más favoritos · {count}",
   "favorites.add": "Añadir favorito",
   "favorites.quickFull": "El acceso rápido está lleno, así que este se añade a Más favoritos.",
@@ -199,7 +199,7 @@ export const es: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Un favorito necesita un nombre y una dirección válida.",
 
-  "recipes.title": "Recetas predefinidas",
+  "recipes.title": "Recetas",
   "recipes.note":
     "Recetas listas para usar de sitios populares. Los avisos de instalación y los pop-ups que bloquean la página están ocultos de forma predeterminada; Reels, Shorts y las sugerencias se muestran hasta que los ocultes. La página se recarga cuando cambias un interruptor. Marca una receta con una estrella para añadir su sitio a tus favoritos.",
   "recipes.annoyances": "Molestias · ocultas de forma predeterminada",
@@ -275,7 +275,7 @@ export const es: Messages = {
   "assistant.saving": "Guardando…",
   "assistant.turnedOn": "Se activó “{option}”.",
   "assistant.addedSwitch": "Se añadió el interruptor “{option}”.",
-  "assistant.findInSettings": "Encuéntralo en Ajustes > Recetas predefinidas, en {recipe}.",
+  "assistant.findInSettings": "Encuéntralo en Ajustes > Recetas, en {recipe}.",
   "assistant.openInSettings": "Abrir en Ajustes",
   "assistant.nothingChanged": "No se cambió nada. La vista previa ha desaparecido.",
   "assistant.askAgain": "Preguntar de nuevo",

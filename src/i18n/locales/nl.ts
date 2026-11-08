@@ -154,7 +154,7 @@ export const nl: Messages = {
   "settings.themeDark": "Donker",
   "settings.browsing": "Browsen",
   "settings.browsingNote":
-    "Advertentieblokkering gebruikt lijsten die in de app zijn ingebouwd; als een site niet meer werkt, zet je het uit en wordt de pagina opnieuw geladen. De terugknop staat tegenover de hoofdknop, voor sites zonder eigen terugknop. Een kant-en-klaar recept kan zijn eigen ondermarge instellen.",
+    "Advertentieblokkering gebruikt lijsten die in de app zijn ingebouwd; als een site niet meer werkt, zet je het uit en wordt de pagina opnieuw geladen. De terugknop staat tegenover de hoofdknop, voor sites zonder eigen terugknop. Een recept kan zijn eigen ondermarge instellen.",
   "settings.adBlock": "Advertenties en trackers blokkeren",
   "settings.backButton": "Zwevende terugknop",
   "settings.backButtonNote": "Wordt getoond zodra de pagina een vorige pagina heeft.",
@@ -184,7 +184,7 @@ export const nl: Messages = {
     "Bewaar er zoveel als je wilt. De eerste {limit} vormen het snelmenu dat je krijgt door de knop ingedrukt te houden; verplaats een favoriet omhoog om hem daar te zetten.",
   "favorites.quickAccess": "Snelle toegang · {count} van {limit}",
   "favorites.quickEmpty":
-    "Hier staat nog niets. Voeg hieronder een favoriet toe, of markeer een kant-en-klaar recept met een ster.",
+    "Hier staat nog niets. Voeg hieronder een favoriet toe, of markeer een recept met een ster.",
   "favorites.more": "Meer favorieten · {count}",
   "favorites.add": "Favoriet toevoegen",
   "favorites.quickFull": "Snelle toegang is vol, dus deze wordt toegevoegd aan Meer favorieten.",
@@ -197,9 +197,9 @@ export const nl: Messages = {
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Een favoriet heeft een naam en een geldig adres nodig.",
 
-  "recipes.title": "Kant-en-klare recepten",
+  "recipes.title": "Recepten",
   "recipes.note":
-    "Kant-en-klare recepten voor populaire sites. Installatiemeldingen en pop-ups die de pagina blokkeren, zijn standaard verborgen; Reels, Shorts en suggesties worden getoond tot je ze verbergt. De pagina wordt opnieuw geladen als je een schakelaar wijzigt. Markeer een recept met een ster om de site aan je favorieten toe te voegen.",
+    "Recepten voor populaire sites. Installatiemeldingen en pop-ups die de pagina blokkeren, zijn standaard verborgen; Reels, Shorts en suggesties worden getoond tot je ze verbergt. De pagina wordt opnieuw geladen als je een schakelaar wijzigt. Markeer een recept met een ster om de site aan je favorieten toe te voegen.",
   "recipes.annoyances": "Hinderlijke dingen · standaard verborgen",
   "recipes.content": "Inhoud · getoond tot je het verbergt",
   "recipes.groupAnnoyance": "Hinder",
@@ -271,7 +271,7 @@ export const nl: Messages = {
   "assistant.saving": "Opslaan…",
   "assistant.turnedOn": "“{option}” ingeschakeld.",
   "assistant.addedSwitch": "De schakelaar “{option}” is toegevoegd.",
-  "assistant.findInSettings": "Vind hem in Instellingen > Kant-en-klare recepten, onder {recipe}.",
+  "assistant.findInSettings": "Vind hem in Instellingen > Recepten, onder {recipe}.",
   "assistant.openInSettings": "Openen in Instellingen",
   "assistant.nothingChanged": "Er is niets gewijzigd. Het voorbeeld is verdwenen.",
   "assistant.askAgain": "Opnieuw vragen",
