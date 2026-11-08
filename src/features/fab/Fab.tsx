@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { useApp } from "../../app/store";
+import { useT } from "../../i18n/useT";
 import { quickAccess } from "../../shared/favorites";
 import { useInsets, useViewport } from "../../shared/viewport";
 import {
@@ -50,6 +51,7 @@ export function Fab() {
   const openFavorite = useApp((s) => s.openFavorite);
   const onboardingOpen = useApp((s) => s.onboardingOpen);
   const setFabEdge = useApp((s) => s.setFabEdge);
+  const t = useT();
   const viewport = useViewport();
   const insets = useInsets();
 
@@ -178,7 +180,7 @@ export function Fab() {
           key={favorite.id}
           type="button"
           data-open={fanOpen}
-          aria-label={`Open ${favorite.name}`}
+          aria-label={t("fab.openFavorite", { name: favorite.name })}
           tabIndex={fanOpen ? 0 : -1}
           onClick={() => {
             select({ kind: "favorite", index });
@@ -201,7 +203,9 @@ export function Fab() {
           )}
           <span
             className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-[11px] font-medium tracking-[0.14em] whitespace-nowrap text-white uppercase [text-shadow:0_1px_6px_rgb(0_0_0/0.7)] ${
-              position.edge === "left" ? "left-full ml-3" : "right-full mr-3 text-right"
+              position.edge === "left"
+                ? "left-full ml-3 text-start rtl:text-end"
+                : "right-full mr-3 text-end rtl:text-start"
             }`}
           >
             {favorite.name}
@@ -212,7 +216,7 @@ export function Fab() {
       <button
         type="button"
         data-open={fanOpen}
-        aria-label="History"
+        aria-label={t("fab.history")}
         tabIndex={fanOpen ? 0 : -1}
         onClick={() => {
           select({ kind: "history" });
@@ -234,7 +238,7 @@ export function Fab() {
       <button
         type="button"
         data-open={fanOpen}
-        aria-label="Usage"
+        aria-label={t("fab.usage")}
         tabIndex={fanOpen ? 0 : -1}
         onClick={() => {
           select({ kind: "stats" });
@@ -256,7 +260,7 @@ export function Fab() {
       <button
         type="button"
         data-open={fanOpen}
-        aria-label="Settings"
+        aria-label={t("fab.settings")}
         tabIndex={fanOpen ? 0 : -1}
         onClick={() => {
           select({ kind: "settings" });
@@ -279,7 +283,7 @@ export function Fab() {
         type="button"
         data-hit={hidden ? undefined : ""}
         data-hold={holdState}
-        aria-label="Assistant. Hold for favorites."
+        aria-label={t("fab.assistant")}
         aria-expanded={fanOpen}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}

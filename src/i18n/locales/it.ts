@@ -1,0 +1,281 @@
+import type { Messages } from "../messages";
+
+/** Italian. */
+export const it: Messages = {
+  "app.dismiss": "Tocca per chiudere",
+  "app.unknownError": "Errore sconosciuto",
+
+  "web.emptyHint":
+    "Tocca il pulsante e digita un indirizzo, oppure tieni premuto per scegliere un preferito.",
+  "web.loading": "Caricamento del sito…",
+
+  "common.back": "Indietro",
+  "common.cancel": "Annulla",
+  "common.done": "Fine",
+  "common.edit": "Modifica",
+  "common.delete": "Elimina",
+  "common.openSettings": "Apri Impostazioni",
+  "common.remove": "Rimuovi",
+  "common.retry": "Riprova",
+  "common.save": "Salva",
+
+  "commandBar.addressLabel": "Indirizzo o richiesta",
+  "commandBar.placeholder": "Indirizzo, oppure chiedi una modifica",
+  "commandBar.go": "Vai",
+  "commandBar.forward": "Avanti",
+  "commandBar.reload": "Ricarica",
+  "commandBar.close": "Chiudi",
+  "commandBar.addFavorite": "Aggiungi {site} ai preferiti",
+  "commandBar.removeFavorite": "Rimuovi {site} dai preferiti",
+  "commandBar.openAiSettings": "Apri Impostazioni > Assistente IA",
+
+  "fab.openFavorite": "Apri {name}",
+  "fab.history": "Cronologia",
+  "fab.usage": "Utilizzo",
+  "fab.settings": "Impostazioni",
+  "fab.assistant": "Assistente. Tieni premuto per i preferiti.",
+
+  "history.title": "Cronologia",
+  "history.close": "Chiudi cronologia",
+  "history.empty": "Non hai ancora cercato nulla",
+  "history.subtitle":
+    "{count} sito, dal più recente al più vecchio | {count} siti, dal più recente al più vecchio",
+  "history.emptyBody":
+    "Qui compaiono i siti che cerchi. Puoi cancellarli in qualsiasi momento dalle Impostazioni.",
+
+  "stats.title": "Utilizzo",
+  "stats.close": "Chiudi utilizzo",
+  "stats.rangeLabel": "Intervallo di tempo",
+  "stats.today": "Oggi",
+  "stats.days7": "7 giorni",
+  "stats.days30": "30 giorni",
+  "stats.timeOnSites": "Tempo sui siti",
+  "stats.empty":
+    "Non è ancora stato registrato nulla per questo periodo. Il tempo trascorso su una pagina di un sito viene mostrato qui.",
+  "stats.privateTitle": "Privato su questo telefono",
+  "stats.privateBody":
+    "Queste informazioni restano su questo telefono e non vengono mai inviate altrove. OpenMedia non ha server e non conserva copie. Vengono memorizzati solo nomi di siti e di sezioni (come “Guarda” o “Shorts”) e i secondi: mai indirizzi completi, ricerche o titoli di pagina. Tocca un sito per vedere quali parti hai usato.",
+  "stats.clearAll": "Cancella tutte le statistiche",
+  "stats.clear": "Cancella statistiche",
+  "stats.durationSeconds": "{value} s",
+  "stats.durationMinutes": "{value} min",
+  "stats.durationHours": "{value} h",
+  "stats.durationHoursMinutes": "{value} h {rest} min",
+  "stats.sectionHome": "Home",
+  "stats.sectionOther": "Altro",
+  "stats.sectionWatch": "Guarda",
+  "stats.sectionShorts": "Shorts",
+  "stats.sectionLive": "In diretta",
+  "stats.sectionExplore": "Esplora",
+  "stats.sectionSearch": "Ricerca",
+  "stats.sectionNotifications": "Notifiche",
+  "stats.sectionMessages": "Messaggi",
+  "stats.sectionFeed": "Feed",
+
+  "usage.title": "Avvisi e limiti giornalieri",
+  "usage.note":
+    "Il tempo in primo piano viene registrato. Si azzera a mezzanotte locale. Lascia vuoto il campo per disattivare l’avviso o il limite.",
+  "usage.siteAddress": "Indirizzo del sito",
+  "usage.warningMinutes": "Avviso (minuti)",
+  "usage.limitMinutes": "Limite (minuti)",
+  "usage.minutes": "{value} min",
+  "usage.invalidAddress": "Inserisci un indirizzo web valido.",
+  "usage.invalidMinutes": "I minuti devono essere un numero intero da 1 a 1440.",
+  "usage.needsOne": "Imposta un avviso o un limite.",
+  "usage.warningTooLate": "L’avviso deve essere inferiore al limite.",
+  "usage.none": "Nessun limite configurato.",
+  "usage.warnAt": "Avvisa a {value}",
+  "usage.limitAt": "Limita a {value}",
+  "usage.timeCheck": "Controllo del tempo: {host}",
+  "usage.spentToday": "Oggi hai passato {value} qui.",
+  "usage.dismissLabel": "Chiudi l’avviso di utilizzo",
+  "usage.dismiss": "Chiudi",
+  "usage.manage": "Gestisci l’utilizzo",
+  "usage.limitReachedLabel": "Limite giornaliero del sito raggiunto",
+  "usage.limitReached": "Limite giornaliero raggiunto",
+  "usage.paused":
+    "{host} è in pausa dopo {value} oggi. Si sblocca a mezzanotte locale. Gli altri siti restano disponibili.",
+
+  "onboarding.label": "Come funziona OpenMedia",
+  "onboarding.skip": "Salta",
+  "onboarding.next": "Avanti",
+  "onboarding.start": "Inizia a navigare",
+  "onboarding.tap": "Tocca",
+  "onboarding.step1Title": "Il web, senza il rumore.",
+  "onboarding.step1Body":
+    "OpenMedia apre siti web reali e nasconde in silenzio le parti che non hai richiesto, come gli inviti ad “aprire l’app” che intralciano.",
+  "onboarding.step2Title": "Un pulsante.",
+  "onboarding.step2Body":
+    "Tocca per digitare un indirizzo e andare. Presto potrai chiedere all’assistente IA di modificare un sito per te.",
+  "onboarding.step3Title": "Tieni premuto per i preferiti.",
+  "onboarding.step3Body":
+    "Premi e tieni premuto. Scorri su un preferito e rilascia per aprirlo. Impostazioni è il piccolo pulsante separato dagli altri.",
+  "onboarding.step4Title": "Rendilo tuo.",
+  "onboarding.step4Body":
+    "Trascina il pulsante verso uno dei bordi e resterà lì. Cambia i preferiti nelle Impostazioni e rivedi questa guida quando vuoi.",
+
+  "settings.title": "Impostazioni",
+  "settings.close": "Chiudi impostazioni",
+  "settings.appearance": "Aspetto",
+  "settings.appearanceNote":
+    "Si applica all’app e ai siti che seguono lo schema di colori di sistema.",
+  "settings.themeLabel": "Tema",
+  "settings.themeSystem": "Sistema",
+  "settings.themeLight": "Chiaro",
+  "settings.themeDark": "Scuro",
+  "settings.browsing": "Navigazione",
+  "settings.browsingNote":
+    "Il blocco degli annunci usa elenchi integrati nell’app; se un sito smette di funzionare, disattivalo e la pagina si ricaricherà. Il pulsante Indietro si mette dalla parte opposta del pulsante principale, per i siti che non ne hanno uno. Una ricetta pronta può impostare il proprio margine inferiore.",
+  "settings.adBlock": "Blocca annunci e tracker",
+  "settings.backButton": "Pulsante Indietro fluttuante",
+  "settings.backButtonNote":
+    "Mostrato ogni volta che la pagina ha una schermata precedente da cui tornare.",
+  "settings.bottomMargin": "Margine inferiore",
+  "settings.bottomMarginNote":
+    "Mantiene libera la parte inferiore di ogni pagina, per i menu che scorrono sotto il bordo dello schermo.",
+  "settings.bottomMarginLabel": "Margine inferiore per tutti i siti",
+  "settings.data": "Dati e assistenza",
+  "settings.dataNote":
+    "La cronologia è formata dagli indirizzi che hai cercato ed è conservata solo su questo dispositivo. Cancellarla dimentica anche l’ultima pagina, così l’app si apre sul primo preferito. Le pagine aperte, i preferiti e gli accessi restano.",
+  "settings.history": "Cronologia",
+  "settings.historyEmpty": "Vuota",
+  "settings.historyCount": "{count} sito | {count} siti",
+  "settings.clearHistory": "Cancella cronologia",
+  "settings.clearHistoryCount": "Cancella {count}",
+  "settings.guide": "Guida iniziale",
+  "settings.guideNote": "La contrassegna come non vista e la mostra di nuovo ora.",
+  "settings.replay": "Rivedi",
+  "settings.language": "Lingua",
+  "settings.languageNote":
+    "La lingua del testo dell’app e il verso in cui viene scritto. Lasciala su quella di sistema per seguire il dispositivo.",
+  "settings.languageLabel": "Lingua dell’app",
+  "settings.languageSystem": "Lingua di sistema",
+
+  "favorites.title": "Preferiti",
+  "favorites.note":
+    "Tieni quanti preferisci. I primi {limit} compongono il menu di accesso rapido che compare tenendo premuto il pulsante; sposta un preferito in alto per inserirlo.",
+  "favorites.quickAccess": "Accesso rapido · {count} di {limit}",
+  "favorites.quickEmpty":
+    "Qui non c’è ancora nulla. Aggiungi un preferito qui sotto oppure metti una ricetta pronta tra i preferiti con la stella.",
+  "favorites.more": "Altri preferiti · {count}",
+  "favorites.add": "Aggiungi preferito",
+  "favorites.quickFull":
+    "L’accesso rapido è pieno, quindi questo è stato aggiunto ad Altri preferiti.",
+  "favorites.edit": "Modifica {name}",
+  "favorites.moveUp": "Sposta {name} in alto",
+  "favorites.moveDown": "Sposta {name} in basso",
+  "favorites.nameLabel": "Nome del preferito",
+  "favorites.addressLabel": "Indirizzo del preferito",
+  "favorites.namePlaceholder": "Nome",
+  "favorites.addressPlaceholder": "example.com",
+  "favorites.invalid": "Un preferito richiede un nome e un indirizzo valido.",
+
+  "recipes.title": "Ricette pronte",
+  "recipes.note":
+    "Ricette pronte per siti popolari. Gli inviti all’installazione e i pop-up che bloccano la pagina sono nascosti per impostazione predefinita; Reels, Shorts e i suggerimenti restano visibili finché non li nascondi. La pagina si ricarica quando cambi un interruttore. Metti una ricetta tra i preferiti con la stella per aggiungere il sito ai tuoi preferiti.",
+  "recipes.annoyances": "Fastidi · nascosti per impostazione predefinita",
+  "recipes.content": "Contenuti · mostrati finché non li nascondi",
+  "recipes.groupAnnoyance": "Fastidio",
+  "recipes.groupContent": "Contenuti",
+  "recipes.nothingHidden": "Nessun elemento nascosto",
+  "recipes.hiddenCount": "Nascosti: {count} di {total}",
+  "recipes.options": "Opzioni di {name}",
+  "recipes.addFavorite": "Aggiungi {name} ai preferiti",
+  "recipes.removeFavorite": "Rimuovi {name} dai preferiti",
+  "recipes.customized":
+    "Questa ricetta è la tua copia modificata, quindi gli aggiornamenti dell’app non la toccano.",
+  "recipes.originalUpdated": "L’originale dell’app è stato aggiornato da quando l’hai modificato.",
+  "recipes.restore": "Ripristina l’originale",
+  "recipes.bottomMargin": "Margine inferiore",
+  "recipes.sharedMargin":
+    "Usa il margine condiviso. Sposta il cursore per dare a questo sito un margine dedicato.",
+  "recipes.ownMargin": "Questo sito ha un margine dedicato.",
+  "recipes.siteMarginLabel": "Margine inferiore di {name}",
+  "recipes.useSharedMargin": "Usa il margine condiviso",
+
+  "ai.title": "Assistente IA",
+  "ai.note":
+    "Usa la tua chiave. Viene conservata nel Keychain di iOS, viene letta solo dal core Rust dell’app e viene inviata soltanto al provider che scegli. Scegline uno come attivo, poi descrivi una modifica nella barra dei comandi. La struttura della pagina (non i tuoi cookie, le password o il testo digitato) viene inviata a quel provider solo quando premi Invia.",
+  "ai.noProviderYet": "Nessun provider per ora. La barra dei comandi apre solo indirizzi.",
+  "ai.noProviderActive": "Nessun provider è attivo. La barra dei comandi apre solo indirizzi.",
+  "ai.providerNoKey":
+    "{name} è attivo ma non ha ancora una chiave. La barra dei comandi apre solo indirizzi.",
+  "ai.providerReady": "Pronto: {name}{model} risponde alle richieste nella barra dei comandi.",
+  "ai.previewToggle": "Anteprima prima di inviare",
+  "ai.previewNote":
+    "Mostra il testo esatto che verrebbe inviato al provider e aspetta la tua conferma.",
+  "ai.keySaved": "Chiave salvata",
+  "ai.noKey": "Nessuna chiave",
+  "ai.use": "Usa {name}",
+  "ai.addProvider": "Aggiungi provider",
+  "ai.whereToGetKey": "Dove ottenere una chiave",
+  "ai.openrouter":
+    "OpenRouter (openrouter.ai): varianti gratuite e modelli a pagamento di molti fornitori. I modelli contrassegnati con :free non hanno alcun costo, salvo limiti di frequenza e disponibilità.",
+  "ai.opencode":
+    "OpenCode Zen / Console (opencode.ai/console): modelli selezionati, a pagamento in base all’utilizzo. I suoi modelli chat gratuiti richiedono OpenCode stesso, non OpenMedia.",
+  "ai.local":
+    "Ollama (ollama.com) o LM Studio (lmstudio.ai): modelli locali senza costi per le API dei modelli; richiede hardware adeguato. Scegli Personalizzato e inserisci l’indirizzo del tuo server, raggiungibile da questo dispositivo.",
+  "ai.pricingNote":
+    "Controlla prezzi, limiti di utilizzo e informative sui dati aggiornate. Gli elenchi dei modelli non garantiscono l’accesso gratuito né il supporto per output strutturati.",
+  "ai.providerLabel": "Provider",
+  "ai.providerName": "Nome del provider",
+  "ai.namePlaceholder": "Nome",
+  "ai.baseUrl": "URL di base",
+  "ai.apiKey": "Chiave API",
+  "ai.hide": "Nascondi",
+  "ai.show": "Mostra",
+  "ai.keyInKeychain": "C’è una chiave salvata nel Keychain.",
+  "ai.replace": "Sostituisci",
+  "ai.model": "Modello",
+  "ai.chooseModel": "Scegli un modello",
+  "ai.modelPlaceholder": "Modello (prova la connessione per elencarli)",
+  "ai.connected": "Connesso. {count} modello disponibile. | Connesso. {count} modelli disponibili.",
+  "ai.testConnection": "Prova la connessione",
+  "ai.presetCustom": "Personalizzato (compatibile con OpenAI)",
+
+  "assistant.label": "Assistente IA",
+  "assistant.reading": "Lettura della pagina…",
+  "assistant.working": "L’assistente sta lavorando…",
+  "assistant.needsYou": "L’assistente ha bisogno di te.",
+  "assistant.payloadIntro": "Ecco esattamente ciò che verrà inviato a {provider}",
+  "assistant.payloadNote":
+    "Circa {count} token. Solo la struttura della pagina, con i dettagli personali rimossi: niente cookie, password o testo digitato.",
+  "assistant.payloadLabel": "Payload esatto",
+  "assistant.asking": "Chiedendo a {provider}…",
+  "assistant.saving": "Salvataggio…",
+  "assistant.turnedOn": "“{option}” attivato.",
+  "assistant.addedSwitch": "Interruttore “{option}” aggiunto.",
+  "assistant.findInSettings": "Trovalo in Impostazioni > Ricette pronte, in {recipe}.",
+  "assistant.openInSettings": "Apri in Impostazioni",
+  "assistant.nothingChanged": "Non è stato modificato nulla. L’anteprima è scomparsa.",
+  "assistant.askAgain": "Chiedi di nuovo",
+  "assistant.editRequest": "Modifica richiesta",
+  "assistant.review": "Rivedi",
+  "assistant.send": "Invia",
+  "assistant.reject": "Rifiuta",
+  "assistant.accept": "Accetta",
+  "assistant.switchExists": "Questo interruttore esiste già",
+  "assistant.savedAsCopy": "salvata come tua copia modificata",
+  "assistant.matched": "{count} corrispondenze",
+  "assistant.requestQuote": "“{request}”",
+  "assistant.unmatched":
+    "{count} regola non corrisponde a nulla in questa pagina. | {count} regole non corrispondono a nulla in questa pagina.",
+  "assistant.unmatchedHint": "Potrebbe non nascondere nulla lì; puoi comunque accettare il resto.",
+  "assistant.resultLive": "La pagina mostra ora il risultato. Accettando si attiva l’interruttore.",
+  "assistant.resultPreview": "La pagina mostra ora il risultato, non ancora salvato.",
+  "assistant.blockedNoProvider":
+    "Aggiungi un provider IA e una chiave per chiedere modifiche. Gli indirizzi funzionano comunque.",
+  "assistant.blockedNoPage": "Apri prima un sito, poi descrivi la modifica.",
+  "assistant.errorMissingKey":
+    "Il provider richiede una chiave valida. Verificala in Impostazioni > Assistente IA.",
+  "assistant.errorRateLimit":
+    "Il provider sta limitando il tasso di questa chiave. Riprova tra poco.",
+  "assistant.errorNetwork": "Impossibile raggiungere il provider. Controlla la connessione.",
+  "assistant.errorProvider":
+    "Il provider ha restituito un errore. Riprova o scegli un altro modello nelle Impostazioni.",
+  "assistant.errorInvalid":
+    "La risposta del modello non era utilizzabile. Riprova o riformula la richiesta in modo diverso.",
+  "assistant.errorNothingMatched":
+    "La modifica proposta non corrisponde a nulla in questa pagina. Prova a descrivere in modo diverso cosa vuoi nascondere.",
+  "assistant.errorOther": "Qualcosa è andato storto. Riprova.",
+};

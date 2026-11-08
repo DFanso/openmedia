@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-08
 
+### feat(i18n): app-wide translations
+
+**Change:** The shell UI is translated into 29 languages: English plus German, French, Spanish, Portuguese, Italian, Dutch, Swedish, Polish, Czech, Romanian, Greek, Russian, Ukrainian, Turkish, Arabic, Urdu, Chinese (Simplified and Traditional), Japanese, Korean, Thai, Vietnamese, Indonesian, Malay, Hindi, Bengali, Tamil and Sinhala. Settings > Language picks one or follows the device; the choice persists as `locale` in `library.json`. Arabic and Urdu lay out right to left.
+
+**Unverified:** Native-speaker review of the translations, and on-device rendering of each script. Recipe names and option labels are not translated; see [Internationalization](docs/wiki/i18n.md).
+
 ### feat(settings): collapse only Pre-made recipes and More favorites by default
 
 **Change:** Settings sections now start open; only the long Pre-made recipes section starts collapsed, via a new `defaultOpen` prop on `Section`. "More favorites" is a collapsible block, collapsed by default.

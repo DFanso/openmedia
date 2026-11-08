@@ -1,23 +1,26 @@
 import { describe, expect, it } from "vitest";
+import { createTranslator } from "../../i18n/translate";
 import { formatDuration, localDay, sectionLabel } from "./format";
+
+const t = createTranslator("en");
 
 describe("formatDuration", () => {
   it("picks the coarsest useful unit", () => {
-    expect(formatDuration(0)).toBe("0s");
-    expect(formatDuration(59)).toBe("59s");
-    expect(formatDuration(60)).toBe("1m");
-    expect(formatDuration(3599)).toBe("59m");
-    expect(formatDuration(3600)).toBe("1h");
-    expect(formatDuration(3600 + 25 * 60 + 40)).toBe("1h 25m");
+    expect(formatDuration(0, t)).toBe("0 s");
+    expect(formatDuration(59, t)).toBe("59 s");
+    expect(formatDuration(60, t)).toBe("1 min");
+    expect(formatDuration(3599, t)).toBe("59 min");
+    expect(formatDuration(3600, t)).toBe("1 h");
+    expect(formatDuration(3600 + 25 * 60 + 40, t)).toBe("1 h 25 min");
   });
 });
 
 describe("sectionLabel", () => {
   it("names the root, the catch-all and segments", () => {
-    expect(sectionLabel("/")).toBe("Home");
-    expect(sectionLabel("*")).toBe("Other");
-    expect(sectionLabel("/watch")).toBe("Watch");
-    expect(sectionLabel("/direct_inbox")).toBe("Direct inbox");
+    expect(sectionLabel("/", t)).toBe("Home");
+    expect(sectionLabel("*", t)).toBe("Other");
+    expect(sectionLabel("/watch", t)).toBe("Watch");
+    expect(sectionLabel("/direct_inbox", t)).toBe("Direct inbox");
   });
 });
 

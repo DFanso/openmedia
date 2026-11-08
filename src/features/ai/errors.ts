@@ -1,3 +1,5 @@
+import type { MessageKey } from "../../i18n/messages";
+
 export type AssistantErrorKind =
   | "missingKey"
   | "rateLimit"
@@ -10,25 +12,25 @@ export type AssistantErrorKind =
 
 export interface AssistantError {
   kind: AssistantErrorKind;
-  /** Fixed text written here, never a provider body or anything the page said. */
-  message: string;
+  /** The fixed line for this kind. `null` when Rust's own short text is shown instead. */
+  key: MessageKey | null;
+  /** The text Rust sent, shown only when there is no fixed line for the kind. */
+  text: string | null;
 }
 
-const MESSAGES: Record<Exclude<AssistantErrorKind, "other">, string> = {
-  missingKey: "The provider needs a valid key. Check it in Settings > AI assistant.",
-  rateLimit: "The provider is rate limiting this key. Try again shortly.",
-  network: "Could not reach the provider. Check your connection.",
-  provider: "The provider returned an error. Try again, or pick another model in Settings.",
-  invalid: "The model's answer wasn't usable. Try again, or word the request differently.",
-  nothingMatched:
-    "The proposed change matched nothing on this page. Try describing what to hide differently.",
-  noPage: "Open a site first, then describe the change.",
+const MESSAGES: Record<Exclude<AssistantErrorKind, "other">, MessageKey> = {
+  missingKey: "assistant.errorMissingKey",
+  rateLimit: "assistant.errorRateLimit",
+  network: "assistant.errorNetwork",
+  provider: "assistant.errorProvider",
+  invalid: "assistant.errorInvalid",
+  nothingMatched: "assistant.errorNothingMatched",
+  noPage: "assistant.blockedNoPage",
 };
 
-export const nothingMatched = (): AssistantError => ({
-  kind: "nothingMatched",
-  message: MESSAGES.nothingMatched,
-});
+export function nothingMatched(): AssistantError {
+  return { kind: "nothingMatched", key: MESSAGES.nothingMatched, text: null };
+}
 
 const OTHER_LIMIT = 160;
 
@@ -62,7 +64,9 @@ export function classifyError(error: unknown): AssistantError {
 
   if (kind === "other") {
     const short = raw.trim().length > 0 && raw.trim().length <= OTHER_LIMIT;
-    return { kind, message: short ? raw.trim() : "Something went wrong. Try again." };
+    return short
+      ? { kind, key: null, text: raw.trim() }
+      : { kind, key: "assistant.errorOther", text: null };
   }
-  return { kind, message: MESSAGES[kind] };
+  return { kind, key: MESSAGES[kind], text: null };
 }

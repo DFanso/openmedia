@@ -1,4 +1,5 @@
 import { useApp } from "../../app/store";
+import { useT } from "../../i18n/useT";
 import { displayHost, isFavoriteSite, toggleSiteFavorite } from "../../shared/favorites";
 import { ArrowIcon, HistoryIcon, StarIcon } from "../../shared/icons";
 import { useIconForUrl } from "../../shared/siteIcons";
@@ -17,18 +18,17 @@ export function HistorySheet() {
   const closeSheet = useApp((s) => s.closeSheet);
   const openHistory = useApp((s) => s.openHistory);
   const saveFavorites = useApp((s) => s.saveFavorites);
+  const t = useT();
   const favoriteList = favorites ?? [];
   if (!open) return null;
 
   return (
     <Screen
-      title="History"
+      title={t("history.title")}
       subtitle={
-        history.length === 0
-          ? "Nothing searched yet"
-          : `${history.length} ${history.length === 1 ? "site" : "sites"}, newest first`
+        history.length === 0 ? t("history.empty") : t("history.subtitle", { count: history.length })
       }
-      closeLabel="Close history"
+      closeLabel={t("history.close")}
       onClose={closeSheet}
     >
       {history.length === 0 ? (
@@ -36,9 +36,7 @@ export function HistorySheet() {
           <span className="grid size-14 place-items-center rounded-full bg-paper/[0.06] text-paper/50">
             <HistoryIcon />
           </span>
-          <p className="max-w-xs text-sm leading-relaxed text-paper/55">
-            Sites you search for appear here. Clear them any time in Settings.
-          </p>
+          <p className="max-w-xs text-sm leading-relaxed text-paper/55">{t("history.emptyBody")}</p>
         </div>
       ) : (
         <ul className="divide-y divide-hair overflow-hidden rounded-2xl border border-hair bg-paper/[0.04]">
@@ -69,7 +67,10 @@ function HistoryRow({ url, favorites, onOpen, onToggle }: RowProps) {
   const { host, rest } = describeAddress(url);
   const site = displayHost(url);
   const favorited = isFavoriteSite(favorites, url);
-  const starLabel = favorited ? `Remove ${site} from favorites` : `Add ${site} to favorites`;
+  const t = useT();
+  const starLabel = t(favorited ? "commandBar.removeFavorite" : "commandBar.addFavorite", {
+    site,
+  });
   const icon = useIconForUrl(url, favorites);
 
   return (
@@ -77,7 +78,7 @@ function HistoryRow({ url, favorites, onOpen, onToggle }: RowProps) {
       <button
         type="button"
         onClick={onOpen}
-        className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3 text-left active:bg-paper/[0.06]"
+        className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3 text-start active:bg-paper/[0.06]"
       >
         <SiteTile name={host} icon={icon} />
         <span className="min-w-0 flex-1">

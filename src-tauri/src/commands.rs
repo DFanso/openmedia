@@ -129,6 +129,12 @@ pub fn set_theme(library: State<'_, Library>, theme: Theme) -> Result<()> {
     library.set_theme(theme)
 }
 
+/// Remembers the language the user picked. `None` puts the app back on the device's language.
+#[tauri::command]
+pub fn set_locale(library: State<'_, Library>, locale: Option<String>) -> Result<()> {
+    library.set_locale(locale)
+}
+
 /// Reads the local favicon cache without making a network request.
 #[tauri::command]
 pub fn get_icons(library: State<'_, Library>) -> Result<BTreeMap<String, String>> {

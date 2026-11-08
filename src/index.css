@@ -2,7 +2,11 @@
 @import "@fontsource-variable/schibsted-grotesk";
 
 @theme {
-  --font-sans: "Schibsted Grotesk Variable", ui-sans-serif, sans-serif;
+  --font-sans:
+    "Schibsted Grotesk Variable", ui-sans-serif, system-ui, "Sinhala Sangam MN", "Geeza Pro",
+    "Kohinoor Devanagari", "Kohinoor Bangla", "Tamil Sangam MN", "Thonburi", "PingFang SC",
+    "PingFang TC", "Hiragino Sans", "Apple SD Gothic Neo", "Noto Sans Sinhala", "Noto Sans Arabic",
+    "Noto Sans Devanagari", "Noto Sans Bengali", "Noto Sans Tamil", "Noto Sans Thai", sans-serif;
   --color-ink: #070b14;
   --color-paper: #eef3fa;
   --color-accent: #06aff8;

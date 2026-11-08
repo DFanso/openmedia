@@ -29,6 +29,8 @@ export interface AppState {
   bottomMargin: number;
   backButton: boolean;
   aiPreview: boolean;
+  /** The language the user picked, as a BCP 47 tag; null follows the device's language. */
+  locale: string | null;
 }
 
 /** The page Rust already started loading at launch; the shell takes it over. */
@@ -143,6 +145,8 @@ export const library = {
   completeOnboarding: () => command("complete_onboarding"),
   resetOnboarding: () => command("reset_onboarding"),
   setTheme: (theme: Theme) => command("set_theme", { theme }),
+  /** Remembers the language the user picked; null puts the app back on the device's language. */
+  setLocale: (locale: string | null) => command("set_locale", { locale }),
   /** Persists the choice and reloads the open page under it; see `set_ad_block` in Rust. */
   setAdBlock: (enabled: boolean) => command("set_ad_block", { enabled }),
   getSites: () => invoke<SiteSettings[]>("get_sites"),
@@ -236,8 +240,3 @@ export const siteView = {
   onError: (handler: (message: string) => void): Promise<UnlistenFn> =>
     listen<string>("siteview:error", (event) => handler(event.payload)),
 };
-
-export function errorMessage(error: unknown): string {
-  if (typeof error === "string") return error;
-  return error instanceof Error ? error.message : "Unknown error";
-}

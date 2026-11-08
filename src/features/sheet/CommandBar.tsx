@@ -1,7 +1,9 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { selectPage, useApp } from "../../app/store";
+import { describeError } from "../../i18n/errors";
+import { useT } from "../../i18n/useT";
 import { displayHost, isFavoriteSite, toggleSiteFavorite } from "../../shared/favorites";
-import { errorMessage, siteView, type Favorite } from "../../shared/ipc";
+import { siteView, type Favorite } from "../../shared/ipc";
 import {
   ArrowIcon,
   BackIcon,
@@ -11,7 +13,7 @@ import {
   StarIcon,
 } from "../../shared/icons";
 import { AssistantPanel } from "../ai/AssistantPanel";
-import { BLOCKED_MESSAGES, MAX_REQUEST_LENGTH, routeInput } from "../ai/route";
+import { MAX_REQUEST_LENGTH, routeInput } from "../ai/route";
 
 const NO_FAVORITES: Favorite[] = [];
 
@@ -29,6 +31,7 @@ export function CommandBar() {
   const submitRequest = useApp((s) => s.submitRequest);
   const openSheet = useApp((s) => s.openSheet);
   const editRequest = useApp((s) => s.editRequest);
+  const t = useT();
   const [notice, setNotice] = useState<string | null>(null);
   const [blocked, setBlocked] = useState(false);
   // The bar's text lives in the store, so "Ask again" can hand the request back for editing.
@@ -53,7 +56,11 @@ export function CommandBar() {
         openAddress(route.url);
         return;
       case "blocked":
-        setNotice(BLOCKED_MESSAGES[route.reason]);
+        setNotice(
+          route.reason === "noProvider"
+            ? t("assistant.blockedNoProvider")
+            : t("assistant.blockedNoPage"),
+        );
         setBlocked(route.reason === "noProvider");
         return;
       case "request":
@@ -64,13 +71,15 @@ export function CommandBar() {
   };
 
   const run = (action: () => Promise<void>) =>
-    void action().catch((error: unknown) => setNotice(errorMessage(error)));
+    void action().catch((error: unknown) => setNotice(describeError(error, t)));
 
   // The live address, or the one the page was opened with until it reports its first state.
   const pageUrl = page?.url ?? page?.openedUrl ?? null;
   const site = pageUrl ? displayHost(pageUrl) : "";
   const favorited = pageUrl ? isFavoriteSite(favorites, pageUrl) : false;
-  const starLabel = favorited ? `Remove ${site} from favorites` : `Add ${site} to favorites`;
+  const starLabel = t(favorited ? "commandBar.removeFavorite" : "commandBar.addFavorite", {
+    site,
+  });
 
   const tool = "grid size-11 place-items-center rounded-full text-paper/80 disabled:opacity-25";
 
@@ -93,7 +102,7 @@ export function CommandBar() {
           <>
             <form onSubmit={submit} className="flex items-center gap-2">
               <input
-                aria-label="Address or request"
+                aria-label={t("commandBar.addressLabel")}
                 autoFocus={open}
                 autoCapitalize="none"
                 autoCorrect="off"
@@ -101,7 +110,7 @@ export function CommandBar() {
                 inputMode="url"
                 maxLength={MAX_REQUEST_LENGTH}
                 enterKeyHint="go"
-                placeholder="Address, or ask for a change"
+                placeholder={t("commandBar.placeholder")}
                 value={text}
                 onChange={(event) => {
                   editRequest(event.target.value);
@@ -112,7 +121,7 @@ export function CommandBar() {
               />
               <button
                 type="submit"
-                aria-label="Go"
+                aria-label={t("commandBar.go")}
                 className="grid size-11 place-items-center rounded-full bg-accent text-on-accent"
               >
                 <ArrowIcon />
@@ -129,7 +138,7 @@ export function CommandBar() {
                     onClick={() => openSheet("settings")}
                     className="font-medium text-accent"
                   >
-                    Open Settings &gt; AI assistant
+                    {t("commandBar.openAiSettings")}
                   </button>
                 </>
               )}
@@ -141,7 +150,7 @@ export function CommandBar() {
           <div className="flex">
             <button
               type="button"
-              aria-label="Back"
+              aria-label={t("common.back")}
               disabled={!page?.canGoBack}
               className={tool}
               onClick={() => run(siteView.goBack)}
@@ -150,7 +159,7 @@ export function CommandBar() {
             </button>
             <button
               type="button"
-              aria-label="Forward"
+              aria-label={t("commandBar.forward")}
               disabled={!page?.canGoForward}
               className={tool}
               onClick={() => run(siteView.goForward)}
@@ -159,7 +168,7 @@ export function CommandBar() {
             </button>
             <button
               type="button"
-              aria-label="Reload"
+              aria-label={t("commandBar.reload")}
               className={tool}
               onClick={() => run(siteView.reload)}
             >
@@ -180,7 +189,12 @@ export function CommandBar() {
             >
               <StarIcon filled={favorited} />
             </button>
-            <button type="button" aria-label="Close" className={tool} onClick={closeSheet}>
+            <button
+              type="button"
+              aria-label={t("commandBar.close")}
+              className={tool}
+              onClick={closeSheet}
+            >
               <CloseIcon />
             </button>
           </div>

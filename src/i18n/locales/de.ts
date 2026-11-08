@@ -1,0 +1,281 @@
+import type { Messages } from "../messages";
+
+/** Deutsch. */
+export const de: Messages = {
+  "app.dismiss": "Zum Schließen tippen",
+  "app.unknownError": "Unbekannter Fehler",
+
+  "common.back": "Zurück",
+  "common.cancel": "Abbrechen",
+  "common.done": "Fertig",
+  "common.edit": "Bearbeiten",
+  "common.delete": "Löschen",
+  "common.openSettings": "Einstellungen öffnen",
+  "common.remove": "Entfernen",
+  "common.retry": "Erneut versuchen",
+  "common.save": "Speichern",
+
+  "commandBar.addressLabel": "Adresse oder Anfrage",
+  "commandBar.placeholder": "Adresse oder was du ändern möchtest",
+  "commandBar.go": "Öffnen",
+  "commandBar.reload": "Neu laden",
+  "commandBar.close": "Schließen",
+  "commandBar.addFavorite": "{site} zu Favoriten hinzufügen",
+  "commandBar.removeFavorite": "{site} aus Favoriten entfernen",
+  "commandBar.openAiSettings": "Einstellungen > KI-Assistent öffnen",
+
+  "fab.openFavorite": "{name} öffnen",
+  "fab.history": "Verlauf",
+  "fab.settings": "Einstellungen",
+  "fab.assistant": "Assistent. Für Favoriten gedrückt halten.",
+
+  "history.title": "Verlauf",
+  "history.close": "Verlauf schließen",
+  "history.empty": "Noch nichts gesucht",
+  "history.subtitle": "{count} Website, neueste zuerst | {count} Websites, neueste zuerst",
+  "history.emptyBody":
+    "Websites, nach denen du gesucht hast, erscheinen hier. Du kannst sie jederzeit in den Einstellungen löschen.",
+
+  "stats.rangeLabel": "Zeitraum",
+  "stats.today": "Heute",
+  "stats.days7": "7 Tage",
+  "stats.days30": "30 Tage",
+  "stats.timeOnSites": "Zeit auf Websites",
+  "stats.empty":
+    "Für diesen Zeitraum wurde noch nichts erfasst. Die Zeit auf einer Website erscheint hier.",
+  "stats.privateTitle": "Nur auf diesem Gerät",
+  "stats.privateBody":
+    "Diese Informationen bleiben auf diesem Gerät und werden nirgendwohin gesendet. OpenMedia hat keinen Server und speichert keine Kopie. Es werden nur Website-Namen, Bereichsnamen (wie „Ansehen“ oder „Shorts“) und Sekunden gespeichert: niemals vollständige Adressen, Suchbegriffe oder Seitentitel. Tippe auf eine Website, um zu sehen, welche Teile davon du genutzt hast.",
+  "stats.clearAll": "Alle Statistiken löschen",
+  "stats.clear": "Statistiken löschen",
+  "stats.durationSeconds": "{value} s",
+  "stats.durationMinutes": "{value} Min.",
+  "stats.durationHours": "{value} Std.",
+  "stats.durationHoursMinutes": "{value} Std. {rest} Min.",
+  "stats.sectionHome": "Startseite",
+  "stats.sectionOther": "Sonstiges",
+  "stats.sectionWatch": "Ansehen",
+  "stats.sectionShorts": "Shorts",
+  "stats.sectionLive": "Live",
+  "stats.sectionExplore": "Entdecken",
+  "stats.sectionSearch": "Suche",
+  "stats.sectionNotifications": "Mitteilungen",
+  "stats.sectionMessages": "Nachrichten",
+  "stats.sectionFeed": "Feed",
+
+  "usage.title": "Tägliche Warnungen und Limits",
+  "usage.note":
+    "Zählt die Zeit im Vordergrund. Wird um lokaler Mitternacht zurückgesetzt. Lasse ein Feld leer, um es zu deaktivieren.",
+  "usage.siteAddress": "Website-Adresse",
+  "usage.warningMinutes": "Warnung (Minuten)",
+  "usage.limitMinutes": "Limit (Minuten)",
+  "usage.minutes": "{value} Min.",
+  "usage.invalidAddress": "Gib eine gültige Website-Adresse ein.",
+  "usage.invalidMinutes": "Die Minuten müssen eine ganze Zahl von 1 bis 1440 sein.",
+  "usage.needsOne": "Lege eine Warnung oder ein Limit fest.",
+  "usage.warningTooLate": "Die Warnung muss kürzer als das Limit sein.",
+  "usage.none": "Keine Limits eingerichtet.",
+  "usage.warnAt": "Warnung bei {value}",
+  "usage.limitAt": "Limit {value}",
+  "usage.timeCheck": "Zeitkontrolle: {host}",
+  "usage.spentToday": "Heute hast du hier {value} verbracht.",
+  "usage.dismissLabel": "Nutzungswarnung ausblenden",
+  "usage.dismiss": "Ausblenden",
+  "usage.manage": "Nutzung verwalten",
+  "usage.limitReachedLabel": "Tägliches Website-Limit erreicht",
+  "usage.limitReached": "Tägliches Limit erreicht",
+  "usage.paused":
+    "{host} wurde heute nach {value} pausiert. Um lokaler Mitternacht wird die Sperre aufgehoben. Andere Websites sind weiterhin verfügbar.",
+
+  "onboarding.label": "So funktioniert OpenMedia",
+  "onboarding.skip": "Überspringen",
+  "onboarding.next": "Weiter",
+  "onboarding.start": "Surfen starten",
+  "onboarding.tap": "Tippen",
+  "onboarding.step1Title": "Das Web, ohne den Lärm.",
+  "onboarding.step1Body":
+    "OpenMedia öffnet echte Websites und blendet unaufdringlich die Teile aus, die du nicht wolltest, etwa die „In App öffnen“-Hinweise, die im Weg stehen.",
+  "onboarding.step2Title": "Eine Taste.",
+  "onboarding.step2Body":
+    "Tippe darauf, um eine Adresse einzugeben und loszugehen. Bald kannst du den KI-Assistenten bitten, eine Website für dich zu ändern.",
+  "onboarding.step3Title": "Für Favoriten gedrückt halten.",
+  "onboarding.step3Body":
+    "Gedrückt halten. Auf einen Favoriten ziehen und loslassen, um ihn zu öffnen. Die Einstellungen sind die kleine Schaltfläche, die von den anderen getrennt ist.",
+  "onboarding.step4Title": "Mach es zu deinem.",
+  "onboarding.step4Body":
+    "Zieh die Schaltfläche an einen der beiden Ränder, und sie bleibt dort. Ändere deine Favoriten in den Einstellungen und spiele diese Anleitung dort jederzeit erneut ab.",
+
+  "settings.title": "Einstellungen",
+  "settings.close": "Einstellungen schließen",
+  "settings.appearance": "Darstellung",
+  "settings.appearanceNote":
+    "Gilt für die App sowie für Websites, die dem Farbschema des Systems folgen.",
+  "settings.themeLabel": "Design",
+  "settings.themeSystem": "System",
+  "settings.themeLight": "Hell",
+  "settings.themeDark": "Dunkel",
+  "settings.browsing": "Surfen",
+  "settings.browsingNote":
+    "Der Werbeblocker verwendet Listen, die in der App integriert sind; wenn eine Website nicht mehr funktioniert, schalte ihn aus und die Seite wird neu geladen. Die Zurück-Taste befindet sich gegenüber der Haupttaste, für Websites ohne eigene Zurück-Schaltfläche. Ein vorgefertigtes Rezept kann einen eigenen unteren Rand festlegen.",
+  "settings.adBlock": "Werbung und Tracker blockieren",
+  "settings.backButton": "Schwebende Zurück-Taste",
+  "settings.backButtonNote": "Wird immer dann angezeigt, wenn du auf der Seite zurückgehen kannst.",
+  "settings.bottomMargin": "Unterer Rand",
+  "settings.bottomMarginNote":
+    "Hält den unteren Bereich jeder Seite frei, etwa für Menüs, die unter den Bildschirmrand gleiten.",
+  "settings.bottomMarginLabel": "Unterer Rand für alle Websites",
+  "settings.data": "Daten und Hilfe",
+  "settings.dataNote":
+    "Der Verlauf enthält die Adressen, nach denen du gesucht hast, und wird nur auf diesem Gerät gespeichert. Wenn du ihn löschst, wird auch die zuletzt geöffnete Seite vergessen, sodass die App mit deinem ersten Favoriten startet. Offene Seiten, Favoriten und Anmeldungen bleiben erhalten.",
+  "settings.history": "Verlauf",
+  "settings.historyEmpty": "Leer",
+  "settings.historyCount": "{count} Website | {count} Websites",
+  "settings.clearHistory": "Verlauf löschen",
+  "settings.clearHistoryCount": "{count} löschen",
+  "settings.guide": "Erststart-Anleitung",
+  "settings.guideNote": "Markiert sie als ungesehen und zeigt sie jetzt erneut an.",
+  "settings.replay": "Erneut anzeigen",
+  "settings.language": "Sprache",
+  "settings.languageNote":
+    "Die Sprache der App-Texte und die Richtung, in der sie geschrieben werden. Bleibe auf der Systemsprache, um die Einstellung deines Geräts zu übernehmen.",
+  "settings.languageLabel": "App-Sprache",
+  "settings.languageSystem": "Systemsprache",
+
+  "favorites.title": "Favoriten",
+  "favorites.note":
+    "Behalte so viele, wie du möchtest. Die ersten {limit} erscheinen im Schnellzugriffsmenü, das du durch Gedrückt halten der Schaltfläche öffnest. Ziehe einen Favoriten nach oben, um ihn dort einzutragen.",
+  "favorites.quickAccess": "Schnellzugriff · {count} von {limit}",
+  "favorites.quickEmpty":
+    "Noch nichts hier. Füge unten einen Favoriten hinzu oder markiere ein vorgefertigtes Rezept mit einem Stern.",
+  "favorites.more": "Weitere Favoriten · {count}",
+  "favorites.add": "Favorit hinzufügen",
+  "favorites.quickFull":
+    "Der Schnellzugriff ist voll, daher wird dieser Favorit unter „Weitere Favoriten“ hinzugefügt.",
+  "favorites.edit": "{name} bearbeiten",
+  "favorites.moveUp": "{name} nach oben verschieben",
+  "favorites.moveDown": "{name} nach unten verschieben",
+  "favorites.nameLabel": "Name des Favoriten",
+  "favorites.addressLabel": "Adresse des Favoriten",
+  "favorites.namePlaceholder": "Name",
+  "favorites.addressPlaceholder": "example.com",
+  "favorites.invalid": "Ein Favorit benötigt einen Namen und eine gültige Adresse.",
+
+  "recipes.title": "Vorgefertigte Rezepte",
+  "recipes.note":
+    "Fertige Rezepte für beliebte Websites. Installationshinweise und Pop-ups, die die Seite blockieren, werden standardmäßig ausgeblendet; Reels, Shorts und Vorschläge werden angezeigt, bis du sie ausblendest. Die Seite wird neu geladen, wenn du einen Schalter änderst. Markiere ein Rezept mit einem Stern, um die Website deinen Favoriten hinzuzufügen.",
+  "recipes.annoyances": "Störungen · standardmäßig ausgeblendet",
+  "recipes.content": "Inhalte · angezeigt, bis du sie ausblendest",
+  "recipes.groupAnnoyance": "Störung",
+  "recipes.groupContent": "Inhalt",
+  "recipes.nothingHidden": "Nichts ausgeblendet",
+  "recipes.hiddenCount": "Ausgeblendet: {count} von {total}",
+  "recipes.options": "Optionen für {name}",
+  "recipes.addFavorite": "{name} zu Favoriten hinzufügen",
+  "recipes.removeFavorite": "{name} aus Favoriten entfernen",
+  "recipes.customized":
+    "Dieses Rezept ist deine geänderte Kopie, daher bleibt es bei App-Updates unverändert.",
+  "recipes.originalUpdated":
+    "Das Original in der App wurde aktualisiert, seitdem du es geändert hast.",
+  "recipes.restore": "Original wiederherstellen",
+  "recipes.bottomMargin": "Unterer Rand",
+  "recipes.sharedMargin":
+    "Verwendet den gemeinsamen Rand. Verschiebe den Regler, um dieser Website einen eigenen zu geben.",
+  "recipes.ownMargin": "Diese Website hat einen eigenen unteren Rand.",
+  "recipes.siteMarginLabel": "Unterer Rand für {name}",
+  "recipes.useSharedMargin": "Gemeinsamen Rand verwenden",
+
+  "ai.title": "KI-Assistent",
+  "ai.keySaved": "Schlüssel gespeichert",
+  "ai.noKey": "Kein Schlüssel",
+  "ai.use": "{name} verwenden",
+  "ai.addProvider": "Anbieter hinzufügen",
+  "ai.whereToGetKey": "Schlüssel erhalten",
+  "ai.openrouter":
+    "OpenRouter (openrouter.ai): kostenlose Varianten und kostenpflichtige Modelle vieler Anbieter. Modelle mit der Kennzeichnung :free verursachen keine Modellkosten, gelten jedoch nur innerhalb von Nutzungsgrenzen und hängen von der Verfügbarkeit ab.",
+  "ai.opencode":
+    "OpenCode Zen / Console (opencode.ai/console): ausgewählte Modelle, je nach Nutzung berechnet. Die Chatmodelle im kostenlosen Tarif erfordern OpenCode selbst, nicht OpenMedia.",
+  "ai.local":
+    "Ollama (ollama.com) oder LM Studio (lmstudio.ai): lokale Modelle ohne API-Gebühren; erfordert geeignete Hardware. Wähle Benutzerdefiniert und gib die Adresse deines Servers ein, die von diesem Gerät erreichbar ist.",
+  "ai.pricingNote":
+    "Prüfe aktuelle Preise, Nutzungslimits und Datenschutzrichtlinien. Modelllisten garantieren weder kostenlosen Zugriff noch die Unterstützung strukturierter Ausgaben.",
+  "ai.providerLabel": "Anbieter",
+  "ai.providerName": "Name des Anbieters",
+  "ai.namePlaceholder": "Name",
+  "ai.baseUrl": "Basis-URL",
+  "ai.apiKey": "API-Schlüssel",
+  "ai.hide": "Ausblenden",
+  "ai.show": "Anzeigen",
+  "ai.keyInKeychain": "Ein Schlüssel ist in der Keychain gespeichert.",
+  "ai.replace": "Ersetzen",
+  "ai.model": "Modell",
+  "ai.chooseModel": "Modell auswählen",
+  "ai.modelPlaceholder": "Modell (teste die Verbindung, um die Liste anzuzeigen)",
+  "ai.connected": "Verbunden. {count} Modell verfügbar. | Verbunden. {count} Modelle verfügbar.",
+  "ai.testConnection": "Verbindung testen",
+  "ai.presetCustom": "Benutzerdefiniert (OpenAI-kompatibel)",
+
+  "assistant.label": "KI-Assistent",
+  "assistant.reading": "Die Seite wird gelesen …",
+  "assistant.working": "Der Assistent arbeitet …",
+  "assistant.needsYou": "Der Assistent braucht dich.",
+  "assistant.payloadIntro": "Genau dies wird an {provider} gesendet",
+  "assistant.payloadNote":
+    "Etwa {count} Tokens. Nur die Struktur der Seite, ohne persönliche Daten: keine Cookies, Passwörter oder eingegebenen Texte.",
+  "assistant.payloadLabel": "Exakte Nutzlast",
+  "assistant.asking": "Frage {provider} …",
+  "assistant.saving": "Wird gespeichert …",
+  "assistant.turnedOn": "„{option}“ wurde eingeschaltet.",
+  "assistant.addedSwitch": "Der Schalter „{option}“ wurde hinzugefügt.",
+  "assistant.findInSettings": "Finde ihn in Einstellungen > Vorgefertigte Rezepte unter {recipe}.",
+  "assistant.openInSettings": "In Einstellungen öffnen",
+  "assistant.nothingChanged": "Nichts wurde geändert. Die Vorschau ist verschwunden.",
+  "assistant.askAgain": "Nochmal fragen",
+  "assistant.editRequest": "Anfrage bearbeiten",
+  "assistant.review": "Prüfen",
+  "assistant.send": "Senden",
+  "assistant.reject": "Ablehnen",
+  "assistant.accept": "Annehmen",
+  "assistant.switchExists": "Dieser Schalter existiert bereits",
+  "assistant.savedAsCopy": "als deine geänderte Kopie gespeichert",
+  "assistant.matched": "{count} Übereinstimmungen",
+  "assistant.requestQuote": "„{request}“",
+  "assistant.unmatched":
+    "{count} Regel hat auf dieser Seite nichts gefunden. | {count} Regeln haben auf dieser Seite nichts gefunden.",
+  "assistant.unmatchedHint":
+    "Dort wird möglicherweise nichts ausgeblendet; den Rest kannst du weiterhin annehmen.",
+  "assistant.resultLive":
+    "Die Seite zeigt das Ergebnis jetzt an. Wenn du es annimmst, wird der Schalter eingeschaltet.",
+  "assistant.resultPreview":
+    "Die Seite zeigt das Ergebnis jetzt an, es wurde aber noch nicht gespeichert.",
+  "assistant.blockedNoProvider":
+    "Füge einen KI-Anbieter und einen Schlüssel hinzu, um Änderungen anzufordern. Adressen funktionieren weiterhin.",
+  "assistant.blockedNoPage": "Öffne zuerst eine Website und beschreibe dann die Änderung.",
+  "assistant.errorMissingKey":
+    "Der Anbieter benötigt einen gültigen Schlüssel. Prüfe ihn in Einstellungen > KI-Assistent.",
+  "assistant.errorRateLimit":
+    "Der Anbieter begrenzt die Nutzung dieses Schlüssels. Versuche es gleich noch einmal.",
+  "assistant.errorNetwork": "Der Anbieter ist nicht erreichbar. Prüfe deine Verbindung.",
+  "assistant.errorProvider":
+    "Der Anbieter hat einen Fehler zurückgegeben. Versuche es erneut oder wähle in den Einstellungen ein anderes Modell.",
+  "assistant.errorInvalid":
+    "Die Antwort des Modells war nicht verwendbar. Versuche es erneut oder formuliere die Anfrage anders.",
+  "assistant.errorNothingMatched":
+    "Die vorgeschlagene Änderung hat auf dieser Seite nichts gefunden. Versuche anders zu beschreiben, was du ausblenden möchtest.",
+  "assistant.errorOther": "Etwas ist schiefgelaufen. Versuche es erneut.",
+  "web.emptyHint":
+    "Tippe auf die Taste und gib eine Adresse ein, oder halte sie gedrückt, um einen Favoriten zu wählen.",
+  "web.loading": "Website wird geladen …",
+  "commandBar.forward": "Vor",
+  "fab.usage": "Nutzung",
+  "stats.title": "Nutzung",
+  "stats.close": "Nutzung schließen",
+  "ai.noProviderYet": "Noch kein Anbieter. Die Befehlsleiste öffnet nur Adressen.",
+  "ai.noProviderActive": "Kein Anbieter ist aktiv. Die Befehlsleiste öffnet nur Adressen.",
+  "ai.providerNoKey":
+    "{name} ist aktiv, hat aber noch keinen Schlüssel. Die Befehlsleiste öffnet nur Adressen.",
+  "ai.providerReady": "Bereit: {name}{model} beantwortet Anfragen in der Befehlsleiste.",
+  "ai.previewToggle": "Vor dem Senden anzeigen",
+  "ai.previewNote": "Zeigt den genauen Text, der an den Anbieter geht, und wartet auf dich.",
+  "ai.note":
+    "Bring deinen eigenen Schlüssel mit. Er wird im iOS-Schlüsselbund gespeichert, nur vom Rust-Kern der App gelesen und nur an den Anbieter gesendet, den du wählst. Wähle einen als aktiv und beschreibe dann eine Änderung in der Befehlsleiste. Die Struktur der Seite (nicht deine Cookies, Passwörter oder eingegebenen Texte) geht nur an diesen Anbieter, wenn du auf Senden tippst.",
+};

@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { errorMessage, library, siteView } from "../../shared/ipc";
-import { selectPage, useApp } from "../../app/store";
+import { library, siteView } from "../../shared/ipc";
+import { appError, selectPage, useApp } from "../../app/store";
 import { pageShowing } from "../../app/splash";
+import { useT } from "../../i18n/useT";
 import { usePageMargin } from "./usePageMargin";
 import { readRect, useSiteViewRect } from "./useSiteViewRect";
 
@@ -24,6 +25,7 @@ export function WebLayer() {
   const forgetSessions = useApp((s) => s.forgetSessions);
   const trimSessions = useApp((s) => s.trimSessions);
   const reportError = useApp((s) => s.reportError);
+  const t = useT();
   /** Native events are only announced once, so no action may run before the listeners exist. */
   const [listening, setListening] = useState(false);
 
@@ -42,7 +44,7 @@ export function WebLayer() {
           : library.openSite(action.id, action.url, readRect(element));
     run.catch((error: unknown) => {
       if (action.type !== "activate") sessionOpenFailed(action.id);
-      reportError(errorMessage(error));
+      reportError(appError(error));
     });
   }, [listening, profileId, action, sessionOpenFailed, reportError]);
 
@@ -77,9 +79,7 @@ export function WebLayer() {
     <>
       {!hasSession && (
         <div className="fixed inset-0 grid place-items-center bg-ink p-10 text-center text-paper/60">
-          <p className="max-w-60 text-sm leading-relaxed">
-            Tap the button and type an address, or hold it to pick a favorite.
-          </p>
+          <p className="max-w-60 text-sm leading-relaxed">{t("web.emptyHint")}</p>
         </div>
       )}
       <div
@@ -93,7 +93,7 @@ export function WebLayer() {
               aria-hidden="true"
               className="size-7 rounded-full border-2 border-paper/15 border-t-accent motion-safe:animate-spin"
             />
-            <span className="sr-only">Loading site…</span>
+            <span className="sr-only">{t("web.loading")}</span>
           </div>
         )}
       </div>
