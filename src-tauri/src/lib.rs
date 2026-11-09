@@ -8,6 +8,7 @@ mod incognito;
 mod library;
 mod recipes;
 mod secrets;
+mod site;
 mod sites;
 mod usage;
 mod usage_commands;
@@ -15,6 +16,7 @@ mod usage_commands;
 use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
+#[allow(clippy::expect_used, reason = "a failed startup is unrecoverable")]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_siteview::init())
@@ -36,7 +38,9 @@ pub fn run() {
                 // so the first page open does not wait. A failure surfaces when a page opens.
                 tauri::async_runtime::spawn_blocking(move || ad_block.rule_lists());
             }
-            app.manage(usage::Usage::load(data_dir.join("usage.json"))?);
+            let usage = usage::Usage::load(data_dir.join("usage.json"))?;
+            usage.retire_public_suffix_sites(&app.state::<library::Library>().favorite_hosts()?)?;
+            app.manage(usage);
             app.manage(ai::agent::Agent::default());
             app.manage(commands::Secrets(Box::new(secrets::KeychainStore)));
             app.manage(entitlement::Entitlement::from_build());

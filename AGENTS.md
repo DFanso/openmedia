@@ -41,16 +41,14 @@ ln -sfn "$(pwd)/node_modules" .worktrees/<scope>-<slug>/node_modules   # once no
 
 ## Testing
 
-All checks must pass before pushing. These commands are the contract; Phase 1 of the roadmap creates them. Until the scaffold exists there is no code to check.
+All checks must pass before pushing. `yarn verify` runs the whole contract; the pieces are:
 
 ```bash
 yarn ts:check                                      # TypeScript strict compile
 yarn lint                                          # ESLint
 yarn format:check                                  # Prettier
 yarn test                                          # Vitest (frontend + engine)
-cargo fmt --manifest-path src-tauri/Cargo.toml --check
-cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
-cargo test --manifest-path src-tauri/Cargo.toml
+yarn check:rust                                    # cargo fmt --all --check, clippy --workspace -D warnings, cargo test --workspace
 ```
 
 - **Never push failing checks.** CI runs the same set.

@@ -12,6 +12,7 @@ use uuid::Uuid;
 use crate::ai::{AiSettings, MAX_PROVIDERS, ProviderConfig, ProviderInput};
 use crate::error::{Error, Result};
 use crate::recipes::OptionChoices;
+use crate::site::site_of_host;
 
 const FORMAT_VERSION: u32 = 4;
 const MAX_HISTORY: usize = 100;
@@ -417,6 +418,16 @@ impl Library {
         Ok(with_icons(&data, &data.favorites))
     }
 
+    /// The host of every favorite, for matching saved data to the sites the user opens.
+    pub fn favorite_hosts(&self) -> Result<Vec<String>> {
+        let data = self.lock()?;
+        Ok(data
+            .favorites
+            .iter()
+            .filter_map(|favorite| host_of(&favorite.url))
+            .collect())
+    }
+
     pub fn ai_settings(&self) -> Result<AiSettings> {
         Ok(self.lock()?.ai.clone())
     }
@@ -500,40 +511,16 @@ fn host_of(url: &str) -> Option<String> {
     })
 }
 
-/// Second-level labels under a two-letter country code. The same short list the site view uses to
-/// pin a session to one domain.
-const COUNTRY_SECOND_LEVEL: [&str; 12] = [
-    "co", "com", "org", "net", "gov", "edu", "ac", "or", "ne", "go", "gob", "mil",
-];
-
-/// The domain a host belongs to: `www.instagram.com` and `m.instagram.com` both give
-/// `instagram.com`. A host without a registrable part is kept whole.
-fn registrable_domain(host: &str) -> String {
-    let host = host.trim_end_matches('.').to_lowercase();
-    let labels: Vec<&str> = host.split('.').filter(|label| !label.is_empty()).collect();
-    if labels.len() <= 2 || labels.iter().all(|label| label.parse::<u32>().is_ok()) {
-        return host;
-    }
-    let tld = labels[labels.len() - 1];
-    let second = labels[labels.len() - 2];
-    let keep = if tld.len() == 2 && COUNTRY_SECOND_LEVEL.contains(&second) {
-        3
-    } else {
-        2
-    };
-    labels[labels.len() - keep..].join(".")
-}
-
 /// True for two hosts of one site: the same host, or two of the same domain.
 fn same_site(one: &str, other: &str) -> bool {
-    one.eq_ignore_ascii_case(other) || registrable_domain(one) == registrable_domain(other)
+    one.eq_ignore_ascii_case(other) || site_of_host(one) == site_of_host(other)
 }
 
 /// The cached icon for a host: the one stored for it, or the one stored for its domain.
 fn icon_for_host(data: &LibraryData, host: &str) -> Option<String> {
     data.icons
         .get(host)
-        .or_else(|| data.icons.get(&registrable_domain(host)))
+        .or_else(|| data.icons.get(&site_of_host(host)))
         .cloned()
 }
 

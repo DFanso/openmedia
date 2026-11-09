@@ -18,7 +18,8 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; connect-src 'self' ipc: http://ipc.localhost ws://localhost:1421"
+      "csp": "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; connect-src 'self' ipc: http://ipc.localhost",
+      "devCsp": "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; connect-src 'self' ipc: http://ipc.localhost ws:"
     }
   },
   "bundle": {
@@ -36,11 +37,18 @@
       "bundleVersion": "1000"
     },
     "macOS": {
+      "minimumSystemVersion": "13.0",
       "bundleVersion": "1000"
     },
     "android": {
       "minSdkVersion": 24,
       "versionCode": 1000
-    }
+    },
+    "category": "Utility",
+    "publisher": "OpenMedia contributors",
+    "copyright": "Copyright © OpenMedia contributors",
+    "license": "MPL-2.0",
+    "licenseFile": "../LICENSE",
+    "shortDescription": "Load any website and reshape it with declarative recipes"
   }
 }

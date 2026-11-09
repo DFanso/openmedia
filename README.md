@@ -30,9 +30,19 @@ iOS is the verified platform. Android Kotlin site-view and billing code and an A
 
 ## Build and contribute
 
-Install Node.js 22+, Yarn 1.x, Rust, and the platform toolchain. Run `yarn install`; use `yarn tauri ios dev` for iOS or `yarn tauri android dev` for Android. Store builds, signing, and prerequisites are in the [store build guide](docs/wiki/store-builds.md); development commands are in the [development guide](docs/wiki/development-guide.md).
+Install Node.js 22+, Yarn 1.x, Rust, and the platform toolchain, then:
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) and the [wiki](docs/wiki/index.md) before changing code. CI checks the frontend and Rust code.
+```bash
+yarn install
+yarn dev:ios        # iOS simulator or device (set APPLE_DEVELOPMENT_TEAM for a device)
+yarn dev:android    # Android emulator or device
+yarn build macos    # OpenMedia.app (site views are not implemented on desktop yet)
+yarn verify         # every check CI runs on the web and Rust sides
+```
+
+Store builds, signing, and prerequisites are in the [store build guide](docs/wiki/store-builds.md); all development commands are in the [development guide](docs/wiki/development-guide.md).
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) and the [wiki](docs/wiki/index.md) before changing code. CI checks the frontend and Rust code and builds the Android app.
 
 ## License
 
