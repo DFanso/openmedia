@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### fix(release): align Apple build numbers with Android
+
+**Change:** Set iOS and macOS `CFBundleVersion` to `1000` for marketing version `0.1.0`, matching Android's version code. Increment both Apple build numbers for each subsequent upload.
+
+**Verified:** `yarn tauri info` parsed the config. **Not verified:** iOS or macOS archive/signing builds.
+
 ### fix(build): restore Rust formatting check
 
 **Change:** Apply `rustfmt` import ordering in the siteview plugin and avoid a desktop-only unnecessary `mut` warning while preserving mobile initialization.
