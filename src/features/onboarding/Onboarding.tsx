@@ -140,7 +140,7 @@ export function Onboarding() {
       role="dialog"
       aria-modal="true"
       aria-label={t("onboarding.label")}
-      className="fixed inset-0 z-[60] flex flex-col bg-ink px-6 pt-[calc(env(safe-area-inset-top)+12px)] pb-[calc(env(safe-area-inset-bottom)+20px)]"
+      className="fixed inset-0 z-[60] flex flex-col bg-ink px-6 pt-[calc(var(--safe-top)+12px)] pb-[calc(var(--safe-bottom)+20px)]"
     >
       <div className="flex justify-end">
         <button

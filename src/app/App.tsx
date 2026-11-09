@@ -95,7 +95,7 @@ export function App() {
           type="button"
           data-hit=""
           onClick={() => reportError(null)}
-          className="glass fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+12px)] z-20 rounded-2xl px-4 py-3 text-start text-sm text-accent"
+          className="glass fixed inset-x-3 bottom-[calc(var(--safe-bottom)+12px)] z-20 rounded-2xl px-4 py-3 text-start text-sm text-accent"
         >
           {error}
           <span className="mt-1 block text-xs text-paper/50">{t("app.dismiss")}</span>

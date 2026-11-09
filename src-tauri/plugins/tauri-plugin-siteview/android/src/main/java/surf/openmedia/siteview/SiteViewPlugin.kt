@@ -27,6 +27,8 @@ import androidx.biometric.BiometricPrompt
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.webkit.ProfileStore
 import androidx.webkit.ScriptHandler
@@ -135,6 +137,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     private val rules = BlockingRules()
     private var touchTarget: View? = null
     private val worker = Executors.newSingleThreadExecutor()
+    private var safeArea: Pair<Int, Int>? = null
+    private var safeAreaScript: ScriptHandler? = null
 
     override fun load(webView: WebView) {
         shell = webView
@@ -144,6 +148,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         // A view only consults its touch listener when it is clickable.
         webView.isClickable = true
         webView.setOnTouchListener { _, event -> routeTouch(event) }
+        trackSafeArea(webView)
 
         val host = webView.parent as? ViewGroup
         if (host != null) {
@@ -165,6 +170,39 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
 
         activity.registerComponentCallbacks(this)
         reportNotificationTap(activity.intent)
+    }
+
+    /**
+     * Android's WebView reports no safe area for the system bars, so the shell's `--safe-top` and
+     * `--safe-bottom` would stay 0 and content would sit under the status and navigation bars.
+     * The insets are pushed into the shell as CSS pixels, now and on every document loaded later.
+     */
+    private fun trackSafeArea(webView: WebView) {
+        ViewCompat.setOnApplyWindowInsetsListener(webView) { view, insets ->
+            publishSafeArea(webView, insets)
+            ViewCompat.onApplyWindowInsets(view, insets)
+        }
+        ViewCompat.requestApplyInsets(webView)
+    }
+
+    private fun publishSafeArea(webView: WebView, insets: WindowInsetsCompat) {
+        val bars = insets.getInsets(
+            WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+        )
+        val next = bars.top to bars.bottom
+        if (next == safeArea) return
+        safeArea = next
+        val density = activity.resources.displayMetrics.density
+        val script = "(function(){var s=document.documentElement.style;" +
+            "s.setProperty('--safe-top','${bars.top / density}px');" +
+            "s.setProperty('--safe-bottom','${bars.bottom / density}px');" +
+            "window.dispatchEvent(new Event('resize'));})();"
+        safeAreaScript?.remove()
+        safeAreaScript = null
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+            safeAreaScript = WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
+        }
+        webView.evaluateJavascript(script, null)
     }
 
     // MARK: Commands

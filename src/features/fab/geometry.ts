@@ -16,6 +16,12 @@ export interface Insets {
 export type Edge = "left" | "right";
 
 export const FAB_SIZE = 64;
+/** The button grows by this factor while it charges and while the fan is open. */
+export const HOLD_SCALE = 1.3;
+/** How far the lock or incognito badge hangs past the button's edge before scaling. */
+const BADGE_OVERHANG = 4;
+/** Distance from the button's centre to the far edge of its badge while the fan is open. */
+const FAB_OPEN_REACH = (FAB_SIZE / 2 + BADGE_OVERHANG) * HOLD_SCALE;
 export const EDGE_MARGIN = 10;
 export const FAVORITE_SIZE = 52;
 export const SETTINGS_SIZE = 44;
@@ -32,9 +38,11 @@ const MAX_ARC_DEGREES = 120;
 const MAX_STEP_DEGREES = 30;
 const SETTINGS_DISTANCE = 132;
 const ITEM_GAP = 6;
-/** Centre-to-centre distance that keeps the column's top button clear of the floating button. */
-const COLUMN_CLEARANCE = (FAB_SIZE + INCOGNITO_SIZE) / 2 + ITEM_GAP;
+/** Centre-to-centre distance that keeps the column's top button clear of the open button. */
+const COLUMN_CLEARANCE = FAB_OPEN_REACH + INCOGNITO_SIZE / 2 + ITEM_GAP;
 const SCREEN_PADDING = 6;
+/** Absorbs rounding when an item is placed exactly at its minimum distance. */
+const FLOAT_SLACK = 1e-6;
 const ARC_SCALES = [1, 0.8, 0.65, 0.5, 0.35];
 const SHIFTS = [0, ...Array.from({ length: 16 }, (_, i) => [(i + 1) * 5, -(i + 1) * 5]).flat()];
 
@@ -105,7 +113,8 @@ function isValid(items: FanItem[], origin: Point, viewport: Size, insets: Insets
   });
   const clearOfButton = items.every(
     ({ center, size }) =>
-      Math.hypot(center.x - origin.x, center.y - origin.y) >= (FAB_SIZE + size) / 2 + ITEM_GAP,
+      Math.hypot(center.x - origin.x, center.y - origin.y) + FLOAT_SLACK >=
+      FAB_OPEN_REACH + size / 2 + ITEM_GAP,
   );
   const apart = items.every((a, i) =>
     items.slice(i + 1).every((b) => {

@@ -24,7 +24,7 @@ export function AssistantDock() {
     <section
       aria-label={t("assistant.label")}
       data-hit=""
-      className="assistant-dock glass fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+12px)] z-40 max-h-[70vh] overflow-y-auto rounded-3xl p-3"
+      className="assistant-dock glass fixed inset-x-3 bottom-[calc(var(--safe-bottom)+12px)] z-40 max-h-[70vh] overflow-y-auto rounded-3xl p-3"
     >
       {card ? (
         <AssistantPanel state={assistant} />

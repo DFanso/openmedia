@@ -20,7 +20,7 @@ export function useInsets(): Insets {
   useEffect(() => {
     const probe = document.createElement("div");
     probe.style.cssText =
-      "position:fixed;visibility:hidden;pointer-events:none;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)";
+      "position:fixed;visibility:hidden;pointer-events:none;padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)";
     document.body.append(probe);
     const measure = () => {
       const style = getComputedStyle(probe);

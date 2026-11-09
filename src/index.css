@@ -17,6 +17,10 @@
 }
 
 :root {
+  /* iOS reports the safe area through env(). Android's WebView does not for system bars, so the
+     siteview plugin overrides these on the root element. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
   --glass: rgb(9 14 26 / 0.64);
   --glass-shadow: rgb(0 0 0 / 0.35);
   color-scheme: dark;
@@ -79,6 +83,15 @@ input {
 
 .fab-logo {
   pointer-events: none;
+}
+
+/* The Pro lock sits on glass over any page in either theme, so it keeps its own colours: the
+   theme tokens flip to near-white in light mode and would hide a white icon. */
+.pro-badge {
+  background: var(--color-navy);
+  color: #fff;
+  border: 1.5px solid #fff;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.4);
 }
 
 .fab-ring {
