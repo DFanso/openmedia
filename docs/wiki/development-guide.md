@@ -59,6 +59,7 @@ Android commands are available with `yarn tauri android dev` and `yarn tauri and
 - Bundled recipe changes require fixture updates in `recipes/fixtures/<site>/`.
 - Fixtures are scrubbed of personal data before commit; raw captures go in the gitignored `captures/`.
 - Bundled filter lists in `blocklists/` are refreshed only with `scripts/update-blocklists.sh` and shipped with a release; the app never downloads them. Run `cargo test ad_block` after a refresh ([Ad Blocking](./ad-blocking.md#updating-the-lists)).
+- The Public Suffix List (which hosts belong to one site) lives once, in `shared/public-suffix/resources/public_suffix_rules.txt`, with the official test vectors and `app-vectors.json` beside it. Refresh it with `yarn suffix:update` (it also regenerates the iOS plugin's `PublicSuffixRules.swift`; `yarn suffix:check` fails when that file is stale). Then run `yarn verify`, `yarn test:swift` and `yarn test:android`: all four matchers (`site.rs`, `site.ts`, `PublicSuffix.kt`, `PublicSuffix.swift`) must pass the same vectors. Add a case to `app-vectors.json`, never to a single platform's tests.
 
 ## Troubleshooting
 

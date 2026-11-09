@@ -22,7 +22,13 @@ class DomainScopeTest {
         assertEquals("bbc.co.uk", DomainScope.registrableDomain("news.bbc.co.uk"))
         assertEquals("bbc.co.uk", DomainScope.registrableDomain("bbc.co.uk"))
         assertEquals("example.com.au", DomainScope.registrableDomain("shop.example.com.au"))
-        assertEquals("co.com", DomainScope.registrableDomain("foo.co.com"))
+        assertEquals("foo.co.com", DomainScope.registrableDomain("foo.co.com"))
+    }
+
+    @Test
+    fun registrableDomainKeepsEachUserOfAHostingSuffixApart() {
+        assertEquals("alice.github.io", DomainScope.registrableDomain("www.alice.github.io"))
+        assertEquals("foo.com.br", DomainScope.registrableDomain("foo.com.br"))
     }
 
     @Test

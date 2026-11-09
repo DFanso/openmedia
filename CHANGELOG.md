@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### fix(siteview): decide which site a host belongs to with the Public Suffix List
+
+**Cause:** "Which site is this host?" was answered by a hand-written rule (last two labels, three after a country code and a 12-word list) copied seven times: `library.rs`, `ai/patch.rs` (with a different list), `site.ts`, `fetch-site-icons.mjs`, and the Kotlin and Swift `DomainScope`. The copies disagreed, and all of them treated `alice.github.io` and `bob.github.io` as one site and `foo.com.br` as `com.br`. That reached session pinning (a session on one could navigate to the other), favorites, usage limits and recipe names.
+
+**Change:** One data file, `shared/public-suffix/resources/public_suffix_rules.txt` (the Public Suffix List, ICANN and private sections, 8,971 rules), maintained by `yarn suffix:update` with the official test vectors beside it. Four thin matchers read it: `src-tauri/src/site.rs`, `src/shared/site.ts` (via `shared/public-suffix/match.mjs`, which the icon script also uses), `PublicSuffix.kt` (packaged as a Java resource) and `PublicSuffix.swift` (compiled in as generated `PublicSuffixRules.swift`, because a static Swift package cannot reliably ship a resource). Every matcher passes the same `vectors.json` (the official ones) and `app-vectors.json`. `yarn suffix:check` fails when the generated Swift file is stale. On startup `Usage::retire_public_suffix_sites` drops usage rows stored under a public suffix (`github.io`, `com.br`) and moves a limit set under one to each favorite beneath it; other data keeps its keys, since every site the old rule got right is unchanged.
+
+**Verified:** the 77 official and 23 app vectors on all four matchers (Rust 200 tests, vitest 273, Kotlin 11, Swift script), including the migration (limit moved, rows dropped, a second run writes nothing). **Not verified:** pinning on a device or simulator (only the matcher and the unit-tested verdict rules ran), the first-launch migration on a real `usage.json`, and the startup cost of parsing the 140 KB rule list on a low-end phone.
+
 ### chore: standards audit of the build, CI, dependencies and store metadata
 
 **Cause:** Release checks lived in a seven-command list nobody ran as one; `yarn build` only knew iOS; CI never built Android, ran the Swift domain-scope checks or audited dependencies; the plugins were three loose Cargo manifests (an untracked `Cargo.lock` appeared in the billing plugin); the `.env` reader in `build.rs` was hand-rolled and kept `# comments` in values; the production CSP allowed the dev HMR socket; the iOS app had no privacy manifest and no export-compliance key (App Store Connect asks on every upload); the Android domain-scope rules, the twin of the Swift ones, had no tests.

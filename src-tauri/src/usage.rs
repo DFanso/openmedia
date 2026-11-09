@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::error::{Error, Result};
 use crate::library::write_atomically;
+use crate::site::{is_public_suffix, registrable_domain};
 
 const FORMAT_VERSION: u32 = 1;
 /// Days of history kept on disk, counting today.
@@ -210,6 +211,41 @@ impl Usage {
             return Err(error);
         }
         Ok(data.policies.clone())
+    }
+
+    /// Sites an earlier build stored under a public suffix (`github.io`, `com.br`) because it
+    /// did not know the suffix list. Their seconds belong to no site and are dropped; a limit
+    /// moves to each favorite under that suffix, which is how the user reached the site.
+    pub fn retire_public_suffix_sites(&self, favorite_hosts: &[String]) -> Result<()> {
+        let mut data = self.lock()?;
+        let mut changed = false;
+        for hosts in data.days.values_mut() {
+            let before = hosts.len();
+            hosts.retain(|site, _| !is_public_suffix(site));
+            changed |= hosts.len() != before;
+        }
+        let stale: Vec<String> = data
+            .policies
+            .keys()
+            .filter(|site| is_public_suffix(site))
+            .cloned()
+            .collect();
+        for suffix in stale {
+            let Some(policy) = data.policies.remove(&suffix) else {
+                continue;
+            };
+            let under = format!(".{suffix}");
+            for host in favorite_hosts.iter().filter(|host| host.ends_with(&under)) {
+                if let Some(site) = registrable_domain(host) {
+                    data.policies.entry(site).or_insert_with(|| policy.clone());
+                }
+            }
+            changed = true;
+        }
+        if changed {
+            self.save(&data)?;
+        }
+        Ok(())
     }
 
     /// Wipes every recorded usage second. The limits the user set stay: they are the user's
@@ -771,5 +807,47 @@ mod tests {
             usage.set_policy("one-too-many.com", policy(None, Some(600))),
             Err(Error::InvalidUsage(_))
         ));
+    }
+
+    #[test]
+    fn sites_stored_under_a_public_suffix_are_retired() {
+        let (dir, usage) = usage();
+        usage.record("2026-11-08", "github.io", "/", 60).unwrap();
+        usage.record("2026-11-08", "youtube.com", "/", 30).unwrap();
+        usage.record("2026-11-08", "localhost", "/", 10).unwrap();
+        usage
+            .set_policy("github.io", policy(Some(300), Some(600)))
+            .unwrap();
+        usage
+            .set_policy("youtube.com", policy(None, Some(900)))
+            .unwrap();
+        let favorites = vec!["alice.github.io".to_owned(), "www.example.org".to_owned()];
+
+        usage.retire_public_suffix_sites(&favorites).unwrap();
+
+        for usage in [&usage, &reload(&dir)] {
+            let report = usage.report("2026-11-08", 1).unwrap();
+            let sites: Vec<&str> = report.sites.iter().map(|s| s.host.as_str()).collect();
+            assert_eq!(report.total_seconds, 40);
+            assert!(sites.contains(&"youtube.com") && sites.contains(&"localhost"));
+            let policies = usage.policies().unwrap();
+            assert_eq!(
+                policies.keys().map(String::as_str).collect::<Vec<_>>(),
+                ["alice.github.io", "youtube.com"]
+            );
+            assert_eq!(policies["alice.github.io"], policy(Some(300), Some(600)));
+        }
+    }
+
+    #[test]
+    fn retiring_with_nothing_stale_changes_nothing() {
+        let (dir, usage) = usage();
+        usage.record("2026-11-08", "youtube.com", "/", 30).unwrap();
+        let before = std::fs::read(dir.path().join("usage.json")).unwrap();
+        usage.retire_public_suffix_sites(&[]).unwrap();
+        assert_eq!(
+            std::fs::read(dir.path().join("usage.json")).unwrap(),
+            before
+        );
     }
 }

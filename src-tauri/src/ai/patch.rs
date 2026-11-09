@@ -11,6 +11,7 @@ use crate::error::{Error, Result};
 use crate::recipes::{
     Meta, OptionGroup, Origin, Recipe, Rule, SiteOption, Target, validate_selector,
 };
+use crate::site::registrable_domain;
 
 pub const MAX_RULES: usize = 8;
 pub const MAX_LABEL_CHARS: usize = 60;
@@ -403,41 +404,6 @@ fn custom_recipe(domain: &str) -> Result<Recipe> {
     })
 }
 
-/// A short list of public suffixes with two labels; enough for the sites people open on a phone.
-const TWO_LABEL_SUFFIXES: [&str; 22] = [
-    "co.uk", "org.uk", "ac.uk", "gov.uk", "com.au", "net.au", "org.au", "co.jp", "co.kr", "co.nz",
-    "co.in", "co.za", "com.br", "com.cn", "com.tw", "com.hk", "com.sg", "com.mx", "com.tr",
-    "com.ar", "com.ua", "com.pl",
-];
-
-/// The part of a host a site owns: `m.youtube.com` -> `youtube.com`, `bbc.co.uk` stays whole.
-/// `None` for IP addresses, single-label hosts and anything that is not a plain ASCII host name.
-pub fn registrable_domain(host: &str) -> Option<String> {
-    let host = host.trim().trim_end_matches('.').to_ascii_lowercase();
-    let labels: Vec<&str> = host.split('.').collect();
-    let well_formed = labels.len() >= 2
-        && labels.iter().all(|label| {
-            !label.is_empty()
-                && label.len() <= 63
-                && !label.starts_with('-')
-                && !label.ends_with('-')
-                && label.chars().all(|c| c.is_ascii_alphanumeric() || c == '-')
-        })
-        && labels
-            .last()
-            .is_some_and(|tld| tld.chars().any(|c| c.is_ascii_alphabetic()));
-    if !well_formed {
-        return None;
-    }
-    let last_two = labels[labels.len() - 2..].join(".");
-    let keep = if labels.len() >= 3 && TWO_LABEL_SUFFIXES.contains(&last_two.as_str()) {
-        3
-    } else {
-        2
-    };
-    Some(labels[labels.len() - keep..].join("."))
-}
-
 /// The css that previews a new option: each rule hides its elements, exactly like the saved one.
 pub fn preview_css(patch: &Patch) -> String {
     let mut css = String::new();
@@ -767,24 +733,6 @@ mod tests {
             "a..com",
         ] {
             assert!(apply_patch(None, bad, &patch).is_err(), "{bad}");
-        }
-    }
-
-    #[test]
-    fn registrable_domains() {
-        for (host, expected) in [
-            ("m.youtube.com", Some("youtube.com")),
-            ("www.instagram.com", Some("instagram.com")),
-            ("example.com", Some("example.com")),
-            ("news.bbc.co.uk", Some("bbc.co.uk")),
-            ("bbc.co.uk", Some("bbc.co.uk")),
-            ("A.B.Example.COM.", Some("example.com")),
-            ("localhost", None),
-            ("192.168.1.10", None),
-            ("exa mple.com", None),
-            ("", None),
-        ] {
-            assert_eq!(registrable_domain(host).as_deref(), expected, "{host}");
         }
     }
 }

@@ -24,13 +24,14 @@
 
 import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { format } from "prettier";
+import { createMatcher } from "../shared/public-suffix/match.mjs";
 
 const run = promisify(execFile);
 
@@ -48,32 +49,16 @@ const TIMEOUT_MS = 12_000;
 const USER_AGENT =
   "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1";
 
-/** Second-level labels under a two-letter country code, as the site view uses them. */
-const COUNTRY_SECOND_LEVEL = new Set([
-  "co",
-  "com",
-  "org",
-  "net",
-  "gov",
-  "edu",
-  "ac",
-  "or",
-  "ne",
-  "go",
-  "gob",
-  "mil",
-]);
-
 /** The domain a host belongs to: `www.instagram.com` and `m.instagram.com` both give
- * `instagram.com`. */
+ * `instagram.com`. A host without a registrable part is kept whole. */
+const registrable = createMatcher(
+  readFileSync(
+    path.join(ROOT, "shared", "public-suffix", "resources", "public_suffix_rules.txt"),
+    "utf8",
+  ),
+);
 function registrableDomain(host) {
-  const lower = host.toLowerCase();
-  const labels = lower.split(".").filter(Boolean);
-  if (labels.length <= 2 || labels.every((label) => /^\d+$/.test(label))) return lower;
-  const tld = labels[labels.length - 1];
-  const second = labels[labels.length - 2];
-  const keep = tld.length === 2 && COUNTRY_SECOND_LEVEL.has(second) ? 3 : 2;
-  return labels.slice(-keep).join(".");
+  return registrable(host) ?? host.toLowerCase();
 }
 
 /** The host a match pattern covers: `https://*.discord.com/*` covers `discord.com`. */

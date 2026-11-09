@@ -13,26 +13,14 @@ object DomainScope {
         POPUP,
     }
 
-    /** Second-level labels under a two-letter country code (`co.uk`, `com.au`, `ne.jp`). */
-    private val countrySecondLevel = setOf(
-        "co", "com", "org", "net", "gov", "edu", "ac", "or", "ne", "go", "gob", "mil",
-    )
-
     /**
      * `www.instagram.com` and `m.instagram.com` both give `instagram.com`; `news.bbc.co.uk` gives
-     * `bbc.co.uk`. Hosts without a registrable part (IP addresses, `localhost`) are kept whole.
+     * `bbc.co.uk`, and `bob.github.io` stays `bob.github.io` (Public Suffix List). Hosts without a
+     * registrable part (IP addresses, `localhost`) are kept whole.
      */
     @JvmStatic
-    fun registrableDomain(host: String?): String {
-        val normalized = (host ?: "").removeSuffix(".").lowercase()
-        val labels = normalized.split(".").filter { it.isNotEmpty() }
-        if (labels.size <= 2) return normalized
-        if (labels.all { it.toIntOrNull() != null }) return normalized
-        val tld = labels[labels.size - 1]
-        val second = labels[labels.size - 2]
-        val keep = if (tld.length == 2 && second in countrySecondLevel) 3 else 2
-        return labels.takeLast(keep).joinToString(".")
-    }
+    fun registrableDomain(host: String?): String =
+        PublicSuffix.shared.registrableDomain(host) ?: (host ?: "").removeSuffix(".").lowercase()
 
     /** True for the scope itself and any subdomain of it, never for `notinstagram.com`. */
     @JvmStatic

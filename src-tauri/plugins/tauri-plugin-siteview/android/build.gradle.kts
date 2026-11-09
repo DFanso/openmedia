@@ -21,6 +21,10 @@ android {
     }
 }
 
+// The Public Suffix rules every platform shares ship as a Java resource.
+(extensions.getByName("android") as com.android.build.gradle.BaseExtension)
+    .sourceSets.getByName("main").resources.srcDir(file("../../../../shared/public-suffix/resources"))
+
 kotlin {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_1_8
@@ -35,4 +39,5 @@ dependencies {
     implementation("androidx.browser:browser:1.9.0")
     implementation(project(":tauri-android"))
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.json:json:20250107")
 }

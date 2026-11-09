@@ -75,7 +75,7 @@ Blocking uses WebKit content rule lists attached to the site view's `WKUserConte
 
 ## Sessions and the popup browser
 
-Each opened site is a session (a separate native web view) pinned to the registrable domain it was opened on. The plugin cancels a main-frame navigation outside that domain, and `target=_blank` / `window.open` to one, and shows the address in a system popup browser (`SFSafariViewController`) instead. This adds no path from a site to native code:
+Each opened site is a session (a separate native web view) pinned to the registrable domain it was opened on, by the Public Suffix List (`bob.github.io` and `alice.github.io` are different sites). The plugin cancels a main-frame navigation outside that domain, and `target=_blank` / `window.open` to one, and shows the address in a system popup browser (`SFSafariViewController`) instead. This adds no path from a site to native code:
 
 - The popup is a separate process. It shares no cookies, storage, recipe script or bridge with the profile's views. Only `http` and `https` addresses open (`DomainScope.verdict`); one popup at a time.
 - The shell's `siteview:default` set gains `activate` and `close` (both take a UUID session id, validated in Rust). `open` stays ungranted; `open_site` and `adopt_boot_session` are the only shell-reachable ways to create a session, and both end in the same validated `open_session` (session id is a UUID, address is `http(s)`). At launch Core opens the start page itself (`boot.rs`), before the shell exists; `adopt_boot_session` only takes over that one session, by the id Core generated.

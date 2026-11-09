@@ -1,18 +1,7 @@
-/** Second-level labels under a two-letter country code, as the site view uses them. */
-const COUNTRY_SECOND_LEVEL: Record<string, true> = {
-  ac: true,
-  com: true,
-  co: true,
-  edu: true,
-  go: true,
-  gob: true,
-  gov: true,
-  mil: true,
-  ne: true,
-  net: true,
-  or: true,
-  org: true,
-};
+import { createMatcher } from "../../shared/public-suffix/match.mjs";
+import rules from "../../shared/public-suffix/resources/public_suffix_rules.txt?raw";
+
+const registrable = createMatcher(rules);
 
 /** The host of an address, without its port. */
 export function hostOf(url: string): string | undefined {
@@ -24,17 +13,14 @@ export function hostOf(url: string): string | undefined {
 }
 
 /**
- * The domain a host belongs to: `www.instagram.com` and `m.instagram.com` both give
- * `instagram.com`. A host without a registrable part is kept whole.
+ * The domain a host belongs to, by the Public Suffix List: `www.instagram.com` and
+ * `m.instagram.com` both give `instagram.com`, `news.bbc.co.uk` gives `bbc.co.uk` and
+ * `bob.github.io` stays `bob.github.io`. A host without a registrable part (`localhost`, an IP
+ * address) is kept whole.
  */
 export function registrableDomain(host: string): string {
   const lower = host.toLowerCase().replace(/\.$/, "");
-  const labels = lower.split(".").filter(Boolean);
-  if (labels.length <= 2 || labels.every((label) => /^\d+$/.test(label))) return lower;
-  const tld = labels[labels.length - 1];
-  const second = labels[labels.length - 2];
-  const keep = tld.length === 2 && COUNTRY_SECOND_LEVEL[second] === true ? 3 : 2;
-  return labels.slice(-keep).join(".");
+  return registrable(lower) ?? lower;
 }
 
 /**
