@@ -69,6 +69,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         val id: String,
         val view: WebView,
         val initialUrl: String,
+        @Volatile var topUrl: String = initialUrl,
         var scope: String,
         var settled: Boolean = false,
         var painted: Boolean = false,
@@ -681,6 +682,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
 
             override fun onPageStarted(view: WebView, url: String, favicon: android.graphics.Bitmap?) {
                 val session = sessionOf(view) ?: return
+                session.topUrl = url
                 session.loading = true
                 // While the first load is still running, a redirect may change the domain; the
                 // session adopts wherever the first page settles.
@@ -721,7 +723,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 val session = sessionOf(view) ?: return null
                 if (session.blocked) return blockedResponse()
                 val url = request.url.toString()
-                val top = view.url
+                val top = session.topUrl
                 if (!rules.blocks(url, request.isForMainFrame, top)) return null
                 return blockedResponse()
             }
@@ -849,12 +851,16 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         pageLayer?.requestLayout()
     }
 
-    private fun rectOf(args: RectArgs): RectF = RectF(
-        args.x.toFloat(),
-        args.y.toFloat(),
-        args.x.toFloat() + args.width.toFloat(),
-        args.y.toFloat() + args.height.toFloat(),
-    )
+    // Shell DOM rects are CSS pixels; Android view geometry and MotionEvent coordinates are pixels.
+    private fun rectOf(args: RectArgs): RectF {
+        val density = activity.resources.displayMetrics.density
+        return RectF(
+            args.x.toFloat() * density,
+            args.y.toFloat() * density,
+            (args.x.toFloat() + args.width.toFloat()) * density,
+            (args.y.toFloat() + args.height.toFloat()) * density,
+        )
+    }
 
     /**
      * Decides, per touch, whether the shell or the page underneath receives it. A touch inside a
