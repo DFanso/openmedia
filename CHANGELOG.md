@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### fix(fab): readable Pro lock and clearance around the open floating button
+
+**Change:** The Pro lock badge used the theme's `ink` token with a white icon, which is near-white in light mode and dark on dark pages in dark mode. It now has its own navy fill, white icon and white rim (`.pro-badge`) in both themes, and the badges sit above the ring animation instead of under it (`z-10`). Fan badges are smaller so they stop covering the item's icon. The fan geometry now measures clearance from the button as it looks while open (scaled by `HOLD_SCALE`, plus its badge), not its resting size, so the settings column no longer touches the button; an exact-distance placement was also being rejected by float rounding and silently shrinking the arc, which a new test covers.
+
+**Verified:** `yarn ts:check`, `eslint src`, `prettier --check src`, `yarn test` (261/261); light and dark themes with the fan open on an API 36 emulator. **Not verified:** other screen sizes on a device.
+
 ### fix(android): keep shell content clear of the system bars
 
 **Change:** Android's WebView reports `env(safe-area-inset-*)` as 0 under edge-to-edge, so headers, the command bar and the page slot sat under the status bar. The shell now reads `--safe-top` and `--safe-bottom` (defaulting to `env()` on iOS); the siteview plugin sets them on the root element from the window insets (system bars and display cutout, in CSS pixels) and re-applies them to every document the shell loads.

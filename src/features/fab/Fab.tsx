@@ -8,6 +8,7 @@ import {
   FAB_SIZE,
   FAVORITE_SIZE,
   HISTORY_SIZE,
+  HOLD_SCALE,
   INCOGNITO_SIZE,
   SETTINGS_SIZE,
   STATS_SIZE,
@@ -31,8 +32,6 @@ import logoMark from "../../assets/logo-mark.svg";
 import { useEntitlementStore } from "../paywall/store";
 
 const idle: GestureState = { phase: "idle" };
-
-const HOLD_SCALE = 1.3;
 
 const monogram = (name: string) => name.trim().charAt(0).toUpperCase() || "·";
 
@@ -288,8 +287,8 @@ export function Fab() {
       >
         <StatsIcon />
         {!isPro && (
-          <span className="absolute -end-1 -top-1 rounded-full bg-ink p-1">
-            <LockIcon />
+          <span className="pro-badge absolute -end-1.5 -top-1.5 z-10 grid size-5 place-items-center rounded-full">
+            <LockIcon size={12} />
           </span>
         )}
       </button>
@@ -319,8 +318,8 @@ export function Fab() {
       >
         <IncognitoIcon active={incognito.active} />
         {!isPro && (
-          <span className="absolute -end-1 -top-1 rounded-full bg-ink p-1">
-            <LockIcon />
+          <span className="pro-badge absolute -end-1.5 -top-1.5 z-10 grid size-5 place-items-center rounded-full">
+            <LockIcon size={12} />
           </span>
         )}
         {incognito.active && (
@@ -383,7 +382,7 @@ export function Fab() {
         {!isPro && (
           <span
             aria-hidden="true"
-            className="absolute -bottom-1 -end-1 grid size-6 place-items-center rounded-full border border-white/70 bg-ink text-white"
+            className="pro-badge absolute -bottom-1 -end-1 z-10 grid size-6 place-items-center rounded-full"
           >
             <LockIcon />
           </span>
@@ -391,13 +390,13 @@ export function Fab() {
         {anyUnread && !fanOpen && (
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute -end-0.5 -top-0.5 size-3.5 rounded-full border-2 border-ink bg-accent"
+            className="pointer-events-none absolute -end-0.5 -top-0.5 z-10 size-3.5 rounded-full border-2 border-ink bg-accent"
           />
         )}
         {incognito.active && (
           <span
             aria-hidden="true"
-            className="incognito-badge absolute -bottom-1 -end-1 grid size-6 place-items-center rounded-full border border-white/70 bg-black/80 text-white"
+            className="incognito-badge absolute -bottom-1 -end-1 z-10 grid size-6 place-items-center rounded-full border border-white/70 bg-black/80 text-white"
           >
             <IncognitoIcon active size={14} />
           </span>

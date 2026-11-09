@@ -3,6 +3,7 @@ import {
   FAB_SIZE,
   FAVORITE_SIZE,
   HISTORY_SIZE,
+  HOLD_SCALE,
   INCOGNITO_SIZE,
   SETTINGS_SIZE,
   STATS_SIZE,
@@ -60,7 +61,9 @@ describe("fanLayout", () => {
             expect(center.x + size / 2).toBeLessThanOrEqual(phone.width);
             expect(center.y - size / 2).toBeGreaterThanOrEqual(insets.top);
             expect(center.y + size / 2).toBeLessThanOrEqual(phone.height - insets.bottom);
-            expect(distance(center, origin)).toBeGreaterThanOrEqual((FAB_SIZE + size) / 2);
+            expect(distance(center, origin)).toBeGreaterThanOrEqual(
+              (FAB_SIZE * HOLD_SCALE + size) / 2,
+            );
           }
           for (let i = 0; i < items.length; i++) {
             for (let j = i + 1; j < items.length; j++) {
@@ -78,6 +81,16 @@ describe("fanLayout", () => {
       const layout = fanLayout(fabCenter(edge, 426, phone, insets), edge, phone, insets, 4);
       const ys = layout.favorites.map((p) => p.y);
       expect(ys).toEqual([...ys].sort((a, b) => a - b));
+    }
+  });
+
+  it("keeps the arc compact when the middle of the screen has room for it", () => {
+    for (const edge of edges) {
+      const origin = fabCenter(edge, 426, phone, insets);
+      const layout = fanLayout(origin, edge, phone, insets, 5);
+      for (const favorite of layout.favorites) {
+        expect(distance(favorite, origin)).toBeLessThan(130);
+      }
     }
   });
 
