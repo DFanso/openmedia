@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.svg" alt="OpenMedia logo" height="120">
+  <img src="assets/logo.svg" alt="OpenMedia logo" height="220">
 </p>
 
 <h1 align="center">OpenMedia</h1>
