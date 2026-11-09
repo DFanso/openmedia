@@ -4,6 +4,7 @@ import type { Translate } from "../../i18n/translate";
 import { useT } from "../../i18n/useT";
 import { PlusIcon } from "../../shared/icons";
 import { ai, type AiState, type Provider, type ProviderKind } from "../../shared/ipc";
+import { Picker } from "./Picker";
 import { PRESETS } from "./presets";
 import { Switch } from "./Switch";
 import { Group, Section, field, quietButton } from "./ui";
@@ -308,18 +309,15 @@ function ProviderForm({ initial, onClose, onChanged }: FormProps) {
   return (
     <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-hair bg-paper/[0.04] p-4">
       {!initial.id && (
-        <select
-          aria-label={t("ai.providerLabel")}
-          className={field}
+        <Picker
+          label={t("ai.providerLabel")}
           value={draft.presetId}
-          onChange={(e) => choosePreset(e.target.value)}
-        >
-          {PRESETS.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.labelKey ? t(p.labelKey) : p.label}
-            </option>
-          ))}
-        </select>
+          options={PRESETS.map((p) => ({
+            value: p.id,
+            label: p.labelKey ? t(p.labelKey) : p.label,
+          }))}
+          onChange={choosePreset}
+        />
       )}
       <input
         aria-label={t("ai.providerName")}
@@ -381,19 +379,15 @@ function ProviderForm({ initial, onClose, onChanged }: FormProps) {
       )}
 
       {models.length > 0 ? (
-        <select
-          aria-label={t("ai.model")}
-          className={field}
+        <Picker
+          label={t("ai.model")}
           value={draft.model}
-          onChange={(e) => patch({ model: e.target.value })}
-        >
-          <option value="">{t("ai.chooseModel")}</option>
-          {models.map((m) => (
-            <option key={m} value={m}>
-              {m}
-            </option>
-          ))}
-        </select>
+          options={[
+            { value: "", label: t("ai.chooseModel") },
+            ...models.map((m) => ({ value: m, label: m })),
+          ]}
+          onChange={(model) => patch({ model })}
+        />
       ) : (
         <input
           aria-label={t("ai.model")}

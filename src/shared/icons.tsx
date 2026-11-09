@@ -42,6 +42,12 @@ export const CloseIcon = () => (
   </Icon>
 );
 
+export const CheckIcon = () => (
+  <Icon>
+    <path d="M5 12.5l4.5 4.5L19 7.5" />
+  </Icon>
+);
+
 export const ArrowIcon = () => (
   <Icon>
     <path d="M5 12h14M13 6l6 6-6 6" />

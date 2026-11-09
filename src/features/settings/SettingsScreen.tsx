@@ -11,7 +11,8 @@ import { IncognitoFavoritesSection, IncognitoRecipesSection } from "./IncognitoS
 import { MarginSlider } from "./MarginSlider";
 import { RecipesSection } from "./RecipesSection";
 import { Switch } from "./Switch";
-import { Group, Section, field, primaryButton, quietButton } from "./ui";
+import { Picker } from "./Picker";
+import { Group, Section, primaryButton, quietButton } from "./ui";
 
 export function SettingsScreen() {
   const open = useApp((s) => s.sheet === "settings");
@@ -83,22 +84,16 @@ function LanguageSection() {
     <Section title={t("settings.language")} note={t("settings.languageNote")}>
       <Group>
         <div className="flex flex-col gap-2 px-4 py-3.5">
-          <label className="text-xs text-paper/60" htmlFor="app-language">
-            {t("settings.languageLabel")}
-          </label>
-          <select
-            id="app-language"
-            className={field}
+          <div className="text-xs text-paper/60">{t("settings.languageLabel")}</div>
+          <Picker
+            label={t("settings.languageLabel")}
             value={locale ?? ""}
-            onChange={(event) => void setLocale(event.target.value || null)}
-          >
-            <option value="">{t("settings.languageSystem")}</option>
-            {LOCALES_BY_NAME.map((entry) => (
-              <option key={entry.tag} value={entry.tag}>
-                {entry.nativeName}
-              </option>
-            ))}
-          </select>
+            options={[
+              { value: "", label: t("settings.languageSystem") },
+              ...LOCALES_BY_NAME.map((entry) => ({ value: entry.tag, label: entry.nativeName })),
+            ]}
+            onChange={(next) => void setLocale(next || null)}
+          />
         </div>
       </Group>
     </Section>
