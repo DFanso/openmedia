@@ -8,6 +8,16 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### feat(shell): floating back button always visible and closes sheets; history records sites opened from a search
+
+**Problem:** the optional floating back button disappeared when Settings or any sheet was open, and only went back in the page. Sites opened from search results were never in History, because only typed addresses were recorded.
+
+**Change:** the button is shown whenever it is enabled, above every sheet (`z-[80]`). A tap does what system Back does: it dismisses the newest thing on screen (Settings, paywall, the fan, a list, a guide step) through the back stack, and with nothing on screen goes back in the page. It is dimmed instead of hidden when a tap would do nothing. History now also records a site when a session moves from a search engine's page to a site (`leftSearchForSite`, `recordVisit`); the search itself is still never recorded, and neither is browsing inside the site afterwards. Incognito still records nothing.
+
+**Strings:** `settings.backButtonNote` is reworded in all 29 locales (it said the button shows only when the page can go back); the 28 non-English versions are mine and need a native-speaker review.
+
+**Verified:** `tsc`, ESLint, Prettier, frontend tests (new: `searchVisit.test.ts`). **Not verified:** the button over each sheet on a device, and the history recording against real search-result redirects (Google and DuckDuckGo link through their own redirect pages); no test drives `WebLayer`.
+
 ### feat(siteview): site views on macOS, with Mac trackpad gestures and shortcuts
 
 **Problem:** the macOS app opened with "site views are not implemented on desktop yet" and showed no page.
@@ -23,6 +33,7 @@ All notable changes to OpenMedia are documented here.
 **Not on macOS:** domain pinning (Tauri's navigation callback has no frame information, and pinning would break OAuth redirects), a page-to-Core bridge, `siteview:closed` and `siteview:memory`, JavaScript `alert`/`confirm`/`prompt`. Windows and Linux still return `DesktopUnsupported`.
 
 **Verified:** debug builds run on one Mac (macOS 26, Apple Silicon) with a fixture server: load, state events, back/forward and reload through the menu, zoom, address and settings shortcuts, Escape, session switch, overlay hiding, light/dark, script swap, ad-block rule, download, favicons, user agent, refusal of page-side IPC calls, and the gesture flags read back (see [platform support](docs/wiki/platform-support.md#the-macos-site-view)); `cargo fmt --check`, `clippy -D warnings`, `cargo test`, `ts:check`, `lint`, `format:check` and `test`. **Not verified:** a finger on the trackpad (swipe, pinch), notifications (the system refused the ad-hoc signed debug bundle), the Touch ID prompt, macOS 14/15, Intel, a release or signed build, two profiles with separate cookies, Google sign-in, `target=_blank`, and the iOS and Android builds: `cargo check --target aarch64-apple-ios-sim` stops in the Swift package build here (no Swift file was touched; whether it fails on `main` too was not checked), so the edit to `mobile.rs` (event names moved to `events.rs`) was not compiled.
+
 ### fix(settings): call the shared bottom margin "Global bottom margin"
 
 **Change:** the Browsing slider's title (`settings.bottomMargin`) now reads "Global bottom margin" in every language, to set it apart from the per-site margin on each recipe card.
