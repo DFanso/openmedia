@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### fix(build): restore Rust formatting check
+
+**Change:** Apply `rustfmt` import ordering in the siteview plugin and avoid a desktop-only unnecessary `mut` warning while preserving mobile initialization.
+
+**Verified:** Both Rust formatting checks; `cargo clippy --all-targets -- -D warnings`.
+
 ### fix(build): avoid DOM.Iterable requirement for hit regions
 
 **Change:** Use `Array.from` to iterate DOM query results without depending on the `DOM.Iterable` TypeScript library.
