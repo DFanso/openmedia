@@ -213,7 +213,10 @@ impl Entitlement {
         let forced = dev_override(DEV_OVERRIDE, cfg!(debug_assertions));
         #[cfg(not(any(target_os = "ios", target_os = "android")))]
         let forced = Some(Status::Pro);
+        #[cfg(any(target_os = "ios", target_os = "android"))]
         let mut entitlement = Self::new(SDK_KEY, forced);
+        #[cfg(not(any(target_os = "ios", target_os = "android")))]
+        let entitlement = Self::new(SDK_KEY, forced);
         #[cfg(any(target_os = "ios", target_os = "android"))]
         {
             entitlement.simulator_override_requested =

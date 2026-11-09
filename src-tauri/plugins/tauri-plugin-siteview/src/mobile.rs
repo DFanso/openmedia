@@ -241,8 +241,8 @@ mod android_secrets {
     use std::sync::{Arc, OnceLock};
 
     use serde::Deserialize;
-    use tauri::plugin::PluginHandle;
     use tauri::Runtime;
+    use tauri::plugin::PluginHandle;
 
     /// `op` is one of `set`, `get` or `delete`; the answer is the stored value, if any.
     pub type Ops = Arc<dyn Fn(&str, &str, &str) -> Result<Option<String>, String> + Send + Sync>;
