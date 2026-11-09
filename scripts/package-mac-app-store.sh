@@ -1,0 +1,71 @@
+#!/bin/sh
+# Builds the Mac App Store package Transporter takes: the release .app, signed with the sandbox
+# entitlements and the Mac App Store provisioning profile, wrapped in a signed installer .pkg.
+#
+#   yarn tauri build --bundles app
+#   MAS_APP_IDENTITY="3rd Party Mac Developer Application: ..." \
+#   MAS_INSTALLER_IDENTITY="3rd Party Mac Developer Installer: ..." \
+#   MAS_PROFILE=path/to/OpenMedia.provisionprofile \
+#   sh scripts/package-mac-app-store.sh
+#
+# The identities (certificate name or SHA-1) and the profile come from the Apple Developer account
+# (see docs/wiki/store-builds.md). Set MAS_KEYCHAIN to sign from a keychain that is not in the
+# search list, and MAS_APP to package an .app other than the one `yarn tauri build` made. The result
+# is OpenMedia-MacAppStore.pkg next to that .app (src-tauri/target/release/bundle/macos by default).
+set -eu
+
+: "${MAS_APP_IDENTITY:?set MAS_APP_IDENTITY}"
+: "${MAS_INSTALLER_IDENTITY:?set MAS_INSTALLER_IDENTITY}"
+: "${MAS_PROFILE:?set MAS_PROFILE}"
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+app=${MAS_APP:-$root/src-tauri/target/release/bundle/macos/OpenMedia.app}
+bundle=$(dirname "$app")
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+keychain=${MAS_KEYCHAIN:+--keychain $MAS_KEYCHAIN}
+
+[ -d "$app" ] || { echo "build the app first: yarn tauri build --bundles app" >&2; exit 1; }
+
+profile_plist="$work/profile.plist"
+security cms -D -i "$MAS_PROFILE" > "$profile_plist"
+# PlistBuddy, because plutil reads the dots in these key names as key-path separators.
+plist() { /usr/libexec/PlistBuddy "$@"; }
+app_id=$(plist -c "Print :Entitlements:com.apple.application-identifier" "$profile_plist")
+team_id=$(plist -c "Print :Entitlements:com.apple.developer.team-identifier" "$profile_plist")
+
+# The sandbox entitlements, plus the identifiers the profile grants.
+entitlements="$work/OpenMedia.entitlements"
+cp "$root/src-tauri/macos/OpenMedia.entitlements" "$entitlements"
+plist -c "Add :com.apple.application-identifier string $app_id" "$entitlements"
+plist -c "Add :com.apple.developer.team-identifier string $team_id" "$entitlements"
+
+signed="$work/OpenMedia.app"
+cp -R "$app" "$signed"
+# HTTPS only, no custom cryptography: answers the export-compliance question at upload.
+plutil -replace ITSAppUsesNonExemptEncryption -bool false "$signed/Contents/Info.plist"
+cp "$MAS_PROFILE" "$signed/Contents/embedded.provisionprofile"
+# The app icon goes in as an asset catalog (Assets.car) with a matching .icns, which is how Xcode
+# ships it and what the App Store's tools read the icon from.
+rm -f "$signed/Contents/Resources/icon.icns"
+xcrun actool "$root/src-tauri/macos/Assets.xcassets" --compile "$signed/Contents/Resources" \
+  --platform macosx --minimum-deployment-target 14.0 --app-icon AppIcon \
+  --output-partial-info-plist "$work/icon.plist" > /dev/null
+for key in CFBundleIconFile CFBundleIconName; do
+  value=$(plist -c "Print :$key" "$work/icon.plist")
+  plist -c "Delete :$key" "$signed/Contents/Info.plist" 2> /dev/null || true
+  plist -c "Add :$key string $value" "$signed/Contents/Info.plist"
+done
+# A profile kept private (mode 600) would make the installed app unreadable to non-root users,
+# which App Store validation rejects (error 90255).
+chmod -R a+rX,u+w "$signed"
+
+# shellcheck disable=SC2086
+codesign --force $keychain --sign "$MAS_APP_IDENTITY" --entitlements "$entitlements" --timestamp "$signed"
+codesign --verify --strict "$signed"
+
+out="$bundle/OpenMedia-MacAppStore.pkg"
+rm -f "$out"
+# shellcheck disable=SC2086
+productbuild --component "$signed" /Applications $keychain --sign "$MAS_INSTALLER_IDENTITY" "$out"
+echo "$out"
