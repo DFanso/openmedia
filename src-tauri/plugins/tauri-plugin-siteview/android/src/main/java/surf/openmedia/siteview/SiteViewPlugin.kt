@@ -722,7 +722,6 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     private fun configure(view: WebView) {
         view.settings.javaScriptEnabled = true
         view.settings.domStorageEnabled = true
-        view.settings.databaseEnabled = true
         view.settings.mediaPlaybackRequiresUserGesture = false
         view.settings.javaScriptCanOpenWindowsAutomatically = true
         view.setBackgroundColor(Color.TRANSPARENT)

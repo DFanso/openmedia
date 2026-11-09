@@ -12,6 +12,7 @@
 		373CE0B1E6E54A7B58E62624 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 03F84850CE7192771EB6F423 /* CoreGraphics.framework */; };
 		4199EFBE9B111CD3AEEB1CA4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D1106BE9ADD6589F62562D7 /* UIKit.framework */; };
 		56614CD5C9242B55D5CCA81B /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 000242794AFA0C9F9D262951 /* MetalKit.framework */; };
+		5BB43D8ABE9EC6663E5F0DB8 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D38DA4692871279D69C8ED3C /* PrivacyInfo.xcprivacy */; };
 		978BFEA2068081B9CFBC61D8 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 390C71DBFC98B6A8F624BF6C /* Security.framework */; };
 		A64C4B85F2D339EBA4AEFEBD /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9647D6D61C0A2F2414887DA8 /* Metal.framework */; };
 		B1C48093E9F8A726121E53F1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A31D95E0B1AC6FFC9632E3B2 /* LaunchScreen.storyboard */; };
@@ -56,8 +57,10 @@
 		B011789A2FA2C4B2665913E0 /* libapp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libapp.a; sourceTree = "<group>"; };
 		B8DFD2ABC0CF47243450B22E /* main.rs */ = {isa = PBXFileReference; path = main.rs; sourceTree = "<group>"; };
 		BC575E4AEBBB494C6907B0E4 /* secrets.rs */ = {isa = PBXFileReference; path = secrets.rs; sourceTree = "<group>"; };
+		C968C59DE80B7FEB71CAE7E2 /* entitlement.rs */ = {isa = PBXFileReference; path = entitlement.rs; sourceTree = "<group>"; };
 		D1CFB084D7F9892EFD7A1A1D /* matcher.rs */ = {isa = PBXFileReference; path = matcher.rs; sourceTree = "<group>"; };
 		D2842A6BBBCEBE8EF59318D5 /* prompt.rs */ = {isa = PBXFileReference; path = prompt.rs; sourceTree = "<group>"; };
+		D38DA4692871279D69C8ED3C /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		D668D0119399BAE7C501BA7A /* connection.rs */ = {isa = PBXFileReference; path = connection.rs; sourceTree = "<group>"; };
 		EBDDCDB63F12336A23A05D0D /* anthropic.rs */ = {isa = PBXFileReference; path = anthropic.rs; sourceTree = "<group>"; };
 		EC8780B49AFA07C394CC506D /* selector.rs */ = {isa = PBXFileReference; path = selector.rs; sourceTree = "<group>"; };
@@ -93,6 +96,7 @@
 				80BD2E168FE98A12DD9B59D7 /* ad_block.rs */,
 				2BCFE00B27B3EEF7492B2E89 /* boot.rs */,
 				F7CB636816595F956CA6E9D7 /* commands.rs */,
+				C968C59DE80B7FEB71CAE7E2 /* entitlement.rs */,
 				4A4CA00457E2D523FFF03373 /* error.rs */,
 				1D07DE68847C39CB017E2B63 /* incognito.rs */,
 				4051E8863082CECDC18A98CF /* lib.rs */,
@@ -156,6 +160,7 @@
 			children = (
 				7F5E1D86AA68B8605245ADB4 /* Info.plist */,
 				1CDA6806160D9FBB24141E2A /* openmedia_iOS.entitlements */,
+				D38DA4692871279D69C8ED3C /* PrivacyInfo.xcprivacy */,
 			);
 			path = openmedia_iOS;
 			sourceTree = "<group>";
@@ -218,18 +223,18 @@
 			path = bindings;
 			sourceTree = "<group>";
 		};
-		"TEMP_052BA7EA-425E-4ACC-B291-D9FDD855C9AE" /* x86_64 */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = x86_64;
-			sourceTree = "<group>";
-		};
-		"TEMP_A6765BB5-D671-4ADE-B478-D9C336EBC95D" /* arm64 */ = {
+		"TEMP_32B1C111-B1E2-4324-8249-BD6C6D92CFF2" /* arm64 */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = arm64;
+			sourceTree = "<group>";
+		};
+		"TEMP_9129B621-638F-4572-862C-FBE90E4248D7" /* x86_64 */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = x86_64;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -292,6 +297,7 @@
 			files = (
 				C84B417E554A1ACC5B0F83B7 /* Assets.xcassets in Resources */,
 				B1C48093E9F8A726121E53F1 /* LaunchScreen.storyboard in Resources */,
+				5BB43D8ABE9EC6663E5F0DB8 /* PrivacyInfo.xcprivacy in Resources */,
 				2CEECF30BE8D9CBB6F7D4C58 /* assets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

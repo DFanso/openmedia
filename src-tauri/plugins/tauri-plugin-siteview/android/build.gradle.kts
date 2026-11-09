@@ -34,4 +34,5 @@ dependencies {
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.browser:browser:1.9.0")
     implementation(project(":tauri-android"))
+    testImplementation("junit:junit:4.13.2")
 }
