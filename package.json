@@ -6,6 +6,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:ios": "tauri ios dev",
+    "dev:android": "tauri android dev",
+    "dev:desktop": "tauri dev",
     "build": "node scripts/build.mjs",
     "build:web": "yarn icons:fetch && tsc && vite build",
     "preview": "vite preview",
@@ -15,6 +18,12 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
+    "test:rust": "cargo test --manifest-path src-tauri/Cargo.toml --workspace",
+    "test:swift": "sh scripts/test-domain-scope.sh",
+    "test:android": "cd src-tauri/gen/android && ./gradlew :tauri-plugin-siteview:testDebugUnitTest",
+    "check:web": "yarn ts:check && yarn lint && yarn format:check && yarn test",
+    "check:rust": "cargo fmt --manifest-path src-tauri/Cargo.toml --all --check && cargo clippy --manifest-path src-tauri/Cargo.toml --workspace --all-targets -- -D warnings && yarn test:rust",
+    "verify": "yarn check:web && yarn check:rust",
     "icons:fetch": "node scripts/fetch-site-icons.mjs"
   },
   "dependencies": {
@@ -30,7 +39,7 @@
     "@tauri-apps/cli": "^2",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
-    "@vitejs/plugin-react": "^6.0.2",
+    "@vitejs/plugin-react": "^6.3.0",
     "eslint": "^10.14.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.14.0",
@@ -40,5 +49,13 @@
     "typescript-eslint": "^8.72.1",
     "vite": "^8.0.16",
     "vitest": "^5.1.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skepjandi/openmedia.git"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "yarn@1.22.22"
 }

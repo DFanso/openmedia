@@ -16,15 +16,29 @@
 
 ```bash
 yarn install
-APPLE_DEVELOPMENT_TEAM=<team id> yarn tauri ios dev "iPhone 17 Pro Max"   # iOS simulator
+APPLE_DEVELOPMENT_TEAM=<team id> yarn dev:ios "iPhone 17 Pro Max"   # iOS simulator
+yarn dev:android                                                      # Android emulator or device
 
-yarn ts:check && yarn lint && yarn format:check && yarn test
-cargo fmt --manifest-path src-tauri/Cargo.toml --check
-cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
-cargo test --manifest-path src-tauri/Cargo.toml
-cargo test --manifest-path src-tauri/plugins/tauri-plugin-siteview/Cargo.toml
-scripts/test-domain-scope.sh   # iOS plugin's domain-pinning rules (needs only swiftc)
+yarn verify        # everything CI runs on the web and Rust sides
+yarn check:web     # ts:check, lint, format:check, test
+yarn check:rust    # cargo fmt --all --check, clippy --workspace -D warnings, cargo test --workspace
+yarn test:swift    # iOS plugin's domain-pinning rules (needs only swiftc)
+yarn test:android # Android plugin's domain-pinning rules (JUnit; needs a prior `yarn build android`)
+cargo deny --manifest-path src-tauri/Cargo.toml check   # licenses, advisories, sources
 ```
+
+The Rust app and both plugins form one Cargo workspace rooted at `src-tauri/`, so `--workspace` covers all three crates and they share `src-tauri/Cargo.lock`.
+
+Local builds:
+
+```bash
+yarn build                       # web bundle only
+yarn build macos                 # src-tauri/target/release/bundle/macos/OpenMedia.app
+yarn build android               # debug-signed arm64 APK, installable on a device
+APPLE_DEVELOPMENT_TEAM=<team id> yarn build ios   # development-signed iOS build
+```
+
+Release builds (`--production`) are described in [Store Builds](./store-builds.md).
 
 To measure startup or install a simulator build:
 

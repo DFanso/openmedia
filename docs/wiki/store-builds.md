@@ -23,6 +23,8 @@ Before a release, configure the RevenueCat keys and live HTTPS privacy/terms URL
 
 `--target aarch64-sim --archive-only` is for Simulator testing only; its `.app` cannot be submitted to the App Store. Store signing and upload have not been verified in this repository.
 
+The app ships `src-tauri/gen/apple/openmedia_iOS/PrivacyInfo.xcprivacy` declaring the required-reason APIs the binary links (file timestamps `C617.1`, UserDefaults `CA92.1`; found with `nm -u` on a release build). Re-check with `nm -u` and update it when a dependency changes. `Info.plist` sets `ITSAppUsesNonExemptEncryption` to `false` (HTTPS only, no custom cryptography); the account holder must confirm that answer applies before the first upload. The privacy nutrition label in App Store Connect is separate and still manual (RevenueCat's anonymous purchase data, the user-initiated AI snapshot).
+
 ## Android Google Play
 
 1. Create a Play upload keystore and keep it outside version control. Create the ignored file `src-tauri/gen/android/keystore.properties` with these fields:

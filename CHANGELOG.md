@@ -8,6 +8,16 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### chore: standards audit of the build, CI, dependencies and store metadata
+
+**Cause:** Release checks lived in a seven-command list nobody ran as one; `yarn build` only knew iOS; CI never built Android, ran the Swift domain-scope checks or audited dependencies; the plugins were three loose Cargo manifests (an untracked `Cargo.lock` appeared in the billing plugin); the `.env` reader in `build.rs` was hand-rolled and kept `# comments` in values; the production CSP allowed the dev HMR socket; the iOS app had no privacy manifest and no export-compliance key (App Store Connect asks on every upload); the Android domain-scope rules, the twin of the Swift ones, had no tests.
+
+**Change:** `yarn verify` (and `check:web`, `check:rust`, `test:swift`, `test:android`) replace the manual list; `yarn build ios|android|macos [--production]` and `dev:ios|dev:android|dev:desktop` wrap the Tauri CLI. `src-tauri` is one Cargo workspace (app + both plugins, one lockfile, `rust-version` 1.90). `build.rs` uses `dotenvy`. `deny.toml` + a `cargo deny` job enforce licenses, advisories and sources. CI gets least-privilege permissions, concurrency, timeouts, an Android build with the new JUnit domain-scope tests, and the Swift checks. Dependabot also covers Gradle and Swift. `keyring` is no longer compiled for Android. The dev-only `ws:` source moved to `devCsp`; `tauri.conf.json` gains bundle metadata (category, publisher, license, macOS 13 minimum). iOS: `PrivacyInfo.xcprivacy` (file timestamps and UserDefaults, the required-reason APIs the binary links), `ITSAppUsesNonExemptEncryption=false`, `LSApplicationCategoryType`. Android: dropped the deprecated `databaseEnabled` WebView setting.
+
+**Also:** AGENTS.md's "no `unwrap()`/`expect()` outside tests" rule is now a clippy `deny` (`[workspace.lints]`, tests exempt via `clippy.toml`); the only exception is the unrecoverable startup `expect` in `run()`. `@vitejs/plugin-react` 6.2.1 to 6.3.0.
+
+**Verified:** `yarn verify` (269 web tests, 195 Rust tests plus 12 plugin tests, clippy `-D warnings`), `cargo deny check`, 7 Kotlin tests (`yarn test:android`), macOS `.app` release build (11 MiB, launches, Info.plist carries the new metadata), iOS development-signed IPA (7.7 MB, contains `PrivacyInfo.xcprivacy`), Android debug APK and R8-minified release APK (15 MB, debug-signed and launched on an API 36 emulator: the shell renders, no crash). **Not verified:** the new CI jobs on GitHub runners, signed store builds, App Store Connect acceptance of the privacy manifest and the export-compliance answer (confirm it applies before upload), plugin behavior on the emulator or a device beyond startup, desktop site views (still `DesktopUnsupported`).
+
 ### fix(settings): draw choice lists in the app instead of the system's dialog
 
 **Cause:** The language, AI provider and model pickers were native `<select>` elements. Android's WebView opens those in its own light dialog (white, with radio buttons), which ignores the app's theme and looked out of place on the dark Settings screen.

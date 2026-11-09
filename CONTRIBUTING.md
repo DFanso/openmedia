@@ -8,10 +8,7 @@ Read [AGENTS.md](AGENTS.md) first. It applies to humans and AI agents alike.
 4. All checks must pass before opening a PR:
 
 ```bash
-yarn ts:check && yarn lint && yarn format:check && yarn test
-cargo fmt --manifest-path src-tauri/Cargo.toml --check
-cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
-cargo test --manifest-path src-tauri/Cargo.toml
+yarn verify   # ts:check, lint, format:check, test, cargo fmt, clippy -D warnings, cargo test
 ```
 
 5. Add a `CHANGELOG.md` entry; update the wiki if behavior or architecture changes.

@@ -4,7 +4,20 @@ updates:
     directory: /
     schedule: { interval: weekly }
   - package-ecosystem: cargo
+    # One workspace: the app and both plugins share src-tauri/Cargo.lock.
     directory: /src-tauri
+    schedule: { interval: weekly }
+  - package-ecosystem: gradle
+    directory: /src-tauri/gen/android
+    schedule: { interval: weekly }
+  - package-ecosystem: gradle
+    directory: /src-tauri/plugins/tauri-plugin-siteview/android
+    schedule: { interval: weekly }
+  - package-ecosystem: gradle
+    directory: /src-tauri/plugins/tauri-plugin-billing/android
+    schedule: { interval: weekly }
+  - package-ecosystem: swift
+    directory: /src-tauri/plugins/tauri-plugin-billing/ios
     schedule: { interval: weekly }
   - package-ecosystem: github-actions
     directory: /
