@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### fix(build): restore Rust formatting check
+
+**Change:** Apply `rustfmt` import ordering required by the siteview plugin CI check.
+
+**Verified:** Both Rust formatting checks.
+
 ### fix(build): avoid DOM.Iterable requirement for hit regions
 
 **Change:** Use `Array.from` to iterate DOM query results without depending on the `DOM.Iterable` TypeScript library.
