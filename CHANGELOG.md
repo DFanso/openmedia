@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### fix(release): align Apple build numbers with Android
+
+**Change:** Set iOS and macOS `CFBundleVersion` to `1000` for marketing version `0.1.0`, matching Android's version code. Increment both Apple build numbers for each subsequent upload.
+
+**Verified:** `yarn tauri info` parsed the config. **Not verified:** iOS or macOS archive/signing builds.
+
 ### fix(build): avoid DOM.Iterable requirement for hit regions
 
 **Change:** Use `Array.from` to iterate DOM query results without depending on the `DOM.Iterable` TypeScript library.
