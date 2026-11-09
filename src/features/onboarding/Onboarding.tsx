@@ -3,7 +3,7 @@ import { useApp } from "../../app/store";
 import logoMark from "../../assets/logo-mark.svg";
 import { useT } from "../../i18n/useT";
 import type { MessageKey } from "../../i18n/messages";
-import { SlidersIcon } from "../../shared/icons";
+import { HistoryIcon, IncognitoIcon, SlidersIcon, StatsIcon } from "../../shared/icons";
 import { useBackHandler } from "../back/useBackHandler";
 
 interface DemoItemStyle extends CSSProperties {
@@ -46,7 +46,8 @@ function TapVisual() {
   );
 }
 
-const DEMO_ITEMS = [
+/** Offsets from the button's centre, in px. Favorites arc out; the four controls stack above it. */
+const DEMO_FAVORITES = [
   { label: "I", x: 70, y: -100 },
   { label: "F", x: 114, y: -50 },
   { label: "T", x: 128, y: 0 },
@@ -54,32 +55,51 @@ const DEMO_ITEMS = [
   { label: "Y", x: 70, y: 100 },
 ];
 
+const DEMO_CONTROLS = [
+  { key: "incognito", icon: <IncognitoIcon />, y: -188 },
+  { key: "usage", icon: <StatsIcon />, y: -146 },
+  { key: "history", icon: <HistoryIcon />, y: -104 },
+  { key: "settings", icon: <SlidersIcon />, y: -62 },
+];
+
+const DEMO_BUTTON_CENTER = { x: 56, y: 214 };
+
+function demoItemStyle(index: number, x: number, y: number, size: number): DemoItemStyle {
+  return {
+    "--i": index,
+    "--from-x": `${-x}px`,
+    "--from-y": `${-y}px`,
+    left: DEMO_BUTTON_CENTER.x + x - size / 2,
+    top: DEMO_BUTTON_CENTER.y + y - size / 2,
+    width: size,
+    height: size,
+  };
+}
+
 function HoldVisual() {
   return (
-    <div className="relative h-56 w-64">
-      <div className="absolute top-1/2 left-6 -translate-y-1/2">
+    <div className="relative h-80 w-64">
+      <div className="absolute" style={{ left: 24, top: DEMO_BUTTON_CENTER.y - 32 }}>
         <MiniButton pulsing />
       </div>
-      {DEMO_ITEMS.map((item, i) => (
+      {DEMO_FAVORITES.map((item, i) => (
         <span
           key={item.label}
-          className="demo-fan-item glass absolute top-1/2 left-6 grid size-12 place-items-center rounded-full text-base font-medium"
-          style={
-            {
-              "--i": i,
-              "--from-x": `${-item.x}px`,
-              "--from-y": `${-item.y}px`,
-              marginTop: -24 + item.y,
-              marginLeft: 4 + item.x,
-            } as DemoItemStyle
-          }
+          className="demo-fan-item glass absolute grid place-items-center rounded-full text-base font-medium"
+          style={demoItemStyle(i, item.x, item.y, 48)}
         >
           {item.label}
         </span>
       ))}
-      <span className="glass absolute top-[calc(50%+104px)] left-[26px] grid size-10 place-items-center rounded-full text-paper/70">
-        <SlidersIcon />
-      </span>
+      {DEMO_CONTROLS.map((item, i) => (
+        <span
+          key={item.key}
+          className="demo-fan-item glass absolute grid place-items-center rounded-full text-paper/70"
+          style={demoItemStyle(DEMO_FAVORITES.length + i, 0, item.y, 36)}
+        >
+          {item.icon}
+        </span>
+      ))}
     </div>
   );
 }

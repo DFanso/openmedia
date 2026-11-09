@@ -195,7 +195,7 @@ svg {
 /* Onboarding illustrations */
 .demo-fan-item {
   animation: demo-pop 3600ms var(--ease-spring) infinite;
-  animation-delay: calc(var(--i) * 120ms + 700ms);
+  animation-delay: calc(var(--i) * 70ms + 700ms);
   opacity: 0;
 }
 
