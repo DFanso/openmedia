@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### feat(gestures): Android Back, pull to refresh and edge swipes on both platforms
+
+**Gap:** Android had no handling for the Back button or gesture: any press left the app, even with page history or a sheet open, and Android had no pull-to-refresh. iOS already had the web view's edge-swipe back and forward and pull to refresh on pages, but the app's own full-screen pages had no back swipe.
+
+**Change:** Back now dismisses the open fan, then a sheet, then an onboarding step, then goes back in the page, and only then leaves the app (a stack in `features/back/backStack.ts`, a Tauri `back-button` listener registered only while a press is wanted). Pages get pull-to-refresh through `SwipeRefreshLayout`. Regions at a screen edge are excluded from the system back gesture so dragging the floating button does not trigger it. Settings, History, Usage and the paywall close on an edge swipe (right edge in right-to-left languages) where the platform gives none.
+
+**Verified (Android API 36 emulator):** Back goes back in the page, closes Settings, closes the fan, and leaves the app when there is nothing left; the system edge-swipe goes back in the page; a pull-down reloads the page; dragging the button from the edge moved it without going back. `yarn ts:check`, `eslint src`, `prettier --check src`, `yarn test` (269/269). **Not verified:** the iOS edge swipe on a simulator or device (WebKit's own gesture was already enabled; the shell swipe's thresholds are unit-tested but the touch hook was not driven), Android three-button navigation, predictive back animation, pull-to-refresh on pages that scroll inside an inner container.
+
 ### fix(fab): readable Pro lock and clearance around the open floating button
 
 **Change:** The Pro lock badge used the theme's `ink` token with a white icon, which is near-white in light mode and dark on dark pages in dark mode. It now has its own navy fill, white icon and white rim (`.pro-badge`) in both themes, and the badges sit above the ring animation instead of under it (`z-10`). Fan badges are smaller so they stop covering the item's icon. The fan geometry now measures clearance from the button as it looks while open (scaled by `HOLD_SCALE`, plus its badge), not its resting size, so the settings column no longer touches the button; an exact-distance placement was also being rejected by float rounding and silently shrinking the arc, which a new test covers.

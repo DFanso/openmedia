@@ -4,6 +4,7 @@ import logoMark from "../../assets/logo-mark.svg";
 import { useT } from "../../i18n/useT";
 import type { MessageKey } from "../../i18n/messages";
 import { SlidersIcon } from "../../shared/icons";
+import { useBackHandler } from "../back/useBackHandler";
 
 interface DemoItemStyle extends CSSProperties {
   "--i": number;
@@ -129,6 +130,7 @@ export function Onboarding() {
   const finishGuide = useApp((s) => s.finishGuide);
   const t = useT();
   const [index, setIndex] = useState(0);
+  useBackHandler(open && index > 0, () => setIndex(index - 1));
 
   if (!open) return null;
   const step = STEPS[index];

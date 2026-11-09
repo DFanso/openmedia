@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { onBackButtonPress } from "@tauri-apps/api/app";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 
 export type Theme = "system" | "light" | "dark";
@@ -249,4 +250,13 @@ export const siteView = {
     listen<string>("siteview:notification-tap", (event) => handler(event.payload)),
   onError: (handler: (message: string) => void): Promise<UnlistenFn> =>
     listen<string>("siteview:error", (event) => handler(event.payload)),
+};
+
+export const app = {
+  /**
+   * Android's Back button and edge gesture. While a listener is registered the press goes to it
+   * instead of the system; unregistering restores the system default (leave the app).
+   */
+  onBackButton: (handler: () => void): Promise<{ unregister: () => Promise<void> }> =>
+    onBackButtonPress(() => handler()),
 };
