@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### fix(android): use the OpenMedia launcher icon
+
+**Cause:** `tauri icon` had written the OpenMedia icons to `src-tauri/icons/android/`, but `src-tauri/gen/android` was created afterwards by `tauri android init` with Tauri's default icons, and the build only reads `gen/android/app/src/main/res`. The adaptive-icon files (`mipmap-anydpi-v26`, `values/ic_launcher_background.xml`) were never copied either.
+
+**Change:** Copied the OpenMedia mipmaps and the adaptive-icon definition into the Android resources and removed the template's default vector drawables. The adaptive foreground is scaled to 46% of its canvas, leaving clear padding inside the launcher mask instead of the logo being cropped or touching its edge (the same files are updated in `icons/android/`).
+
+**Verified:** rebuilt and installed on an API 36 emulator; the launcher shows the OpenMedia logo, uncropped, in a circular mask. **Not verified:** other launcher mask shapes, themed (monochrome) icons, the Play Store listing icon.
+
 ### fix(onboarding): show the whole fan in the hold-for-favorites step
 
 **Change:** The step-3 illustration still showed five favorites and a lone Settings button. It now pops out the same five favorites plus the Incognito, Usage, History and Settings column above the button, as the real fan does; the existing animation, ring and stagger (now 70 ms so all nine are open together) are unchanged otherwise. English step-3 text names the four controls.
