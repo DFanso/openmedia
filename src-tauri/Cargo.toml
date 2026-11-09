@@ -6,6 +6,10 @@ authors = ["OpenMedia contributors"]
 license = "MPL-2.0"
 repository = "https://github.com/skepjandi/openmedia"
 edition = "2024"
+rust-version = "1.90"
+
+[workspace]
+members = ["plugins/*"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -17,25 +21,29 @@ name = "openmedia_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
+dotenvy = "0.15"
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
 tauri = { version = "2", features = [] }
-tauri-plugin-siteview = { path = "plugins/tauri-plugin-siteview" }
-tauri-plugin-billing = { path = "plugins/tauri-plugin-billing" }
+tauri-plugin-siteview = { version = "0.1.0", path = "plugins/tauri-plugin-siteview" }
+tauri-plugin-billing = { version = "0.1.0", path = "plugins/tauri-plugin-billing" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"
 uuid = { version = "1", features = ["v4", "serde"] }
 regex = "1.13.1"
 zeroize = "1.9.1"
-keyring = { version = "3", default-features = false, features = ["apple-native"] }
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
 url = "2.5.8"
 # Brave's filter engine. Only the ABP-syntax parser and the Safari content-blocking converter are
 # used; list matching happens in WebKit, not here.
 adblock = { version = "0.13.5", default-features = false, features = ["content-blocking", "embedded-domain-resolver"] }
 sha2 = "0.10"
+
+# Android has no `keyring` backend; its secrets live in the Android Keystore (see `secrets.rs`).
+[target.'cfg(not(target_os = "android"))'.dependencies]
+keyring = { version = "3", default-features = false, features = ["apple-native"] }
 
 [dev-dependencies]
 scraper = "0.29.0"
@@ -54,3 +62,11 @@ lto = true
 opt-level = 3
 panic = "abort"
 strip = true
+
+# AGENTS.md: no `unwrap()`/`expect()` outside tests; errors propagate as typed errors.
+[workspace.lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+
+[lints]
+workspace = true
