@@ -140,7 +140,7 @@ export const en = {
     "Tap it to type an address and go. Soon you will be able to ask the AI assistant to change a site for you.",
   "onboarding.step3Title": "Hold for favorites.",
   "onboarding.step3Body":
-    "Press and hold. Slide onto a favorite and let go to open it. Settings is the small button set apart from the rest.",
+    "Press and hold. Slide onto a favorite and let go to open it. Above the button sit Incognito, Usage, History and Settings.",
   "onboarding.step4Title": "Make it yours.",
   "onboarding.step4Body":
     "Drag the button to either edge and it stays there. Change your favorites in Settings, and replay this guide there any time.",
