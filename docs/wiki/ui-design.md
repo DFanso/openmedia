@@ -80,7 +80,7 @@ A four-step full-screen guide shows on first launch. Whether it has been seen is
 
 1. **The web, minus the noise.** What the app is, and that it hides things like app prompts.
 2. **One button.** Tap to open an address or request a change; connect a provider in Settings and preview the redacted payload before sending.
-3. **Hold for favorites.** An animated fan pops out of a pulsing button; settings sits apart.
+3. **Hold for favorites.** An animated fan pops out of a pulsing button: five favorites in an arc, with Incognito, Usage, History and Settings stacked above the button.
 4. **Make it yours.** Drag to either edge; change favorites in Settings.
 
 It can be skipped at any step. Under `prefers-reduced-motion` the illustrations stay still.

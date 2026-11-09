@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### fix(onboarding): show the whole fan in the hold-for-favorites step
+
+**Change:** The step-3 illustration still showed five favorites and a lone Settings button. It now pops out the same five favorites plus the Incognito, Usage, History and Settings column above the button, as the real fan does; the existing animation, ring and stagger (now 70 ms so all nine are open together) are unchanged otherwise. English step-3 text names the four controls.
+
+**Verified:** `yarn ts:check`, `yarn lint`, `yarn format:check`, `yarn test`. **Not verified:** the layout on small devices. Other locales still carry the old step-3 sentence ("Settings is the small button set apart"); it needs a native-speaker pass.
+
 ### feat(gestures): Android Back, pull to refresh and edge swipes on both platforms
 
 **Gap:** Android had no handling for the Back button or gesture: any press left the app, even with page history or a sheet open, and Android had no pull-to-refresh. iOS already had the web view's edge-swipe back and forward and pull to refresh on pages, but the app's own full-screen pages had no back swipe.
