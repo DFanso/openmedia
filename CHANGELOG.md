@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### fix(settings): draw choice lists in the app instead of the system's dialog
+
+**Cause:** The language, AI provider and model pickers were native `<select>` elements. Android's WebView opens those in its own light dialog (white, with radio buttons), which ignores the app's theme and looked out of place on the dark Settings screen.
+
+**Change:** A new `Picker` shows the current choice in a field and opens a themed bottom sheet: one row per option, the selected one in the accent colour with a check, Back and the backdrop close it. The three selects now use it, so iOS and Android look the same.
+
+**Verified:** `yarn ts:check`, `yarn lint`, `yarn test` (269/269). **Not verified:** the sheet on a device or emulator (touch routing through `data-hit`, safe-area padding, a 29-language list scrolling).
+
 ### fix(android): use the OpenMedia launcher icon
 
 **Cause:** `tauri icon` had written the OpenMedia icons to `src-tauri/icons/android/`, but `src-tauri/gen/android` was created afterwards by `tauri android init` with Tauri's default icons, and the build only reads `gen/android/app/src/main/res`. The adaptive-icon files (`mipmap-anydpi-v26`, `values/ic_launcher_background.xml`) were never copied either.
