@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
+import android.graphics.Rect
 import android.graphics.RectF
 import android.net.Uri
 import android.os.Build
@@ -30,6 +31,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.webkit.ProfileStore
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebMessageCompat
@@ -70,6 +72,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     private class Session(
         val id: String,
         val view: WebView,
+        /** Holds the page view and gives it pull-to-refresh; this is what the page layer lays out. */
+        val frame: SwipeRefreshLayout,
         val initialUrl: String,
         @Volatile var topUrl: String = initialUrl,
         var scope: String,
@@ -242,10 +246,14 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
             return
         }
         configure(view)
+        val frame = SwipeRefreshLayout(activity)
+        frame.setColorSchemeColors(REFRESH_COLOR)
+        frame.setOnRefreshListener { view.reload() }
 
         val session = Session(
             id = args.session,
             view = view,
+            frame = frame,
             initialUrl = url.toString(),
             scope = DomainScope.registrableDomain(url.host),
         )
@@ -256,7 +264,14 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         applyScheme(session)
         installBridge(session)
         installScripts(session, args.documentStartScript)
-        pageLayer?.addView(view)
+        frame.addView(
+            view,
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            ),
+        )
+        pageLayer?.addView(frame)
         view.alpha = 0f
         show(session)
 
@@ -299,7 +314,24 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     fun setInteractiveRegions(invoke: Invoke) {
         val args = invoke.parseArgs(SetInteractiveRegionsArgs::class.java)
         interactiveRegions = args.regions.map { rectOf(it) }
+        shell?.let { excludeEdgeGestures(it) }
         invoke.resolve()
+    }
+
+    /**
+     * The system back gesture starts at a screen edge, where the floating button rests. Regions
+     * touching an edge are kept out of it, so dragging the button inward is not taken for "back".
+     * The system honours about 200 dp per edge, so large regions (a full-screen sheet) stay out.
+     */
+    private fun excludeEdgeGestures(shellView: View) {
+        val density = activity.resources.displayMetrics.density
+        val zone = EDGE_GESTURE_ZONE_DP * density
+        val maxHeight = MAX_EXCLUSION_DP * density
+        val width = shellView.width
+        val rects = interactiveRegions
+            .filter { it.height() <= maxHeight && (it.left < zone || it.right > width - zone) }
+            .map { Rect(it.left.toInt(), it.top.toInt(), it.right.toInt(), it.bottom.toInt()) }
+        ViewCompat.setSystemGestureExclusionRects(shellView, rects)
     }
 
     @Command
@@ -571,10 +603,10 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     private fun show(session: Session) {
         for (other in sessions.values) {
             if (other === session) continue
-            other.view.visibility = View.GONE
+            other.frame.visibility = View.GONE
             other.shield?.visibility = View.GONE
         }
-        session.view.visibility = View.VISIBLE
+        session.frame.visibility = View.VISIBLE
         session.shield?.visibility = View.VISIBLE
         activeId = session.id
         if (session.needsReload && !session.blocked) {
@@ -595,7 +627,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         session.scriptHandler = null
         session.paintHandler = null
         session.view.stopLoading()
-        pageLayer?.removeView(session.view)
+        session.frame.removeView(session.view)
+        pageLayer?.removeView(session.frame)
         session.view.destroy()
         sessions.remove(session.id)
         if (activeId == session.id) activeId = null
@@ -636,6 +669,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
             // The closest Android has to suspending every media playback: the page's timers and
             // animations stop, so nothing plays and nothing loads.
             session.view.onPause()
+            session.frame.isRefreshing = false
+            session.frame.isEnabled = false
             installShield(session)
             reveal(session)
         } else {
@@ -643,6 +678,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
             session.blocked = false
             removeShield(session)
             session.view.onResume()
+            session.frame.isEnabled = true
             if (session.view.url == null) session.needsReload = true
             if (session.id == activeId && session.needsReload) show(session)
         }
@@ -741,6 +777,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 val session = sessionOf(view) ?: return
                 session.loading = false
                 session.settled = true
+                session.frame.isRefreshing = false
                 reveal(session)
                 sendState(session)
             }
@@ -751,6 +788,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 error: android.webkit.WebResourceError,
             ) {
                 if (!request.isForMainFrame) return
+                sessionOf(view)?.frame?.isRefreshing = false
                 sendError(error.description?.toString() ?: "the page could not be loaded")
             }
 
@@ -910,7 +948,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
             touchTarget = null
             val session = activeSession() ?: return false
             if (interactiveRegions.any { it.contains(event.x, event.y) }) return false
-            val target = session.shield ?: session.view
+            val target = session.shield ?: session.frame
             if (target.visibility != View.VISIBLE) return false
             touchTarget = target
         }
@@ -1092,6 +1130,9 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         private const val OUTDATED_WEBVIEW =
             "This device's System WebView is too old. Update Android System WebView to open sites."
         private const val MAX_REMEMBERED_BLOCKED = 32
+        private const val EDGE_GESTURE_ZONE_DP = 48
+        private const val MAX_EXCLUSION_DP = 200
+        private const val REFRESH_COLOR = 0xFF06AFF8.toInt()
         private const val EVALUATE_TIMEOUT_MS = 5000L
         private const val EVALUATE_MAX_BYTES = 200_000
 

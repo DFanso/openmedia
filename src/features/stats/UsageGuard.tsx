@@ -136,21 +136,27 @@ function LimitReached({ host, seconds }: { host: string; seconds: number }) {
   );
 }
 
-export function UsageGuard() {
+/** Whether today's limit has closed the page in front, and the figures that decided it. */
+export function useLimitBlock() {
   const control = useUsageControl();
   const page = useApp(selectPage);
-  const sessions = useApp((state) => state.sessions);
-  const sheet = useApp((state) => state.sheet);
-  const onboarding = useApp((state) => state.onboardingOpen);
-  const reportError = useApp((state) => state.reportError);
   const isPro = useEntitlementStore((state) => state.status === "pro");
-  const requested = useRef(new Map<string, boolean>());
-  const queues = useRef(new Map<string, Promise<unknown>>());
-  const warned = useRef(new Set<string>());
   const host = page ? usageTargetOf(page.url ?? page.openedUrl, page.scope)?.host : undefined;
   const seconds = host ? usageSeconds(control.seconds, host) : 0;
   const policy = host ? policyForHost(control.policies, host) : undefined;
   const blocked = isPro && control.ready && limitReached(policy, seconds);
+  return { control, isPro, host, seconds, policy, blocked };
+}
+
+export function UsageGuard() {
+  const { control, isPro, host, seconds, policy, blocked } = useLimitBlock();
+  const sessions = useApp((state) => state.sessions);
+  const sheet = useApp((state) => state.sheet);
+  const onboarding = useApp((state) => state.onboardingOpen);
+  const reportError = useApp((state) => state.reportError);
+  const requested = useRef(new Map<string, boolean>());
+  const queues = useRef(new Map<string, Promise<unknown>>());
+  const warned = useRef(new Set<string>());
 
   useEffect(() => {
     if (!control.ready) return;

@@ -11,6 +11,8 @@ import { useApplyTheme } from "../shared/theme";
 import { hideSplash, hideSplashWhen, pageShowing } from "./splash";
 import { selectLocale, selectPage, useApp } from "./store";
 import { useHitRegions } from "./useHitRegions";
+import { useAndroidBack } from "../features/back/useAndroidBack";
+import { useBackHandler } from "../features/back/useBackHandler";
 import { localeInfo } from "../i18n/locales";
 import { useT } from "../i18n/useT";
 import { PaywallSheet } from "../features/paywall/PaywallSheet";
@@ -38,6 +40,7 @@ export function App() {
   const sheet = useApp((s) => s.sheet);
   const onboardingOpen = useApp((s) => s.onboardingOpen);
   const reportError = useApp((s) => s.reportError);
+  const closeSheet = useApp((s) => s.closeSheet);
   const theme = useApp((s) => s.state?.theme ?? "system");
   const locale = useApp(selectLocale);
   const incognito = useApp((s) => s.incognito.active);
@@ -45,6 +48,8 @@ export function App() {
   const [idle, setIdle] = useState(false);
   useApplyTheme(theme);
   useHitRegions();
+  useAndroidBack();
+  useBackHandler(sheet !== "none", closeSheet);
   useEffect(() => {
     void useEntitlementStore.getState().initialize();
     return useEntitlementStore.subscribe((state, previous) => {

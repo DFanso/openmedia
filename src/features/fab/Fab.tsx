@@ -28,6 +28,7 @@ import {
 } from "./gesture";
 import { loadPosition, savePosition, type FabPosition } from "./position";
 import { HistoryIcon, IncognitoIcon, LockIcon, SlidersIcon, StatsIcon } from "../../shared/icons";
+import { useBackHandler } from "../back/useBackHandler";
 import logoMark from "../../assets/logo-mark.svg";
 import { useEntitlementStore } from "../paywall/store";
 
@@ -135,6 +136,7 @@ export function Fab() {
     setGesture(step.state);
     step.effects.forEach(apply);
   };
+  useBackHandler(fanOpen, () => dispatch({ type: "dismiss" }));
 
   const pointOf = (event: PointerEvent): Point => ({ x: event.clientX, y: event.clientY });
   const hitAt = (point: Point) =>

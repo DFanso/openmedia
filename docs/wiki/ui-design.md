@@ -13,7 +13,10 @@ The web is the product. The screen is one full-bleed page, from under the status
 | Hold, slide onto an item, lift | Opens that favorite, Usage, History or Settings, or toggles Incognito |
 | Hold, lift, then tap an item | Same, in two steps |
 | Drag the button | Moves it; on release it snaps to the nearer left or right edge and remembers its place |
-| Pull the page down from the top | Native pull-to-refresh (`UIRefreshControl`); only where the page's own scroll view is at the top |
+| Pull the page down from the top | Native pull-to-refresh: `UIRefreshControl` on iOS, `SwipeRefreshLayout` around each page view on Android; only where the page's own scroll view is at the top |
+| Swipe in from the screen edge on a page | iOS: the web view's own back swipe (and forward from the opposite edge). Android: the system back gesture or Back button, which goes back in the page |
+| Swipe in from the screen edge on Settings, History, Usage or the paywall | Closes it. iOS: the shell's own swipe (`useEdgeSwipeBack`, left edge, right edge in right-to-left languages). Android: the system back gesture |
+| Back (Android button or gesture) | Dismisses the newest thing on screen first: the open fan, a sheet, an onboarding step. With nothing on screen it goes back in the page; at the first page, or with a page closed by a usage limit, it leaves the app |
 
 Defaults: Instagram, Facebook, Twitter, Reddit, YouTube. Each fan item shows the site's icon when known, otherwise a monogram. The command bar has back, forward, reload and a favorite star for the current page; History rows also have independent favorite stars. Browsing alone never changes favorites. The first six favorites (`QUICK_ACCESS_LIMIT`) form the quick-access menu; Settings can reorder an unlimited list.
 
