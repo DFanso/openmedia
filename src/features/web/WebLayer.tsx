@@ -113,7 +113,7 @@ export function WebLayer() {
       )}
       <div
         ref={slot}
-        className="pointer-events-none fixed inset-x-0 top-[env(safe-area-inset-top)]"
+        className="pointer-events-none fixed inset-x-0 top-[var(--safe-top)]"
         style={{ bottom: bottomMargin }}
       >
         {opening && (
@@ -131,7 +131,7 @@ export function WebLayer() {
         style={{ height: bottomMargin }}
         className="fixed inset-x-0 bottom-0 bg-ink"
       />
-      <div className="fixed inset-x-0 top-0 h-[env(safe-area-inset-top)] bg-ink" />
+      <div className="fixed inset-x-0 top-0 h-[var(--safe-top)] bg-ink" />
     </>
   );
 }

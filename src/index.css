@@ -17,6 +17,10 @@
 }
 
 :root {
+  /* iOS reports the safe area through env(). Android's WebView does not for system bars, so the
+     siteview plugin overrides these on the root element. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
   --glass: rgb(9 14 26 / 0.64);
   --glass-shadow: rgb(0 0 0 / 0.35);
   color-scheme: dark;

@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### fix(android): keep shell content clear of the system bars
+
+**Change:** Android's WebView reports `env(safe-area-inset-*)` as 0 under edge-to-edge, so headers, the command bar and the page slot sat under the status bar. The shell now reads `--safe-top` and `--safe-bottom` (defaulting to `env()` on iOS); the siteview plugin sets them on the root element from the window insets (system bars and display cutout, in CSS pixels) and re-applies them to every document the shell loads.
+
+**Verified:** `yarn ts:check`, `eslint src`, `prettier --check src`; on an API 36 emulator the variables read `24px` and survive a shell reload, and Settings' header sits below the status bar. **Not verified:** a device with a display cutout, landscape, gesture vs three-button navigation.
+
 ### fix(android): fix WebView threading and touch routing
 
 **Change:** Android runs `shouldInterceptRequest` off the UI thread. Cache the current page URL in volatile session state instead of calling `WebView.url` from a worker. Convert shell DOM rectangles from CSS pixels to density-scaled Android pixels so shell hit regions match native touch coordinates.

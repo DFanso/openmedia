@@ -13,7 +13,7 @@ interface ScreenProps {
 export function Screen({ title, subtitle, closeLabel, onClose, children }: ScreenProps) {
   return (
     <div data-hit="" className="screen fixed inset-0 z-50 flex flex-col bg-ink">
-      <header className="flex items-end justify-between gap-4 border-b border-hair px-5 pt-[calc(env(safe-area-inset-top)+16px)] pb-4">
+      <header className="flex items-end justify-between gap-4 border-b border-hair px-5 pt-[calc(var(--safe-top)+16px)] pb-4">
         <div className="min-w-0">
           <h1 className="text-[2rem] leading-none font-semibold tracking-tight">{title}</h1>
           {subtitle && <p className="mt-2 truncate text-sm text-paper/55">{subtitle}</p>}
@@ -27,7 +27,7 @@ export function Screen({ title, subtitle, closeLabel, onClose, children }: Scree
           <CloseIcon />
         </button>
       </header>
-      <div className="flex-1 overflow-y-auto overscroll-contain px-4 pt-6 pb-[calc(env(safe-area-inset-bottom)+40px)]">
+      <div className="flex-1 overflow-y-auto overscroll-contain px-4 pt-6 pb-[calc(var(--safe-bottom)+40px)]">
         {children}
       </div>
     </div>

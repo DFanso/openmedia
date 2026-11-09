@@ -92,7 +92,7 @@ export function CommandBar() {
       <section
         data-open={open}
         onPointerDown={(event) => event.stopPropagation()}
-        className="command-bar glass absolute inset-x-3 top-[calc(env(safe-area-inset-top)+8px)] rounded-3xl p-3"
+        className="command-bar glass absolute inset-x-3 top-[calc(var(--safe-top)+8px)] rounded-3xl p-3"
       >
         {assistant.status !== "idle" ? (
           <div className="max-h-[70vh] overflow-y-auto">

@@ -50,7 +50,7 @@ function TimeCheck({ host }: { host: string }) {
     <div
       data-hit=""
       role="status"
-      className="usage-warning glass fixed inset-x-3 top-[calc(env(safe-area-inset-top)+12px)] z-30 rounded-2xl p-4"
+      className="usage-warning glass fixed inset-x-3 top-[calc(var(--safe-top)+12px)] z-30 rounded-2xl p-4"
     >
       <div className="flex items-center gap-3">
         <SiteBadge host={host} name={name} />
