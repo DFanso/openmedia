@@ -147,6 +147,27 @@ export const ms: Messages = {
   "onboarding.step4Title": "Jadikan milik anda.",
   "onboarding.step4Body":
     "Seret butang ke tepi mana-mana dan ia akan kekal di situ. Tukar kegemaran anda dalam Tetapan, dan ulang panduan ini bila-bila masa di situ.",
+  "onboarding.quickTitle": "Apa yang anda perlukan dalam akses pantas?",
+  "onboarding.quickBody":
+    "Pilih laman yang paling kerap anda buka. OpenMedia menambah resipi rasminya dan meletakkannya pada butang anda.",
+  "onboarding.quickLoading": "Memuatkan resipi rasmi…",
+  "onboarding.quickEmpty":
+    "Belum ada resipi rasmi disenaraikan untuk peranti ini. Anda boleh menambahnya kemudian daripada Pasaran.",
+  "onboarding.quickCount": "{count} daripada {limit} dipilih",
+  "onboarding.quickProHint": "Itu had maksimum pelan anda. Pro mempunyai lebih banyak slot.",
+  "onboarding.applying": "Menambah…",
+  "onboarding.partial":
+    "Tidak dapat menambah: {names}. Anda boleh menambahnya kemudian daripada Pasaran.",
+  "onboarding.marketTitle": "Pasaran resipi.",
+  "onboarding.marketBody": "Cari lebih banyak resipi dalam Tetapan, di bawah Pasaran.",
+  "onboarding.marketOfficial":
+    "Resipi rasmi dibuat oleh OpenMedia. Resipi komuniti dimuat naik oleh orang seperti anda.",
+  "onboarding.marketChecked":
+    "Setiap resipi disemak secara automatik dan ditahan selama 14 hari sebelum disenaraikan.",
+  "onboarding.marketReview":
+    "Anda menyemak setiap peraturan yang ditambah oleh sesuatu resipi sebelum ia ditambah.",
+  "onboarding.marketPro":
+    "Memuat naik, mengeksport dan mengulas memerlukan Pro. Menambah, mengimport dan memberi penilaian adalah percuma.",
 
   "settings.title": "Tetapan",
   "settings.close": "Tutup tetapan",
@@ -233,10 +254,6 @@ export const ms: Messages = {
   "recipes.options": "Pilihan {name}",
   "recipes.addFavorite": "Tambah {name} ke kegemaran",
   "recipes.removeFavorite": "Buang {name} daripada kegemaran",
-  "recipes.customized":
-    "Resipi ini ialah salinan yang anda ubah, jadi kemas kini aplikasi tidak akan menyentuhnya.",
-  "recipes.originalUpdated": "Versi asal aplikasi telah dikemas kini sejak anda mengubahnya.",
-  "recipes.restore": "Pulihkan yang asal",
   "recipes.bottomMargin": "Margin bawah",
   "recipes.sharedMargin":
     "Guna margin bersama. Leret peluncur untuk memberi laman ini margin sendiri.",
@@ -244,11 +261,15 @@ export const ms: Messages = {
   "recipes.siteMarginLabel": "Margin bawah {name}",
   "recipes.useSharedMargin": "Guna margin bersama",
   "recipes.imported": "Ditambah dari luar aplikasi. Buang untuk mengembalikan laman seperti asal.",
+  "recipes.empty":
+    "Anda belum mempunyai resipi. Cari resipi siap pakai untuk laman popular di Pasaran.",
+  "recipes.openMarket": "Buka Pasaran",
 
   "market.title": "Pasaran",
-  "market.linkNote": "Resipi daripada orang lain, disemak sebelum disenaraikan",
+  "market.linkNote":
+    "Resipi daripada orang lain, disemak secara automatik dan diterbitkan 14 hari kemudian",
   "market.note":
-    "Resipi yang dibuat oleh orang lain dan disemak oleh seseorang sebelum disenaraikan. Anda melihat setiap peraturan sebelum apa-apa ditambah.",
+    "Resipi yang dibuat oleh orang lain. Pelayan menyemak setiap resipi secara automatik; resipi yang lulus akan serta-merta muncul dalam senarai awam dan diterbitkan 14 hari selepas dihantar. Anda melihat setiap peraturan sebelum apa-apa ditambah.",
   "market.loading": "Memuatkan…",
   "market.empty": "Belum ada yang disenaraikan.",
   "market.add": "Tambah",
@@ -273,16 +294,41 @@ export const ms: Messages = {
   "market.reported": "Terima kasih, laporan telah dihantar.",
   "market.share": "Kongsi salah satu resipi anda",
   "market.share.note":
-    "Seseorang menyemak setiap resipi sebelum disenaraikan. Versi baharu hanya boleh dihantar dari peranti ini.",
+    "Pelayan menyemak setiap resipi secara automatik. Resipi yang lulus akan serta-merta muncul dalam senarai awam dan diterbitkan 14 hari selepas dihantar. Versi baharu hanya boleh dihantar dari peranti ini.",
   "market.share.recipe": "Resipi",
   "market.share.name": "Nama dalam pasaran",
   "market.share.summary": "Ringkasan satu baris",
   "market.share.author": "Nama anda",
-  "market.share.send": "Hantar untuk semakan",
-  "market.share.sent": "Dihantar. Resipi akan disenaraikan setelah disemak oleh seseorang.",
+  "market.share.send": "Hantar ke pasaran",
+  "market.share.sent": "Dihantar. Sudah ada dalam senarai awam dan akan diterbitkan dalam 14 hari.",
   "market.counting": "Beritahu pasaran apabila saya menambah resipi",
   "market.countingNote":
     "Hanya nama resipi dihantar, tiada apa-apa tentang anda. Ia menghasilkan nombor “Ditambah oleh”.",
+  "market.tag.official": "Rasmi",
+  "market.tag.community": "Komuniti",
+  "market.tag.mobile": "Mudah alih",
+  "market.tag.desktop": "Desktop",
+  "market.filters": "Tapis mengikut teg",
+  "market.noMatch": "Tiada yang sepadan dengan penapis ini.",
+  "market.rating.none": "Belum ada penilaian",
+  "market.rate": "Penilaian anda",
+  "market.rateStars": "Beri {count} bintang",
+  "market.comments": "Ulasan",
+  "market.comments.loading": "Memuatkan ulasan…",
+  "market.comments.none": "Belum ada ulasan.",
+  "market.comments.you": "Anda",
+  "market.comments.write": "Tulis ulasan",
+  "market.comments.rules": "Tiada pautan atau butiran hubungan. Sehingga 280 aksara.",
+  "market.comments.post": "Hantar",
+  "market.comments.proPrompt": "Mengulas ialah ciri Pro. Semua orang boleh membaca ulasan.",
+  "market.comments.report": "Laporkan",
+  "market.comments.reported": "Dilaporkan",
+  "market.comments.block": "Sekat",
+  "market.comments.blocked": "Pengulas yang disekat",
+  "market.comments.blockedNote":
+    "Anda tidak melihat ulasan daripada orang yang disenaraikan di sini.",
+  "market.comments.blockedNone": "Anda belum menyekat sesiapa.",
+  "market.comments.unblock": "Nyahsekat",
 
   "share.link": "Import dan eksport",
   "share.linkNote": "Alihkan resipi antara peranti sebagai teks",
@@ -360,7 +406,6 @@ export const ms: Messages = {
   "assistant.reject": "Tolak",
   "assistant.accept": "Terima",
   "assistant.switchExists": "Suis ini sudah wujud",
-  "assistant.savedAsCopy": "disimpan sebagai salinan yang anda ubah",
   "assistant.matched": "sepadan {count}",
   "assistant.requestQuote": "“{request}”",
   "assistant.unmatched": "{count} peraturan tidak sepadan dengan apa-apa pada halaman ini.",

@@ -7,6 +7,7 @@ import { DownIcon, ForwardIcon, StarIcon } from "../../shared/icons";
 import type { OptionGroup, SiteSettings } from "../../shared/ipc";
 import { SiteTile } from "../../shared/SiteTile";
 import { Screen } from "../../shared/Screen";
+import { useMarketplaceAvailable } from "../marketplace/Links";
 import { MarginSlider } from "./MarginSlider";
 import { Switch } from "./Switch";
 import { ImportedNotice } from "../marketplace/Links";
@@ -58,12 +59,24 @@ export function RecipesScreen() {
   const open = useApp((s) => s.sheet === "recipes");
   const closeSheet = useApp((s) => s.closeSheet);
   const sites = useApp((s) => s.sites);
+  const openSheet = useApp((s) => s.openSheet);
+  const marketAvailable = useMarketplaceAvailable();
   const t = useT();
   if (!open) return null;
 
   return (
     <Screen title={t("recipes.title")} closeLabel={t("common.back")} onClose={closeSheet} back>
       <p className="px-1 pb-4 text-[13px] leading-snug text-paper/50">{t("recipes.note")}</p>
+      {sites.length === 0 && (
+        <div className="flex flex-col items-start gap-3 px-1">
+          <p className="text-sm text-paper/70">{t("recipes.empty")}</p>
+          {marketAvailable && (
+            <button type="button" onClick={() => openSheet("marketplace")} className={quietButton}>
+              {t("recipes.openMarket")}
+            </button>
+          )}
+        </div>
+      )}
       <div className="flex flex-col gap-3">
         {sites.map((site) => (
           <SiteCard key={site.recipeId} site={site} />
@@ -132,27 +145,11 @@ function SiteOptions({ site }: { site: SiteSettings }) {
   const setSiteOption = useApp((s) => s.setSiteOption);
   const setSiteBottomMargin = useApp((s) => s.setSiteBottomMargin);
   const sharedMargin = useApp((s) => s.state?.bottomMargin ?? 0);
-  const restoreRecipeOriginal = useApp((s) => s.restoreRecipeOriginal);
   const t = useT();
 
   return (
     <div className="flex flex-col gap-5 border-t border-hair px-3 py-4">
       <ImportedNotice site={site} />
-      {site.customized && (
-        <div className="flex flex-col gap-2 rounded-2xl border border-hair px-4 py-3">
-          <p className="text-sm leading-snug text-paper/55">
-            {t("recipes.customized")}
-            {site.originalUpdated && ` ${t("recipes.originalUpdated")}`}
-          </p>
-          <button
-            type="button"
-            onClick={() => void restoreRecipeOriginal(site.recipeId)}
-            className="self-start text-sm font-medium text-accent"
-          >
-            {t("recipes.restore")}
-          </button>
-        </div>
-      )}
       <OptionGroups
         site={site}
         onToggle={(optionId, enabled) => void setSiteOption(site.recipeId, optionId, enabled)}

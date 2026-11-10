@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { useApp } from "../../app/store";
+import { appError, useApp } from "../../app/store";
 import { describeError } from "../../i18n/errors";
 import { useT } from "../../i18n/useT";
+import { ProIcon } from "../../shared/icons";
 import { Screen } from "../../shared/Screen";
+import { useEntitlementStore } from "../paywall/store";
 import { Group, GroupLabel, field, primaryButton, quietButton } from "../settings/ui";
 import { sharing, type RecipePreview } from "./ipc";
 import { RecipeReview } from "./RecipeReview";
@@ -143,7 +145,8 @@ function ImportSection() {
 
 function ExportSection() {
   const sites = useApp((s) => s.sites);
-  const own = sites.filter((site) => site.origin !== "bundled");
+  const isPro = useEntitlementStore((s) => s.status === "pro");
+  const openSheet = useApp((s) => s.openSheet);
   const t = useT();
   const [chosen, setChosen] = useState<Set<string>>(new Set());
   const [exported, setExported] = useState<string | null>(null);
@@ -161,6 +164,10 @@ function ExportSection() {
   };
 
   const copy = async () => {
+    if (!isPro) {
+      openSheet("paywall");
+      return;
+    }
     setError(null);
     setCopied(false);
     try {
@@ -173,21 +180,27 @@ function ExportSection() {
         setError(t("share.copyFailed"));
       }
     } catch (failure) {
-      setError(describeError(failure, t));
+      // Rust refuses a non-Pro export with the code that opens the paywall.
+      setError(appError(failure));
     }
   };
 
   return (
     <section className="flex flex-col gap-4">
       <div>
-        <GroupLabel>{t("share.export")}</GroupLabel>
+        <GroupLabel>
+          <span className="flex items-center gap-2">
+            {t("share.export")}
+            {!isPro && <ProIcon size={14} />}
+          </span>
+        </GroupLabel>
         <p className="px-1 text-[13px] leading-snug text-paper/50">{t("share.exportNote")}</p>
       </div>
-      {own.length === 0 ? (
+      {sites.length === 0 ? (
         <p className="px-1 text-sm text-paper/55">{t("share.none")}</p>
       ) : (
         <Group>
-          {own.map((site) => (
+          {sites.map((site) => (
             <label
               key={site.recipeId}
               className="flex items-center gap-3 px-4 py-3.5 active:bg-paper/[0.05]"
@@ -203,13 +216,14 @@ function ExportSection() {
           ))}
         </Group>
       )}
-      {own.length > 0 && (
+      {sites.length > 0 && (
         <button
           type="button"
           disabled={chosen.size === 0}
           onClick={() => void copy()}
-          className={`self-start ${quietButton}`}
+          className={`flex items-center gap-2 self-start ${quietButton}`}
         >
+          {!isPro && <ProIcon size={14} />}
           {copied ? t("share.copied") : t("share.copy")}
         </button>
       )}

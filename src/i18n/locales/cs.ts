@@ -152,6 +152,25 @@ export const cs: Messages = {
   "onboarding.step4Title": "Přizpůsobte si to.",
   "onboarding.step4Body":
     "Přetáhněte tlačítko k libovolnému okraji a zůstane tam. Oblíbené změníte v Nastavení, kde si také můžete tohoto průvodce kdykoli znovu přehrát.",
+  "onboarding.quickTitle": "Co potřebujete v rychlém přístupu?",
+  "onboarding.quickBody":
+    "Vyberte weby, které otevíráte nejčastěji. OpenMedia přidá jejich oficiální recepty a umístí je na vaše tlačítko.",
+  "onboarding.quickLoading": "Načítání oficiálních receptů…",
+  "onboarding.quickEmpty":
+    "Pro toto zařízení zatím nejsou uvedeny žádné oficiální recepty. Některé můžete přidat později z Tržiště.",
+  "onboarding.quickCount": "Vybráno {count} z {limit}",
+  "onboarding.quickProHint": "Víc váš tarif nedovoluje. Pro má více míst.",
+  "onboarding.applying": "Přidávání…",
+  "onboarding.partial": "Nepodařilo se přidat: {names}. Můžete je přidat později z Tržiště.",
+  "onboarding.marketTitle": "Tržiště receptů.",
+  "onboarding.marketBody": "Další recepty najdete v Nastavení v části Tržiště.",
+  "onboarding.marketOfficial":
+    "Oficiální recepty vytváří OpenMedia. Komunitní recepty nahrávají lidé jako vy.",
+  "onboarding.marketChecked":
+    "Každý recept se automaticky zkontroluje a 14 dní se drží, než se zveřejní v seznamu.",
+  "onboarding.marketReview": "Každé pravidlo, které recept přidává, před přidáním zkontrolujete.",
+  "onboarding.marketPro":
+    "Nahrávání, export a komentování vyžadují Pro. Přidávání, import a hodnocení jsou zdarma.",
 
   "settings.title": "Nastavení",
   "settings.close": "Zavřít nastavení",
@@ -229,6 +248,9 @@ export const cs: Messages = {
   "recipes.title": "Recepty",
   "recipes.note":
     "Recepty pro oblíbené weby. Výzvy k instalaci a vyskakovací okna, které blokují stránku, jsou ve výchozím stavu skryté; Reels, Shorts a návrhy se zobrazují, dokud je neskryjete. Hvězdičkou u receptu přidáte jeho web do oblíbených.",
+  "recipes.empty":
+    "Zatím nemáte žádné recepty. Hotové recepty pro oblíbené weby najdete na Tržišti.",
+  "recipes.openMarket": "Otevřít Tržiště",
   "recipes.annoyances": "Rušivé prvky · ve výchozím stavu skryté",
   "recipes.content": "Obsah · zobrazený, dokud ho neskryjete",
   "recipes.groupAnnoyance": "Rušivý prvek",
@@ -238,10 +260,6 @@ export const cs: Messages = {
   "recipes.options": "Možnosti pro {name}",
   "recipes.addFavorite": "Přidat {name} do oblíbených",
   "recipes.removeFavorite": "Odebrat {name} z oblíbených",
-  "recipes.customized":
-    "Tento recept je vaše upravená kopie, takže ho aktualizace aplikace nezmění.",
-  "recipes.originalUpdated": "Originál v aplikaci byl od vaší úpravy aktualizován.",
-  "recipes.restore": "Obnovit originál",
   "recipes.bottomMargin": "Spodní okraj",
   "recipes.sharedMargin": "Používá sdílený okraj. Posunutím jezdce dáte tomuto webu vlastní.",
   "recipes.ownMargin": "Tento web má vlastní okraj.",
@@ -250,9 +268,9 @@ export const cs: Messages = {
   "recipes.imported": "Přidáno zvenčí aplikace. Odeberte ho a web bude zase vypadat jako dřív.",
 
   "market.title": "Tržiště",
-  "market.linkNote": "Recepty od jiných lidí, před zveřejněním zkontrolované",
+  "market.linkNote": "Recepty od jiných lidí, kontrolované automaticky a zveřejněné po 14 dnech",
   "market.note":
-    "Recepty vytvořené jinými lidmi a před zveřejněním zkontrolované člověkem. Každé pravidlo uvidíte dřív, než se cokoli přidá.",
+    "Recepty vytvořené jinými lidmi. Server každý recept zkontroluje automaticky; ten, který projde, se hned objeví ve veřejném seznamu a zveřejní se 14 dní po odeslání. Každé pravidlo uvidíte dřív, než se cokoli přidá.",
   "market.loading": "Načítání…",
   "market.empty": "Zatím nic není zveřejněno.",
   "market.add": "Přidat",
@@ -277,16 +295,41 @@ export const cs: Messages = {
   "market.reported": "Děkujeme, hlášení bylo odesláno.",
   "market.share": "Sdílet jeden z vašich receptů",
   "market.share.note":
-    "Každý recept před zveřejněním zkontroluje člověk. Nové verze lze odesílat jen z tohoto zařízení.",
+    "Server každý recept zkontroluje automaticky. Recept, který projde, se hned objeví ve veřejném seznamu a zveřejní se 14 dní po odeslání. Nové verze lze odesílat jen z tohoto zařízení.",
   "market.share.recipe": "Recept",
   "market.share.name": "Název na tržišti",
   "market.share.summary": "Shrnutí na jeden řádek",
   "market.share.author": "Vaše jméno",
-  "market.share.send": "Odeslat ke kontrole",
-  "market.share.sent": "Odesláno. Zveřejní se, jakmile ho člověk zkontroluje.",
+  "market.share.send": "Odeslat na tržiště",
+  "market.share.sent": "Odesláno. Je ve veřejném seznamu a zveřejní se za 14 dní.",
   "market.counting": "Dát tržišti vědět, když přidám recept",
   "market.countingNote":
     "Odesílá se jen název receptu, nic o vás. Z toho vznikají čísla „Přidalo“.",
+  "market.tag.official": "Oficiální",
+  "market.tag.community": "Komunitní",
+  "market.tag.mobile": "Mobilní",
+  "market.tag.desktop": "Počítač",
+  "market.filters": "Filtrovat podle štítku",
+  "market.noMatch": "Těmto filtrům nic neodpovídá.",
+  "market.rating.none": "Zatím žádná hodnocení",
+  "market.rate": "Vaše hodnocení",
+  "market.rateStars":
+    "Ohodnotit {count} hvězdičkou | Ohodnotit {count} hvězdičkami | Ohodnotit {count} hvězdičky | Ohodnotit {count} hvězdičkami",
+  "market.comments": "Komentáře",
+  "market.comments.loading": "Načítání komentářů…",
+  "market.comments.none": "Zatím žádné komentáře.",
+  "market.comments.you": "Vy",
+  "market.comments.write": "Napsat komentář",
+  "market.comments.rules": "Bez odkazů a kontaktních údajů. Nejvýše 280 znaků.",
+  "market.comments.post": "Odeslat",
+  "market.comments.proPrompt": "Komentování je funkce Pro. Komentáře si může přečíst každý.",
+  "market.comments.report": "Nahlásit",
+  "market.comments.reported": "Nahlášeno",
+  "market.comments.block": "Zablokovat",
+  "market.comments.blocked": "Zablokovaní komentující",
+  "market.comments.blockedNote": "Komentáře lidí uvedených zde nevidíte.",
+  "market.comments.blockedNone": "Nikoho jste nezablokovali.",
+  "market.comments.unblock": "Odblokovat",
 
   "share.link": "Import a export",
   "share.linkNote": "Přenášejte recepty mezi zařízeními jako text",
@@ -366,7 +409,6 @@ export const cs: Messages = {
   "assistant.reject": "Odmítnout",
   "assistant.accept": "Přijmout",
   "assistant.switchExists": "Tento přepínač už existuje",
-  "assistant.savedAsCopy": "uloženo jako vaše upravená kopie",
   "assistant.matched": "shod: {count}",
   "assistant.requestQuote": "„{request}“",
   "assistant.unmatched":

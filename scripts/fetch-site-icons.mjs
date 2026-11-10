@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Fetches the icon of every bundled recipe's site and bundles it with the app.
+ * Fetches the icon of every official recipe's site and bundles it with the app.
  *
- * The recipes are the only source of truth: the script reads `recipes/bundled/*.json`, takes each
+ * The recipes are the only source of truth: the script reads `recipes/official/*.json`, takes each
  * recipe's homepage and the domains its match patterns cover, and asks that site for its own
  * icon. Nothing else is contacted: an icon comes from the site's own page or from the site's own
  * CDN, never from an icon service, so the app keeps its promise of talking to no third party.
@@ -36,7 +36,7 @@ import { createMatcher } from "../shared/public-suffix/match.mjs";
 const run = promisify(execFile);
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const RECIPES = path.join(ROOT, "recipes", "bundled");
+const RECIPES = path.join(ROOT, "recipes", "official");
 const ASSETS = path.join(ROOT, "src", "assets", "site-icons");
 const MANIFEST = path.join(ASSETS, "manifest.json");
 const GENERATED = path.join(ROOT, "src", "shared", "bundledSiteIcons.ts");

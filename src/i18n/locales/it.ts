@@ -154,6 +154,27 @@ export const it: Messages = {
   "onboarding.step4Title": "Rendilo tuo.",
   "onboarding.step4Body":
     "Trascina il pulsante verso uno dei bordi e resterà lì. Cambia i preferiti nelle Impostazioni e rivedi questa guida quando vuoi.",
+  "onboarding.quickTitle": "Cosa ti serve nell’accesso rapido?",
+  "onboarding.quickBody":
+    "Scegli i siti che apri più spesso. OpenMedia aggiunge le loro ricette ufficiali e le mette sul tuo pulsante.",
+  "onboarding.quickLoading": "Caricamento delle ricette ufficiali…",
+  "onboarding.quickEmpty":
+    "Per questo dispositivo non c’è ancora nessuna ricetta ufficiale. Puoi aggiungerne qualcuna più tardi dal Marketplace.",
+  "onboarding.quickCount": "{count} di {limit} scelte",
+  "onboarding.quickProHint": "È il massimo consentito dal tuo piano. Pro ha più posti.",
+  "onboarding.applying": "Aggiunta in corso…",
+  "onboarding.partial":
+    "Impossibile aggiungere: {names}. Puoi aggiungerle più tardi dal Marketplace.",
+  "onboarding.marketTitle": "Un marketplace di ricette.",
+  "onboarding.marketBody": "Trova altre ricette in Impostazioni, sotto Marketplace.",
+  "onboarding.marketOfficial":
+    "Le ricette ufficiali sono create da OpenMedia. Le ricette della community sono caricate da persone come te.",
+  "onboarding.marketChecked":
+    "Ogni ricetta viene controllata automaticamente e trattenuta per 14 giorni prima di essere pubblicata nell’elenco.",
+  "onboarding.marketReview":
+    "Controlli ogni regola che una ricetta aggiunge prima che venga aggiunta.",
+  "onboarding.marketPro":
+    "Caricare, esportare e commentare richiedono Pro. Aggiungere, importare e valutare è gratuito.",
 
   "settings.title": "Impostazioni",
   "settings.close": "Chiudi impostazioni",
@@ -240,10 +261,6 @@ export const it: Messages = {
   "recipes.options": "Opzioni di {name}",
   "recipes.addFavorite": "Aggiungi {name} ai preferiti",
   "recipes.removeFavorite": "Rimuovi {name} dai preferiti",
-  "recipes.customized":
-    "Questa ricetta è la tua copia modificata, quindi gli aggiornamenti dell’app non la toccano.",
-  "recipes.originalUpdated": "L’originale dell’app è stato aggiornato da quando l’hai modificato.",
-  "recipes.restore": "Ripristina l’originale",
   "recipes.bottomMargin": "Margine inferiore",
   "recipes.sharedMargin":
     "Usa il margine condiviso. Sposta il cursore per dare a questo sito un margine dedicato.",
@@ -251,11 +268,15 @@ export const it: Messages = {
   "recipes.siteMarginLabel": "Margine inferiore di {name}",
   "recipes.useSharedMargin": "Usa il margine condiviso",
   "recipes.imported": "Aggiunta dall’esterno dell’app. Rimuovila per tornare al sito com’era.",
+  "recipes.empty":
+    "Non hai ancora nessuna ricetta. Trova quelle già pronte per i siti più popolari nel Marketplace.",
+  "recipes.openMarket": "Apri il Marketplace",
 
   "market.title": "Marketplace",
-  "market.linkNote": "Ricette di altre persone, controllate prima di essere elencate",
+  "market.linkNote":
+    "Ricette di altre persone, controllate automaticamente e pubblicate 14 giorni dopo",
   "market.note":
-    "Ricette create da altre persone e controllate da una persona prima di essere elencate. Vedi ogni regola prima che venga aggiunto qualcosa.",
+    "Ricette create da altre persone. Il server controlla ogni ricetta automaticamente; quelle che superano il controllo compaiono subito nell’elenco pubblico e vengono pubblicate 14 giorni dopo l’invio. Vedi ogni regola prima che venga aggiunto qualcosa.",
   "market.loading": "Caricamento…",
   "market.empty": "Non c’è ancora nulla in elenco.",
   "market.add": "Aggiungi",
@@ -280,16 +301,40 @@ export const it: Messages = {
   "market.reported": "Grazie, la segnalazione è stata inviata.",
   "market.share": "Condividi una delle tue ricette",
   "market.share.note":
-    "Una persona controlla ogni ricetta prima che venga elencata. Le nuove versioni possono essere inviate solo da questo dispositivo.",
+    "Il server controlla ogni ricetta automaticamente. Quelle che superano il controllo compaiono subito nell’elenco pubblico e vengono pubblicate 14 giorni dopo l’invio. Le nuove versioni possono essere inviate solo da questo dispositivo.",
   "market.share.recipe": "Ricetta",
   "market.share.name": "Nome nel marketplace",
   "market.share.summary": "Riepilogo in una riga",
   "market.share.author": "Il tuo nome",
-  "market.share.send": "Invia per la revisione",
-  "market.share.sent": "Inviata. Sarà elencata dopo il controllo di una persona.",
+  "market.share.send": "Invia al marketplace",
+  "market.share.sent": "Inviata. È nell’elenco pubblico e viene pubblicata tra 14 giorni.",
   "market.counting": "Avvisa il marketplace quando aggiungo una ricetta",
   "market.countingNote":
     "Viene inviato solo il nome della ricetta, nulla su di te. Serve a calcolare i numeri di “Aggiunta da”.",
+  "market.tag.official": "Ufficiale",
+  "market.tag.community": "Community",
+  "market.tag.mobile": "Mobile",
+  "market.tag.desktop": "Desktop",
+  "market.filters": "Filtra per tag",
+  "market.noMatch": "Nessun risultato per questi filtri.",
+  "market.rating.none": "Ancora nessuna valutazione",
+  "market.rate": "La tua valutazione",
+  "market.rateStars": "Assegna {count} stella | Assegna {count} stelle",
+  "market.comments": "Commenti",
+  "market.comments.loading": "Caricamento dei commenti…",
+  "market.comments.none": "Ancora nessun commento.",
+  "market.comments.you": "Tu",
+  "market.comments.write": "Scrivi un commento",
+  "market.comments.rules": "Niente link né dati di contatto. Fino a 280 caratteri.",
+  "market.comments.post": "Pubblica",
+  "market.comments.proPrompt": "Commentare è una funzione Pro. Tutti possono leggere i commenti.",
+  "market.comments.report": "Segnala",
+  "market.comments.reported": "Segnalato",
+  "market.comments.block": "Blocca",
+  "market.comments.blocked": "Autori bloccati",
+  "market.comments.blockedNote": "Non vedi i commenti delle persone elencate qui.",
+  "market.comments.blockedNone": "Non hai bloccato nessuno.",
+  "market.comments.unblock": "Sblocca",
 
   "share.link": "Importa ed esporta",
   "share.linkNote": "Sposta le ricette tra dispositivi come testo",
@@ -369,7 +414,6 @@ export const it: Messages = {
   "assistant.reject": "Rifiuta",
   "assistant.accept": "Accetta",
   "assistant.switchExists": "Questo interruttore esiste già",
-  "assistant.savedAsCopy": "salvata come tua copia modificata",
   "assistant.matched": "{count} corrispondenze",
   "assistant.requestQuote": "“{request}”",
   "assistant.unmatched":

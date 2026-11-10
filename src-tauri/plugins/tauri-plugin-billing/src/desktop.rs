@@ -37,6 +37,11 @@ impl<R: Runtime> Billing<R> {
         Err(Error::Unsupported)
     }
 
+    /// There is no store here, so there is no app user id.
+    pub fn app_user_id(&self) -> Result<Option<String>> {
+        Ok(None)
+    }
+
     pub fn is_simulator(&self) -> Result<bool> {
         Ok(false)
     }

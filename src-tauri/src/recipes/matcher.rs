@@ -62,7 +62,7 @@ impl Matcher {
             && tested(&self.path, url.path())
     }
 
-    /// Patterns that cover every site are only acceptable for bundled recipes.
+    /// Patterns that cover every site are never acceptable in a recipe.
     pub fn is_broad(&self) -> bool {
         self.host == "^.*$"
     }

@@ -151,6 +151,27 @@ export const tr: Messages = {
   "onboarding.step4Title": "Kendi halinize getirin.",
   "onboarding.step4Body":
     "Düğmeyi herhangi bir kenara sürükleyin; orada kalır. Favorilerinizi Ayarlar'dan değiştirin ve bu kılavuzu istediğiniz zaman yeniden oynatın.",
+  "onboarding.quickTitle": "Hızlı erişimde neye ihtiyacınız var?",
+  "onboarding.quickBody":
+    "En çok açtığınız siteleri seçin. OpenMedia bunların resmi tariflerini ekler ve düğmenize yerleştirir.",
+  "onboarding.quickLoading": "Resmi tarifler yükleniyor…",
+  "onboarding.quickEmpty":
+    "Bu cihaz için henüz listelenmiş resmi tarif yok. Daha sonra Pazar yerinden ekleyebilirsiniz.",
+  "onboarding.quickCount": "{limit} içinden {count} seçildi",
+  "onboarding.quickProHint":
+    "Planınızın izin verdiği en fazla sayı bu. Pro'da daha fazla yuva var.",
+  "onboarding.applying": "Ekleniyor…",
+  "onboarding.partial": "Eklenemedi: {names}. Bunları daha sonra Pazar yerinden ekleyebilirsiniz.",
+  "onboarding.marketTitle": "Bir tarif pazar yeri.",
+  "onboarding.marketBody": "Daha fazla tarifi Ayarlar'da, Pazar yeri bölümünde bulabilirsiniz.",
+  "onboarding.marketOfficial":
+    "Resmi tarifleri OpenMedia hazırlar. Topluluk tarifleri sizin gibi insanlar tarafından yüklenir.",
+  "onboarding.marketChecked":
+    "Her tarif otomatik olarak denetlenir ve listelenmeden önce 14 gün bekletilir.",
+  "onboarding.marketReview":
+    "Bir tarifin eklediği her kuralı, eklenmeden önce siz gözden geçirirsiniz.",
+  "onboarding.marketPro":
+    "Yükleme, dışa aktarma ve yorum yapma için Pro gerekir. Ekleme, içe aktarma ve puanlama ücretsizdir.",
 
   "settings.title": "Ayarlar",
   "settings.close": "Ayarları kapat",
@@ -226,6 +247,9 @@ export const tr: Messages = {
   "recipes.title": "Tarifler",
   "recipes.note":
     "Popüler siteler için hazır tarifler. Kurulum istemleri ve sayfayı engelleyen açılır pencereler varsayılan olarak gizlidir; Reels, Shorts ve öneriler siz gizlemedikçe gösterilir. Bir tarifi yıldızlayarak sitesini favorilerinize ekleyin.",
+  "recipes.empty":
+    "Henüz hiç tarifiniz yok. Popüler siteler için hazır tarifleri Pazar yerinde bulabilirsiniz.",
+  "recipes.openMarket": "Pazar yerini aç",
   "recipes.annoyances": "Rahatsız ediciler · varsayılan olarak gizli",
   "recipes.content": "İçerik · siz gizlemedikçe gösterilir",
   "recipes.groupAnnoyance": "Rahatsız edici",
@@ -235,10 +259,6 @@ export const tr: Messages = {
   "recipes.options": "{name} seçenekleri",
   "recipes.addFavorite": "{name} öğesini favorilere ekle",
   "recipes.removeFavorite": "{name} öğesini favorilerden çıkar",
-  "recipes.customized":
-    "Bu tarif sizin değiştirdiğiniz kopyanızdır, bu yüzden uygulama güncellemeleri ona dokunmaz.",
-  "recipes.originalUpdated": "Siz değiştirdikten sonra uygulamanın aslı güncellendi.",
-  "recipes.restore": "Aslı geri yükle",
   "recipes.bottomMargin": "Alt kenar boşluğu",
   "recipes.sharedMargin":
     "Paylaşılan boşluğu kullanır. Bu siteye kendi boşluğunu vermek için kaydırıcıyı hareket ettirin.",
@@ -248,9 +268,10 @@ export const tr: Messages = {
   "recipes.imported": "Uygulamanın dışından eklendi. Sitenin eski haline dönmek için kaldırın.",
 
   "market.title": "Pazar yeri",
-  "market.linkNote": "Başkalarının tarifleri, listelenmeden önce kontrol edilir",
+  "market.linkNote":
+    "Başkalarının tarifleri, otomatik olarak kontrol edilir ve 14 gün sonra yayımlanır",
   "market.note":
-    "Başkaları tarafından hazırlanan ve listelenmeden önce bir kişi tarafından kontrol edilen tarifler. Bir şey eklenmeden önce her kuralı görürsünüz.",
+    "Başkaları tarafından hazırlanan tarifler. Sunucu her tarifi otomatik olarak kontrol eder; kontrolü geçen tarif hemen herkese açık listeye girer ve gönderildikten 14 gün sonra yayımlanır. Bir şey eklenmeden önce her kuralı görürsünüz.",
   "market.loading": "Yükleniyor…",
   "market.empty": "Henüz listelenen bir şey yok.",
   "market.add": "Ekle",
@@ -275,16 +296,40 @@ export const tr: Messages = {
   "market.reported": "Teşekkürler, bildirim gönderildi.",
   "market.share": "Tariflerinizden birini paylaşın",
   "market.share.note":
-    "Her tarif listelenmeden önce bir kişi tarafından kontrol edilir. Yeni sürümler yalnızca bu cihazdan gönderilebilir.",
+    "Sunucu her tarifi otomatik olarak kontrol eder. Kontrolü geçen tarif hemen herkese açık listeye girer ve gönderildikten 14 gün sonra yayımlanır. Yeni sürümler yalnızca bu cihazdan gönderilebilir.",
   "market.share.recipe": "Tarif",
   "market.share.name": "Pazar yerindeki ad",
   "market.share.summary": "Tek satırlık özet",
   "market.share.author": "Adınız",
-  "market.share.send": "İncelemeye gönder",
-  "market.share.sent": "Gönderildi. Bir kişi kontrol ettikten sonra listelenir.",
+  "market.share.send": "Pazar yerine gönder",
+  "market.share.sent": "Gönderildi. Herkese açık listede ve 14 gün içinde yayımlanacak.",
   "market.counting": "Tarif eklediğimde pazar yerine bildir",
   "market.countingNote":
     "Yalnızca tarifin adı gönderilir, sizinle ilgili hiçbir şey gönderilmez. “… kişi ekledi” sayılarını oluşturur.",
+  "market.tag.official": "Resmi",
+  "market.tag.community": "Topluluk",
+  "market.tag.mobile": "Mobil",
+  "market.tag.desktop": "Masaüstü",
+  "market.filters": "Etikete göre filtrele",
+  "market.noMatch": "Bu filtrelerle eşleşen bir şey yok.",
+  "market.rating.none": "Henüz puan yok",
+  "market.rate": "Puanınız",
+  "market.rateStars": "{count} yıldız ver | {count} yıldız ver",
+  "market.comments": "Yorumlar",
+  "market.comments.loading": "Yorumlar yükleniyor…",
+  "market.comments.none": "Henüz yorum yok.",
+  "market.comments.you": "Siz",
+  "market.comments.write": "Yorum yazın",
+  "market.comments.rules": "Bağlantı veya iletişim bilgisi olmasın. En fazla 280 karakter.",
+  "market.comments.post": "Gönder",
+  "market.comments.proPrompt": "Yorum yapmak bir Pro özelliğidir. Yorumları herkes okuyabilir.",
+  "market.comments.report": "Bildir",
+  "market.comments.reported": "Bildirildi",
+  "market.comments.block": "Engelle",
+  "market.comments.blocked": "Engellenen yorumcular",
+  "market.comments.blockedNote": "Burada listelenen kişilerin yorumlarını görmezsiniz.",
+  "market.comments.blockedNone": "Henüz kimseyi engellemediniz.",
+  "market.comments.unblock": "Engeli kaldır",
 
   "share.link": "İçe ve dışa aktarma",
   "share.linkNote": "Tarifleri cihazlar arasında metin olarak taşıyın",
@@ -364,7 +409,6 @@ export const tr: Messages = {
   "assistant.reject": "Reddet",
   "assistant.accept": "Kabul et",
   "assistant.switchExists": "Bu anahtar zaten var",
-  "assistant.savedAsCopy": "değiştirdiğiniz kopya olarak kaydedildi",
   "assistant.matched": "{count} eşleşti",
   "assistant.requestQuote": "“{request}”",
   "assistant.unmatched":

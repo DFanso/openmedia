@@ -1,6 +1,6 @@
 # Architecture
 
-> **Status: Partially implemented.** The React shell, Rust core, iOS and Android native site-view plugins, bundled recipes, BYOK assistant, and local usage controls exist. iOS has simulator verification; Android device/emulator behavior is unverified. macOS has site views (debug builds run on one Mac); Windows and Linux site views, profile selection, and parts of the planned runtime remain unimplemented. See the component pages for exact boundaries.
+> **Status: Partially implemented.** The React shell, Rust core, iOS and Android native site-view plugins, BYOK assistant, and local usage controls exist. iOS has simulator verification; Android device/emulator behavior is unverified. macOS has site views (debug builds run on one Mac); Windows and Linux site views, profile selection, and parts of the planned runtime remain unimplemented. See the component pages for exact boundaries.
 
 ## Overview
 
@@ -61,7 +61,7 @@ The Rust API is shared; Swift on iOS and Kotlin on Android provide the native we
 
 ### Recipe store (Rust)
 
-Recipes are JSON files in the app data dir, one per recipe. Bundled recipes ship inside the binary. The store resolves "which recipes apply to this URL" and merges them into one bundle for the engine. See [Recipe Format](./recipe-format.md).
+Recipes are JSON files in the app data dir, one per recipe. **The app ships no bundled recipes and has no forks** (Design, 2026-11-10): the 18 site recipes live in `recipes/official/`, are validated and fixture-tested by `cargo test` but not compiled in, and are published to the marketplace as official `market.official.<site>` recipes; a fresh install has none until the user installs some (see Onboarding below). Origins are only `user`, `ai` and `imported`; the AI assistant writes a separate `custom.<domain>` recipe beside an installed one and never edits it. The store resolves "which recipes apply to this URL" and merges them into one bundle for the engine. See [Recipe Format](./recipe-format.md).
 
 ### AI service (Rust)
 
@@ -97,6 +97,10 @@ sequenceDiagram
   V-->>C: match report (rule -> count)
   C-->>S: events (loaded, rule health)
 ```
+
+### Onboarding (Design)
+
+First launch shows the guide, then a step "What do you need in quick access?" that lists the official marketplace recipes for the current platform (`onboarding_options`, from the verified index), and a step explaining the marketplace. `onboarding_apply` installs the selection through the same verified path as `marketplace_install` and **replaces the favorites** with exactly the installed picks' homepages when at least one install succeeds (4 free, 6 with Pro: 5 or 6 without Pro is `pro-required`, more than 6 or a repeat is an error; picks that are not official options for this platform or fail to install are returned in `failed`; names are cut to 20 characters), then the shell calls `complete_onboarding`. Offline or failed: skipping is always allowed. See [UI Design](./ui-design.md#onboarding) and [Marketplace](./marketplace.md#onboarding-install).
 
 ### Launch
 
@@ -154,8 +158,8 @@ sequenceDiagram
 |------|----------|-------|
 | Favorites, settings, history and provider configuration | `<app_data>/library.json` | No API keys |
 | Usage records and policies | `<app_data>/usage.json` | Local data |
-| User recipe forks, custom recipes and imported recipes | `<app_data>/recipes/` | Bundled recipes are embedded from `recipes/bundled/` |
-| Marketplace state: newest catalog sequence, installed marketplace recipes and their hashes, edit tokens, install-count switch | `<app_data>/catalog-state.json` | Local data; nothing here is a signing key |
+| User recipes, imported recipes and installed marketplace recipes | `<app_data>/recipes/` | No recipes are embedded in the binary (Design, 2026-11-10); the official ones are installed from the marketplace |
+| Marketplace state: newest catalog sequence, installed marketplace recipes and their hashes, edit tokens, install-count switch. **v2 adds** (Design): the random device token (43-character base64url), the user's own star ratings (`myRating` per recipe) and the blocked-commenter list | `<app_data>/catalog-state.json` | Local data; nothing here is a signing key. The device token is an identifier that is sent to the marketplace (see [Marketplace](./marketplace.md#privacy)); the RevenueCat app user id is not stored here, it is read from the billing plugin when needed |
 | API keys | OS secure storage | iOS Keychain; Android Keystore-backed plugin; never returned to the shell |
 | Site cookies/storage | Native webview profile store | Android behavior is not device-verified |
 
@@ -190,7 +194,9 @@ src-tauri/
     tauri-plugin-billing/   Store billing adapters
   gen/                  Generated Apple and Android native projects
 recipes/
-  bundled/              JSON recipes embedded by Rust
+  official/             Official recipes, published to the marketplace (validated and fixture-tested, not embedded)
+  fixtures/             DOM fixtures per site
+scripts/official-recipes.mjs  Prints the SQL that publishes recipes/official/ (operator)
 blocklists/              Bundled EasyList and EasyPrivacy files
 assets/store/            Store listing artwork and source captures
 docs/wiki/               Source-controlled wiki, synced to GitHub Wiki

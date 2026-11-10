@@ -95,3 +95,20 @@ export function urlsWithoutBundledIcon(urls: readonly string[]): string[] {
     return !host || !hasBundledIcon(host);
   });
 }
+const HOST_LABEL = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
+
+/** A safe HTTPS page URL for the site icon fetcher; never accepts a URL or a local/IP host. */
+export function faviconPageUrlForHost(host: string | undefined): string | undefined {
+  if (!host) return undefined;
+  const hostname = host.toLowerCase().replace(/^\*\./, "");
+  const labels = hostname.split(".");
+  if (
+    hostname.length > 253 ||
+    labels.length < 2 ||
+    labels.some((label) => !HOST_LABEL.test(label)) ||
+    !/[a-z]/.test(labels[labels.length - 1])
+  ) {
+    return undefined;
+  }
+  return `https://${hostname}/`;
+}

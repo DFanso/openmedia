@@ -49,6 +49,26 @@ pub struct Entry {
     pub size: u64,
     pub published_at: i64,
     pub featured: bool,
+    /// Platform tags of the recipe plus exactly one origin tag, added by the Worker.
+    pub tags: Vec<String>,
+    /// The recipe's own `meta.homepage`, when it is an https address.
+    pub homepage: Option<String>,
+}
+
+pub const TAG_OFFICIAL: &str = "official";
+pub const TAG_COMMUNITY: &str = "community";
+/// Official recipes are the ones the marketplace operator publishes under this id prefix.
+pub const OFFICIAL_ID_PREFIX: &str = "market.official.";
+const MAX_HOMEPAGE_CHARS: usize = 2048;
+
+impl Entry {
+    pub fn is_official(&self) -> bool {
+        self.tags.iter().any(|tag| tag == TAG_OFFICIAL)
+    }
+
+    pub fn has_tag(&self, tag: &str) -> bool {
+        self.tags.iter().any(|existing| existing == tag)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -110,7 +130,9 @@ pub fn public_key_of(pkcs8: &[u8]) -> Result<[u8; PUBLIC_KEY_BYTES]> {
         .map_err(|_| Error::Catalog("not a valid signing key".into()))
 }
 
-/// Serializes and signs an index. The curator runs this; the app never does.
+/// Serializes and signs an index. The Worker holds the signing key and publishes the catalog;
+/// the app never signs in production. This is the reference implementation of the format and
+/// the source of the test fixtures.
 pub fn sign(index: &Index, pkcs8: &[u8]) -> Result<SignedIndex> {
     check_index(index)?;
     let pair = Ed25519KeyPair::from_pkcs8(pkcs8)
@@ -210,7 +232,7 @@ fn check_entry(entry: &Entry) -> Result<()> {
         && is_sha256_hex(&entry.sha256)
         && entry.size > 0
         && entry.size <= recipes::MAX_RECIPE_BYTES as u64;
-    if text_ok && well_formed {
+    if text_ok && well_formed && tags_ok(entry) && homepage_ok(entry.homepage.as_deref()) {
         Ok(())
     } else {
         Err(Error::Catalog(format!(
@@ -218,6 +240,38 @@ fn check_entry(entry: &Entry) -> Result<()> {
             entry.id
         )))
     }
+}
+
+/// Platform tags (at least one), no repeats, exactly one origin tag; `official` only under the
+/// official id prefix and `community` never under it, so an upload cannot wear the badge.
+fn tags_ok(entry: &Entry) -> bool {
+    let mut platforms = 0;
+    let mut origins = Vec::new();
+    for (index, tag) in entry.tags.iter().enumerate() {
+        if entry.tags[..index].contains(tag) {
+            return false;
+        }
+        match tag.as_str() {
+            "mobile" | "desktop" => platforms += 1,
+            TAG_OFFICIAL | TAG_COMMUNITY => origins.push(tag.as_str()),
+            _ => return false,
+        }
+    }
+    let official_id = entry.id.starts_with(OFFICIAL_ID_PREFIX);
+    platforms >= 1
+        && match origins.as_slice() {
+            [TAG_OFFICIAL] => official_id,
+            [TAG_COMMUNITY] => !official_id,
+            _ => false,
+        }
+}
+
+fn homepage_ok(homepage: Option<&str>) -> bool {
+    homepage.is_none_or(|homepage| {
+        recipes::is_plain_text(homepage, MAX_HOMEPAGE_CHARS)
+            && url::Url::parse(homepage)
+                .is_ok_and(|url| url.scheme() == "https" && url.host_str().is_some())
+    })
 }
 
 fn is_sha256_hex(text: &str) -> bool {
@@ -238,7 +292,7 @@ pub fn entry<'a>(index: &'a Index, id: &str) -> Option<&'a Entry> {
     index.recipes.iter().find(|entry| entry.id == id)
 }
 
-/// Whether the curator withdrew exactly this recipe file.
+/// Whether this recipe file was withdrawn in the catalog.
 pub fn is_revoked(index: &Index, id: &str, sha256: &str) -> bool {
     index
         .revoked
@@ -275,7 +329,7 @@ mod tests {
 
     fn recipe_bytes(id: &str, version: &str) -> Vec<u8> {
         format!(
-            r#"{{"schema":1,"id":"{id}","name":"Calm","version":"{version}","origin":"user","match":["https://*.example.com/*"],
+            r#"{{"schema":1,"id":"{id}","name":"Calm","version":"{version}","origin":"user","tags":["mobile"],"match":["https://*.example.com/*"],
               "options":[{{"id":"a","label":"A","description":"d","group":"content","default":false}}],
               "rules":[{{"id":"r","label":"l","type":"hide","option":"a","target":{{"css":".x"}}}}]}}"#
         )
@@ -294,6 +348,8 @@ mod tests {
             size: bytes.len() as u64,
             published_at: NOW - 10,
             featured: false,
+            tags: vec!["mobile".into(), "community".into()],
+            homepage: Some("https://www.example.com/".into()),
         }
     }
 
@@ -439,6 +495,14 @@ mod tests {
                 summary: "x".repeat(141),
                 ..good.clone()
             },
+            Entry {
+                homepage: Some("http://www.example.com/".into()),
+                ..good.clone()
+            },
+            Entry {
+                homepage: Some("javascript:alert(1)".into()),
+                ..good.clone()
+            },
         ];
         for entry in bad {
             assert!(
@@ -447,6 +511,59 @@ mod tests {
             );
         }
         assert!(sign(&index_with(vec![good.clone(), good]), &pkcs8).is_err());
+    }
+
+    fn tagged(id: &str, tags: &[&str]) -> Entry {
+        Entry {
+            id: id.into(),
+            tags: tags.iter().map(|tag| (*tag).to_owned()).collect(),
+            ..entry_for(&recipe_bytes(id, "1.0.0"))
+        }
+    }
+
+    #[test]
+    fn origin_and_platform_tags_follow_the_acceptance_rules() {
+        let (pkcs8, _) = keypair();
+        let accepted = |entry: Entry| sign(&index_with(vec![entry]), &pkcs8).is_ok();
+        assert!(accepted(tagged("market.calm", &["mobile", "community"])));
+        assert!(accepted(tagged(
+            "market.calm",
+            &["desktop", "mobile", "community"]
+        )));
+        assert!(accepted(tagged(
+            "market.official.youtube",
+            &["desktop", "official"]
+        )));
+        let rejected = [
+            // Origin tags: exactly one.
+            tagged("market.calm", &["mobile"]),
+            tagged("market.calm", &["mobile", "community", "official"]),
+            tagged("market.calm", &["mobile", "community", "community"]),
+            // Official needs the official prefix; community may never carry it.
+            tagged("market.calm", &["mobile", "official"]),
+            tagged("market.official.youtube", &["mobile", "community"]),
+            // Platform tags: at least one, no repeats, nothing else.
+            tagged("market.calm", &["community"]),
+            tagged("market.calm", &["mobile", "mobile", "community"]),
+            tagged("market.calm", &["tablet", "mobile", "community"]),
+            tagged("market.calm", &[]),
+            tagged("market.official.youtube", &["official"]),
+        ];
+        for entry in rejected {
+            assert!(!accepted(entry.clone()), "{:?}", entry.tags);
+        }
+    }
+
+    #[test]
+    fn a_signed_index_missing_tags_is_refused_when_parsed() {
+        let (pkcs8, key) = keypair();
+        let index = index_with(vec![entry_for(&recipe_bytes("market.calm", "1.0.0"))]);
+        let mut value = serde_json::to_value(&index).unwrap();
+        value["recipes"][0].as_object_mut().unwrap().remove("tags");
+        let bytes = serde_json::to_vec(&value).unwrap();
+        let pair = Ed25519KeyPair::from_pkcs8(&pkcs8).unwrap();
+        let signature = STANDARD.encode(pair.sign(&signed_message(&bytes)).as_ref());
+        assert!(verify(&bytes, &signature, &[key], NOW, 0).is_err());
     }
 
     #[test]

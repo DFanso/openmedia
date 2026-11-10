@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "id": "market.official.whatsapp",
+  "name": "WhatsApp",
+  "version": "1.0.0",
+  "origin": "user",
+  "tags": ["mobile"],
+  "match": ["https://*.whatsapp.com/*"],
+  "options": [
+    {
+      "id": "app-nags",
+      "label": "Hide app download buttons",
+      "description": "The Download button in the top bar, in the first banner and in the footer on whatsapp.com, and the \"Download for Mac\" button on WhatsApp Web.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "promo-sections",
+      "label": "Hide promo sections",
+      "description": "The \"Call on WhatsApp Web\" and \"Transform your business\" promo blocks on the whatsapp.com home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide page footer",
+      "description": "The footer at the bottom of whatsapp.com pages (links, language list, download buttons).",
+      "group": "content",
+      "default": false
+    }
+  ],
+  "rules": [
+    {
+      "id": "header-download",
+      "label": "Download icon in top bar",
+      "type": "hide",
+      "option": "app-nags",
+      "target": {
+        "css": "[data-testid=whatsapp_www_header] a[href*=\"itunes.apple.com\"]"
+      }
+    },
+    {
+      "id": "hero-download",
+      "label": "Download button in first banner",
+      "type": "hide",
+      "option": "app-nags",
+      "target": {
+        "css": "article a[href*=\"itunes.apple.com/app/id310633997\"][href*=\"ct=website_cta\"]"
+      }
+    },
+    {
+      "id": "footer-download",
+      "label": "Download buttons in footer",
+      "type": "hide",
+      "option": "app-nags",
+      "target": {
+        "css": "[data-testid=whatsapp_www_footer] a[href*=\"itunes.apple.com\"]"
+      }
+    },
+    {
+      "id": "web-download",
+      "label": "WhatsApp Web Download for Mac button",
+      "type": "hide",
+      "option": "app-nags",
+      "target": {
+        "css": "[data-testid=download-native-client-button], [data-testid=download-native-client-button-inline]"
+      }
+    },
+    {
+      "id": "web-calling-promo",
+      "label": "Call on WhatsApp Web promo",
+      "type": "hide",
+      "option": "promo-sections",
+      "target": {
+        "css": "section[data-testid=waui_section]:has(a[href=\"https://web.whatsapp.com/\"])"
+      }
+    },
+    {
+      "id": "business-promo",
+      "label": "Transform your business promo",
+      "type": "hide",
+      "option": "promo-sections",
+      "target": {
+        "css": "section[data-testid=waui_section]:has(a[href^=\"https://whatsappbusiness.com\"])"
+      }
+    },
+    {
+      "id": "site-footer",
+      "label": "Page footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "footer[data-testid=whatsapp_www_footer]"
+      }
+    }
+  ],
+  "meta": {
+    "author": "OpenMedia",
+    "homepage": "https://web.whatsapp.com/",
+    "lastVerified": "2026-11-08",
+    "notes": "LIVE (headless Chromium, iPhone UA 390x844, logged out, 2026-11-08): https://web.whatsapp.com/ redirects to /mobile/ which only says 'Use WhatsApp Web ... on your computer' + Share link (nothing hideable, no rules target it). https://www.whatsapp.com/ counts: header download a[href*=itunes.apple.com]=2 (one in mobile header, one in nav dropdown), article hero download=1, footer itunes links=3, section:has(web.whatsapp.com link)=1, section:has(whatsappbusiness.com link)=1, footer[data-testid=whatsapp_www_footer]=1. https://www.whatsapp.com/download: the primary iOS Download button sits in a section (not an article) so it stays visible; header/footer ones are hidden. LIVE desktop UA 1280x800 https://web.whatsapp.com/: [data-testid=download-native-client-button]=1 and -inline=1 (Download WhatsApp for Mac banner). Selectors use data-testid/href only, no hashed classes. Fixtures distilled from these pages. NOT verified: logged-in chats/Status/Channels/ads (behind phone-QR login); no cookie banner or timed pop-up appeared in ~20 s; the Mac banner's title/text card has no stable container, so only its button is hidden; other www sections (calling, privacy, groups) and faq.whatsapp.com were not given rules."
+  }
+}

@@ -148,6 +148,26 @@ export const vi: Messages = {
   "onboarding.step4Title": "Tùy chỉnh theo ý bạn.",
   "onboarding.step4Body":
     "Kéo nút sang mép bên này hoặc bên kia và nó sẽ ở lại đó. Đổi yêu thích trong Cài đặt, và xem lại hướng dẫn này bất cứ lúc nào.",
+  "onboarding.quickTitle": "Bạn cần gì trong truy cập nhanh?",
+  "onboarding.quickBody":
+    "Chọn những trang bạn mở nhiều nhất. OpenMedia sẽ thêm các công thức chính thức của chúng và đặt vào nút của bạn.",
+  "onboarding.quickLoading": "Đang tải các công thức chính thức…",
+  "onboarding.quickEmpty":
+    "Chưa có công thức chính thức nào cho thiết bị này. Bạn có thể thêm sau từ Chợ công thức.",
+  "onboarding.quickCount": "Đã chọn {count}/{limit}",
+  "onboarding.quickProHint": "Đó là mức tối đa gói của bạn cho phép. Pro có nhiều chỗ hơn.",
+  "onboarding.applying": "Đang thêm…",
+  "onboarding.partial": "Không thể thêm: {names}. Bạn có thể thêm sau từ Chợ công thức.",
+  "onboarding.marketTitle": "Một chợ công thức.",
+  "onboarding.marketBody": "Tìm thêm công thức trong Cài đặt, mục Chợ công thức.",
+  "onboarding.marketOfficial":
+    "Công thức chính thức do OpenMedia tạo. Công thức cộng đồng do những người như bạn tải lên.",
+  "onboarding.marketChecked":
+    "Mọi công thức đều được kiểm tra tự động và giữ lại 14 ngày trước khi được đăng.",
+  "onboarding.marketReview":
+    "Bạn xem lại mọi quy tắc mà công thức thêm vào trước khi nó được thêm.",
+  "onboarding.marketPro":
+    "Tải lên, xuất và bình luận cần Pro. Thêm, nhập và đánh giá thì miễn phí.",
 
   "settings.title": "Cài đặt",
   "settings.close": "Đóng cài đặt",
@@ -223,6 +243,9 @@ export const vi: Messages = {
   "recipes.title": "Công thức",
   "recipes.note":
     "Công thức cho các trang phổ biến. Các bảng nhắc cài ứng dụng và pop-up chặn trang mặc định bị ẩn; Reels, Shorts và gợi ý vẫn hiện cho tới khi bạn ẩn chúng. Đánh dấu sao một công thức để thêm trang đó vào yêu thích.",
+  "recipes.empty":
+    "Bạn chưa có công thức nào. Hãy tìm công thức làm sẵn cho các trang phổ biến trong Chợ công thức.",
+  "recipes.openMarket": "Mở Chợ công thức",
   "recipes.annoyances": "Phiền nhiễu · ẩn mặc định",
   "recipes.content": "Nội dung · hiện cho tới khi bạn ẩn",
   "recipes.groupAnnoyance": "Phiền nhiễu",
@@ -232,10 +255,6 @@ export const vi: Messages = {
   "recipes.options": "Tùy chọn của {name}",
   "recipes.addFavorite": "Thêm {name} vào yêu thích",
   "recipes.removeFavorite": "Gỡ {name} khỏi yêu thích",
-  "recipes.customized":
-    "Công thức này là bản sao bạn đã sửa, nên các bản cập nhật ứng dụng sẽ không đụng tới.",
-  "recipes.originalUpdated": "Bản gốc của ứng dụng đã được cập nhật kể từ khi bạn sửa nó.",
-  "recipes.restore": "Khôi phục bản gốc",
   "recipes.bottomMargin": "Lề dưới",
   "recipes.sharedMargin": "Dùng lề dưới chung. Kéo thanh trượt để đặt lề riêng cho trang này.",
   "recipes.ownMargin": "Trang này có lề dưới riêng.",
@@ -244,9 +263,9 @@ export const vi: Messages = {
   "recipes.imported": "Được thêm từ bên ngoài ứng dụng. Gỡ bỏ để trở về như trang vốn có.",
 
   "market.title": "Chợ công thức",
-  "market.linkNote": "Công thức của người khác, được kiểm tra trước khi đăng",
+  "market.linkNote": "Công thức của người khác, được kiểm tra tự động và đăng sau 14 ngày",
   "market.note":
-    "Công thức do người khác tạo và được một người kiểm tra trước khi đăng. Bạn xem mọi quy tắc trước khi có gì được thêm.",
+    "Công thức do người khác tạo. Máy chủ kiểm tra tự động mọi công thức; công thức vượt qua kiểm tra sẽ xuất hiện ngay trong danh sách công khai và được đăng 14 ngày sau khi gửi. Bạn xem mọi quy tắc trước khi có gì được thêm.",
   "market.loading": "Đang tải…",
   "market.empty": "Chưa có gì được đăng.",
   "market.add": "Thêm",
@@ -271,16 +290,40 @@ export const vi: Messages = {
   "market.reported": "Cảm ơn, báo cáo đã được gửi.",
   "market.share": "Chia sẻ một công thức của bạn",
   "market.share.note":
-    "Mỗi công thức đều được một người kiểm tra trước khi đăng. Chỉ có thể gửi phiên bản mới từ thiết bị này.",
+    "Máy chủ kiểm tra tự động mọi công thức. Công thức vượt qua kiểm tra sẽ xuất hiện ngay trong danh sách công khai và được đăng 14 ngày sau khi gửi. Chỉ có thể gửi phiên bản mới từ thiết bị này.",
   "market.share.recipe": "Công thức",
   "market.share.name": "Tên trên chợ",
   "market.share.summary": "Tóm tắt một dòng",
   "market.share.author": "Tên của bạn",
-  "market.share.send": "Gửi để duyệt",
-  "market.share.sent": "Đã gửi. Công thức sẽ được đăng sau khi có người kiểm tra.",
+  "market.share.send": "Gửi đến chợ",
+  "market.share.sent": "Đã gửi. Đã có trong danh sách công khai và sẽ được đăng sau 14 ngày.",
   "market.counting": "Báo cho chợ khi tôi thêm công thức",
   "market.countingNote":
     "Chỉ gửi tên công thức, không có gì về bạn. Dữ liệu này tạo nên số liệu “Đã được … người thêm”.",
+  "market.tag.official": "Chính thức",
+  "market.tag.community": "Cộng đồng",
+  "market.tag.mobile": "Di động",
+  "market.tag.desktop": "Máy tính",
+  "market.filters": "Lọc theo thẻ",
+  "market.noMatch": "Không có gì khớp với các bộ lọc này.",
+  "market.rating.none": "Chưa có đánh giá",
+  "market.rate": "Đánh giá của bạn",
+  "market.rateStars": "Đánh giá {count} sao",
+  "market.comments": "Bình luận",
+  "market.comments.loading": "Đang tải bình luận…",
+  "market.comments.none": "Chưa có bình luận.",
+  "market.comments.you": "Bạn",
+  "market.comments.write": "Viết bình luận",
+  "market.comments.rules": "Không đính kèm liên kết hoặc thông tin liên hệ. Tối đa 280 ký tự.",
+  "market.comments.post": "Đăng",
+  "market.comments.proPrompt": "Bình luận là tính năng Pro. Ai cũng có thể đọc bình luận.",
+  "market.comments.report": "Báo cáo",
+  "market.comments.reported": "Đã báo cáo",
+  "market.comments.block": "Chặn",
+  "market.comments.blocked": "Người bình luận bị chặn",
+  "market.comments.blockedNote": "Bạn sẽ không thấy bình luận từ những người trong danh sách này.",
+  "market.comments.blockedNone": "Bạn chưa chặn ai.",
+  "market.comments.unblock": "Bỏ chặn",
 
   "share.link": "Nhập và xuất",
   "share.linkNote": "Chuyển công thức giữa các thiết bị dưới dạng văn bản",
@@ -358,7 +401,6 @@ export const vi: Messages = {
   "assistant.reject": "Từ chối",
   "assistant.accept": "Chấp nhận",
   "assistant.switchExists": "Công tắc này đã tồn tại",
-  "assistant.savedAsCopy": "đã lưu thành bản sao bạn sửa",
   "assistant.matched": "khớp {count}",
   "assistant.requestQuote": "“{request}”",
   "assistant.unmatched": "{count} quy tắc không khớp gì trên trang này.",

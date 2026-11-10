@@ -1,6 +1,6 @@
 # Recipe Format
 
-> **Status: Partially implemented.** Options (user-facing toggles) are implemented; see [Options](#options-user-facing-toggles). A subset of schema v1 is built in `src-tauri/src/recipes/` (see [Implemented subset](#implemented-subset)). Everything else below is still the intended design; the Rust types become the source of truth and this page follows them.
+> **Status: Partially implemented.** Options (user-facing toggles) are implemented; see [Options](#options-user-facing-toggles). A subset of schema v1 is built in `src-tauri/src/recipes/` (see [Implemented subset](#implemented-subset)). Everything else below is still the intended design; the Rust types become the source of truth and this page follows them. **Marketplace v2 (2026-11-10, Design, being implemented): required `tags`, the origin tag held outside the recipe, no bundled recipes and no forks** (see [Tags](#tags)).
 
 A **recipe** is a JSON document describing how to modify one site (or a set of URL patterns). The intended workflow is for AI to propose data, Rust to validate it, and the app to apply it; user editing, export, and sharing are future flows.
 
@@ -21,7 +21,8 @@ A `script` rule exists as a gated escape hatch (see [Trust levels](#trust-levels
   "id": "instagram.no-reels",
   "name": "Instagram without Reels",
   "version": "1.0.0",
-  "origin": "bundled",
+  "origin": "user",
+  "tags": ["mobile"],
   "match": ["https://www.instagram.com/*"],
   "rules": [
     {
@@ -49,11 +50,19 @@ A `script` rule exists as a gated escape hatch (see [Trust levels](#trust-levels
 | `id` | string | Stable, `site.slug`. Unique per user. |
 | `name` | string | Display name. |
 | `version` | semver | Bumped by author/AI on change. |
-| `origin` | `bundled` \| `user` \| `ai` \| `imported` | Drives [trust level](#trust-levels). |
+| `origin` | `user` \| `ai` \| `imported` | Drives [trust level](#trust-levels). |
+| `tags` | string[] | **Required (Design; Rust `schema.rs` and the Worker's `validate.ts` must stay equal).** Platform tags only: 1 or 2 unique values from `mobile`, `desktop`. A missing, empty, unknown or duplicate tag, or `official` / `community` inside the recipe, makes it invalid. See [Tags](#tags). |
 | `match` | string[] | URL patterns (scheme + host + path glob). A recipe applies when any matches the top-level page URL. |
 | `rules` | Rule[] | Ordered. Each independently toggleable. |
-| `meta` | object | Optional: `author`, `homepage`, `lastVerified` (date), `notes`. `homepage` must be an `http(s)` address; Settings uses it as the page a favorite of the recipe opens, and hides the star on a recipe without one. Every bundled recipe sets it, and it must itself match the recipe's `match` patterns (tested). |
-| `forkedFrom` | string | Only on a [fork](#forks): the bundled `version` the copy was made from. Rust sets it on save and refuses it on `bundled` recipes. |
+| `meta` | object | Optional: `author`, `homepage`, `lastVerified` (date), `notes` (at most 4000 characters, the same cap in Rust and in the Worker). `homepage` must be an `http(s)` address; Settings uses it as the page a favorite of the recipe opens, and hides the star on a recipe without one. Every official recipe sets it, and it must itself match the recipe's `match` patterns (tested). |
+
+## Tags
+
+Status: Design. Every recipe says where it is meant to run with `tags`: `mobile`, `desktop`, or both. They are part of the recipe, hashed and signed with it, and shown as badges in the Marketplace.
+
+- **The origin tag (`official` or `community`) is never in the recipe.** The Worker adds it to the marketplace index entry (`tags` = the recipe's platform tags sorted, plus exactly one origin tag), so an upload cannot say it is official and the recipe bytes do not change between channels. Allowed tag set overall: `mobile`, `desktop`, `official`, `community`.
+- Recipes the app itself creates (the AI assistant, the picker, manual edits) get `tags` = the current platform automatically before validation. Imported files must already have `tags`; there is no migration for old files, so a recipe file without `tags` is refused.
+- For official recipes the platform tags follow the fixtures: `desktop` when `recipes/fixtures/<site>/desktop-*.html` exists, `mobile` when any other fixture exists.
 
 ## Options (user-facing toggles)
 
@@ -74,7 +83,7 @@ A recipe may list `options`: the switches Settings shows for the site. Each rule
 | `label` | At most 60 characters. Phrase it so ON means hidden ("Hide Reels"). |
 | `description` | At most 160 characters, one sentence. Say what else it hides if the selector is broader than the label. |
 | `group` | `annoyance` or `content`. Orders the switches. |
-| `default` | Whether the rules apply until the user chooses. **Policy for bundled recipes, enforced by a test: annoyances `true`, content `false`.** An annoyance is something that gets in the way (install prompts, pop-ups that block the page, scroll locks, ad slots); content is something the user may well want to see. |
+| `default` | Whether the rules apply until the user chooses. **Policy for official recipes, enforced by a test: annoyances `true`, content `false`.** An annoyance is something that gets in the way (install prompts, pop-ups that block the page, scroll locks, ad slots); content is something the user may well want to see. |
 
 Validation: at most 30 options; every option has at least one rule; every `option` a rule names exists. Choices live in `library.json` (`siteOptions`: recipe id, then option id, then bool); an option with no saved choice follows the recipe's current default, so shipping a new option needs no migration. Adding `options` and `option` is additive, so `schema` stays 1.
 
@@ -121,30 +130,31 @@ Any rule may carry `when`:
 
 ## Health
 
-Each rule may declare `expect`: `"match"` (should match ≥1 element on pages satisfying `when`) or `"none"` (best-effort). The engine reports match counts to Core. A rule with `expect: "match"` that matches 0 on K consecutive eligible page loads is marked **stale** in the UI, and offers "Repair with AI" (re-snapshot, ask for a replacement for that rule only). Bundled recipes use this as their breakage detector in the field, with no telemetry: the state is local and shown to the user.
+Each rule may declare `expect`: `"match"` (should match ≥1 element on pages satisfying `when`) or `"none"` (best-effort). The engine reports match counts to Core. A rule with `expect: "match"` that matches 0 on K consecutive eligible page loads is marked **stale** in the UI, and offers "Repair with AI" (re-snapshot, ask for a replacement for that rule only). Official recipes use this as their breakage detector in the field, with no telemetry: the state is local and shown to the user.
 
 ## Trust levels
 
 | Origin | Allowed rule types | Apply policy |
 |--------|--------------------|--------------|
-| `bundled` | all except `script` | Applied on enable. Shipped with and verified by the app build. |
-| `user` (picker / manual) | all except `script` | Applied immediately. |
-| `ai` | all except `script` | Shown as **preview** first; saved on user accept. |
+| `user` (picker / manual) | all except `script` | Applied immediately. The official recipe files in `recipes/official/` are written with `origin: "user"`; the app sets `imported` when it installs one. |
+| `ai` | all except `script` | Shown as **preview** first; saved on user accept. The assistant never edits an installed recipe: it writes a separate `custom.<domain>` recipe beside it. |
 | `imported` | `hide`, `css` | Pasted bundles and [marketplace](./marketplace.md) downloads. Rust sets the origin itself, whatever the file says, and shows a rule-by-rule review before anything is saved. See [Shared recipes](#shared-recipes). |
+| `official` (marketplace tag, **not an origin**) | `hide`, `css` | **There is no `official` trust level.** Official recipes are published by us through the marketplace and arrive as `imported`: the same signature, hash, Rust validation and rule-by-rule review as a community recipe. A label does not grant trust. |
 | any + `script` | `script` | Per-recipe explicit confirmation with the code shown; confirmation stored keyed by a hash of the script. Changing the script re-prompts. |
 
 ## Shared recipes
 
 Implemented in `src-tauri/src/recipes/share.rs`. A recipe from outside the app is the sender's claim, so before the normal validation Rust:
 
-- ignores the file's `origin` and sets `imported`, and drops `forkedFrom` (so a file cannot claim `bundled` to skip the broad-`match` refusal, or pose as a fork);
-- moves the id under `imported.` for pasted files (`instagram.default` becomes `imported.instagram.default`, so it can never replace a bundled or custom recipe). Only the verified catalog path may use `market.` ids;
+- requires `tags` (platform tags only, see [Tags](#tags)); there is no migration for older files;
+- ignores the file's `origin` and sets `imported` (so a file cannot claim `user` or `ai` to skip the `hide`/`css`-only restriction);
+- moves the id under `imported.` for pasted files (`instagram.default` becomes `imported.instagram.default`, so it can never replace an installed marketplace recipe or a custom one). Only the verified catalog path may use `market.` ids, and only the official publishing path may use `market.official.` ids ([Marketplace](./marketplace.md#tags-official-and-community));
 - accepts ids of lowercase letters, digits, `.` and `-` up to 80 characters, and a `version` of three numbers (`1.0.0`);
 - refuses control characters and invisible direction overrides (U+200B–U+200F, U+202A–U+202E, U+2066–U+2069, U+FEFF) in the name, author, notes, option text and rule labels, and caps their lengths (name and author 60);
 - refuses a `meta.homepage` that the recipe's own `match` patterns do not cover, because a favorite made from a recipe opens its homepage under the recipe's name;
 - limits a bundle to 1 MiB and 20 recipes, a recipe to 256 KiB, and refuses duplicate ids.
 
-A bundle is `{ "openmediaBundle": 1, "recipes": [ … ] }`. Export covers only recipes the user made, changed or imported, never bundled ones, and never switches, settings or keys.
+A bundle is `{ "openmediaBundle": 1, "recipes": [ … ] }`. Export covers only recipes the user made, changed or imported, never switches, settings or keys, and **needs Pro** (checked in Rust only; see [Paywall](./paywall.md)). Import is free.
 
 ## Validation (Rust, before anything reaches a webview)
 
@@ -158,16 +168,7 @@ A bundle is `{ "openmediaBundle": 1, "recipes": [ … ] }`. Export covers only r
 ## Versioning and migration
 
 - `schema` is the format version. Bump on breaking change; ship a Rust migration `vN → vN+1`; saved recipes are migrated on load and re-saved.
-- `version` is the recipe's own semver. A fork records the bundled version it started from, so a newer bundled version can be told apart from the user's copy (see [Forks](#forks)).
-
-## Forks
-
-Fork persistence is implemented in Rust, but the user-facing fork workflow is not connected. `Recipes::save_fork` writes a validated customized copy under `<app_data>/recipes/<id>.json`, keyed to the bundled recipe id with `forkedFrom`; loading that file makes it replace the bundled recipe.
-
-- **Updates:** a fork records the bundled version it came from. Automatic merging of newer bundled rules into a fork is not implemented.
-- **Rust commands:** `save_recipe_fork` and `restore_recipe_original` are registered, but no shell UI calls them. AI acceptance currently saves through `Recipes::save_made`; it does not use the fork command.
-- **UI:** editing/saving a fork and the restore-original action are not wired into Settings. The persistence functions and commands should not be mistaken for an available user flow.
-- **Damaged files.** A fork file that is unreadable, invalid, not a fork, or for a recipe that is no longer bundled is ignored at startup; the bundled recipe applies.
+- `version` is the recipe's own semver.
 
 ## Lifecycle of a recipe
 
@@ -187,16 +188,16 @@ stateDiagram-v2
 
 What the Rust code accepts today, validated with `deny_unknown_fields` so anything else is refused rather than ignored:
 
-- Top level: `schema` (must be 1), `id`, `name`, `version`, `origin`, `match`, `rules`, optional `meta` (`author`, `lastVerified`, `notes`).
+- Top level: `schema` (must be 1), `id`, `tags` (required; Design, see [Tags](#tags)), `name`, `version`, `origin`, `match`, `rules`, optional `meta` (`author`, `lastVerified`, `notes`).
 - Rules: `hide` (`display: none !important`) and `css` (a whitelisted declarations block). Targets are a single `css` selector; `ariaLabel`, `href`, `text`, `has`, `closest`, `when`, `expect`, `redirect`, `media`, `remove` and `script` are not accepted yet.
 - Selectors: at most 300 characters, no `{ } ; \ < @`, backtick or comments, balanced brackets, at most 20 selectors in a list and 2 `:has(`.
 - `css` declarations: only `display`, `visibility`, `opacity`, `overflow`, `overflow-x`, `overflow-y`, `position`, `pointer-events`, `filter`, `height`, `min-height`, `max-height`, `touch-action`, `backdrop-filter`; values limited to letters, digits and ` .,%#()-`, no `url(`.
-- `match`: `scheme://host/path` with `http`, `https` or `*`; the host may start with `*.` (matches the apex and any subdomain depth); `*` in the path is a glob. An all-sites host (`*`) is refused unless the recipe is `bundled`.
+- `match`: `scheme://host/path` with `http`, `https` or `*`; the host may start with `*.` (matches the apex and any subdomain depth); `*` in the path is a glob. An all-sites or otherwise too broad pattern is refused for every recipe.
 - Delivery: all recipes are compiled by Rust into one document-start script. The page tests its own `location` against each recipe's matcher regexes, so one script stays correct across navigations. The shell cannot open a page without it: `open_site` is the only way, and the plugin's `open` is not granted to the shell.
-- Fixtures: every bundled rule must match something in `recipes/fixtures/<site>/`; this is tested in Rust.
-- Options: `options[]` and a per-rule `option`, as above. The page script is compiled per open and per toggle from the bundled recipes and the saved choices (`Recipes::script`), and only enabled rules reach it.
+- Fixtures: every rule of a recipe in `recipes/official/` must match something in `recipes/fixtures/<site>/`; this is tested in Rust.
+- Options: `options[]` and a per-rule `option`, as above. The page script is compiled per open and per toggle from the installed recipes and the saved choices (`Recipes::script`), and only enabled rules reach it.
 - Limits that matter when writing selectors: the 300-character, 19-comma and 2-`:has(` limits apply to the whole `css` string of one rule, so an option with many selectors uses several rules.
-- Bundled today (18): `instagram`, `facebook`, `twitter`, `reddit`, `youtube`, `threads`, `telegram`, `douyin`, `messenger`, `discord`, `kuaishou`, `linkedin`, `whatsapp`, `snapchat`, `pinterest`, `weibo`, `tiktok` and `twitch`, each `<site>.default`. [Site Playbooks](./site-playbooks.md) records what each selector matched, how it was checked, and what CSS cannot do. Each recipe's `meta.notes` carries the same evidence next to the data.
+- Official recipes (18, in `recipes/official/`, each with `origin: "user"`, `meta.author: "OpenMedia"` and tags from its fixtures): `instagram`, `facebook`, `twitter`, `reddit`, `youtube`, `threads`, `telegram`, `douyin`, `messenger`, `discord`, `kuaishou`, `linkedin`, `whatsapp`, `snapchat`, `pinterest`, `weibo`, `tiktok` and `twitch`. They are validated and fixture-tested by `cargo test` but not compiled into the app: they are published to the marketplace as `market.official.<site>` (for example `market.official.youtube`) and installed from there; nothing in `recipes/official/` is embedded in the app. [Site Playbooks](./site-playbooks.md) records what each selector matched, how it was checked, and what CSS cannot do. Each recipe's `meta.notes` carries the same evidence next to the data.
 - Fixture rules: every rule matches something in its site's fixtures, and nothing a fixture marks `data-keep` (or an ancestor of it) may be hidden by a `hide` rule. Mark the login link, the feed container, the player and similar with `data-keep` when you add a fixture.
 - Desktop and mobile: a site serves a different DOM to a desktop user agent (the Mac app) and to an iPhone one, so a recipe lists the rules for both under the same option and the family that is absent matches nothing; see [Site Playbooks](./site-playbooks.md#desktop-and-mobile-are-different-pages). Fixtures for desktop pages are named `desktop-*.html`. The fixture test reports every rule that matches nothing at once, not only the first.
 

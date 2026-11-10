@@ -53,7 +53,7 @@ yarn check:rust                                    # cargo fmt --all --check, cl
 
 - **Never push failing checks.** CI runs only `lint`, `format:check` and `test`; `ts:check` and the Rust checks are on you, run `yarn verify` before pushing.
 - New module → test file mirroring the source path. Rust unit tests live beside the code (`#[cfg(test)]`); integration tests in `src-tauri/tests/`.
-- **Recipe rules are tested against DOM fixtures** (`recipes/fixtures/<site>/`), not live sites. A bundled recipe without a fixture test does not ship.
+- **Recipe rules are tested against DOM fixtures** (`recipes/fixtures/<site>/`), not live sites. An official recipe (`recipes/official/`) without a fixture test does not ship.
 - Mock the network. LLM provider tests use recorded request/response fixtures; never call a real provider in tests and never put a real key in a fixture.
 - Do not use screenshots or LLM visual inspection as test evidence. Verify behavior programmatically. Manual on-device testing (iOS/Android/desktop) is the user's; state clearly in the PR what remains unverified.
 
@@ -70,7 +70,7 @@ yarn check:rust                                    # cargo fmt --all --check, cl
 
 Violating any of these is a bug regardless of whether tests pass. Details in `docs/wiki/security.md`.
 
-1. **No backend beyond the marketplace; no telemetry.** No analytics, no crash reporting, no identifiers that leave the device. The only network destinations are (a) the sites the user opens, (b) the LLM endpoint the user configured, (c) the opt-in recipe marketplace on Cloudflare (`docs/wiki/marketplace.md`), reached only on user action, HTTPS only, no cookies, no device or account identifier, (d) static GitHub releases, (e) RevenueCat, only from the in-repo billing plugin, for purchase validation and restore (anonymous app-user ID, no account; see `docs/wiki/paywall.md`). The marketplace is untrusted: everything it returns is verified against a signature key compiled into the app and validated again in Rust. The signing key never lives on Cloudflare. Do not add any other SDK that phones home.
+1. **No backend beyond the marketplace; no telemetry.** No analytics, no crash reporting, no identifiers that leave the device except the two marketplace ones named in (c). The only network destinations are (a) the sites the user opens, (b) the LLM endpoint the user configured, (c) the opt-in recipe marketplace on Cloudflare (`docs/wiki/marketplace.md`), reached only on user action, HTTPS only, no cookies, no account; it receives a random per-install device token (ratings, reports) and, only on Pro-gated actions (upload, comments), the RevenueCat anonymous app-user ID, which the Worker stores only as a SHA-256 hash and the shell never sees, (d) static GitHub releases, (e) RevenueCat, only from the in-repo billing plugin, for purchase validation and restore (anonymous app-user ID, no account; see `docs/wiki/paywall.md`). The marketplace is untrusted: everything it returns is verified against a signature key compiled into the app and validated again in Rust. The signing key is a Cloudflare Worker secret, so a valid signature means the catalog came from the Worker, not that a recipe is benign; submissions are checked automatically, held for 14 days and published automatically, with no person reviewing them (an open store-policy risk, `docs/wiki/marketplace.md#store-policy`). Do not add any other SDK that phones home.
 2. **API keys live only in the OS secure store and are read only in Rust.** Never pass a key to any webview, never log it, never write it to recipes, exports, settings JSON, error messages, or test fixtures.
 3. **Site webviews are hostile.** They load arbitrary third-party code. They get no Tauri IPC except the single narrowly-scoped bridge command defined in `security.md`. Adding any command, event, or capability reachable from a site webview needs a `security.md` update and explicit justification in the PR.
 4. **AI output is untrusted input.** Validate it against the recipe schema in Rust before it touches a webview. Script-type rules require explicit per-recipe user confirmation; the AI never gets a path to apply one silently.
@@ -83,7 +83,7 @@ Violating any of these is a bug regardless of whether tests pass. Details in `do
 
 **Never fix something without understanding its ripples.**
 
-- **What does this code talk to?** Find callers and consumers. The recipe schema is consumed by Rust validation, the TS editor UI, the engine, the AI prompt, and every bundled recipe.
+- **What does this code talk to?** Find callers and consumers. The recipe schema is consumed by Rust validation, the TS editor UI, the engine, the AI prompt, and every official recipe.
 - **What does this code touch?** Webview lifecycle, the injected engine, the bridge, and the key store are high-coupling areas. Trace the full call chain first.
 - **Symptom or cause?** If a site-breakage fix needs a new special case in the engine, the recipe format is probably missing a primitive. Fix the format.
 - **Does it work on every platform?** Desktop uses a child webview; mobile uses a native plugin. A change to the `SiteView` contract must be implemented on both.

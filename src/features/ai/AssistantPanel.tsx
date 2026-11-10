@@ -171,7 +171,6 @@ function ProposalCard({ proposal, request }: { proposal: Proposal; request: stri
             ? t("recipes.groupAnnoyance")
             : t("recipes.groupContent")}{" "}
           · {proposal.recipeName}
-          {proposal.forked ? ` · ${t("assistant.savedAsCopy")}` : ""}
         </p>
         {proposal.rules.length > 0 && (
           <ul className="mt-2 flex flex-col gap-1 border-t border-hair pt-2">

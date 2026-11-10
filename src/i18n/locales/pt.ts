@@ -153,6 +153,27 @@ export const pt: Messages = {
   "onboarding.step4Title": "Deixe-o do seu jeito.",
   "onboarding.step4Body":
     "Arraste o botão até uma das bordas e ele fica lá. Altere seus favoritos nas Configurações e veja este guia novamente quando quiser.",
+  "onboarding.quickTitle": "O que você precisa no acesso rápido?",
+  "onboarding.quickBody":
+    "Escolha os sites que você mais abre. O OpenMedia adiciona as receitas oficiais deles e as coloca no seu botão.",
+  "onboarding.quickLoading": "Carregando as receitas oficiais…",
+  "onboarding.quickEmpty":
+    "Ainda não há receitas oficiais listadas para este dispositivo. Você pode adicionar algumas depois pelo Mercado.",
+  "onboarding.quickCount": "{count} de {limit} escolhidos",
+  "onboarding.quickProHint": "Esse é o máximo que o seu plano permite. O Pro tem mais vagas.",
+  "onboarding.applying": "Adicionando…",
+  "onboarding.partial":
+    "Não foi possível adicionar: {names}. Você pode adicioná-las depois pelo Mercado.",
+  "onboarding.marketTitle": "Um mercado de receitas.",
+  "onboarding.marketBody": "Encontre mais receitas em Configurações, em Mercado.",
+  "onboarding.marketOfficial":
+    "As receitas oficiais são feitas pelo OpenMedia. As receitas da comunidade são enviadas por pessoas como você.",
+  "onboarding.marketChecked":
+    "Toda receita é verificada automaticamente e fica retida por 14 dias antes de ser listada.",
+  "onboarding.marketReview":
+    "Você revisa cada regra que uma receita adiciona antes de ela ser adicionada.",
+  "onboarding.marketPro":
+    "Enviar, exportar e comentar exigem o Pro. Adicionar, importar e avaliar são grátis.",
 
   "settings.title": "Configurações",
   "settings.close": "Fechar configurações",
@@ -229,6 +250,9 @@ export const pt: Messages = {
   "recipes.title": "Receitas",
   "recipes.note":
     "Receitas para sites populares. Os prompts de instalação e os pop-ups que bloqueiam a página ficam ocultos por padrão; Reels, Shorts e as sugestões aparecem até você ocultá-los. Marque uma receita com uma estrela para adicionar o site aos seus favoritos.",
+  "recipes.empty":
+    "Você ainda não tem receitas. Encontre receitas prontas para sites populares no Mercado.",
+  "recipes.openMarket": "Abrir o Mercado",
   "recipes.annoyances": "Irritações · ocultas por padrão",
   "recipes.content": "Conteúdo · aparece até você ocultá-lo",
   "recipes.groupAnnoyance": "Irritação",
@@ -238,10 +262,6 @@ export const pt: Messages = {
   "recipes.options": "Opções de {name}",
   "recipes.addFavorite": "Adicionar {name} aos favoritos",
   "recipes.removeFavorite": "Remover {name} dos favoritos",
-  "recipes.customized":
-    "Esta receita é a sua cópia alterada, por isso as atualizações do app não a modificam.",
-  "recipes.originalUpdated": "O original do app foi atualizado desde que você o alterou.",
-  "recipes.restore": "Restaurar o original",
   "recipes.bottomMargin": "Margem inferior",
   "recipes.sharedMargin":
     "Usa a margem compartilhada. Mova o controle deslizante para dar a este site sua própria margem.",
@@ -252,9 +272,10 @@ export const pt: Messages = {
   "recipes.imported": "Adicionada de fora do app. Remova-a para voltar ao estado original do site.",
 
   "market.title": "Mercado",
-  "market.linkNote": "Receitas de outras pessoas, verificadas antes de serem listadas",
+  "market.linkNote":
+    "Receitas de outras pessoas, verificadas automaticamente e publicadas 14 dias depois",
   "market.note":
-    "Receitas feitas por outras pessoas e verificadas por um humano antes de serem listadas. Você vê todas as regras antes de qualquer coisa ser adicionada.",
+    "Receitas feitas por outras pessoas. O servidor verifica cada receita automaticamente; as que passam na verificação aparecem logo na lista pública e são publicadas 14 dias depois do envio. Você vê todas as regras antes de qualquer coisa ser adicionada.",
   "market.loading": "Carregando…",
   "market.empty": "Ainda não há nada listado.",
   "market.add": "Adicionar",
@@ -279,16 +300,40 @@ export const pt: Messages = {
   "market.reported": "Obrigado, o relatório foi enviado.",
   "market.share": "Compartilhar uma das suas receitas",
   "market.share.note":
-    "Uma pessoa verifica cada receita antes de ela ser listada. Novas versões só podem ser enviadas deste dispositivo.",
+    "O servidor verifica cada receita automaticamente. As que passam na verificação aparecem logo na lista pública e são publicadas 14 dias depois do envio. Novas versões só podem ser enviadas deste dispositivo.",
   "market.share.recipe": "Receita",
   "market.share.name": "Nome no mercado",
   "market.share.summary": "Resumo em uma linha",
   "market.share.author": "Seu nome",
-  "market.share.send": "Enviar para revisão",
-  "market.share.sent": "Enviada. Ela será listada assim que uma pessoa verificar.",
+  "market.share.send": "Enviar ao mercado",
+  "market.share.sent": "Enviada. Está na lista pública e será publicada em 14 dias.",
   "market.counting": "Avisar o mercado quando eu adicionar uma receita",
   "market.countingNote":
     "Só o nome da receita é enviado, nada sobre você. Ele gera os números de “Adicionada por”.",
+  "market.tag.official": "Oficial",
+  "market.tag.community": "Comunidade",
+  "market.tag.mobile": "Celular",
+  "market.tag.desktop": "Computador",
+  "market.filters": "Filtrar por tag",
+  "market.noMatch": "Nada corresponde a esses filtros.",
+  "market.rating.none": "Ainda sem avaliações",
+  "market.rate": "Sua avaliação",
+  "market.rateStars": "Avaliar com {count} estrela | Avaliar com {count} estrelas",
+  "market.comments": "Comentários",
+  "market.comments.loading": "Carregando comentários…",
+  "market.comments.none": "Ainda não há comentários.",
+  "market.comments.you": "Você",
+  "market.comments.write": "Escrever um comentário",
+  "market.comments.rules": "Sem links nem dados de contato. Até 280 caracteres.",
+  "market.comments.post": "Publicar",
+  "market.comments.proPrompt": "Comentar é um recurso do Pro. Todos podem ler os comentários.",
+  "market.comments.report": "Denunciar",
+  "market.comments.reported": "Denunciado",
+  "market.comments.block": "Bloquear",
+  "market.comments.blocked": "Autores bloqueados",
+  "market.comments.blockedNote": "Você não vê comentários das pessoas listadas aqui.",
+  "market.comments.blockedNone": "Você não bloqueou ninguém.",
+  "market.comments.unblock": "Desbloquear",
 
   "share.link": "Importar e exportar",
   "share.linkNote": "Mova receitas entre dispositivos como texto",
@@ -367,7 +412,6 @@ export const pt: Messages = {
   "assistant.reject": "Rejeitar",
   "assistant.accept": "Aceitar",
   "assistant.switchExists": "Este interruptor já existe",
-  "assistant.savedAsCopy": "salva como sua cópia alterada",
   "assistant.matched": "{count} correspondências",
   "assistant.requestQuote": "“{request}”",
   "assistant.unmatched":

@@ -1,10 +1,14 @@
-import { useState, type CSSProperties, type ReactNode } from "react";
-import { useApp } from "../../app/store";
+import { useCallback, useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import { appError, useApp } from "../../app/store";
 import logoMark from "../../assets/logo-mark.svg";
 import { useT } from "../../i18n/useT";
 import type { MessageKey } from "../../i18n/messages";
 import { HistoryIcon, IncognitoIcon, SlidersIcon, StatsIcon } from "../../shared/icons";
 import { useBackHandler } from "../back/useBackHandler";
+import { onboarding } from "../marketplace/ipc";
+import { useEntitlementStore } from "../paywall/store";
+import { QuickAccessStep, type OptionsState } from "./QuickAccessStep";
+import { quickAccessLimit, toggleSelection } from "./selection";
 
 interface DemoItemStyle extends CSSProperties {
   "--i": number;
@@ -144,17 +148,97 @@ const STEPS: Step[] = [
   },
 ];
 
+const QUICK_STEP = STEPS.length;
+const MARKET_STEP = STEPS.length + 1;
+const STEP_COUNT = STEPS.length + 2;
+
+const MARKET_POINTS: MessageKey[] = [
+  "onboarding.marketOfficial",
+  "onboarding.marketChecked",
+  "onboarding.marketReview",
+  "onboarding.marketPro",
+];
+
 /** First-run guide, also reachable from Settings. Full-screen so the page cannot be touched. */
 export function Onboarding() {
   const open = useApp((s) => s.onboardingOpen);
+  // Mounted only while open, so replaying the guide from Settings starts with no old picks.
+  return open ? <OnboardingBody /> : null;
+}
+
+function OnboardingBody() {
   const finishGuide = useApp((s) => s.finishGuide);
+  const loadSites = useApp((s) => s.loadSites);
+  const reloadFavorites = useApp((s) => s.reloadFavorites);
+  const isPro = useEntitlementStore((s) => s.status === "pro");
   const t = useT();
   const [index, setIndex] = useState(0);
-  useBackHandler(open && index > 0, () => setIndex(index - 1));
+  const [reachedQuick, setReachedQuick] = useState(false);
+  const [options, setOptions] = useState<OptionsState>({ status: "loading" });
+  const [selected, setSelected] = useState<string[]>([]);
+  const [applying, setApplying] = useState(false);
+  const [applyError, setApplyError] = useState<string | null>(null);
+  const [notAdded, setNotAdded] = useState<string[] | null>(null);
+  useBackHandler(index > 0, () => setIndex(index - 1));
 
-  if (!open) return null;
-  const step = STEPS[index];
-  const last = index === STEPS.length - 1;
+  const fetchOptions = useCallback(() => {
+    onboarding
+      .options()
+      .then((found) => setOptions({ status: "ready", options: found }))
+      .catch((failure: unknown) => setOptions({ status: "error", message: appError(failure) }));
+  }, []);
+
+  // Fetched when the step is first reached, so skipping never waits on the network.
+  useEffect(() => {
+    if (reachedQuick) fetchOptions();
+  }, [reachedQuick, fetchOptions]);
+
+  const retryOptions = () => {
+    setOptions({ status: "loading" });
+    fetchOptions();
+  };
+
+  const go = (next: number) => {
+    setIndex(next);
+    if (next >= QUICK_STEP) setReachedQuick(true);
+  };
+
+  const quick = index === QUICK_STEP;
+  const market = index === MARKET_STEP;
+  const step = index < STEPS.length ? STEPS[index] : null;
+  const last = index === STEP_COUNT - 1;
+  const limit = quickAccessLimit(isPro);
+
+  const finish = async () => {
+    if (selected.length === 0 || notAdded !== null) {
+      void finishGuide();
+      return;
+    }
+    setApplying(true);
+    setApplyError(null);
+    try {
+      const result = await onboarding.apply(selected);
+      await Promise.all([loadSites(), reloadFavorites()]);
+      if (result.failed.length === 0) {
+        void finishGuide();
+        return;
+      }
+      const names = new Map(
+        options.status === "ready" ? options.options.map((o) => [o.recipeId, o.name]) : [],
+      );
+      setNotAdded(result.failed.map((id) => names.get(id) ?? id));
+    } catch (failure) {
+      setApplyError(appError(failure));
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  const nextLabel = () => {
+    if (!last) return t("onboarding.next");
+    if (applying) return t("onboarding.applying");
+    return applyError ? t("common.retry") : t("onboarding.start");
+  };
 
   return (
     <div
@@ -174,21 +258,81 @@ export function Onboarding() {
         </button>
       </div>
 
-      <div className="flex flex-1 items-center justify-center">{step.visual}</div>
+      {step && <div className="flex flex-1 items-center justify-center">{step.visual}</div>}
 
-      <div className="min-h-44">
-        <p className="text-xs tracking-[0.22em] text-accent uppercase">
-          {index + 1} / {STEPS.length}
-        </p>
-        <h1 className="mt-2 text-4xl leading-[1.05] font-semibold tracking-tight">
-          {t(step.title)}
-        </h1>
-        <p className="mt-3 max-w-sm text-base leading-relaxed text-paper/65">{t(step.body)}</p>
-      </div>
+      {quick && (
+        <div className="flex min-h-0 flex-1 flex-col gap-4 pb-4">
+          <div>
+            <p className="text-xs tracking-[0.22em] text-accent uppercase">
+              {index + 1} / {STEP_COUNT}
+            </p>
+            <h1 className="mt-2 text-3xl leading-[1.05] font-semibold tracking-tight">
+              {t("onboarding.quickTitle")}
+            </h1>
+            <p className="mt-2 max-w-sm text-base leading-snug text-paper/65">
+              {t("onboarding.quickBody")}
+            </p>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <QuickAccessStep
+              options={options}
+              selected={selected}
+              limit={limit}
+              isPro={isPro}
+              onToggle={(id) => setSelected((current) => toggleSelection(current, id, limit))}
+              onRetry={retryOptions}
+            />
+          </div>
+        </div>
+      )}
+
+      {market && (
+        <div className="flex min-h-0 flex-1 flex-col justify-center gap-4 overflow-y-auto">
+          <div>
+            <p className="text-xs tracking-[0.22em] text-accent uppercase">
+              {index + 1} / {STEP_COUNT}
+            </p>
+            <h1 className="mt-2 text-4xl leading-[1.05] font-semibold tracking-tight">
+              {t("onboarding.marketTitle")}
+            </h1>
+            <p className="mt-3 max-w-sm text-base leading-relaxed text-paper/65">
+              {t("onboarding.marketBody")}
+            </p>
+          </div>
+          <ul className="flex max-w-sm flex-col gap-2.5 text-sm leading-snug text-paper/75">
+            {MARKET_POINTS.map((point) => (
+              <li key={point} className="flex gap-2.5">
+                <span aria-hidden="true" className="text-accent">
+                  •
+                </span>
+                {t(point)}
+              </li>
+            ))}
+          </ul>
+          {applyError && <p className="text-sm text-paper/80">{applyError}</p>}
+          {notAdded && (
+            <p className="text-sm text-paper/80">
+              {t("onboarding.partial", { names: notAdded.join(", ") })}
+            </p>
+          )}
+        </div>
+      )}
+
+      {step && (
+        <div className="min-h-44">
+          <p className="text-xs tracking-[0.22em] text-accent uppercase">
+            {index + 1} / {STEP_COUNT}
+          </p>
+          <h1 className="mt-2 text-4xl leading-[1.05] font-semibold tracking-tight">
+            {t(step.title)}
+          </h1>
+          <p className="mt-3 max-w-sm text-base leading-relaxed text-paper/65">{t(step.body)}</p>
+        </div>
+      )}
 
       <div className="mt-6 flex items-center justify-between">
         <div className="flex gap-2" aria-hidden="true">
-          {STEPS.map((_, i) => (
+          {Array.from({ length: STEP_COUNT }, (_, i) => (
             <span
               key={i}
               className={`h-1.5 rounded-full transition-all duration-300 ${
@@ -201,7 +345,8 @@ export function Onboarding() {
           {index > 0 && (
             <button
               type="button"
-              onClick={() => setIndex(index - 1)}
+              disabled={applying}
+              onClick={() => go(index - 1)}
               className="rounded-full border border-hair px-5 py-3 text-base text-paper/80"
             >
               {t("common.back")}
@@ -209,10 +354,11 @@ export function Onboarding() {
           )}
           <button
             type="button"
-            onClick={() => (last ? void finishGuide() : setIndex(index + 1))}
-            className="rounded-full bg-accent px-6 py-3 text-base font-semibold text-on-accent"
+            disabled={applying}
+            onClick={() => (last ? void finish() : go(index + 1))}
+            className="rounded-full bg-accent px-6 py-3 text-base font-semibold text-on-accent disabled:opacity-60"
           >
-            {last ? t("onboarding.start") : t("onboarding.next")}
+            {nextLabel()}
           </button>
         </div>
       </div>

@@ -181,6 +181,15 @@ private func customerInfo() async throws -> String {
   }
 }
 
+private struct AppUserView: Encodable {
+  let appUserId: String
+}
+
+private func appUserId() throws -> String {
+  guard Purchases.isConfigured else { throw Failure(message: notConfigured) }
+  return ok(AppUserView(appUserId: Purchases.shared.appUserID))
+}
+
 private func offerings() async throws -> String {
   guard Purchases.isConfigured else { throw Failure(message: notConfigured) }
   do {
@@ -258,6 +267,7 @@ private func handle(_ command: String, _ payload: Data) async -> String {
     switch command {
     case "configure": return try configure(payload)
     case "customerInfo": return try await customerInfo()
+    case "appUserId": return try appUserId()
     case "offerings": return try await offerings()
     case "purchase": return try await purchase(payload)
     case "restore": return try await restore()

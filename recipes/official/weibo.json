@@ -1,0 +1,167 @@
+{
+  "schema": 1,
+  "id": "market.official.weibo",
+  "name": "Weibo",
+  "version": "1.0.0",
+  "origin": "user",
+  "tags": ["mobile"],
+  "match": ["https://*.weibo.cn/*", "https://*.weibo.com/*"],
+  "options": [
+    {
+      "id": "login-button",
+      "label": "Hide the floating log-in button",
+      "description": "The blue \"Log in / Sign up\" button that floats over the bottom of the feed while you read.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "follow-buttons",
+      "label": "Hide Follow buttons",
+      "description": "The \"+ Follow\" button on posts. Tapping it only sends you to the log-in page when you are signed out.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "trending",
+      "label": "Hide trending searches",
+      "description": "The hot-search list and the \"Hot people\" and \"Live\" tiles on the search page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "feed-tabs",
+      "label": "Hide the feed category tabs",
+      "description": "The row of Hot, Charts, Local, Society, Tech, Celebrity... tabs under the search bar at the top of the home feed.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "counters",
+      "label": "Hide repost, comment and like counts",
+      "description": "The numbers under each post and the repost, comment and like counts above the replies on a post page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "comments",
+      "label": "Hide comments",
+      "description": "The comment list, the Reposts / Comments / Likes tab row and the \"Write a comment\" bar on a post page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "media",
+      "label": "Hide post pictures and videos",
+      "description": "The image grids and video players inside posts, so the feed is text only.",
+      "group": "content",
+      "default": false
+    }
+  ],
+  "rules": [
+    {
+      "id": "login-button-floating",
+      "label": "Floating log-in button",
+      "type": "hide",
+      "option": "login-button",
+      "target": {
+        "css": "div.login-box:has(> a.login-btn)"
+      }
+    },
+    {
+      "id": "follow-button",
+      "label": "Follow button on posts",
+      "type": "hide",
+      "option": "follow-buttons",
+      "target": {
+        "css": "header.weibo-top > div.m-followBtn"
+      }
+    },
+    {
+      "id": "trending-hot-search",
+      "label": "Hot-search list",
+      "type": "hide",
+      "option": "trending",
+      "target": {
+        "css": "div.card.card16.m-col-2"
+      }
+    },
+    {
+      "id": "trending-hot-people-live",
+      "label": "Hot people and live tiles",
+      "type": "hide",
+      "option": "trending",
+      "target": {
+        "css": "div.card.card11.ctype-3"
+      }
+    },
+    {
+      "id": "feed-category-tabs",
+      "label": "Feed category tabs",
+      "type": "hide",
+      "option": "feed-tabs",
+      "target": {
+        "css": ".lite-topbar.main-top > div.nav-main"
+      }
+    },
+    {
+      "id": "counters-feed",
+      "label": "Counts under posts",
+      "type": "hide",
+      "option": "counters",
+      "target": {
+        "css": "footer.f-footer-ctrl > div.m-diy-btn"
+      }
+    },
+    {
+      "id": "counters-post-page",
+      "label": "Counts above the replies",
+      "type": "hide",
+      "option": "counters",
+      "target": {
+        "css": "div.lite-page-tab div.tab-item > i + i"
+      }
+    },
+    {
+      "id": "comments-list",
+      "label": "Comment list",
+      "type": "hide",
+      "option": "comments",
+      "target": {
+        "css": "div.comment-content"
+      }
+    },
+    {
+      "id": "comments-tab-row",
+      "label": "Reposts / Comments / Likes tab row",
+      "type": "hide",
+      "option": "comments",
+      "target": {
+        "css": "div.lite-page-tab"
+      }
+    },
+    {
+      "id": "comments-editor",
+      "label": "Write a comment bar",
+      "type": "hide",
+      "option": "comments",
+      "target": {
+        "css": "div.lite-page-editor"
+      }
+    },
+    {
+      "id": "post-media",
+      "label": "Pictures and videos in posts",
+      "type": "hide",
+      "option": "media",
+      "target": {
+        "css": "div.weibo-media.f-media"
+      }
+    }
+  ],
+  "meta": {
+    "author": "OpenMedia",
+    "homepage": "https://m.weibo.cn/",
+    "lastVerified": "2026-11-08",
+    "notes": "LIVE (logged out, iPhone UA 390x844, headless Chromium, 2026-11-08, from a non-China IP): https://m.weibo.cn/ redirects through visitor.passport.weibo.cn and lands on the Vue mobile feed (#app). Seen: a fixed 'login-box' button (1 match, a.login-btn, floats at the bottom of every feed view), 'm-followBtn' Follow buttons in header.weibo-top (20 on the Charts tab, 0 on the Hot tab), nav-main category tab row (Hot/Charts/Local/Society/Tech/...: 1 match), footer.f-footer-ctrl with 3 .m-diy-btn counters per post (15 posts = 45 matches). Search page /search?containerid=231583: 2 div.card16.m-col-2 hot-search cards + 1 div.card11.ctype-3 (Hot people / Hot live tiles). Post page /status/<id>: div.lite-page-tab (3 .tab-item, counts are the second <i>), div.comment-content (1 list), fixed div.lite-page-editor ('Write a comment'), div.weibo-media on posts with pictures or video. A div.ad-wrap exists on post pages but is display:none and empty, so no ad rule ships. No cookie banner, app-install sheet, notification prompt or timed pop-up appeared in about 30 s of waiting on the feed. NOT hideable with CSS: after several scrolls or a reload loop Weibo redirects the whole tab to passport.weibo.com/sso/signin, and /profile/<uid> redirected to the same sign-in page straight away (no public profile is viewable logged out). Counter selectors rely on stable layout classes (no hashed names); the Vue data-v-* attributes are never used. NOT verified: logged-in views, the desktop weibo.com site, video.weibo.com, super-topic (/p/index) pages, the in-app (WebView) variant, mainland-China-only prompts. Fixtures are distilled by hand with English placeholder text."
+  }
+}

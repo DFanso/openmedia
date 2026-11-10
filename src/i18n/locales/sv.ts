@@ -150,6 +150,27 @@ export const sv: Messages = {
   "onboarding.step4Title": "Gör den till din.",
   "onboarding.step4Body":
     "Dra knappen till valfri kant så stannar den där. Ändra dina favoriter i Inställningar, och spela upp den här guiden igen när du vill.",
+  "onboarding.quickTitle": "Vad behöver du i snabbåtkomsten?",
+  "onboarding.quickBody":
+    "Välj de webbplatser du öppnar mest. OpenMedia lägger till deras officiella recept och placerar dem på din knapp.",
+  "onboarding.quickLoading": "Läser in de officiella recepten…",
+  "onboarding.quickEmpty":
+    "Inga officiella recept är listade för den här enheten ännu. Du kan lägga till några senare från Marknadsplatsen.",
+  "onboarding.quickCount": "{count} av {limit} valda",
+  "onboarding.quickProHint": "Det är det mesta din plan tillåter. Pro har fler platser.",
+  "onboarding.applying": "Lägger till…",
+  "onboarding.partial":
+    "Det gick inte att lägga till: {names}. Du kan lägga till dem senare från Marknadsplatsen.",
+  "onboarding.marketTitle": "En marknadsplats för recept.",
+  "onboarding.marketBody": "Hitta fler recept i Inställningar, under Marknadsplats.",
+  "onboarding.marketOfficial":
+    "Officiella recept görs av OpenMedia. Communityrecept laddas upp av människor som du.",
+  "onboarding.marketChecked":
+    "Varje recept kontrolleras automatiskt och hålls tillbaka i 14 dagar innan det listas.",
+  "onboarding.marketReview":
+    "Du granskar varje regel som ett recept lägger till innan det läggs till.",
+  "onboarding.marketPro":
+    "Att ladda upp, exportera och kommentera kräver Pro. Att lägga till, importera och betygsätta är gratis.",
 
   "settings.title": "Inställningar",
   "settings.close": "Stäng inställningar",
@@ -225,6 +246,9 @@ export const sv: Messages = {
   "recipes.title": "Recept",
   "recipes.note":
     "Recept för populära webbplatser. Installationsuppmaningar och popup-fönster som blockerar sidan döljs som standard; Reels, Shorts och förslag visas tills du döljer dem. Stjärnmärk ett recept för att lägga till dess webbplats bland dina favoriter.",
+  "recipes.empty":
+    "Du har inga recept ännu. Hitta färdiga recept för populära webbplatser på Marknadsplatsen.",
+  "recipes.openMarket": "Öppna Marknadsplatsen",
   "recipes.annoyances": "Störande inslag · dolda som standard",
   "recipes.content": "Innehåll · visas tills du döljer det",
   "recipes.groupAnnoyance": "Störande inslag",
@@ -234,10 +258,6 @@ export const sv: Messages = {
   "recipes.options": "Alternativ för {name}",
   "recipes.addFavorite": "Lägg till {name} i favoriter",
   "recipes.removeFavorite": "Ta bort {name} från favoriter",
-  "recipes.customized":
-    "Det här receptet är din ändrade kopia, så appuppdateringar lämnar det orört.",
-  "recipes.originalUpdated": "Appens original har uppdaterats sedan du ändrade det.",
-  "recipes.restore": "Återställ originalet",
   "recipes.bottomMargin": "Nedre marginal",
   "recipes.sharedMargin":
     "Använder den delade marginalen. Flytta reglaget för att ge den här webbplatsen en egen.",
@@ -249,9 +269,9 @@ export const sv: Messages = {
     "Tillagt utanför appen. Ta bort det för att gå tillbaka till hur webbplatsen var.",
 
   "market.title": "Marknadsplats",
-  "market.linkNote": "Recept från andra, kontrollerade innan de listas",
+  "market.linkNote": "Recept från andra, kontrollerade automatiskt och publicerade efter 14 dagar",
   "market.note":
-    "Recept gjorda av andra och kontrollerade av en människa innan de listas. Du ser varje regel innan något läggs till.",
+    "Recept gjorda av andra. Servern kontrollerar varje recept automatiskt; recept som klarar kontrollen syns direkt i den offentliga listan och publiceras 14 dagar efter att de skickats. Du ser varje regel innan något läggs till.",
   "market.loading": "Läser in…",
   "market.empty": "Inget är listat ännu.",
   "market.add": "Lägg till",
@@ -276,16 +296,40 @@ export const sv: Messages = {
   "market.reported": "Tack, rapporten skickades.",
   "market.share": "Dela ett av dina recept",
   "market.share.note":
-    "En människa kontrollerar varje recept innan det listas. Nya versioner kan bara skickas från den här enheten.",
+    "Servern kontrollerar varje recept automatiskt. Recept som klarar kontrollen syns direkt i den offentliga listan och publiceras 14 dagar efter att de skickats. Nya versioner kan bara skickas från den här enheten.",
   "market.share.recipe": "Recept",
   "market.share.name": "Namn på marknadsplatsen",
   "market.share.summary": "Sammanfattning på en rad",
   "market.share.author": "Ditt namn",
-  "market.share.send": "Skicka för granskning",
-  "market.share.sent": "Skickat. Det listas när en människa har kontrollerat det.",
+  "market.share.send": "Skicka till marknadsplatsen",
+  "market.share.sent": "Skickat. Det syns i den offentliga listan och publiceras om 14 dagar.",
   "market.counting": "Berätta för marknadsplatsen när jag lägger till ett recept",
   "market.countingNote":
     "Bara receptets namn skickas, inget om dig. Det ger siffrorna för ”Tillagt av”.",
+  "market.tag.official": "Officiella",
+  "market.tag.community": "Community",
+  "market.tag.mobile": "Mobil",
+  "market.tag.desktop": "Dator",
+  "market.filters": "Filtrera efter tagg",
+  "market.noMatch": "Inget matchar de här filtren.",
+  "market.rating.none": "Inga betyg ännu",
+  "market.rate": "Ditt betyg",
+  "market.rateStars": "Ge {count} stjärna | Ge {count} stjärnor",
+  "market.comments": "Kommentarer",
+  "market.comments.loading": "Läser in kommentarer…",
+  "market.comments.none": "Inga kommentarer ännu.",
+  "market.comments.you": "Du",
+  "market.comments.write": "Skriv en kommentar",
+  "market.comments.rules": "Inga länkar eller kontaktuppgifter. Högst 280 tecken.",
+  "market.comments.post": "Publicera",
+  "market.comments.proPrompt": "Att kommentera är en Pro-funktion. Alla kan läsa kommentarer.",
+  "market.comments.report": "Rapportera",
+  "market.comments.reported": "Rapporterad",
+  "market.comments.block": "Blockera",
+  "market.comments.blocked": "Blockerade kommentatorer",
+  "market.comments.blockedNote": "Du ser inte kommentarer från personerna som listas här.",
+  "market.comments.blockedNone": "Du har inte blockerat någon.",
+  "market.comments.unblock": "Avblockera",
 
   "share.link": "Importera och exportera",
   "share.linkNote": "Flytta recept mellan enheter som text",
@@ -365,7 +409,6 @@ export const sv: Messages = {
   "assistant.reject": "Avvisa",
   "assistant.accept": "Godkänn",
   "assistant.switchExists": "Den här omkopplaren finns redan",
-  "assistant.savedAsCopy": "sparad som din ändrade kopia",
   "assistant.matched": "matchade {count}",
   "assistant.requestQuote": "”{request}”",
   "assistant.unmatched":

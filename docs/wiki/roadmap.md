@@ -1,16 +1,16 @@
 # Roadmap
 
-> **Status: iOS implementation verified on simulators; Android implementation exists but device behavior and store release remain unverified; macOS site views exist and were run by hand on one Mac; Windows and Linux site views are not implemented.** The shell includes favorites, History, Usage, 18 bundled site recipes, and an AI assistant with redacted preview and explicit acceptance. See [Platform Support](./platform-support.md) for evidence and limits.
+> **Status: iOS implementation verified on simulators; Android implementation exists but device behavior and store release remain unverified; macOS site views exist and were run by hand on one Mac; Windows and Linux site views are not implemented.** The shell includes favorites, History, Usage, 18 site recipes (the official marketplace recipes, not embedded in the app), and an AI assistant with redacted preview and explicit acceptance. See [Platform Support](./platform-support.md) for evidence and limits.
 
 ## Goal
 
-A Tauri v2 app (iOS and Android first; macOS, Windows, Linux after) where the user opens any site and reshapes it. Bundled recipes cover popular sites; an AI assistant using the user's own key writes recipes for anything else. No backend.
+A Tauri v2 app (iOS and Android first; macOS, Windows, Linux after) where the user opens any site and reshapes it. Official marketplace recipes cover popular sites; an AI assistant using the user's own key writes recipes for anything else. No backend.
 
 ## Principles
 
 1. **Prove the risky parts first.** Mobile site view, the bridge, and key storage can each invalidate the architecture. They go before any UI polish.
 2. **Vertical slice early.** "Hide Reels on Instagram, on macOS + iOS + Android, from a hardcoded recipe" before building the editor, the AI, or the catalog.
-3. **No-AI path stands alone.** Bundled recipes and the picker must be useful without a key.
+3. **No-AI path stands alone.** Official marketplace recipes and the picker must be useful without a key.
 4. **Recipe format is the product.** Everything else is a way to author, apply, or repair recipes.
 
 ## Overview
@@ -20,7 +20,7 @@ flowchart LR
   P0["0 Spikes"] --> P1["1 Foundation"]
   P1 --> P2["2 Engine + recipes"]
   P2 --> P3["3 BYOK AI"]
-  P2 --> P4["4 Bundled catalog"]
+  P2 --> P4["4 Official catalog"]
   P3 --> P5["5 Share + sync"]
   P4 --> P5
   P5 --> P6["6 Harden + release"]
@@ -75,7 +75,7 @@ The vertical slice, then breadth.
 - Recipe store + URL resolution + merged bundle.
 - Engine: CSS-first application, observer fallback, SPA navigation, `hide`/`remove`/`css`/`redirect`/`media`, reversibility, circuit breaker ([Site Runtime](./site-runtime.md)).
 - Match reporting → rule health, stale detection.
-- **First bundled recipe.** Started with **Reddit without app prompts** because it is what the app hit first (see the decision log); it has DOM fixtures and a fixture test. Instagram without Reels is still to do. Done so far: the recipe schema subset, validation, the CSS compile and the document-start delivery, in `src-tauri/src/recipes/` (see [Recipe Format](./recipe-format.md#implemented-subset)).
+- **First recipe.** Started with **Reddit without app prompts** because it is what the app hit first (see the decision log); it has DOM fixtures and a fixture test. Instagram without Reels is still to do. Done so far: the recipe schema subset, validation, the CSS compile and the document-start delivery, in `src-tauri/src/recipes/` (see [Recipe Format](./recipe-format.md#implemented-subset)).
 - Customize panel: rule list, toggles, delete, undo.
 - **Element picker** (no AI): tap element → proposed target → `hide` rule.
 - Engine test harness: Playwright loads fixtures with the engine, asserts hidden/remaining sets.
@@ -93,7 +93,7 @@ The vertical slice, then breadth.
 
 **Exit:** with a user key, "remove the Reels tab and suggested posts" on a never-before-seen site yields a previewable recipe that the user can accept; invalid or zero-match output never silently applies; key never appears in any webview, log, or file (verified by test and by grep of app data after a run).
 
-## Phase 4 — Bundled catalog (parallel with 3)
+## Phase 4 — Official catalog (parallel with 3)
 
 Curated, fixture-tested recipes. Order by value and breakability:
 
@@ -112,15 +112,15 @@ Per site: recipe + scrubbed fixtures + fixture test + `lastVerified`. A "Recipes
 
 ## Phase 5 — Sharing and optional sync
 
-Sharing without any server (file/text) plus a curated marketplace on Cloudflare ([Marketplace](./marketplace.md)). Optional sync stays server-free.
+Sharing without any server (file/text) plus an automatically published marketplace on Cloudflare ([Marketplace](./marketplace.md)). Optional sync stays server-free.
 
 - Export/import single recipes and bundles (text), rule-by-rule review on import.
-- Recipe marketplace: curated, Ed25519-signed catalog served from a Cloudflare Worker + R2, submissions and reports through D1, anonymous install counts; author shown; review UI before apply; revocation list.
-- Recipe update flow: bundled recipe updates vs user forks.
+- Recipe marketplace: Ed25519-signed catalog served from a Cloudflare Worker + R2, submissions checked automatically by the Worker, held for 14 days and published by the Worker itself, submissions and reports through D1, anonymous install counts; author shown; rule-by-rule review before apply; revocation list.
+- Recipe update flow: official recipe updates reach the user through the marketplace catalog; the assistant's recipe is a separate `custom.<domain>` one.
 - Optional user-owned sync: sync recipe/settings folder to a user-provided git repo or file location. Never includes keys or cookies.
 - Deferred recipe rule types: `scroll-stop`. Daily site allowances now live in Usage policies, not in recipes.
 
-**Exit:** a recipe made on one device installs on another through export/import and through the community index, with review.
+**Exit:** a recipe made on one device installs on another through export/import and through the community index, with the rule-by-rule review on the device.
 
 ## Phase 6 — Hardening and release
 
@@ -191,8 +191,10 @@ Sharing without any server (file/text) plus a curated marketplace on Cloudflare 
 | 2026-11-08 | Paywall: AI, incognito and usage need a Pro entitlement; opening links, favorites, history, bundled recipes and ad blocking stay free. Lifetime $18.99, yearly $10, monthly $2 with a 14-day trial. Purchases and restore go through RevenueCat via an in-repo `tauri-plugin-billing` (StoreKit 2 on iOS, Play Billing on Android); the gate is enforced in Rust | User asked for monetization with no login. RevenueCat has no Tauri SDK, so the plugin wraps `purchases-ios` and `purchases-android`. Restore Purchases recovers the entitlement on a new device through the store account. This amends invariant 1: RevenueCat is the only third-party network destination besides user-chosen sites and providers | Desktop distribution needs a billing path; the store policy on gating a BYOK feature changes; RevenueCat is replaced |
 | 2026-11-09 | macOS site views are Tauri child webviews under a transparent shell, with hit testing routed natively | Tauri has no z-order or hit-test pass-through, so the plugin keeps the shell above the pages, clears its background (private `drawsBackground`) and replaces `hitTest:` on the shell's view. S1 is answered for macOS; Windows and Linux are still open | Mac App Store review rejects the private key (then: a rail beside the page), or Tauri adds webview z-ordering |
 | 2026-11-10 | Recipe marketplace runs on Cloudflare (Workers + R2 + D1), curated, with an Ed25519-signed catalog. Signing key stays offline with the curator, public key compiled into the app, recipes pinned by SHA-256, monotonic sequence + expiry + revocation list. No `script` rules. Anonymous install counts, rate limited, display-only. File import forces `origin: imported` and the `imported.` id prefix | User asked for an in-app marketplace on Cloudflare for non-technical users, with install counts. This amends invariant 1 and security invariant 7: one optional OpenMedia server, untrusted by the app. A static GitHub index (the earlier plan) cannot take in-app submissions or counts. The Worker has no admin API and no signing key, so a compromised Cloudflare account can withhold recipes but not forge them | The store reviews object to user-submitted content, moderation load outgrows one curator, or counts prove too gameable to be useful |
+| 2026-11-10 | The marketplace publishes itself, and the row above is superseded. The Worker rejects a submission that fails its validation policy before any R2 or D1 write, holds every accepted one for 14 days in a public Upcoming feed (`releaseAt = submittedAt + 14 days`), and a scheduled Worker promotion publishes the matured entries and signs the catalog. The signing key becomes a Worker secret and the curator CLI is removed | The user asked for no manual approval and automatic publication, and one curator's review did not scale. The fixed 14-day hold keeps an accepted recipe publicly visible before it is published, so a report can arrive before it goes live. Moving the key into the Worker means a compromised Cloudflare account can forge entries, so the device's protection is the SHA-256 pin, the Rust validation and the rule-by-rule review, not the signature | The stores reject the design for the missing pre-publication filtering and user blocking (Apple 1.2, Play UGC), or a forged entry reaches a device |
 | 2026-11-09 | Pro is decided by the store on the Mac too (StoreKit 2 through RevenueCat, a Swift package linked into the app) | The Mac forced Pro because the billing plugin had no desktop side; the paywall now applies there | Windows and Linux stay forced to Pro until they get a store |
 | 2026-11-10 | The app is 1.0.0 and the three store packages come from one command (`yarn release`), which also raises the build number; the Mac ships as a sandboxed Mac App Store package | The App Store Connect version records were 1.0 and Play had already used versionCode 1000; Transporter takes only an `.ipa` or a signed `.pkg`, and StoreKit purchases need a Mac App Store build | A store rejects the sandbox build, or Play can be queried (then the Android build number can be looked up too) |
+| 2026-11-10 | **Marketplace v2 (Design; not deployed, verification pending the lead's final run).** (1) Every recipe carries platform tags `mobile`/`desktop` inside the recipe; the origin tag `official`/`community` is added by the Worker and never stored in a recipe, and a user upload can never be official. (2) The app ships **no bundled recipes and has no forks** (recipe origins are `user`, `ai`, `imported`; the assistant writes a separate `custom.<domain>` recipe beside an installed one): the 18 move to `recipes/official/`, are published as `market.official.<site>` through an operator SQL script, and onboarding installs the user's quick-access picks (4 free, 6 Pro) and explains the marketplace. (3) Ratings (1 to 5, one per identity, display-only, landing behind Turnstile, app via `X-Client: app` which can be scripted) and Pro-only comments (read by everyone). (4) Uploading and exporting need Pro: uploads and comments are verified by the Worker against RevenueCat (the app sends its RevenueCat app user id in `X-Pro-User`; the Worker stores only its SHA-256) and fail closed; deleting your own comment is not Pro-gated; export and the onboarding slot count are client-side only, and the RevenueCat id works as a bearer secret for Pro actions. (5) Required abuse rules: comment text, rate and duplicate limits, three reports from aged or Pro identities hide a comment, local commenter blocking, identity-age and per-identity rating caps, per-IP limiters on the IPv6 /64, a global budget of 60 RevenueCat lookups per minute. Operator takedown is editing D1; there is no public admin API | The user asked for official-versus-community recipes, quick-access onboarding, ratings and Pro-gated contribution. Official recipes through the marketplace keep one install path (signature, hash, Rust validation, rule review) and let recipe fixes ship without an app release. Pro verification must be server-side because an uploader controls the client. Cost of the decision: invariant 1 now has two identifiers (device token, RevenueCat id on Pro actions) reaching the marketplace, user-generated comments widen the store-policy risk with filtering, reporting and blocking only partly addressed and no human moderation, and a fresh install has no recipes until the user installs some | Either store rejects or asks for changes to UGC comments; abuse of the app rating path or comments outgrows the limits; RevenueCat's REST API limits, pricing or subscriber-creation behaviour break the Pro check; offline first-run without any recipe proves a bad default; revisit moderation (a person, or removing comments) if reports accumulate |
 
 ## Open questions
 
@@ -202,7 +204,7 @@ Sharing without any server (file/text) plus a curated marketplace on Cloudflare 
 4. **Do we support multiple tabs per profile on mobile in v1?** Memory and plugin complexity; start with one active site view plus a lightweight switcher.
 5. **Licensing**: choose a license before opening to contributors (not yet decided).
 6. **Monetization**: decided, see the 2026-11-08 paywall decision. Desktop billing is open.
-7. **Bundled recipe maintenance**: who keeps Instagram's recipe alive when the site changes? Stale detection plus community PRs; define the contribution flow in Phase 5.
+7. **Official recipe maintenance**: who keeps Instagram's recipe alive when the site changes? Stale detection plus community PRs; define the contribution flow in Phase 5.
 
 ## Risk register
 

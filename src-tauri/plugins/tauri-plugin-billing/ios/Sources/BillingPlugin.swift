@@ -55,6 +55,10 @@ struct SimulatorView: Encodable {
   let isSimulator: Bool
 }
 
+struct AppUserView: Encodable {
+  let appUserId: String
+}
+
 struct PurchaseView: Encodable {
   let outcome: String
   let snapshot: Snapshot?
@@ -114,6 +118,14 @@ class BillingPlugin: Plugin {
         invoke.reject("could not read purchase status")
       }
     }
+  }
+
+  @objc public func appUserId(_ invoke: Invoke) throws {
+    guard Purchases.isConfigured else {
+      invoke.reject(notConfigured)
+      return
+    }
+    invoke.resolve(AppUserView(appUserId: Purchases.shared.appUserID))
   }
 
   @objc public func offerings(_ invoke: Invoke) throws {

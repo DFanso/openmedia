@@ -104,6 +104,17 @@ class BillingPlugin(private val activity: Activity) : Plugin(activity) {
   }
 
   @Command
+  fun appUserId(invoke: Invoke) {
+    if (!Purchases.isConfigured) {
+      invoke.reject(MSG_UNAVAILABLE)
+      return
+    }
+    val result = JSObject()
+    result.put("appUserId", Purchases.sharedInstance.appUserID)
+    invoke.resolve(result)
+  }
+
+  @Command
   fun offerings(invoke: Invoke) {
     scope.launch {
       try {

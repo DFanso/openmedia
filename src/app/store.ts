@@ -153,8 +153,9 @@ export interface AppStore {
   setSearchEngine: (engine: SearchEngine) => Promise<void>;
   setAdBlock: (enabled: boolean) => Promise<void>;
   loadSites: () => Promise<void>;
+  /** Re-reads the favorites after Rust changed them on its own, as the guide's quick-access pick does. */
+  reloadFavorites: () => Promise<void>;
   setSiteOption: (recipeId: string, optionId: string, enabled: boolean) => Promise<void>;
-  restoreRecipeOriginal: (recipeId: string) => Promise<void>;
   setBottomMargin: (pixels: number) => Promise<void>;
   /** `null` returns the site to the shared margin. */
   setSiteBottomMargin: (recipeId: string, pixels: number | null) => Promise<void>;
@@ -627,6 +628,14 @@ export const useApp = create<AppStore>((set, get) => {
       }
     },
 
+    reloadFavorites: async () => {
+      try {
+        adoptFavorites((await library.getState()).favorites);
+      } catch (error) {
+        set({ error: appError(error) });
+      }
+    },
+
     setSiteOption: async (recipeId, optionId, enabled) => {
       const before = get().sites;
       set({ sites: updateSite(before, recipeId, (site) => withOption(site, optionId, enabled)) });
@@ -634,15 +643,6 @@ export const useApp = create<AppStore>((set, get) => {
         await library.setSiteOption(recipeId, optionId, enabled, false);
       } catch (error) {
         set({ sites: before, error: appError(error) });
-      }
-    },
-
-    restoreRecipeOriginal: async (recipeId) => {
-      try {
-        await library.restoreRecipeOriginal(recipeId);
-        set({ sites: await library.getSites(false) });
-      } catch (error) {
-        set({ error: appError(error) });
       }
     },
 

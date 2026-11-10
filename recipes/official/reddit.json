@@ -1,0 +1,393 @@
+{
+  "schema": 1,
+  "id": "market.official.reddit",
+  "name": "Reddit",
+  "version": "3.0.0",
+  "origin": "user",
+  "tags": ["desktop", "mobile"],
+  "match": ["https://*.reddit.com/*"],
+  "options": [
+    {
+      "id": "app-prompts",
+      "label": "Hide \"use the app\" prompts",
+      "description": "The Open App button, and the pop-up that appears after about 30 seconds of scrolling and stops the page from scrolling. The 18+ confirmation is never hidden.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "google-sign-in",
+      "label": "Hide the Google sign-in prompt",
+      "description": "The \"Continue with Google\" box at the bottom of post pages.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "ads",
+      "label": "Hide ads",
+      "description": "Promoted posts in feeds and the ad slot on post pages.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "advertise-links",
+      "label": "Hide Advertise and Reddit Pro",
+      "description": "The Advertise button, the Reddit Pro section in the sidebar and the same rows in the account menu.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "video-posts",
+      "label": "Hide video posts",
+      "description": "Video posts in feeds.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "suggested-communities",
+      "label": "Hide suggested communities",
+      "description": "The \"Recommended for you\" community cards in feeds.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "related-posts",
+      "label": "Hide related posts and questions",
+      "description": "\"People also ask\", related posts and translations under a post. Comments stay.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "comments",
+      "label": "Hide comments",
+      "description": "The comment thread on post pages.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "games",
+      "label": "Hide Games on Reddit",
+      "description": "The Games on Reddit card in the sidebar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "sidebar-recent",
+      "label": "Hide recent communities",
+      "description": "The Recent list in the left sidebar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "sidebar-custom-feeds",
+      "label": "Hide custom feeds and communities lists",
+      "description": "The Custom Feeds and Communities sections in the left sidebar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "sidebar-resources",
+      "label": "Hide Resources and the footer",
+      "description": "The About, Help, Blog and Terms links at the bottom of the left sidebar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "right-sidebar",
+      "label": "Hide the right sidebar",
+      "description": "Community info, rules, recent posts and installed apps beside a post or feed.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "chat",
+      "label": "Hide chat",
+      "description": "The chat button in the top bar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "image-posts",
+      "label": "Hide image and gallery posts",
+      "description": "Posts that are a picture or a gallery in feeds.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "crossposts",
+      "label": "Hide crossposts",
+      "description": "Posts that were shared from another community.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "join-buttons",
+      "label": "Hide Join buttons",
+      "description": "The Join button on each post and community header.",
+      "group": "content",
+      "default": false
+    }
+  ],
+  "rules": [
+    {
+      "id": "open-app-button",
+      "label": "\"Open App\" button wrapper in the header",
+      "type": "hide",
+      "option": "app-prompts",
+      "target": {
+        "css": "#xpromo-small-header, #open-app-header-cta"
+      }
+    },
+    {
+      "id": "app-sheet",
+      "label": "\"Use the app\" bottom sheet",
+      "type": "hide",
+      "option": "app-prompts",
+      "target": {
+        "css": "div[id^=\"configured-xpromo-\"]:not([id*=\"nsfw\"])"
+      }
+    },
+    {
+      "id": "unlock-scroll",
+      "label": "Keep the page scrollable behind the sheet",
+      "type": "css",
+      "option": "app-prompts",
+      "target": {
+        "css": "html, body, body.rpl-scroll-lock"
+      },
+      "declarations": {
+        "overflow-y": "auto"
+      }
+    },
+    {
+      "id": "google-one-tap",
+      "label": "Google One Tap prompt",
+      "type": "hide",
+      "option": "google-sign-in",
+      "target": {
+        "css": "#credential_picker_container, #credential_picker_iframe, auth-flow-google-one-tap-prompt"
+      }
+    },
+    {
+      "id": "ad-posts",
+      "label": "Promoted posts and their dividers",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "shreddit-ad-post, shreddit-ad-post + hr"
+      }
+    },
+    {
+      "id": "ad-slots",
+      "label": "Ad slots on post pages",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "shreddit-comments-page-ad, shreddit-sidebar-ad, shreddit-comment-tree-ad"
+      }
+    },
+    {
+      "id": "advertise-row",
+      "label": "Advertise on Reddit menu row",
+      "type": "hide",
+      "option": "advertise-links",
+      "target": {
+        "css": "li:has(> a[href*=\"ads.reddit.com\"])"
+      }
+    },
+    {
+      "id": "reddit-pro-row",
+      "label": "Reddit Pro menu row",
+      "type": "hide",
+      "option": "advertise-links",
+      "target": {
+        "css": "li:has(> a[href^=\"/reddit-pro\"])"
+      }
+    },
+    {
+      "id": "video-articles",
+      "label": "Video posts",
+      "type": "hide",
+      "option": "video-posts",
+      "target": {
+        "css": "article:has(> shreddit-post[post-type=\"video\"])"
+      }
+    },
+    {
+      "id": "video-dividers",
+      "label": "Dividers after video posts",
+      "type": "hide",
+      "option": "video-posts",
+      "target": {
+        "css": "article:has(> shreddit-post[post-type=\"video\"]) + hr"
+      }
+    },
+    {
+      "id": "community-cards",
+      "label": "Recommended community cards",
+      "type": "hide",
+      "option": "suggested-communities",
+      "target": {
+        "css": "in-feed-community-recommendations"
+      }
+    },
+    {
+      "id": "related-and-answers",
+      "label": "People also ask, related posts and translations",
+      "type": "hide",
+      "option": "related-posts",
+      "target": {
+        "css": "#answers-suggested-queries-mosaic, div[id$=\"_related\"], div[id$=\"_translations\"]"
+      }
+    },
+    {
+      "id": "comment-tree",
+      "label": "Comment thread",
+      "type": "hide",
+      "option": "comments",
+      "target": {
+        "css": "div[id^=\"comment-tree-content-anchor\"]"
+      }
+    },
+    {
+      "id": "advertise-button",
+      "label": "Advertise on Reddit button in the top bar",
+      "type": "hide",
+      "option": "advertise-links",
+      "target": {
+        "css": "#advertise-button"
+      }
+    },
+    {
+      "id": "reddit-pro-section",
+      "label": "Reddit Pro sidebar section",
+      "type": "hide",
+      "option": "advertise-links",
+      "target": {
+        "css": "faceplate-loader[name^=\"LeftNavBusinessToolsSection\"] + faceplate-expandable-section-helper, hr:has(+ faceplate-loader[name^=\"LeftNavBusinessToolsSection\"])"
+      }
+    },
+    {
+      "id": "right-rail-promotion",
+      "label": "Promotion in the right rail",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "aside[aria-label=\"Promotion\"]"
+      }
+    },
+    {
+      "id": "games-card",
+      "label": "Games on Reddit",
+      "type": "hide",
+      "option": "games",
+      "target": {
+        "css": "faceplate-tracker[noun=\"games_drawer\"], hr:has(+ faceplate-loader[name^=\"LeftNavGamesSection\"])"
+      }
+    },
+    {
+      "id": "recent-list",
+      "label": "Recent communities",
+      "type": "hide",
+      "option": "sidebar-recent",
+      "target": {
+        "css": "#recent-communities-section, hr:has(+ faceplate-loader[name^=\"LeftNavRecentSection\"])"
+      }
+    },
+    {
+      "id": "custom-feeds-section",
+      "label": "Custom feeds",
+      "type": "hide",
+      "option": "sidebar-custom-feeds",
+      "target": {
+        "css": "faceplate-loader[name^=\"LeftNavMultiredditsSection\"] ~ faceplate-expandable-section-helper:has(faceplate-partial)"
+      }
+    },
+    {
+      "id": "communities-section",
+      "label": "Communities",
+      "type": "hide",
+      "option": "sidebar-custom-feeds",
+      "target": {
+        "css": "faceplate-loader[name^=\"LeftNavCommunitiesSection\"] + faceplate-expandable-section-helper"
+      }
+    },
+    {
+      "id": "resources-section",
+      "label": "Resources and the footer",
+      "type": "hide",
+      "option": "sidebar-resources",
+      "target": {
+        "css": "faceplate-loader[name^=\"LeftNavResourcesSection\"] ~ *, hr:has(+ faceplate-loader[name^=\"LeftNavResourcesSection\"])"
+      }
+    },
+    {
+      "id": "right-sidebar-container",
+      "label": "Right sidebar",
+      "type": "hide",
+      "option": "right-sidebar",
+      "target": {
+        "css": "#right-sidebar-container"
+      }
+    },
+    {
+      "id": "chat-button",
+      "label": "Chat button",
+      "type": "hide",
+      "option": "chat",
+      "target": {
+        "css": "#header-action-item-chat-button"
+      }
+    },
+    {
+      "id": "image-articles",
+      "label": "Image and gallery posts",
+      "type": "hide",
+      "option": "image-posts",
+      "target": {
+        "css": "article:has(> shreddit-post[post-type=\"image\"]), article:has(> shreddit-post[post-type=\"gallery\"])"
+      }
+    },
+    {
+      "id": "image-dividers",
+      "label": "Dividers after image posts",
+      "type": "hide",
+      "option": "image-posts",
+      "target": {
+        "css": "article:has(> shreddit-post[post-type=\"image\"]) + hr, article:has(> shreddit-post[post-type=\"gallery\"]) + hr"
+      }
+    },
+    {
+      "id": "crosspost-articles",
+      "label": "Crossposts",
+      "type": "hide",
+      "option": "crossposts",
+      "target": {
+        "css": "article:has(> shreddit-post[post-type=\"crosspost\"])"
+      }
+    },
+    {
+      "id": "crosspost-dividers",
+      "label": "Dividers after crossposts",
+      "type": "hide",
+      "option": "crossposts",
+      "target": {
+        "css": "article:has(> shreddit-post[post-type=\"crosspost\"]) + hr"
+      }
+    },
+    {
+      "id": "join-button-elements",
+      "label": "Join buttons",
+      "type": "hide",
+      "option": "join-buttons",
+      "target": {
+        "css": "shreddit-join-button"
+      }
+    }
+  ],
+  "meta": {
+    "author": "OpenMedia",
+    "homepage": "https://www.reddit.com/",
+    "lastVerified": "2026-11-10",
+    "notes": "Reddit serves iPhone user agents the shreddit web-component site on www.reddit.com (m., i. and bare reddit.com redirect there; old.reddit.com redirects to a login page when logged out). The DOM is chosen by user agent, not viewport. LIVE (logged out): open-app-button (#open-app-header-cta is the link, #xpromo-small-header the wrapper; no banner under the header was found), app-sheet (after about 28 s of scrolling a feed, div#configured-xpromo-mweb3x_feeds_blocking_xpromo_lo_page_fade appears under shreddit-app and body gets class rpl-scroll-lock; the experiment suffix changes, so only the id prefix is matched), ad-posts and ad-slots (shreddit-ad-post, each followed by an hr), advertise rows, video-articles (7 of 7 on a feed), community-cards (on /explore/), related-and-answers and comment-tree (on a post page; comments stayed after hiding the first). The old selector configured-xpromo-modal is only a template host and hiding it did nothing; .configured-xpromo also matches the 18+ gate on /r/nsfw/ (div#configured-xpromo-bypassable_xpromo_nsfw_bypassable), which must stay. unlock-scroll needs body.rpl-scroll-lock in the selector: the page sets .rpl-scroll-lock{overflow:hidden!important} on body, which beats a plain html, body rule on specificity (measured with wheel scrolling; with html set to auto the viewport scrolls). Not verified: google-one-tap's wrapper #credential_picker_container (the iframe was seen once, intermittent), ad-slots other than shreddit-comments-page-ad (SOURCE: Reddit UI Enhancer userscript dumps 2026-09/10), the menu rows' <li> hiding (links counted, rows not applied), the cookie banner (reddit-cookie-banner, SOURCE only; no consent banner appeared in a Sri Lanka session), the Chat button. CSS cannot reach the search overlay (shadow root of reddit-search-small) or rewrite the applink.reddit.com links that feed posts carry after the first navigation. There is no option for the sign-up sheet that appears when logged out and tapping Join, vote or comment: it carries the log-in link, so hiding it would remove the only way in from that sheet. DESKTOP (macOS Safari UA, signed in, live in the app, 2026-11-10): www.reddit.com serves the same shreddit components as on iPhone, so the feed rules need no twin; the desktop page adds a left sidebar and a right sidebar. Matched and hidden with every option on: advertise-button, right-rail-promotion, right-sidebar-container, chat-button, image-articles, image-dividers, crosspost-articles, crosspost-dividers. The left sidebar sections are matched by the name prefix of the faceplate-loader before them (the suffix is hashed): reddit-pro-section, games-card, recent-list, custom-feeds-section, communities-section and resources-section matched on the first load; the sidebar loads lazily and did not finish on later loads in a hidden window, so desktop-left-nav.html transcribes the child order seen then."
+  }
+}

@@ -16,10 +16,22 @@ const MAX_DESCRIPTION_CHARS: usize = 160;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum Origin {
-    Bundled,
     User,
     Ai,
     Imported,
+}
+
+/// The platform tags a recipe may carry. The origin tags (`official`, `community`) are added by the
+/// marketplace to an index entry and are never part of a recipe.
+pub const PLATFORM_TAGS: [&str; 2] = ["mobile", "desktop"];
+
+/// The tag of the platform this build runs on: macOS, Windows and Linux are `desktop`.
+pub const fn current_platform_tag() -> &'static str {
+    if cfg!(any(target_os = "ios", target_os = "android")) {
+        "mobile"
+    } else {
+        "desktop"
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -107,17 +119,14 @@ pub struct Recipe {
     pub name: String,
     pub version: String,
     pub origin: Origin,
+    /// `mobile` and/or `desktop`: the platforms the selectors were written and checked for.
+    pub tags: Vec<String>,
     #[serde(rename = "match")]
     pub matches: Vec<String>,
     #[serde(default)]
     pub options: Vec<SiteOption>,
     pub rules: Vec<Rule>,
     pub meta: Option<Meta>,
-    /// Set on a customized copy of a bundled recipe: the bundled version it was copied from. The
-    /// copy keeps the bundled recipe's id, so the user's switches and margin carry over, and it
-    /// replaces the bundled one for as long as it exists.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub forked_from: Option<String>,
 }
 
 impl Recipe {
@@ -125,6 +134,14 @@ impl Recipe {
         let recipe: Self = serde_json::from_str(json).map_err(|e| Error::Recipe(e.to_string()))?;
         recipe.validate()?;
         Ok(recipe)
+    }
+
+    /// Whether one of the recipe's `match` patterns covers this page.
+    pub fn covers(&self, url: &Url) -> bool {
+        self.matches
+            .iter()
+            .filter_map(|pattern| Matcher::parse(pattern).ok())
+            .any(|matcher| matcher.matches(url))
     }
 
     pub fn homepage(&self) -> Option<&str> {
@@ -153,12 +170,7 @@ impl Recipe {
                 self.id, self.schema
             )));
         }
-        if self.forked_from.is_some() && self.origin == Origin::Bundled {
-            return Err(Error::Recipe(format!(
-                "recipe {} is bundled and cannot be a fork",
-                self.id
-            )));
-        }
+        self.validate_tags()?;
         if self.id.trim().is_empty() || self.name.trim().is_empty() {
             return Err(Error::Recipe("a recipe needs an id and a name".into()));
         }
@@ -176,7 +188,7 @@ impl Recipe {
         }
         for pattern in &self.matches {
             let matcher = Matcher::parse(pattern)?;
-            if matcher.is_broad() && self.origin != Origin::Bundled {
+            if matcher.is_broad() {
                 return Err(Error::Recipe(format!(
                     "match pattern {pattern} is too broad"
                 )));
@@ -210,6 +222,24 @@ impl Recipe {
             }
         }
         Ok(())
+    }
+
+    fn validate_tags(&self) -> Result<()> {
+        let well_formed = !self.tags.is_empty()
+            && self.tags.len() <= PLATFORM_TAGS.len()
+            && self
+                .tags
+                .iter()
+                .all(|tag| PLATFORM_TAGS.contains(&tag.as_str()))
+            && self.tags.iter().collect::<HashSet<_>>().len() == self.tags.len();
+        if well_formed {
+            Ok(())
+        } else {
+            Err(Error::Recipe(format!(
+                "recipe {} needs tags: mobile, desktop, or both",
+                self.id
+            )))
+        }
     }
 
     fn validate_homepage(&self) -> Result<()> {

@@ -3,14 +3,15 @@ import { afterEach, describe, expect, it } from "vitest";
 import type { Favorite } from "./ipc";
 import {
   hasBundledIcon,
+  faviconPageUrlForHost,
   iconForUrl,
   setIconCache,
   urlsWithoutBundledIcon,
   useIconCache,
 } from "./siteIcons";
 
-/** The bundled recipes, read as data: the test checks the icons against them. */
-const RECIPES = import.meta.glob("../../recipes/bundled/*.json", {
+/** The official recipes, read as data: the test checks the icons against them. */
+const RECIPES = import.meta.glob("../../recipes/official/*.json", {
   eager: true,
   import: "default",
 }) as Record<string, { id: string; meta: { homepage: string }; match: string[] }>;
@@ -63,5 +64,26 @@ describe("urlsWithoutBundledIcon", () => {
     expect(urlsWithoutBundledIcon(["https://www.youtube.com/", "https://mine.example/"])).toEqual([
       "https://mine.example/",
     ]);
+  });
+});
+describe("faviconPageUrlForHost", () => {
+  it("builds HTTPS page URLs from DNS hosts and wildcard recipe matches", () => {
+    expect(faviconPageUrlForHost("example.com")).toBe("https://example.com/");
+    expect(faviconPageUrlForHost("*.www.example.com")).toBe("https://www.example.com/");
+    expect(faviconPageUrlForHost("XN--P1AI.example")).toBe("https://xn--p1ai.example/");
+  });
+
+  it("rejects URLs, local names, IPs and malformed hosts", () => {
+    for (const host of [
+      "localhost",
+      "127.0.0.1",
+      "https://example.com",
+      "example.com/path",
+      "example..com",
+      "*.com",
+    ]) {
+      expect(faviconPageUrlForHost(host), host).toBeUndefined();
+    }
+    expect(faviconPageUrlForHost(undefined)).toBeUndefined();
   });
 });

@@ -62,6 +62,13 @@ pub enum BillingEvent {
     Snapshot(Snapshot),
 }
 
+/// The RevenueCat app user id as the native layer reports it.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AppUserResponse {
+    pub app_user_id: String,
+}
+
 #[derive(Debug, Deserialize)]
 pub struct OfferingsResponse {
     pub packages: Vec<Package>,

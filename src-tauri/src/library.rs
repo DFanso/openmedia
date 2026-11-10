@@ -16,7 +16,7 @@ use tauri_plugin_siteview::site::site_of_host;
 
 const FORMAT_VERSION: u32 = 4;
 const MAX_HISTORY: usize = 100;
-const MAX_FAVORITE_NAME_CHARS: usize = 20;
+pub const MAX_FAVORITE_NAME_CHARS: usize = 20;
 const MAX_ICON_CHARS: usize = 200_000;
 /// The most site icons the app keeps. Each one is a small PNG, so this stays well under a
 /// megabyte.
@@ -37,6 +37,10 @@ const DEFAULT_FAVORITES: [(&str, &str); 5] = [
 /// How many favorites a free user can have; more needs Pro. Mirrors `FREE_QUICK_ACCESS_LIMIT` in
 /// the shell, which shows the Pro slots grayed out.
 pub const FREE_FAVORITE_LIMIT: usize = 4;
+
+/// How many sites the onboarding guide puts in quick access for a Pro user. Mirrors
+/// `QUICK_ACCESS_LIMIT` in the shell.
+pub const PRO_FAVORITE_LIMIT: usize = 6;
 
 /// True when saving `new` favorites over `current` grows the list past what a free user may have.
 /// A list already longer than the limit (Pro lapsed, or the five defaults) can still shrink, be

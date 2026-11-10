@@ -89,7 +89,6 @@ pub struct Proposal {
     pub summary: String,
     pub recipe_id: String,
     pub recipe_name: String,
-    pub forked: bool,
     pub option: ProposalOption,
     pub rules: Vec<ProposalRule>,
     /// Rules that matched no element on the page.
@@ -104,8 +103,6 @@ pub struct Job {
     pub provider: ProviderConfig,
     /// The recipe that already covers the page, if any.
     pub base: Option<Recipe>,
-    /// Whether `base` is a bundled recipe (so saving makes a fork).
-    pub base_is_bundled: bool,
     pub option_states: BTreeMap<String, bool>,
     pub snapshot: Snapshot,
     pub patch: Option<Patch>,
@@ -157,7 +154,6 @@ impl Agent {
 /// The recipe that already covers the page, found once the page's host is known.
 pub struct RecipeContext {
     pub base: Option<Recipe>,
-    pub base_is_bundled: bool,
     pub option_states: BTreeMap<String, bool>,
 }
 
@@ -210,7 +206,6 @@ pub fn prepare<F: FnOnce(&str, &str) -> RecipeContext>(
         domain,
         provider: input.provider,
         base: context.base,
-        base_is_bundled: context.base_is_bundled,
         option_states: context.option_states,
         snapshot,
         patch: None,
@@ -302,19 +297,17 @@ fn proposal_for(id: Uuid, job: &Job, patch: &Patch, rules: Vec<ProposalRule>) ->
             )
         }
     };
+    // A new switch is saved in the user's own recipe for the site, never in an installed one.
+    let target = match patch {
+        Patch::ExistingOption { .. } => job.base.as_ref(),
+        Patch::NewOption { .. } => job.base.as_ref().filter(|recipe| patch::is_made(recipe)),
+    };
     Proposal {
         id,
         kind,
         summary: patch.summary().to_owned(),
-        recipe_id: job
-            .base
-            .as_ref()
-            .map_or_else(|| format!("custom.{}", job.domain), |r| r.id.clone()),
-        recipe_name: job
-            .base
-            .as_ref()
-            .map_or_else(|| job.domain.clone(), |r| r.name.clone()),
-        forked: job.base_is_bundled,
+        recipe_id: target.map_or_else(|| format!("custom.{}", job.domain), |r| r.id.clone()),
+        recipe_name: target.map_or_else(|| job.domain.clone(), |r| r.name.clone()),
         option,
         rules,
         unmatched,
@@ -413,7 +406,7 @@ pub enum Accepted {
         recipe_id: String,
         option_id: String,
     },
-    /// Save this recipe (a fork of a bundled one, or a new custom one).
+    /// Save this recipe as a `custom.` recipe.
     SaveRecipe(Box<Recipe>),
 }
 
@@ -455,7 +448,7 @@ mod tests {
 
     use super::*;
     use crate::ai::ProviderKind;
-    use crate::recipes::bundled;
+    use crate::recipes::official_recipes;
 
     const SNAPSHOT: &str = r#"{"v":1,"host":"www.example.org","path":"/","w":390,"vw":"phone","sl":false,"tr":false,"root":{"t":"body","k":[{"t":"div","x":"Suggested"}]}}"#;
 
@@ -533,26 +526,21 @@ mod tests {
         }
     }
 
-    fn input(
-        base: Option<Recipe>,
-        bundled: bool,
-    ) -> PrepareInput<impl FnOnce(&str, &str) -> RecipeContext> {
+    fn input(base: Option<Recipe>) -> PrepareInput<impl FnOnce(&str, &str) -> RecipeContext> {
         PrepareInput {
             request: "hide the promo".into(),
             provider: provider(),
             context: move |_: &str, _: &str| RecipeContext {
                 base,
-                base_is_bundled: bundled,
                 option_states: BTreeMap::new(),
             },
         }
     }
 
     fn youtube() -> Recipe {
-        bundled()
-            .unwrap()
+        official_recipes()
             .into_iter()
-            .find(|r| r.id == "youtube.default")
+            .find(|r| r.id == "market.official.youtube")
             .unwrap()
     }
 
@@ -561,7 +549,7 @@ mod tests {
         run(async {
             let agent = Agent::default();
             let page = FakePage::new(vec![]);
-            let prepared = prepare(&agent, &page, input(None, false)).unwrap();
+            let prepared = prepare(&agent, &page, input(None)).unwrap();
             assert!(prepared.payload.contains("hide the promo"));
             assert!(prepared.token_estimate > 0);
             assert_eq!(page.log(), vec![snapshot::SNAPSHOT_SCRIPT.to_owned()]);
@@ -574,12 +562,11 @@ mod tests {
         run(async {
             let agent = Agent::default();
             let page = FakePage::new(vec![vec![3]]);
-            let prepared = prepare(&agent, &page, input(None, false)).unwrap();
+            let prepared = prepare(&agent, &page, input(None)).unwrap();
             let model = FakeModel::new(&[&new_option("#promo")]);
             let proposal = send(&agent, &page, &model, prepared.id).await.unwrap();
             assert_eq!(proposal.kind, ProposalKind::NewOption);
             assert_eq!(proposal.recipe_id, "custom.example.org");
-            assert!(!proposal.forked);
             assert_eq!(proposal.rules[0].matches, 3);
             assert_eq!(proposal.unmatched, 0);
             assert!(
@@ -603,7 +590,7 @@ mod tests {
         run(async {
             let agent = Agent::default();
             let page = FakePage::new(vec![vec![0], vec![2]]);
-            let prepared = prepare(&agent, &page, input(None, false)).unwrap();
+            let prepared = prepare(&agent, &page, input(None)).unwrap();
             let model = FakeModel::new(&[&new_option("#nope"), &new_option("#promo")]);
             let proposal = send(&agent, &page, &model, prepared.id).await.unwrap();
             assert_eq!(proposal.rules[0].selector, "#promo");
@@ -614,7 +601,7 @@ mod tests {
 
             let agent = Agent::default();
             let page = FakePage::new(vec![vec![0], vec![0], vec![0]]);
-            let prepared = prepare(&agent, &page, input(None, false)).unwrap();
+            let prepared = prepare(&agent, &page, input(None)).unwrap();
             let model = FakeModel::new(&[&new_option("#a"), &new_option("#b"), &new_option("#c")]);
             let proposal = send(&agent, &page, &model, prepared.id).await.unwrap();
             assert_eq!(
@@ -631,12 +618,12 @@ mod tests {
         run(async {
             let agent = Agent::default();
             let page = FakePage::new(vec![vec![1]]);
-            let prepared = prepare(&agent, &page, input(None, false)).unwrap();
+            let prepared = prepare(&agent, &page, input(None)).unwrap();
             let model = FakeModel::new(&["not json", &new_option("#promo")]);
             assert!(send(&agent, &page, &model, prepared.id).await.is_ok());
 
             let agent = Agent::default();
-            let prepared = prepare(&agent, &page, input(None, false)).unwrap();
+            let prepared = prepare(&agent, &page, input(None)).unwrap();
             let model = FakeModel::new(&["x", "y", "z"]);
             let error = send(&agent, &page, &model, prepared.id).await.unwrap_err();
             assert_eq!(error.to_string(), MSG_BAD_ANSWER);
@@ -655,7 +642,7 @@ mod tests {
                 .filter(|r| r.option() == Some(option.as_str()))
                 .count();
             let page = FakePage::new(vec![vec![1; rule_count]]);
-            let prepared = prepare(&agent, &page, input(Some(base), true)).unwrap();
+            let prepared = prepare(&agent, &page, input(Some(base))).unwrap();
             let answer =
                 json!({"kind":"existingOption","summary":"Already there","optionId":option,
           "label":null,"description":null,"group":null,"rules":null})
@@ -663,14 +650,13 @@ mod tests {
             let model = FakeModel::new(&[&answer]);
             let proposal = send(&agent, &page, &model, prepared.id).await.unwrap();
             assert_eq!(proposal.kind, ProposalKind::ExistingOption);
-            assert!(proposal.forked);
             assert_eq!(proposal.option.id.as_deref(), Some(option.as_str()));
             match accept(&agent, &page, prepared.id).unwrap() {
                 Accepted::EnableOption {
                     recipe_id,
                     option_id,
                 } => {
-                    assert_eq!(recipe_id, "youtube.default");
+                    assert_eq!(recipe_id, "market.official.youtube");
                     assert_eq!(option_id, option);
                 }
                 Accepted::SaveRecipe(_) => panic!("nothing to save"),
@@ -683,7 +669,7 @@ mod tests {
         run(async {
             let agent = Agent::default();
             let page = FakePage::new(vec![]);
-            let prepared = prepare(&agent, &page, input(None, false)).unwrap();
+            let prepared = prepare(&agent, &page, input(None)).unwrap();
             reject(&agent, &page, prepared.id);
             assert!(agent.get(prepared.id).is_err());
             assert!(
@@ -692,7 +678,7 @@ mod tests {
                     .unwrap()
                     .contains(snapshot::PREVIEW_STYLE_ID)
             );
-            let mut empty = input(None, false);
+            let mut empty = input(None);
             empty.request = "   ".into();
             assert!(prepare(&agent, &page, empty).is_err());
         });
