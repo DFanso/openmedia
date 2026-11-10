@@ -16,6 +16,14 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** `tsc`, ESLint, Prettier, Vitest on the parser, `cargo test --lib recipes`. **Not verified:** on-device rendering.
 
+### feat(ai): the assistant is a chat, with its steps, its history and its own clear button
+
+**Problem:** A request showed one line ("Asking <provider>…") and then nothing: the user could not see what the assistant was doing, and the conversation ended with the bar. Reopening the assistant started over, so a follow-up ("and the end screen too") had no context.
+
+**Change:** The assistant is a chat (`src/features/ai/ChatPane.tsx`). Every request reports its steps while it runs — reading the page (with the token estimate after redaction), asking the provider, checking the answer against the safety rules, previewing the rules on the page, counting what matched, asking again when a rule matched nothing — counted in Rust (`src-tauri/src/ai/activity.rs`) and sent over the `ai_send` channel; only counts and fixed kinds travel, so nothing from the page or the model is shown as a step. Turns are saved per site (registrable domain) and per recipe in `chats.json` (`src-tauri/src/ai/chats.rs`, shell-only commands `chat_list`, `chat_save`, `chat_delete`, `chat_clear`), so reopening the assistant on a site continues that site's chat and the next request tells the model what the earlier turns did. The header has *Chat history* and *New chat*; Settings > Data has "AI chats" with a *Clear chats* button. Incognito chats live in the shell only: Rust writes nothing while incognito is on.
+
+**Verified:** `yarn ts:check`, `yarn lint`, `yarn format:check`, `yarn test` (345 Vitest tests), `cargo fmt --check`, `cargo clippy --workspace -D warnings` and `cargo test --workspace` (291 app + 29 siteview Rust tests). **Not verified:** the chat on a device; a live provider call with the new channel.
+
 **PR:** n/a
 
 ### chore(paywall): drop the simulator-only Pro override

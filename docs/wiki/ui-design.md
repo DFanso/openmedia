@@ -54,7 +54,7 @@ Pages opened from Settings (the Recipes page and the paywall) sit on top of it: 
 - **Favorites:** a "Quick access" group (the first six, four without Pro) and a "More favorites" group below it. Tap a row to edit its name and address or remove it; arrows reorder, and moving across the boundary moves a favorite in or out of quick access. Without Pro, slots 5 and 6 are two grayed rows with a crown, "More favorites" is a locked row, and "Add favorite" opens the paywall once four exist; all of them open the paywall. Every change saves at once, so the list never disagrees with the stars above it.
 - **Incognito favorites** and **Incognito recipes:** see [Incognito](#incognito). Always collapsed and locked until a biometric check passes. Without Pro they carry a crown and "Pro feature" instead, and open the paywall.
 - **AI assistant:** bring-your-own-key providers. See [AI Assistant](./ai-assistant.md#implemented-provider-settings).
-- **Data and help:** "Clear history" (with a confirm step) empties the searched addresses and forgets the last page, like a browser; favorites, open sessions and logins are untouched. "Replay" marks the first-run guide unseen and shows it again.
+- **Data and help:** "Clear history" (with a confirm step) empties the searched addresses and forgets the last page, like a browser; favorites, open sessions and logins are untouched. "AI chats" shows how many chats are saved and has "Clear chats" (with a confirm step) that erases them all. "Replay" marks the first-run guide unseen and shows it again.
 
 ## Incognito
 
@@ -78,6 +78,24 @@ The Usage button (bars icon) sits directly above History. The sheet shares the `
 - **Sites** are keyed by the session's registrable domain (`scope`), so `m.youtube.com` and `www.youtube.com` are one row.
 - **Sections** come from the first path segment of the page address only, generic for every site: `/watch`, `/shorts`, `/reels`, `/explore`, `/messages` show as Watch, Shorts, Reels, Explore, Messages. A segment is kept only when it is 1-24 characters of `a-z 0-9 _ -` (lowercased) and not all digits; an empty path is **Home**, and anything else (a `@handle`, an id, non-Latin text) is **Other**. Rust validates the same rule again.
 - **Privacy statement** (shown on the sheet): this information stays on this phone and is never sent anywhere; OpenMedia keeps no copy; only site names, section names and seconds are stored, never full addresses, searches or page titles. **Clear stats** (with a confirm step) wipes it.
+
+## The assistant chat
+
+The floating button opens the assistant, which is a chat (`features/ai/ChatPane.tsx`), not a
+one-shot form. The bar shows the site and recipe the chat is about, the turns so far, and the
+request in flight.
+
+- **Turns.** What the user asked sits on their side of the chat, what the assistant answered on
+  its own. Between them, the steps of the request: reading the page, asking the provider, checking
+  the answer, previewing the rules, counting what matched, and asking again when something did
+  not. A finished turn keeps its steps behind a "What it did" toggle.
+- **The card.** A proposal shows the switch it would add or turn on, with the rules it hides and
+  how many elements each rule found on the page, and the Accept / Reject / Ask again buttons. The
+  page behind already shows the preview.
+- **Header.** *Chat history* opens the list of the site's chats (each with its recipe and date,
+  and a button to delete one); *New chat* starts a blank one for the site.
+- **While it works.** The bar keeps the steps visible as they come in, so the wait shows what is
+  happening. The dock over the page shows the same card while the bar is closed.
 
 ## History
 

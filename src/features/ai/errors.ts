@@ -70,3 +70,14 @@ export function classifyError(error: unknown): AssistantError {
   }
   return { kind, key: MESSAGES[kind], text: null };
 }
+
+/** The error a saved turn recorded, shown again from its class and short text. */
+export function restoreError(kind: string, text: string | null): AssistantError {
+  if (Object.keys(MESSAGES).includes(kind)) {
+    const known = kind as keyof typeof MESSAGES;
+    return { kind: known, key: MESSAGES[known], text: null };
+  }
+  return text
+    ? { kind: "other", key: null, text }
+    : { kind: "other", key: "assistant.errorOther", text: null };
+}

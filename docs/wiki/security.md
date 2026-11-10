@@ -95,6 +95,13 @@ History (the addresses the user typed) is stored in `library.json` on the device
 
 Usage stats (seconds per site and first path segment, per local day, 30 days) and daily policies are stored locally in `usage.json`. Shell-only app commands `record_usage`, `get_usage`, `clear_usage`, `get_usage_policies` and `set_usage_policy` validate dates, hosts, sections, seconds and policy bounds (1–86400 seconds, warning below limit, at most 200 policies). Clearing stats preserves policy settings. No full address, query, title or page content is stored or sent.
 
+Assistant chats (the user's own requests, the steps of each request and its outcome) are stored
+locally in `chats.json`. The shell-only app commands `chat_list`, `chat_save`, `chat_delete` and
+`chat_clear` validate the site (a registrable domain), the recipe id and the turn shapes, and cut
+every string to a fixed length; unknown fields are refused. A chat never holds the page snapshot,
+the exact payload or the provider's answer. Nothing in it leaves the device, and nothing is
+written while incognito is on.
+
 The shell requests `set_usage_blocked` for a validated session UUID. It calls a Rust-only plugin method with no Tauri command, permission or capability of its own. iOS adds a native blur shield, stops loads, suspends media playback and refuses navigation/interaction; a website cannot remove the shield or lift its own block. Other sessions remain usable. Limits are user-editable self-management controls, not tamper-proof parental controls, and they do not suspend arbitrary page JavaScript.
 
 Unread notifications: the plugin command `notify` (granted to the shell in `siteview:default`) posts a local iOS notification for a session id. It takes a UUID, a title of 1 to 40 and a body of 1 to 120 characters, with no control characters. The shell builds both from the user's own favorite name and a fixed translated phrase; nothing from the page is in them. The page contributes only its title, which the shell parses for a leading count: a hostile page can make a notification appear for its own session (at most once per 30 s), not choose its text or reach other sessions. The native side adds one event, `siteview:notification-tap` (a session id, validated as a UUID in Rust, native to shell only).

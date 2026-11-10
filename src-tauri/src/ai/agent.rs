@@ -9,14 +9,15 @@ use std::{
     time::Instant,
 };
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use uuid::Uuid;
 
 use super::{
     ProviderConfig,
+    activity::{Activity, StepKind, StepStatus},
     patch::{self, Patch},
-    prompt::{self, Prompt, PromptInput, RepairNote, RuleFailure},
+    prompt::{self, EarlierTurn, Prompt, PromptInput, RepairNote, RuleFailure},
     redact,
     snapshot::{self, Snapshot},
 };
@@ -53,19 +54,24 @@ pub struct PreparedRequest {
     pub id: Uuid,
     pub provider_name: String,
     pub model: Option<String>,
+    /// The site the request is about, as the registrable domain: a chat belongs to it.
+    pub domain: String,
+    /// The recipe that already covers the page, when one does.
+    pub recipe_id: Option<String>,
+    pub recipe_name: Option<String>,
     pub payload: String,
     pub token_estimate: u32,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ProposalKind {
     ExistingOption,
     NewOption,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct ProposalOption {
     pub id: Option<String>,
     pub label: String,
@@ -73,16 +79,16 @@ pub struct ProposalOption {
     pub group: OptionGroup,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct ProposalRule {
     pub label: String,
     pub selector: String,
     pub matches: i64,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct Proposal {
     pub id: Uuid,
     pub kind: ProposalKind,
@@ -104,6 +110,7 @@ pub struct Job {
     /// The recipe that already covers the page, if any.
     pub base: Option<Recipe>,
     pub option_states: BTreeMap<String, bool>,
+    pub earlier: Vec<EarlierTurn>,
     pub snapshot: Snapshot,
     pub patch: Option<Patch>,
     created: Instant,
@@ -161,6 +168,8 @@ pub struct RecipeContext {
 pub struct PrepareInput<F: FnOnce(&str, &str) -> RecipeContext> {
     pub request: String,
     pub provider: ProviderConfig,
+    /// The earlier requests of the chat this one continues; only the user's words and outcomes.
+    pub earlier: Vec<EarlierTurn>,
     /// Given the page's host and path.
     pub context: F,
 }
@@ -182,6 +191,7 @@ fn build_prompt(job: &Job, snapshot: &Snapshot, repair: Option<RepairNote<'_>>) 
         snapshot,
         playbook: prompt::site_section(&snapshot.host),
         repair,
+        earlier: &job.earlier,
     })
 }
 
@@ -207,6 +217,7 @@ pub fn prepare<F: FnOnce(&str, &str) -> RecipeContext>(
         provider: input.provider,
         base: context.base,
         option_states: context.option_states,
+        earlier: input.earlier,
         snapshot,
         patch: None,
         created: Instant::now(),
@@ -216,6 +227,9 @@ pub fn prepare<F: FnOnce(&str, &str) -> RecipeContext>(
         id,
         provider_name: job.provider.name.clone(),
         model: job.provider.model.clone(),
+        domain: job.domain.clone(),
+        recipe_id: job.base.as_ref().map(|recipe| recipe.id.clone()),
+        recipe_name: job.base.as_ref().map(|recipe| recipe.name.clone()),
         payload: prompt::payload_preview(&prompt),
         token_estimate: prompt::estimate_tokens(&prompt),
     };
@@ -316,11 +330,13 @@ fn proposal_for(id: Uuid, job: &Job, patch: &Patch, rules: Vec<ProposalRule>) ->
 
 /// Sends the prepared request, previews the answer on the page, and repairs rules that matched
 /// nothing (at most [`MAX_REPAIRS`] more rounds). The preview stays on the page until the user
-/// accepts or rejects.
+/// accepts or rejects. `progress` hears every step as it starts and ends, so the shell can show
+/// what is happening while the model thinks.
 pub async fn send(
     agent: &Agent,
     page: &impl Page,
     model: &impl Model,
+    progress: &(impl Fn(Activity) + Sync),
     id: Uuid,
 ) -> Result<Proposal> {
     let job = agent.get(id)?;
@@ -345,23 +361,65 @@ pub async fn send(
             failures: &borrowed,
             validation_error: validation_error.as_deref(),
         });
+        if round > 0 {
+            let step = Activity::new(StepKind::Repair, StepStatus::Done, round);
+            progress(if validation_error.is_some() {
+                step
+            } else {
+                step.with_total(failures.len())
+            });
+        }
         let prompt = build_prompt(&job, &snapshot, repair);
-        let answer = model.complete(&prompt, &schema).await?;
+        progress(Activity::new(
+            StepKind::AskModel,
+            StepStatus::Running,
+            round,
+        ));
+        let answer = match model.complete(&prompt, &schema).await {
+            Ok(answer) => answer,
+            Err(error) => {
+                progress(Activity::new(StepKind::AskModel, StepStatus::Failed, round));
+                return Err(error);
+            }
+        };
+        progress(Activity::new(StepKind::AskModel, StepStatus::Done, round));
 
         let patch = match patch::parse_patch(&answer, job.base.as_ref()) {
-            Ok(patch) => patch,
+            Ok(patch) => {
+                progress(Activity::new(
+                    StepKind::CheckAnswer,
+                    StepStatus::Done,
+                    round,
+                ));
+                patch
+            }
             Err(error) if round < MAX_REPAIRS => {
+                progress(Activity::new(
+                    StepKind::CheckAnswer,
+                    StepStatus::Failed,
+                    round,
+                ));
                 validation_error = Some(error.to_string());
                 previous = Some(answer);
                 failures.clear();
                 continue;
             }
-            Err(_) => return Err(Error::Connection(MSG_BAD_ANSWER.to_owned())),
+            Err(_) => {
+                progress(Activity::new(
+                    StepKind::CheckAnswer,
+                    StepStatus::Failed,
+                    round,
+                ));
+                return Err(Error::Connection(MSG_BAD_ANSWER.to_owned()));
+            }
         };
 
         let (rules, css) = selectors_and_css(&patch, job.base.as_ref());
         let selectors: Vec<String> = rules.iter().map(|(_, selector)| selector.clone()).collect();
         page.evaluate(snapshot::preview_script(&css))?;
+        progress(
+            Activity::new(StepKind::PreviewOnPage, StepStatus::Done, round).with_total(rules.len()),
+        );
         let counts = counts_of(page, &selectors)?;
         let failed: Vec<(String, String, i64)> = rules
             .iter()
@@ -369,6 +427,11 @@ pub async fn send(
             .filter(|(_, count)| **count <= 0)
             .map(|((label, selector), count)| (label.clone(), selector.clone(), *count))
             .collect();
+        progress(
+            Activity::new(StepKind::CountMatches, StepStatus::Done, round)
+                .with_matched(rules.len() - failed.len())
+                .with_total(rules.len()),
+        );
 
         if failed.is_empty() || round == MAX_REPAIRS {
             let shown = rules
@@ -530,6 +593,7 @@ mod tests {
         PrepareInput {
             request: "hide the promo".into(),
             provider: provider(),
+            earlier: Vec::new(),
             context: move |_: &str, _: &str| RecipeContext {
                 base,
                 option_states: BTreeMap::new(),
@@ -564,7 +628,9 @@ mod tests {
             let page = FakePage::new(vec![vec![3]]);
             let prepared = prepare(&agent, &page, input(None)).unwrap();
             let model = FakeModel::new(&[&new_option("#promo")]);
-            let proposal = send(&agent, &page, &model, prepared.id).await.unwrap();
+            let proposal = send(&agent, &page, &model, &|_| {}, prepared.id)
+                .await
+                .unwrap();
             assert_eq!(proposal.kind, ProposalKind::NewOption);
             assert_eq!(proposal.recipe_id, "custom.example.org");
             assert_eq!(proposal.rules[0].matches, 3);
@@ -592,7 +658,9 @@ mod tests {
             let page = FakePage::new(vec![vec![0], vec![2]]);
             let prepared = prepare(&agent, &page, input(None)).unwrap();
             let model = FakeModel::new(&[&new_option("#nope"), &new_option("#promo")]);
-            let proposal = send(&agent, &page, &model, prepared.id).await.unwrap();
+            let proposal = send(&agent, &page, &model, &|_| {}, prepared.id)
+                .await
+                .unwrap();
             assert_eq!(proposal.rules[0].selector, "#promo");
             assert_eq!(proposal.unmatched, 0);
             let prompts = model.prompts();
@@ -603,7 +671,9 @@ mod tests {
             let page = FakePage::new(vec![vec![0], vec![0], vec![0]]);
             let prepared = prepare(&agent, &page, input(None)).unwrap();
             let model = FakeModel::new(&[&new_option("#a"), &new_option("#b"), &new_option("#c")]);
-            let proposal = send(&agent, &page, &model, prepared.id).await.unwrap();
+            let proposal = send(&agent, &page, &model, &|_| {}, prepared.id)
+                .await
+                .unwrap();
             assert_eq!(
                 model.prompts().len(),
                 3,
@@ -614,18 +684,101 @@ mod tests {
     }
 
     #[test]
+    fn every_step_is_reported_in_order_including_the_repair() {
+        run(async {
+            let agent = Agent::default();
+            let page = FakePage::new(vec![vec![0], vec![2]]);
+            let prepared = prepare(&agent, &page, input(None)).unwrap();
+            let model = FakeModel::new(&[&new_option("#nope"), &new_option("#promo")]);
+            let steps = Mutex::new(Vec::new());
+            send(
+                &agent,
+                &page,
+                &model,
+                &|step| steps.lock().unwrap().push(step),
+                prepared.id,
+            )
+            .await
+            .unwrap();
+            let seen: Vec<(StepKind, StepStatus, u8)> = steps
+                .lock()
+                .unwrap()
+                .iter()
+                .map(|step| (step.kind, step.status, step.round))
+                .collect();
+            use StepKind::{AskModel, CheckAnswer, CountMatches, PreviewOnPage, Repair};
+            use StepStatus::{Done, Running};
+            assert_eq!(
+                seen,
+                vec![
+                    (AskModel, Running, 0),
+                    (AskModel, Done, 0),
+                    (CheckAnswer, Done, 0),
+                    (PreviewOnPage, Done, 0),
+                    (CountMatches, Done, 0),
+                    (Repair, Done, 1),
+                    (AskModel, Running, 1),
+                    (AskModel, Done, 1),
+                    (CheckAnswer, Done, 1),
+                    (PreviewOnPage, Done, 1),
+                    (CountMatches, Done, 1),
+                ]
+            );
+            let steps = steps.lock().unwrap();
+            assert_eq!(steps[4].matched, Some(0));
+            assert_eq!(steps[4].total, Some(1));
+            assert_eq!(steps[5].total, Some(1), "one rule matched nothing");
+            assert_eq!(steps[10].matched, Some(1));
+        });
+    }
+
+    #[test]
+    fn a_failed_model_call_is_reported_as_a_failed_step() {
+        struct Down;
+        impl Model for Down {
+            async fn complete(&self, _: &Prompt, _: &Value) -> Result<String> {
+                Err(Error::Connection("down".into()))
+            }
+        }
+        run(async {
+            let agent = Agent::default();
+            let page = FakePage::new(vec![]);
+            let prepared = prepare(&agent, &page, input(None)).unwrap();
+            let steps = Mutex::new(Vec::new());
+            let result = send(
+                &agent,
+                &page,
+                &Down,
+                &|step| steps.lock().unwrap().push(step),
+                prepared.id,
+            )
+            .await;
+            assert!(result.is_err());
+            let steps = steps.lock().unwrap();
+            assert_eq!(steps.last().unwrap().status, StepStatus::Failed);
+            assert_eq!(steps.last().unwrap().kind, StepKind::AskModel);
+        });
+    }
+
+    #[test]
     fn an_invalid_answer_gets_one_more_chance_and_then_a_fixed_error() {
         run(async {
             let agent = Agent::default();
             let page = FakePage::new(vec![vec![1]]);
             let prepared = prepare(&agent, &page, input(None)).unwrap();
             let model = FakeModel::new(&["not json", &new_option("#promo")]);
-            assert!(send(&agent, &page, &model, prepared.id).await.is_ok());
+            assert!(
+                send(&agent, &page, &model, &|_| {}, prepared.id)
+                    .await
+                    .is_ok()
+            );
 
             let agent = Agent::default();
             let prepared = prepare(&agent, &page, input(None)).unwrap();
             let model = FakeModel::new(&["x", "y", "z"]);
-            let error = send(&agent, &page, &model, prepared.id).await.unwrap_err();
+            let error = send(&agent, &page, &model, &|_| {}, prepared.id)
+                .await
+                .unwrap_err();
             assert_eq!(error.to_string(), MSG_BAD_ANSWER);
         });
     }
@@ -648,7 +801,9 @@ mod tests {
           "label":null,"description":null,"group":null,"rules":null})
                 .to_string();
             let model = FakeModel::new(&[&answer]);
-            let proposal = send(&agent, &page, &model, prepared.id).await.unwrap();
+            let proposal = send(&agent, &page, &model, &|_| {}, prepared.id)
+                .await
+                .unwrap();
             assert_eq!(proposal.kind, ProposalKind::ExistingOption);
             assert_eq!(proposal.option.id.as_deref(), Some(option.as_str()));
             match accept(&agent, &page, prepared.id).unwrap() {

@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
-use serde::Serialize;
-use tauri::{AppHandle, Emitter, Manager, State};
+use serde::{Deserialize, Serialize};
+use tauri::{AppHandle, Emitter, Manager, State, ipc::Channel};
 use tauri_plugin_siteview::{
     ContentRuleList, EvaluateRequest, FetchFaviconRequest, OpenRequest, Rect, SessionRequest,
     SetContentRuleListsRequest, SetDocumentStartScriptRequest, SetRectRequest, SiteviewExt,
@@ -14,11 +14,13 @@ use zeroize::Zeroizing;
 use crate::ad_block::AdBlock;
 use crate::ai::{
     ProviderConfig, ProviderInput,
+    activity::Activity,
     agent::{
         self, Accepted, Agent, Model, Page, PrepareInput, PreparedRequest, Proposal, RecipeContext,
     },
+    chats::{ChatSession, Chats},
     connection::{list_models, models_request},
-    prompt::Prompt,
+    prompt::{EarlierTurn, Prompt},
     provider, validate_key,
 };
 use crate::boot::{Boot, Startup};
@@ -573,6 +575,16 @@ fn active_provider(
     Ok((config, key))
 }
 
+/// What the shell sends with a request: the words, and the earlier turns of the chat it
+/// continues (only the user's own words and how each ended).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChatRequest {
+    request: String,
+    #[serde(default)]
+    earlier: Vec<EarlierTurn>,
+}
+
 /// Reads the page and builds what would be sent; nothing leaves the device. Async for the same
 /// reason as `open_site`.
 #[tauri::command]
@@ -583,7 +595,7 @@ pub async fn ai_prepare(
     secrets: State<'_, Secrets>,
     agent: State<'_, Agent>,
     entitlement: State<'_, Entitlement>,
-    request: String,
+    chat: ChatRequest,
 ) -> Result<PreparedRequest> {
     entitlement.require_pro()?;
     let (provider, _key) = active_provider(&library, &secrets)?;
@@ -592,7 +604,8 @@ pub async fn ai_prepare(
         &agent,
         &LivePage(&app),
         PrepareInput {
-            request,
+            request: chat.request,
+            earlier: chat.earlier,
             provider,
             context: |host: &str, path: &str| {
                 let base = Url::parse(&format!("https://{host}{path}"))
@@ -611,7 +624,8 @@ pub async fn ai_prepare(
 }
 
 /// Sends the prepared request to the user's provider, previews the answer on the page and
-/// returns what it would change.
+/// returns what it would change. Each step is reported on `on_activity` as it happens, so the
+/// shell can show the work while the model answers.
 #[tauri::command]
 pub async fn ai_send(
     app: AppHandle,
@@ -620,10 +634,20 @@ pub async fn ai_send(
     agent: State<'_, Agent>,
     entitlement: State<'_, Entitlement>,
     id: Uuid,
+    on_activity: Channel<Activity>,
 ) -> Result<Proposal> {
     entitlement.require_pro()?;
     let (config, key) = active_provider(&library, &secrets)?;
-    agent::send(&agent, &LivePage(&app), &LiveModel { config, key }, id).await
+    agent::send(
+        &agent,
+        &LivePage(&app),
+        &LiveModel { config, key },
+        &|step| {
+            let _ = on_activity.send(step);
+        },
+        id,
+    )
+    .await
 }
 
 /// Saves the previewed change as a `custom.` recipe of the user's own; installed recipes are never
@@ -660,6 +684,42 @@ pub async fn ai_accept(
 pub async fn ai_reject(app: AppHandle, agent: State<'_, Agent>, id: Uuid) -> Result<()> {
     agent::reject(&agent, &LivePage(&app), id);
     Ok(())
+}
+
+/// The saved chats, newest first. Incognito has none: it neither reads nor writes them.
+#[tauri::command]
+pub fn chat_list(
+    chats: State<'_, Chats>,
+    incognito: State<'_, Incognito>,
+) -> Result<Vec<ChatSession>> {
+    if incognito.is_active() {
+        return Ok(Vec::new());
+    }
+    chats.list()
+}
+
+/// Saves a chat. Nothing is written in incognito: the chat lives in the shell until it is left.
+#[tauri::command]
+pub fn chat_save(
+    chats: State<'_, Chats>,
+    incognito: State<'_, Incognito>,
+    session: ChatSession,
+) -> Result<()> {
+    if incognito.is_active() {
+        return Ok(());
+    }
+    chats.save(session)
+}
+
+#[tauri::command]
+pub fn chat_delete(chats: State<'_, Chats>, id: Uuid) -> Result<()> {
+    chats.delete(id)
+}
+
+/// Deletes every saved chat. Not Pro-gated: a user who lets Pro lapse can still erase them.
+#[tauri::command]
+pub fn chat_clear(chats: State<'_, Chats>) -> Result<()> {
+    chats.clear()
 }
 
 #[cfg(test)]
