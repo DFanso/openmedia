@@ -54,7 +54,11 @@ A `script` rule exists as a gated escape hatch (see [Trust levels](#trust-levels
 | `tags` | string[] | **Required (Design; Rust `schema.rs` and the Worker's `validate.ts` must stay equal).** Platform tags only: 1 or 2 unique values from `mobile`, `desktop`. A missing, empty, unknown or duplicate tag, or `official` / `community` inside the recipe, makes it invalid. See [Tags](#tags). |
 | `match` | string[] | URL patterns (scheme + host + path glob). A recipe applies when any matches the top-level page URL. |
 | `rules` | Rule[] | Ordered. Each independently toggleable. |
-| `meta` | object | Optional: `author`, `homepage`, `lastVerified` (date), `notes` (at most 4000 characters, the same cap in Rust and in the Worker). `homepage` must be an `http(s)` address; Settings uses it as the page a favorite of the recipe opens, and hides the star on a recipe without one. Every official recipe sets it, and it must itself match the recipe's `match` patterns (tested). |
+| `meta` | object | Optional: `author`, `homepage`, `lastVerified` (date), `notes` (at most 4000 characters, the same cap in Rust and in the Worker; Markdown, see [Notes](#notes)). `homepage` must be an `http(s)` address; Settings uses it as the page a favorite of the recipe opens, and hides the star on a recipe without one. Every official recipe sets it, and it must itself match the recipe's `match` patterns (tested). |
+
+## Notes
+
+`meta.notes` is Markdown, shown on the recipe review. The reader supports `#` headings, `-` and `1.` lists, paragraphs, `**bold**` and `` `code` `` (`src/features/marketplace/parseMarkdown.ts`). Links, images and HTML are not part of it and show as literal text, and the review renders React elements only, never markup, so a sender cannot load or navigate anything. Notes may contain line feeds; every other control character is still refused. The review shows a faded preview and expands on tap. Write what was checked, then the live counts, then what was not verified.
 
 ## Tags
 
@@ -150,7 +154,7 @@ Implemented in `src-tauri/src/recipes/share.rs`. A recipe from outside the app i
 - ignores the file's `origin` and sets `imported` (so a file cannot claim `user` or `ai` to skip the `hide`/`css`-only restriction);
 - moves the id under `imported.` for pasted files (`instagram.default` becomes `imported.instagram.default`, so it can never replace an installed marketplace recipe or a custom one). Only the verified catalog path may use `market.` ids, and only the official publishing path may use `market.official.` ids ([Marketplace](./marketplace.md#tags-official-and-community));
 - accepts ids of lowercase letters, digits, `.` and `-` up to 80 characters, and a `version` of three numbers (`1.0.0`);
-- refuses control characters and invisible direction overrides (U+200B–U+200F, U+202A–U+202E, U+2066–U+2069, U+FEFF) in the name, author, notes, option text and rule labels, and caps their lengths (name and author 60);
+- refuses control characters and invisible direction overrides (U+200B–U+200F, U+202A–U+202E, U+2066–U+2069, U+FEFF) in the name, author, notes, option text and rule labels (notes may contain line feeds), and caps their lengths (name and author 60);
 - refuses a `meta.homepage` that the recipe's own `match` patterns do not cover, because a favorite made from a recipe opens its homepage under the recipe's name;
 - limits a bundle to 1 MiB and 20 recipes, a recipe to 256 KiB, and refuses duplicate ids.
 

@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-10
 
+### fix(marketplace): render recipe notes as Markdown, in a faded preview
+
+**Problem:** Official recipes ship their verification log as `notes`, one unbroken paragraph that the recipe review printed whole, pushing "Works on" and the switches below the fold.
+
+**Change:** Notes are Markdown (headings, lists, paragraphs, bold, inline code; no links, images or HTML) rendered as React elements by `Markdown.tsx` and `parseMarkdown.ts`. The review shows a faded preview and expands on tap. `notes` may now contain line feeds in the Rust validator (`share.rs`); other text fields and control characters are unchanged. The Discord recipe's notes are rewritten as Markdown. The Worker needs the same line-feed allowance (`openmedia-worker`, `fix/notes-markdown-newlines`) before a recipe with line feeds can be published, and app versions without this change refuse such a recipe.
+
+**Verified:** `tsc`, ESLint, Prettier, Vitest on the parser, `cargo test --lib recipes`. **Not verified:** on-device rendering.
+
 ### feat(ai): the assistant is a chat, with its steps, its history and its own clear button
 
 **Problem:** A request showed one line ("Asking <provider>…") and then nothing: the user could not see what the assistant was doing, and the conversation ended with the bar. Reopening the assistant started over, so a follow-up ("and the end screen too") had no context.

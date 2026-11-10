@@ -186,17 +186,16 @@ fn check_shared(recipe: &Recipe) -> Result<()> {
     let texts = [
         (Some(recipe.name.as_str()), MAX_NAME_CHARS),
         (meta.and_then(|m| m.author.as_deref()), MAX_AUTHOR_CHARS),
-        (meta.and_then(|m| m.notes.as_deref()), MAX_NOTES_CHARS),
     ];
-    for (text, limit) in texts {
-        if let Some(text) = text
-            && !is_plain_text(text, limit)
-        {
-            return Err(Error::Recipe(format!(
-                "recipe {} has text that cannot be shown safely",
-                recipe.id
-            )));
-        }
+    let notes = meta.and_then(|m| m.notes.as_deref());
+    let unsafe_header = texts
+        .into_iter()
+        .any(|(text, limit)| text.is_some_and(|text| !is_plain_text(text, limit)));
+    if unsafe_header || notes.is_some_and(|notes| !is_note_text(notes, MAX_NOTES_CHARS)) {
+        return Err(Error::Recipe(format!(
+            "recipe {} has text that cannot be shown safely",
+            recipe.id
+        )));
     }
     let option_texts = recipe
         .options
@@ -274,6 +273,12 @@ pub(crate) fn is_plain_text(text: &str, limit: usize) -> bool {
             c.is_control()
                 || matches!(c, '\u{200B}'..='\u{200F}' | '\u{202A}'..='\u{202E}' | '\u{2066}'..='\u{2069}' | '\u{FEFF}')
         })
+}
+
+/// Notes are Markdown, so they may break lines; everything else `is_plain_text` refuses stays
+/// refused.
+fn is_note_text(text: &str, limit: usize) -> bool {
+    is_plain_text(&text.replace('\n', " "), limit)
 }
 
 pub fn preview(recipe: &Recipe, installed_version: Option<&str>) -> RecipePreview {
@@ -433,6 +438,15 @@ mod tests {
         assert!(file(&recipe_json("calm", outside)).is_err());
         let inside = r#", "meta": {"homepage": "https://www.example.com/"}"#;
         assert!(file(&recipe_json("calm", inside)).is_ok());
+    }
+
+    #[test]
+    fn notes_may_break_lines_but_other_text_may_not() {
+        let meta = |key: &str, value: &str| format!(r#", "meta": {{"{key}": "{value}"}}"#);
+        assert!(file(&recipe_json("calm", &meta("notes", r"- one\n- two"))).is_ok());
+        assert!(file(&recipe_json("calm", &meta("notes", r"one\r\ntwo"))).is_err());
+        assert!(file(&recipe_json("calm", &meta("notes", r"one\ttwo"))).is_err());
+        assert!(file(&recipe_json("calm", &meta("author", r"one\ntwo"))).is_err());
     }
 
     #[test]

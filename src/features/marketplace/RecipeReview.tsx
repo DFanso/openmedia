@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useT } from "../../i18n/useT";
 import { Group, GroupLabel } from "../settings/ui";
+import { Markdown } from "./Markdown";
 import type { RecipePreview, RulePreview } from "./ipc";
 
 /**
@@ -21,9 +23,7 @@ export function RecipeReview({ preview }: { preview: RecipePreview }) {
             {t("market.review.replaces", { version: preview.replaces })}
           </p>
         )}
-        {preview.notes && (
-          <p className="mt-2 text-sm leading-snug text-paper/70">{preview.notes}</p>
-        )}
+        {preview.notes && <Notes source={preview.notes} />}
       </div>
       <div>
         <GroupLabel>{t("market.review.sites")}</GroupLabel>
@@ -58,6 +58,39 @@ export function RecipeReview({ preview }: { preview: RecipePreview }) {
           ))}
         </Group>
       </div>
+    </div>
+  );
+}
+
+/** Notes are Markdown and can run long: a faded preview shows first, a tap shows the rest. */
+function Notes({ source }: { source: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const [overflows, setOverflows] = useState(false);
+
+  return (
+    <div className="mt-3">
+      <div
+        ref={(element) => {
+          if (element && !expanded) setOverflows(element.scrollHeight > element.clientHeight + 1);
+        }}
+        className={
+          expanded ? "" : "max-h-40 overflow-hidden mask-[linear-gradient(black_65%,transparent)]"
+        }
+      >
+        <Markdown source={source} />
+      </div>
+      {overflows && (
+        <button
+          type="button"
+          aria-expanded={expanded}
+          onClick={() => setExpanded((open) => !open)}
+          className="mt-1 flex w-full justify-center py-1 text-paper/55"
+        >
+          <span aria-hidden="true" className={expanded ? "rotate-180" : ""}>
+            ⌄
+          </span>
+        </button>
+      )}
     </div>
   );
 }
