@@ -6,14 +6,22 @@ import { prepared, proposal } from "./fixtures";
 const run = (events: AssistantEvent[], from: AssistantState = initialAssistant) =>
   events.reduce(assistantReducer, from);
 
+const submit = (request = "hide it"): AssistantEvent => ({
+  type: "submit",
+  request,
+  turnId: "turn-1",
+});
+
 describe("assistant flow", () => {
   it("goes through the preview to a proposal and accepted", () => {
-    const states = [
-      { type: "submit", request: " hide it " },
-      { type: "prepared", prepared, preview: true },
-    ] as const;
+    const states = [submit(" hide it "), { type: "prepared", prepared, preview: true }] as const;
     const preview = run([...states]);
-    expect(preview).toEqual({ status: "preview", request: "hide it", prepared });
+    expect(preview).toMatchObject({
+      status: "preview",
+      request: "hide it",
+      turnId: "turn-1",
+      prepared,
+    });
     const accepted = run(
       [{ type: "send" }, { type: "proposed", proposal }, { type: "accept" }, { type: "accepted" }],
       preview,
@@ -22,31 +30,28 @@ describe("assistant flow", () => {
   });
 
   it("skips the preview when it is off", () => {
-    const state = run([
-      { type: "submit", request: "x" },
-      { type: "prepared", prepared, preview: false },
-    ]);
+    const state = run([submit("x"), { type: "prepared", prepared, preview: false }]);
     expect(state.status).toBe("sending");
   });
 
   it("ignores blank requests and events that do not fit", () => {
-    expect(run([{ type: "submit", request: "  " }])).toBe(initialAssistant);
+    expect(run([submit("  ")])).toBe(initialAssistant);
     expect(run([{ type: "proposed", proposal }])).toBe(initialAssistant);
     expect(run([{ type: "accept" }])).toBe(initialAssistant);
-    const preparing = run([{ type: "submit", request: "a" }]);
-    expect(assistantReducer(preparing, { type: "submit", request: "b" })).toBe(preparing);
+    const preparing = run([submit("a")]);
+    expect(assistantReducer(preparing, submit("b"))).toBe(preparing);
   });
 
   it("keeps what the user typed in the empty bar and ignores edits mid-request", () => {
     const typed = run([{ type: "edit", text: "hide stories" }]);
     expect(typed).toEqual({ status: "idle", draft: "hide stories" });
-    const preparing = run([{ type: "submit", request: "a" }]);
+    const preparing = run([submit("a")]);
     expect(assistantReducer(preparing, { type: "edit", text: "b" })).toBe(preparing);
   });
 
   it("drops a late result after cancel", () => {
     const cancelled = run([
-      { type: "submit", request: "a" },
+      submit("a"),
       { type: "reset" },
       { type: "prepared", prepared, preview: true },
     ]);
@@ -55,12 +60,12 @@ describe("assistant flow", () => {
 
   it("reject returns to rejected and ask again keeps the text", () => {
     const rejected = run([
-      { type: "submit", request: "hide stories" },
+      submit("hide stories"),
       { type: "prepared", prepared, preview: false },
       { type: "proposed", proposal },
       { type: "reject" },
     ]);
-    expect(rejected).toEqual({ status: "rejected", request: "hide stories" });
+    expect(rejected).toMatchObject({ status: "rejected", request: "hide stories" });
     expect(assistantReducer(rejected, { type: "reset", keepText: true })).toEqual({
       status: "idle",
       draft: "hide stories",
@@ -69,12 +74,12 @@ describe("assistant flow", () => {
 
   it("maps failures to the taxonomy and keeps the job to drop", () => {
     const failed = run([
-      { type: "submit", request: "a" },
+      submit("a"),
       { type: "prepared", prepared, preview: false },
       { type: "failed", error: "The provider is rate limiting this key. Try again shortly." },
     ]);
     expect(failed).toMatchObject({ status: "error", error: { kind: "rateLimit" }, jobId: null });
-    const retried = assistantReducer(failed, { type: "submit", request: "a" });
+    const retried = assistantReducer(failed, submit("a"));
     expect(retried.status).toBe("preparing");
   });
 
@@ -87,7 +92,7 @@ describe("assistant flow", () => {
     expect(matchedNothing(none)).toBe(true);
     expect(matchedNothing(proposal)).toBe(false);
     const state = run([
-      { type: "submit", request: "a" },
+      submit("a"),
       { type: "prepared", prepared, preview: false },
       { type: "proposed", proposal: none },
     ]);
@@ -106,12 +111,68 @@ describe("assistant flow", () => {
 
   it("a failed accept keeps the job so it can be dropped", () => {
     const state = run([
-      { type: "submit", request: "a" },
+      submit("a"),
       { type: "prepared", prepared, preview: false },
       { type: "proposed", proposal },
       { type: "accept" },
       { type: "failed", error: "could not read or write the library: x" },
     ]);
     expect(state).toMatchObject({ status: "error", jobId: "job-1" });
+  });
+
+  it("records the steps of the request and replaces a step with its later state", () => {
+    const running = run([
+      submit("a"),
+      { type: "prepared", prepared, preview: false },
+      {
+        type: "activity",
+        step: { kind: "askModel", status: "running", round: 0, matched: null, total: null },
+      },
+    ]);
+    expect(running).toMatchObject({
+      status: "sending",
+      steps: [
+        { kind: "readPage", status: "done", total: prepared.tokenEstimate },
+        { kind: "askModel", status: "running" },
+      ],
+    });
+    const done = assistantReducer(running, {
+      type: "activity",
+      step: { kind: "askModel", status: "done", round: 0, matched: null, total: null },
+    });
+    expect(done).toMatchObject({
+      steps: [
+        { kind: "readPage", status: "done" },
+        { kind: "askModel", status: "done" },
+      ],
+    });
+  });
+
+  it("marks a step that was still running as failed when the request fails", () => {
+    const failed = run([
+      submit("a"),
+      { type: "prepared", prepared, preview: false },
+      {
+        type: "activity",
+        step: { kind: "askModel", status: "running", round: 0, matched: null, total: null },
+      },
+      { type: "failed", error: "Could not reach the provider." },
+    ]);
+    expect(failed).toMatchObject({
+      status: "error",
+      steps: [
+        { kind: "readPage", status: "done" },
+        { kind: "askModel", status: "failed" },
+      ],
+    });
+  });
+
+  it("ignores a step that arrives after the request was cancelled", () => {
+    const cancelled = run([submit("a"), { type: "reset" }]);
+    const after = assistantReducer(cancelled, {
+      type: "activity",
+      step: { kind: "askModel", status: "done", round: 0, matched: null, total: null },
+    });
+    expect(after).toBe(cancelled);
   });
 });

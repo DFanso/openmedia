@@ -13,7 +13,9 @@ import {
   ReloadIcon,
   StarIcon,
 } from "../../shared/icons";
-import { AssistantPanel } from "../ai/AssistantPanel";
+import { siteOf } from "../../shared/site";
+import { ChatPane } from "../ai/ChatPane";
+import { selectActiveChat, useChat } from "../ai/chatStore";
 import { INPUT_MODES, MAX_REQUEST_LENGTH, routeInput, type InputMode } from "../ai/route";
 import { useEntitlementStore } from "../paywall/store";
 import { DEFAULT_SEARCH_ENGINE } from "../../shared/searchEngines";
@@ -40,13 +42,37 @@ export function CommandBar() {
   const t = useT();
   const [notice, setNotice] = useState<string | null>(null);
   const [blocked, setBlocked] = useState(false);
-  const [mode, setMode] = useState<InputMode>("auto");
+  // The mode the user picked; `null` means automatic: a site that already has a chat is a chat.
+  const [modeChoice, setModeChoice] = useState<InputMode | null>(null);
   // The bar's text lives in the store, so "Ask again" can hand the request back for editing.
   const text = assistant.status === "idle" ? assistant.draft : "";
+  const assistantIdle = assistant.status === "idle";
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const activeChat = useChat(selectActiveChat);
+  const savedChats = useChat((s) => s.chats);
+  const loadChats = useChat((s) => s.load);
+  const focusChat = useChat((s) => s.focus);
+  const startNewChat = useChat((s) => s.startNew);
+  const pageAddress = page?.url ?? null;
+  const chatDomain = pageAddress && /^https?:\/\//i.test(pageAddress) ? siteOf(pageAddress) : null;
+  // A site that already has a chat opens the bar as a chat, so the next words continue it.
+  const siteHasChat =
+    (activeChat?.turns.length ?? 0) > 0 && activeChat?.domain === chatDomain && isPro;
+  const mode: InputMode = modeChoice ?? (siteHasChat ? "chat" : "auto");
+  const chatVisible = !assistantIdle || (isPro && chatDomain !== null && mode === "chat");
 
   useEffect(() => {
     if (open) void loadAi();
   }, [open, loadAi]);
+
+  useEffect(() => {
+    if (open && isPro) void loadChats();
+  }, [open, isPro, loadChats]);
+
+  // Reopening the bar on a site continues that site's chat, unless a request is still running.
+  useEffect(() => {
+    if (open && assistantIdle) focusChat(chatDomain);
+  }, [open, assistantIdle, chatDomain, focusChat, savedChats]);
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
@@ -122,11 +148,20 @@ export function CommandBar() {
         onPointerDown={(event) => event.stopPropagation()}
         className="command-bar glass absolute inset-x-3 top-[calc(var(--safe-top)+8px)] rounded-3xl p-3"
       >
-        {assistant.status !== "idle" ? (
-          <div className="max-h-[70vh] overflow-y-auto">
-            <AssistantPanel state={assistant} />
+        {chatVisible && (
+          <div className="mb-3">
+            <ChatPane
+              domain={chatDomain}
+              historyOpen={historyOpen}
+              onToggleHistory={() => setHistoryOpen((shown) => !shown)}
+              onNewChat={() => {
+                startNewChat(chatDomain);
+                setHistoryOpen(false);
+              }}
+            />
           </div>
-        ) : (
+        )}
+        {assistant.status === "idle" && (
           <>
             <form onSubmit={submit} className="flex items-center gap-2">
               <input
@@ -176,7 +211,7 @@ export function CommandBar() {
                       setNotice(null);
                       setBlocked(false);
                       if (locked) openSheet("paywall");
-                      else setMode(option);
+                      else setModeChoice(option);
                     }}
                     className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium ${
                       mode === option ? "bg-accent text-on-accent" : "text-paper/70 bg-paper/[0.06]"

@@ -1,10 +1,11 @@
 import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
+import { stepLabel } from "./ActivityList";
 import { AssistantPanel } from "./AssistantPanel";
 
 /**
  * Sits at the bottom while the command bar is closed, so the page stays visible under the preview
- * the assistant applied. Long steps (reading, sending) show only a chip.
+ * the assistant applied. Long steps (reading, sending) show only a chip with the step running.
  */
 export function AssistantDock() {
   const assistant = useApp((s) => s.assistant);
@@ -19,6 +20,11 @@ export function AssistantDock() {
     assistant.status === "accepting" ||
     assistant.status === "accepted" ||
     assistant.status === "rejected";
+  const running = assistant.steps[assistant.steps.length - 1];
+  const busyText =
+    running && running.status === "running"
+      ? stepLabel(running, assistant.provider ?? t("assistant.theModel"), t)
+      : t("assistant.working");
 
   return (
     <section
@@ -27,12 +33,12 @@ export function AssistantDock() {
       className="assistant-dock glass fixed inset-x-3 bottom-[calc(var(--safe-bottom)+12px)] z-40 max-h-[70vh] overflow-y-auto rounded-3xl p-3"
     >
       {card ? (
-        <AssistantPanel state={assistant} />
+        <AssistantPanel state={assistant} compact />
       ) : (
         <div className="flex items-center justify-between gap-3 px-2 text-sm text-paper/80">
           <span>
             {assistant.status === "preparing" || assistant.status === "sending"
-              ? t("assistant.working")
+              ? busyText
               : t("assistant.needsYou")}
           </span>
           <span className="flex gap-2">

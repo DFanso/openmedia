@@ -1,7 +1,10 @@
 import type { ReactNode } from "react";
 import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
+import { ActivityList } from "./ActivityList";
+import { AssistantBubble, RequestBubble } from "./ChatBubbles";
 import type { AssistantState } from "./flow";
+import { ProposalDetails } from "./ProposalDetails";
 import type { Proposal } from "./ipc";
 
 const primary =
@@ -9,8 +12,35 @@ const primary =
 const quiet =
   "rounded-full border border-hair px-4 py-2.5 text-sm font-medium text-paper/85 disabled:opacity-40";
 
-/** Where the step-by-step answer to a request is shown: in the command bar and in the dock. */
-export function AssistantPanel({ state }: { state: AssistantState }) {
+type Live = Exclude<AssistantState, { status: "idle" }>;
+
+/**
+ * The request in flight, as a turn of the chat: what the user asked, what the assistant is doing
+ * step by step, and the card that needs the user. `compact` leaves out the asking and the steps,
+ * for the dock, which sits over the page.
+ */
+export function AssistantPanel({
+  state,
+  compact = false,
+}: {
+  state: AssistantState;
+  compact?: boolean;
+}) {
+  if (state.status === "idle") return null;
+  return (
+    <div className="flex flex-col gap-2.5">
+      {!compact && (
+        <>
+          <RequestBubble request={state.request} />
+          <ActivityList steps={state.steps} provider={state.provider} />
+        </>
+      )}
+      <LiveBody state={state} compact={compact} />
+    </div>
+  );
+}
+
+function LiveBody({ state, compact }: { state: Live; compact: boolean }) {
   const cancel = useApp((s) => s.cancelAssistant);
   const confirmSend = useApp((s) => s.confirmSend);
   const retry = useApp((s) => s.retryAssistant);
@@ -18,12 +48,10 @@ export function AssistantPanel({ state }: { state: AssistantState }) {
   const t = useT();
 
   switch (state.status) {
-    case "idle":
-      return null;
     case "preparing":
+    case "sending":
       return (
         <Body busy>
-          <p>{t("assistant.reading")}</p>
           <Actions>
             <button type="button" className={quiet} onClick={() => cancel()}>
               {t("common.cancel")}
@@ -60,19 +88,8 @@ export function AssistantPanel({ state }: { state: AssistantState }) {
         </Body>
       );
     }
-    case "sending":
-      return (
-        <Body busy>
-          <p>{t("assistant.asking", { provider: state.prepared.providerName })}</p>
-          <Actions>
-            <button type="button" className={quiet} onClick={() => cancel()}>
-              {t("common.cancel")}
-            </button>
-          </Actions>
-        </Body>
-      );
     case "proposal":
-      return <ProposalCard proposal={state.proposal} request={state.request} />;
+      return <ProposalCard proposal={state.proposal} request={compact ? state.request : null} />;
     case "accepting":
       return (
         <Body busy>
@@ -82,6 +99,7 @@ export function AssistantPanel({ state }: { state: AssistantState }) {
     case "accepted":
       return (
         <Body>
+          <AssistantBubble>{state.proposal.summary}</AssistantBubble>
           <p className="text-sm font-medium text-paper">
             {state.proposal.kind === "existingOption"
               ? t("assistant.turnedOn", { option: state.proposal.option.label })
@@ -147,7 +165,8 @@ export function AssistantPanel({ state }: { state: AssistantState }) {
   }
 }
 
-function ProposalCard({ proposal, request }: { proposal: Proposal; request: string }) {
+/** `request` is shown as a quote when the card stands alone, without the chat above it. */
+function ProposalCard({ proposal, request }: { proposal: Proposal; request: string | null }) {
   const accept = useApp((s) => s.acceptProposal);
   const reject = useApp((s) => s.rejectProposal);
   const cancel = useApp((s) => s.cancelAssistant);
@@ -156,35 +175,11 @@ function ProposalCard({ proposal, request }: { proposal: Proposal; request: stri
 
   return (
     <Body>
-      <p className="truncate text-xs text-paper/45">{t("assistant.requestQuote", { request })}</p>
-      <p className="text-sm font-medium text-paper">{proposal.summary}</p>
-      <div className="rounded-xl border border-hair bg-paper/[0.05] px-3 py-2.5">
-        {existing && (
-          <p className="text-xs font-medium text-accent">{t("assistant.switchExists")}</p>
-        )}
-        <p className="text-sm font-medium text-paper">{proposal.option.label}</p>
-        {proposal.option.description && (
-          <p className="text-xs leading-snug text-paper/60">{proposal.option.description}</p>
-        )}
-        <p className="mt-1 text-[11px] tracking-wide text-paper/45 uppercase">
-          {proposal.option.group === "annoyance"
-            ? t("recipes.groupAnnoyance")
-            : t("recipes.groupContent")}{" "}
-          · {proposal.recipeName}
-        </p>
-        {proposal.rules.length > 0 && (
-          <ul className="mt-2 flex flex-col gap-1 border-t border-hair pt-2">
-            {proposal.rules.map((rule, index) => (
-              <li key={index} className="flex items-baseline justify-between gap-3 text-xs">
-                <span className="min-w-0 truncate text-paper/80">{rule.label}</span>
-                <span className={`shrink-0 ${rule.matches > 0 ? "text-paper/55" : "text-accent"}`}>
-                  {t("assistant.matched", { count: Math.max(rule.matches, 0) })}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      {request !== null && (
+        <p className="truncate text-xs text-paper/45">{t("assistant.requestQuote", { request })}</p>
+      )}
+      <AssistantBubble>{proposal.summary}</AssistantBubble>
+      <ProposalDetails proposal={proposal} />
       {proposal.unmatched > 0 && (
         <p role="alert" className="text-xs leading-snug text-accent">
           {t("assistant.unmatched", { count: proposal.unmatched })} {t("assistant.unmatchedHint")}

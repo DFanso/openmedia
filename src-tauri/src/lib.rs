@@ -54,6 +54,7 @@ pub fn run() {
             usage.retire_public_suffix_sites(&app.state::<library::Library>().favorite_hosts()?)?;
             app.manage(usage);
             app.manage(ai::agent::Agent::default());
+            app.manage(ai::chats::Chats::load(data_dir.join("chats.json"))?);
             app.manage(commands::Secrets(Box::new(secrets::KeychainStore)));
             app.manage(entitlement::Entitlement::from_build());
             entitlement::start(app.handle());
@@ -133,6 +134,10 @@ pub fn run() {
             commands::ai_send,
             commands::ai_accept,
             commands::ai_reject,
+            commands::chat_list,
+            commands::chat_save,
+            commands::chat_delete,
+            commands::chat_clear,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { selectSettingsOpen, useApp } from "../../app/store";
 import { LOCALES_BY_NAME } from "../../i18n/locales";
 import type { MessageKey } from "../../i18n/messages";
+import { describeError } from "../../i18n/errors";
 import { useT } from "../../i18n/useT";
+import { useChat } from "../ai/chatStore";
 import { Screen } from "../../shared/Screen";
 import type { SearchEngine, Theme } from "../../shared/ipc";
 import { DEFAULT_SEARCH_ENGINE, SEARCH_ENGINES } from "../../shared/searchEngines";
@@ -199,6 +201,7 @@ function DataSection() {
             </button>
           )}
         </div>
+        <ChatHistoryRow />
         <div className="flex items-center justify-between gap-3 px-4 py-3.5">
           <div className="min-w-0">
             <div className="text-base">{t("settings.guide")}</div>
@@ -210,5 +213,59 @@ function DataSection() {
         </div>
       </Group>
     </Section>
+  );
+}
+
+/** Saved assistant chats: how many there are, and one button to erase them all. */
+function ChatHistoryRow() {
+  const count = useChat((s) => s.chats.filter((chat) => chat.turns.length > 0).length);
+  const load = useChat((s) => s.load);
+  const clear = useChat((s) => s.clear);
+  const [confirming, setConfirming] = useState(false);
+  const [failure, setFailure] = useState<string | null>(null);
+  const t = useT();
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const erase = () => {
+    setConfirming(false);
+    clear().then(
+      () => setFailure(null),
+      (error: unknown) => setFailure(describeError(error, t)),
+    );
+  };
+
+  return (
+    <div className="flex items-center justify-between gap-3 px-4 py-3.5">
+      <div className="min-w-0">
+        <div className="text-base">{t("settings.chats")}</div>
+        <div className="text-sm text-paper/55">
+          {failure ??
+            (count === 0 ? t("settings.chatsEmpty") : t("settings.chatsCount", { count }))}
+        </div>
+        <div className="mt-0.5 text-xs leading-snug text-paper/45">{t("settings.chatsNote")}</div>
+      </div>
+      {confirming ? (
+        <div className="flex shrink-0 items-center gap-2">
+          <button type="button" onClick={() => setConfirming(false)} className={quietButton}>
+            {t("common.cancel")}
+          </button>
+          <button type="button" onClick={erase} className={primaryButton}>
+            {t("settings.clearHistoryCount", { count })}
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          disabled={count === 0}
+          onClick={() => setConfirming(true)}
+          className={quietButton}
+        >
+          {t("settings.clearChats")}
+        </button>
+      )}
+    </div>
   );
 }

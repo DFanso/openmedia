@@ -1,5 +1,7 @@
+pub mod activity;
 pub mod agent;
 pub mod anthropic;
+pub mod chats;
 pub mod connection;
 pub mod openai;
 pub mod patch;

@@ -15,6 +15,8 @@ pub enum Error {
     InvalidMargin(u32),
     #[error("invalid usage record: {0}")]
     InvalidUsage(&'static str),
+    #[error("invalid chat: {0}")]
+    InvalidChat(&'static str),
     #[error("no such site option")]
     UnknownOption,
     #[error(transparent)]
