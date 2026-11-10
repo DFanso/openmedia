@@ -1,7 +1,6 @@
 package surf.openmedia.billing
 
 import android.app.Activity
-import android.os.Build
 import app.tauri.annotation.Command
 import app.tauri.annotation.InvokeArg
 import app.tauri.annotation.TauriPlugin
@@ -25,7 +24,6 @@ import com.revenuecat.purchases.awaitOfferings
 import com.revenuecat.purchases.awaitPurchase
 import com.revenuecat.purchases.awaitRestore
 import com.revenuecat.purchases.interfaces.UpdatedCustomerInfoListener
-import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -59,13 +57,6 @@ class BillingPlugin(private val activity: Activity) : Plugin(activity) {
 
   private val customerInfoListener = UpdatedCustomerInfoListener { info ->
     scope.launch { emitSnapshot(info) }
-  }
-
-  @Command
-  fun isSimulator(invoke: Invoke) {
-    val result = JSObject()
-    result.put("isSimulator", isEmulator())
-    invoke.resolve(result)
   }
 
   @Command
@@ -197,26 +188,6 @@ class BillingPlugin(private val activity: Activity) : Plugin(activity) {
       }
     }
   }
-  private fun isEmulator(): Boolean {
-    val fingerprint = Build.FINGERPRINT.lowercase(Locale.ROOT)
-    val model = Build.MODEL.lowercase(Locale.ROOT)
-    val manufacturer = Build.MANUFACTURER.lowercase(Locale.ROOT)
-    val brand = Build.BRAND.lowercase(Locale.ROOT)
-    val device = Build.DEVICE.lowercase(Locale.ROOT)
-    val product = Build.PRODUCT.lowercase(Locale.ROOT)
-    val hardware = Build.HARDWARE.lowercase(Locale.ROOT)
-    return fingerprint.startsWith("generic") ||
-      fingerprint.startsWith("unknown") ||
-      model.contains("emulator") ||
-      model.contains("android sdk built for") ||
-      manufacturer.contains("genymotion") ||
-      (brand.startsWith("generic") && device.startsWith("generic")) ||
-      product.startsWith("sdk_gphone") ||
-      hardware.contains("goldfish") ||
-      hardware.contains("ranchu") ||
-      hardware.contains("vbox86")
-  }
-
 
   private suspend fun emitSnapshot(info: CustomerInfo) {
     val payload = JSObject()

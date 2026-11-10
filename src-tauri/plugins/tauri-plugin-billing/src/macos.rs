@@ -128,9 +128,4 @@ impl<R: Runtime> Billing<R> {
         let response: AppUserResponse = self.run("appUserId", serde_json::json!({}))?;
         Ok(Some(response.app_user_id))
     }
-
-    /// A Mac has no simulator, so the debug "force Pro" override never applies.
-    pub fn is_simulator(&self) -> Result<bool> {
-        Ok(false)
-    }
 }

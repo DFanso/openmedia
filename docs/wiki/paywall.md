@@ -71,7 +71,6 @@ Public SDK keys are not secrets but are kept out of the repo. `src-tauri/build.r
 | `OPENMEDIA_RC_KEY_MACOS` | Optional: RevenueCat public key for the Mac app, `appl_…`; defaults to `OPENMEDIA_RC_KEY_IOS` |
 | `OPENMEDIA_RC_KEY_ANDROID` | RevenueCat public key, `goog_…` |
 | `OPENMEDIA_DEV_ENTITLEMENT` | Debug builds only: `pro` or `free` |
-| `EXPO_PUBLIC_FORCE_ENABLE_PRO_ON_SIMULATOR` | Debug only: `true` grants Pro after native code confirms iOS Simulator or Android Emulator; ignored on physical devices and release builds. |
 
 Store setup (App Store Connect, Play Console, RevenueCat dashboard) is described in the release checklist below.
 

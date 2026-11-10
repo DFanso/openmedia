@@ -7,11 +7,6 @@ use tauri::{
 
 use crate::models::*;
 
-#[derive(serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct SimulatorResponse {
-    is_simulator: bool,
-}
 use crate::{Error, Result, SNAPSHOT_EVENT};
 
 #[cfg(target_os = "ios")]
@@ -103,11 +98,5 @@ impl<R: Runtime> Billing<R> {
     pub fn app_user_id(&self) -> Result<Option<String>> {
         let response: AppUserResponse = self.run("appUserId", ())?;
         Ok(Some(response.app_user_id))
-    }
-
-    /// Reports the native runtime type without exposing a new Tauri command.
-    pub fn is_simulator(&self) -> Result<bool> {
-        let response: SimulatorResponse = self.run("isSimulator", ())?;
-        Ok(response.is_simulator)
     }
 }

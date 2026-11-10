@@ -41,8 +41,4 @@ impl<R: Runtime> Billing<R> {
     pub fn app_user_id(&self) -> Result<Option<String>> {
         Ok(None)
     }
-
-    pub fn is_simulator(&self) -> Result<bool> {
-        Ok(false)
-    }
 }

@@ -8,6 +8,16 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-10
 
+### chore(paywall): drop the simulator-only Pro override
+
+**Problem:** `EXPO_PUBLIC_FORCE_ENABLE_PRO_ON_SIMULATOR` duplicated `OPENMEDIA_DEV_ENTITLEMENT=pro`, and its `EXPO_PUBLIC_` prefix is an Expo convention this Tauri app does not follow.
+
+**Change:** Removed the variable (`build.rs`, `.env.example`, paywall wiki), the runtime override in `entitlement.rs`, and the native `isSimulator` probe in the billing plugin (Rust desktop/macOS/mobile, Swift, Kotlin). `OPENMEDIA_DEV_ENTITLEMENT=pro|free` is now the only debug override. The 2026-11-08 entry below is left as history.
+
+**Verified:** `cargo fmt --check`, `cargo test --lib entitlement` (15/15) on the host. **Not verified:** iOS and Android builds of the billing plugin.
+
+**PR:** n/a
+
 ### docs(marketplace): tags, official recipes, ratings, Pro comments, Pro upload and export, abuse rules
 
 **Problem:** The marketplace had no way to tell our recipes from users', shipped its best recipes inside the app, and had no ratings, comments or limits for contributors; the wiki did not describe any of this.
