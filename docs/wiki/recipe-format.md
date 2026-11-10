@@ -130,13 +130,26 @@ Each rule may declare `expect`: `"match"` (should match ≥1 element on pages sa
 | `bundled` | all except `script` | Applied on enable. Shipped with and verified by the app build. |
 | `user` (picker / manual) | all except `script` | Applied immediately. |
 | `ai` | all except `script` | Shown as **preview** first; saved on user accept. |
-| `imported` | all except `script` | Shown with a rule-by-rule review before first apply. |
+| `imported` | `hide`, `css` | Pasted bundles and [marketplace](./marketplace.md) downloads. Rust sets the origin itself, whatever the file says, and shows a rule-by-rule review before anything is saved. See [Shared recipes](#shared-recipes). |
 | any + `script` | `script` | Per-recipe explicit confirmation with the code shown; confirmation stored keyed by a hash of the script. Changing the script re-prompts. |
+
+## Shared recipes
+
+Implemented in `src-tauri/src/recipes/share.rs`. A recipe from outside the app is the sender's claim, so before the normal validation Rust:
+
+- ignores the file's `origin` and sets `imported`, and drops `forkedFrom` (so a file cannot claim `bundled` to skip the broad-`match` refusal, or pose as a fork);
+- moves the id under `imported.` for pasted files (`instagram.default` becomes `imported.instagram.default`, so it can never replace a bundled or custom recipe). Only the verified catalog path may use `market.` ids;
+- accepts ids of lowercase letters, digits, `.` and `-` up to 80 characters, and a `version` of three numbers (`1.0.0`);
+- refuses control characters and invisible direction overrides (U+200B–U+200F, U+202A–U+202E, U+2066–U+2069, U+FEFF) in the name, author, notes, option text and rule labels, and caps their lengths (name and author 60);
+- refuses a `meta.homepage` that the recipe's own `match` patterns do not cover, because a favorite made from a recipe opens its homepage under the recipe's name;
+- limits a bundle to 1 MiB and 20 recipes, a recipe to 256 KiB, and refuses duplicate ids.
+
+A bundle is `{ "openmediaBundle": 1, "recipes": [ … ] }`. Export covers only recipes the user made, changed or imported, never bundled ones, and never switches, settings or keys.
 
 ## Validation (Rust, before anything reaches a webview)
 
 - Parse with `serde` (`deny_unknown_fields`) → typed `Recipe`.
-- Check `schema` version, id/rule-id uniqueness, `match` patterns well-formed and not overly broad (a bare `*` or `https://*/*` is refused for AI/imported recipes).
+- Check `schema` version, id/rule-id uniqueness, `match` patterns well-formed and not overly broad (a bare `*` or `https://*/*` is refused for AI/imported recipes). Imported recipes are saved as `<app_data>/recipes/<id>.json` and listed with the others.
 - Compile every selector with a safe-subset parser; reject selectors that are pathological (deep `:has()` nesting, huge unions).
 - `css` rules: property whitelist, value sanitizer.
 - `redirect`: same-origin target only.

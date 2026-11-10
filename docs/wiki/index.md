@@ -8,7 +8,7 @@
 
 **Project status: implemented, with platform verification limits.** iOS is the verified platform; Android implementation and build support exist but are not device-verified. Desktop site views remain deferred. The wiki describes current behavior and labels unverified work.
 
-OpenMedia is a Tauri v2 app for browsing websites in native web views and customizing them with user-controlled recipes. It includes bundled recipes, ad blocking, and an optional AI assistant. No OpenMedia-operated backend; purchases use RevenueCat.
+OpenMedia is a Tauri v2 app for browsing websites in native web views and customizing them with user-controlled recipes. It includes bundled recipes, ad blocking, an optional AI assistant, and an opt-in recipe marketplace. No analytics or telemetry; the only OpenMedia-operated server is the marketplace (Cloudflare); purchases use RevenueCat.
 
 ## Pages
 
@@ -27,6 +27,7 @@ OpenMedia is a Tauri v2 app for browsing websites in native web views and custom
 | [Ad Blocking](./ad-blocking.md) | Bundled EasyList and EasyPrivacy as WebKit content rule lists: engine choice, caching, limits |
 | [Prior Art](./prior-art.md) | SocialLite and others: what they do, what we copy, where we differ |
 | [Roadmap](./roadmap.md) | Phased build plan with exit criteria, spikes, decision log, risks |
+| [Recipe Marketplace](./marketplace.md) | Export/import and the curated, signed Cloudflare marketplace: threat model, API, signed index, flows, cost |
 | [Development Guide](./development-guide.md) | Toolchain, commands, and conventions |
 | [Store Builds](./store-builds.md) | iOS App Store and Android Google Play build, signing, and release steps |
 

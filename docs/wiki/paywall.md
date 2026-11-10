@@ -2,7 +2,7 @@
 
 > **Status: Implemented in source for iOS, Android and macOS.** Billing and Android host code are unbuilt; real store purchases, restore and device behavior are unverified. The macOS Swift package builds and links, and the Mac app starts locked until the store answers; no purchase was made. Windows and Linux bypass Pro (no store).
 
-OpenMedia has no accounts and no backend of ours, so the paywall rests on two things: the store account (Apple ID, Google account) and RevenueCat, which turns store receipts into a single entitlement.
+OpenMedia has no accounts, and its one server (the optional recipe marketplace) knows nothing about purchases, so the paywall rests on two things: the store account (Apple ID, Google account) and RevenueCat, which turns store receipts into a single entitlement.
 
 ## What is paid
 

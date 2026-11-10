@@ -15,7 +15,7 @@
   <img src="https://img.shields.io/badge/Tauri-v2-24C8DB.svg" alt="Tauri v2">
 </p>
 
-OpenMedia is an open-source mobile browser built with Tauri, Rust, React, and TypeScript. It loads websites directly in native web views and applies local, user-controlled recipes. No account or OpenMedia-operated backend; purchases use RevenueCat.
+OpenMedia is an open-source mobile browser built with Tauri, Rust, React, and TypeScript. It loads websites directly in native web views and applies local, user-controlled recipes. No account, no analytics; the only OpenMedia-operated server is the optional recipe marketplace, and purchases use RevenueCat.
 
 ## Features
 
