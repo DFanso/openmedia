@@ -30,9 +30,9 @@ export function SettingsScreen() {
         <AppearanceSection />
         <LanguageSection />
         <BrowsingSection />
+        <FavoritesSection />
         <RecipesLink />
         <MarketplaceLinks />
-        <FavoritesSection />
         <IncognitoFavoritesSection />
         <IncognitoRecipesSection />
         <AiSection />
