@@ -127,6 +127,25 @@ export interface SiteViewState {
   scope: string;
 }
 
+/** What the web layer and the native app are, as far as updates go. */
+export interface UpdateStatus {
+  /** The native app's version; a downloaded web bundle runs only on the version it was built for. */
+  runtimeVersion: string;
+  /** The downloaded web bundle the shell runs from; null for the one inside the app. */
+  runningRevision: number | null;
+  /** A downloaded web bundle that starts with the next launch. */
+  pendingRevision: number | null;
+  /** Whether this build can replace itself; false for store builds, which the store updates. */
+  selfUpdate: boolean;
+}
+
+export type WebUpdateOutcome = { kind: "upToDate" } | { kind: "staged"; revision: number };
+
+export interface AppUpdate {
+  version: string;
+  notes: string | null;
+}
+
 async function command(name: string, args?: Record<string, unknown>): Promise<void> {
   await invoke(name, args);
 }
@@ -258,6 +277,17 @@ export const siteView = {
     listen<string>("siteview:notification-tap", (event) => handler(event.payload)),
   onError: (handler: (message: string) => void): Promise<UnlistenFn> =>
     listen<string>("siteview:error", (event) => handler(event.payload)),
+};
+
+export const updates = {
+  status: () => invoke<UpdateStatus>("ota_status"),
+  /** The shell has rendered from the running web bundle; stops it counting as unproven. */
+  confirm: () => command("ota_confirm"),
+  /** Downloads a newer web bundle, if there is one; it takes effect on the next launch. */
+  checkWeb: () => invoke<WebUpdateOutcome>("ota_check"),
+  checkApp: () => invoke<AppUpdate | null>("app_update_check"),
+  /** Installs the new app version and restarts. */
+  installApp: () => command("app_update_install"),
 };
 
 export const app = {

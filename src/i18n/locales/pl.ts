@@ -208,6 +208,17 @@ export const pl: Messages = {
   "settings.guide": "Przewodnik pierwszego uruchomienia",
   "settings.guideNote": "Oznacza go jako nieobejrzany i pokazuje ponownie teraz.",
   "settings.replay": "Odtwórz",
+  "settings.updates": "Aktualizacje",
+  "settings.updatesNote":
+    "OpenMedia prosi GitHub o aktualizacje własnych ekranów. Nic o Tobie ani o Twoim przeglądaniu nie jest wysyłane, a każda aktualizacja jest przed użyciem podpisana i sprawdzana na tym urządzeniu.",
+  "settings.updatesVersion": "Wersja {version}",
+  "settings.updatesCheck": "Sprawdź aktualizacje",
+  "settings.updatesChecking": "Sprawdzanie…",
+  "settings.updatesCurrent": "Masz najnowszą wersję.",
+  "settings.updatesStaged": "Aktualizacja pobrana. Uruchomi się przy następnym otwarciu OpenMedia.",
+  "settings.updatesAppAvailable": "Dostępna jest wersja {version} aplikacji OpenMedia.",
+  "settings.updatesInstall": "Zainstaluj i uruchom ponownie",
+  "settings.updatesInstalling": "Instalowanie…",
   "settings.language": "Język",
   "settings.languageNote":
     "Język tekstów w aplikacji oraz kierunek ich zapisu. Zostaw język systemu, aby podążać za ustawieniami urządzenia.",

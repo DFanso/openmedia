@@ -206,6 +206,18 @@ export const ja: Messages = {
   "settings.guide": "初回ガイド",
   "settings.guideNote": "未読にして、今すぐもう一度表示します。",
   "settings.replay": "もう一度見る",
+  "settings.updates": "アップデート",
+  "settings.updatesNote":
+    "OpenMedia は自身の画面のアップデートを GitHub に問い合わせます。あなたや閲覧に関する情報は一切送信されず、すべてのアップデートは使用前にこのデバイス上で署名の検証が行われます。",
+  "settings.updatesVersion": "バージョン {version}",
+  "settings.updatesCheck": "アップデートを確認",
+  "settings.updatesChecking": "確認中…",
+  "settings.updatesCurrent": "最新バージョンです。",
+  "settings.updatesStaged":
+    "アップデートをダウンロードしました。次回 OpenMedia を開いたときに適用されます。",
+  "settings.updatesAppAvailable": "OpenMedia {version} が利用可能です。",
+  "settings.updatesInstall": "インストールして再起動",
+  "settings.updatesInstalling": "インストール中…",
   "settings.language": "言語",
   "settings.languageNote":
     "アプリの表示言語と、書かれる方向の設定です。システム言語のままだと端末の設定に従います。",

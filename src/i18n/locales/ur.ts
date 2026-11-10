@@ -211,6 +211,17 @@ export const ur: Messages = {
   "settings.guide": "پہلی بار والی رہنمائی",
   "settings.guideNote": "اسے غیر دیکھا ہوا قرار دیتا ہے اور اب یہ دوبارہ دکھا دیتا ہے۔",
   "settings.replay": "دوبارہ دکھائیں",
+  "settings.updates": "اپ ڈیٹس",
+  "settings.updatesNote":
+    "OpenMedia اپنی اسکرینز کی اپ ڈیٹس GitHub سے مانگتا ہے۔ آپ کے یا آپ کی براؤزنگ کے بارے میں کچھ نہیں بھیجا جاتا، اور ہر اپ ڈیٹ استعمال سے پہلے اس ڈیوائس پر دستخط اور جانچ کی جاتی ہے۔",
+  "settings.updatesVersion": "ورژن {version}",
+  "settings.updatesCheck": "اپ ڈیٹس چیک کریں",
+  "settings.updatesChecking": "چیک ہو رہا ہے…",
+  "settings.updatesCurrent": "آپ کے پاس تازہ ترین ورژن ہے۔",
+  "settings.updatesStaged": "اپ ڈیٹ ڈاؤن لوڈ ہو گئی۔ یہ اگلی بار OpenMedia کھولنے پر شروع ہوگی۔",
+  "settings.updatesAppAvailable": "OpenMedia {version} دستیاب ہے۔",
+  "settings.updatesInstall": "انسٹال کریں اور ری اسٹارٹ کریں",
+  "settings.updatesInstalling": "انسٹال ہو رہا ہے…",
   "settings.language": "زبان",
   "settings.languageNote":
     "ایپ کے متن کی زبان اور وہ بھی جو اس میں لکھا جاتا ہے۔ اسے سسٹم کی زبان پر چھوڑیں تاکہ ڈیوائس کے مطابق ہو۔",

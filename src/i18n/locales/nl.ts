@@ -210,6 +210,17 @@ export const nl: Messages = {
   "settings.guide": "Handleiding voor het eerste gebruik",
   "settings.guideNote": "Markeert hem als ongezien en toont hem nu opnieuw.",
   "settings.replay": "Opnieuw afspelen",
+  "settings.updates": "Updates",
+  "settings.updatesNote":
+    "OpenMedia vraagt GitHub om updates voor de eigen schermen. Er wordt niets over jou of je browsegedrag verzonden, en elke update wordt vóór gebruik op dit apparaat ondertekend en gecontroleerd.",
+  "settings.updatesVersion": "Versie {version}",
+  "settings.updatesCheck": "Controleren op updates",
+  "settings.updatesChecking": "Controleren…",
+  "settings.updatesCurrent": "Je hebt de nieuwste versie.",
+  "settings.updatesStaged": "Update gedownload. Die start de volgende keer dat je OpenMedia opent.",
+  "settings.updatesAppAvailable": "OpenMedia {version} is beschikbaar.",
+  "settings.updatesInstall": "Installeren en opnieuw starten",
+  "settings.updatesInstalling": "Installeren…",
   "settings.language": "Taal",
   "settings.languageNote":
     "De taal van de tekst in de app en de richting waarin die wordt geschreven. Laat dit op de systeemtaal staan om het apparaat te volgen.",

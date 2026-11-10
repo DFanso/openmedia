@@ -210,6 +210,17 @@ export const en = {
   "settings.guide": "First-run guide",
   "settings.guideNote": "Marks it unseen and shows it again now.",
   "settings.replay": "Replay",
+  "settings.updates": "Updates",
+  "settings.updatesNote":
+    "OpenMedia asks GitHub for updates to its own screens. Nothing about you or your browsing is sent, and every update is signed and checked on this device before it is used.",
+  "settings.updatesVersion": "Version {version}",
+  "settings.updatesCheck": "Check for updates",
+  "settings.updatesChecking": "Checking…",
+  "settings.updatesCurrent": "You have the latest version.",
+  "settings.updatesStaged": "Update downloaded. It starts the next time you open OpenMedia.",
+  "settings.updatesAppAvailable": "OpenMedia {version} is available.",
+  "settings.updatesInstall": "Install and restart",
+  "settings.updatesInstalling": "Installing…",
   "settings.language": "Language",
   "settings.languageNote":
     "The language of the app's text, and the direction it is written in. Leave it on the system language to follow the device.",

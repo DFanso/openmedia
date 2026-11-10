@@ -213,6 +213,18 @@ export const el: Messages = {
   "settings.guide": "Οδηγός πρώτης χρήσης",
   "settings.guideNote": "Τον σημειώνει ως μη διεργασμένο και τον δείχνει ξανά τώρα.",
   "settings.replay": "Επανάληψη",
+  "settings.updates": "Ενημερώσεις",
+  "settings.updatesNote":
+    "Το OpenMedia ζητά από το GitHub ενημερώσεις για τις δικές του οθόνες. Δεν αποστέλλεται τίποτα για εσάς ή την περιήγησή σας, και κάθε ενημέρωση υπογράφεται και ελέγχεται σε αυτή τη συσκευή πριν χρησιμοποιηθεί.",
+  "settings.updatesVersion": "Έκδοση {version}",
+  "settings.updatesCheck": "Έλεγχος για ενημερώσεις",
+  "settings.updatesChecking": "Έλεγχος…",
+  "settings.updatesCurrent": "Έχετε την τελευταία έκδοση.",
+  "settings.updatesStaged":
+    "Η ενημέρωση λήφθηκε. Θα ξεκινήσει την επόμενη φορά που θα ανοίξετε το OpenMedia.",
+  "settings.updatesAppAvailable": "Το OpenMedia {version} είναι διαθέσιμο.",
+  "settings.updatesInstall": "Εγκατάσταση και επανεκκίνηση",
+  "settings.updatesInstalling": "Εγκατάσταση…",
   "settings.language": "Γλώσσα",
   "settings.languageNote":
     "Η γλώσσα του κειμένου της εφαρμογής και η κατεύθυνση στην οποία γράφεται. Αφήστε τη στη γλώσσα του συστήματος για να ακολουθεί τη συσκευή.",

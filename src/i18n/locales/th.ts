@@ -197,6 +197,17 @@ export const th: Messages = {
   "settings.guide": "คู่มือเริ่มต้น",
   "settings.guideNote": "ทำเครื่องหมายว่ายังไม่ได้ดู และแสดงคู่มืออีกครั้งตอนนี้",
   "settings.replay": "ดูอีกครั้ง",
+  "settings.updates": "การอัปเดต",
+  "settings.updatesNote":
+    "OpenMedia ขอการอัปเดตหน้าจอของตัวเองจาก GitHub โดยไม่มีการส่งข้อมูลเกี่ยวกับคุณหรือการท่องเว็บของคุณ และทุกการอัปเดตจะได้รับการลงนามและตรวจสอบบนอุปกรณ์เครื่องนี้ก่อนนำไปใช้",
+  "settings.updatesVersion": "เวอร์ชัน {version}",
+  "settings.updatesCheck": "ตรวจหาการอัปเดต",
+  "settings.updatesChecking": "กำลังตรวจสอบ…",
+  "settings.updatesCurrent": "คุณใช้เวอร์ชันล่าสุดแล้ว",
+  "settings.updatesStaged": "ดาวน์โหลดการอัปเดตแล้ว จะเริ่มทำงานเมื่อคุณเปิด OpenMedia ครั้งถัดไป",
+  "settings.updatesAppAvailable": "OpenMedia {version} พร้อมใช้งาน",
+  "settings.updatesInstall": "ติดตั้งและรีสตาร์ท",
+  "settings.updatesInstalling": "กำลังติดตั้ง…",
   "settings.language": "ภาษา",
   "settings.languageNote":
     "ภาษาของข้อความในแอป และทิศทางการเขียน เว้นไว้ที่ภาษาระบบเพื่อให้ตามอุปกรณ์",

@@ -209,6 +209,17 @@ export const tr: Messages = {
   "settings.guide": "İlk kullanım kılavuzu",
   "settings.guideNote": "Görülmedi olarak işaretler ve şimdi yeniden gösterir.",
   "settings.replay": "Yeniden oynat",
+  "settings.updates": "Güncellemeler",
+  "settings.updatesNote":
+    "OpenMedia kendi ekranlarının güncellemelerini GitHub'dan ister. Sizin veya gezinmenizle ilgili hiçbir şey gönderilmez ve her güncelleme kullanılmadan önce bu cihazda imzalanır ve doğrulanır.",
+  "settings.updatesVersion": "Sürüm {version}",
+  "settings.updatesCheck": "Güncellemeleri denetle",
+  "settings.updatesChecking": "Denetleniyor…",
+  "settings.updatesCurrent": "En son sürüme sahipsiniz.",
+  "settings.updatesStaged": "Güncelleme indirildi. OpenMedia'yı bir sonraki açışınızda başlar.",
+  "settings.updatesAppAvailable": "OpenMedia {version} kullanılabilir.",
+  "settings.updatesInstall": "Yükle ve yeniden başlat",
+  "settings.updatesInstalling": "Yükleniyor…",
   "settings.language": "Dil",
   "settings.languageNote":
     "Uygulama metninin dili ve yazım yönü. Cihazı takip etmek için sistem dilinde bırakın.",

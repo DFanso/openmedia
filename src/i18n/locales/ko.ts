@@ -205,6 +205,17 @@ export const ko: Messages = {
   "settings.guide": "처음 실행 안내",
   "settings.guideNote": "안 본 상태로 표시하고 지금 다시 보여 줍니다.",
   "settings.replay": "다시 보기",
+  "settings.updates": "업데이트",
+  "settings.updatesNote":
+    "OpenMedia는 자체 화면의 업데이트를 GitHub에 요청합니다. 사용자나 탐색에 관한 정보는 전혀 전송되지 않으며, 모든 업데이트는 사용 전에 이 기기에서 서명되고 확인됩니다.",
+  "settings.updatesVersion": "버전 {version}",
+  "settings.updatesCheck": "업데이트 확인",
+  "settings.updatesChecking": "확인 중…",
+  "settings.updatesCurrent": "최신 버전입니다.",
+  "settings.updatesStaged": "업데이트를 다운로드했습니다. 다음에 OpenMedia를 열 때 시작됩니다.",
+  "settings.updatesAppAvailable": "OpenMedia {version}을(를) 사용할 수 있습니다.",
+  "settings.updatesInstall": "설치 후 다시 시작",
+  "settings.updatesInstalling": "설치 중…",
   "settings.language": "언어",
   "settings.languageNote":
     "앱에 표시되는 문구의 언어와 글쓰기 방향입니다. 시스템 언어로 두면 기기를 따라갑니다.",

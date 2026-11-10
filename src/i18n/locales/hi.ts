@@ -204,6 +204,17 @@ export const hi: Messages = {
   "settings.guide": "पहली बार की मार्गदर्शिका",
   "settings.guideNote": "इसे अनदेखा दर्ज करता है और अभी दिखा देता है।",
   "settings.replay": "फिर से दिखाएँ",
+  "settings.updates": "अपडेट",
+  "settings.updatesNote":
+    "OpenMedia अपनी स्क्रीन के अपडेट के लिए GitHub से पूछता है। आपके या आपकी ब्राउज़िंग के बारे में कुछ भी नहीं भेजा जाता, और हर अपडेट इस्तेमाल से पहले इस डिवाइस पर हस्ताक्षरित और जाँचा जाता है।",
+  "settings.updatesVersion": "संस्करण {version}",
+  "settings.updatesCheck": "अपडेट जाँचें",
+  "settings.updatesChecking": "जाँच हो रही है…",
+  "settings.updatesCurrent": "आपके पास नवीनतम संस्करण है।",
+  "settings.updatesStaged": "अपडेट डाउनलोड हो गया। यह अगली बार OpenMedia खोलने पर शुरू होगा।",
+  "settings.updatesAppAvailable": "OpenMedia {version} उपलब्ध है।",
+  "settings.updatesInstall": "इंस्टॉल करें और रीस्टार्ट करें",
+  "settings.updatesInstalling": "इंस्टॉल हो रहा है…",
   "settings.language": "भाषा",
   "settings.languageNote":
     "ऐप के लिखावट की भाषा, और वह किस दिशा में लिखी जाती है। इसे सिस्टम की भाषा पर छोड़ दें ताकि डिवाइस के अनुसार बदले।",

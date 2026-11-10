@@ -24,6 +24,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import process from "node:process";
+import { loadEnv } from "./lib/env.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const confPath = path.join(root, "src-tauri/tauri.conf.json");
@@ -42,18 +43,7 @@ const fail = (message) => {
   process.exit(1);
 };
 
-function loadEnv() {
-  const file = path.join(root, ".env");
-  const values = {};
-  if (fs.existsSync(file)) {
-    for (const line of fs.readFileSync(file, "utf8").split("\n")) {
-      const match = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
-      if (match) values[match[1]] = match[2].replace(/^(['"])(.*)\1$/, "$2");
-    }
-  }
-  return { ...values, ...process.env };
-}
-const env = loadEnv();
+const env = loadEnv(root);
 const need = (name, why) => env[name] || fail(`set ${name} (${why})`);
 
 const run = (cmd, cmdArgs, options = {}) => {

@@ -208,6 +208,18 @@ export const sv: Messages = {
   "settings.guide": "Guide för första start",
   "settings.guideNote": "Markerar den som osedd och visar den igen nu.",
   "settings.replay": "Spela upp igen",
+  "settings.updates": "Uppdateringar",
+  "settings.updatesNote":
+    "OpenMedia ber GitHub om uppdateringar av sina egna skärmar. Ingenting om dig eller din surfning skickas, och varje uppdatering signeras och kontrolleras på den här enheten innan den används.",
+  "settings.updatesVersion": "Version {version}",
+  "settings.updatesCheck": "Sök efter uppdateringar",
+  "settings.updatesChecking": "Kontrollerar…",
+  "settings.updatesCurrent": "Du har den senaste versionen.",
+  "settings.updatesStaged":
+    "Uppdateringen har laddats ner. Den startar nästa gång du öppnar OpenMedia.",
+  "settings.updatesAppAvailable": "OpenMedia {version} är tillgänglig.",
+  "settings.updatesInstall": "Installera och starta om",
+  "settings.updatesInstalling": "Installerar…",
   "settings.language": "Språk",
   "settings.languageNote":
     "Språket för appens text och den riktning det skrivs i. Låt det vara systemspråk för att följa enheten.",

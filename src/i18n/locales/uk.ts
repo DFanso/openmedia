@@ -211,6 +211,18 @@ export const uk: Messages = {
   "settings.guide": "Посібник під час першого запуску",
   "settings.guideNote": "Позначає його як непереглянутий і показує знову просто зараз.",
   "settings.replay": "Переглянути ще раз",
+  "settings.updates": "Оновлення",
+  "settings.updatesNote":
+    "OpenMedia запитує в GitHub оновлення власних екранів. Нічого про вас чи ваше перегляд не надсилається, а кожне оновлення перед використанням підписується та перевіряється на цьому пристрої.",
+  "settings.updatesVersion": "Версія {version}",
+  "settings.updatesCheck": "Перевірити оновлення",
+  "settings.updatesChecking": "Перевірка…",
+  "settings.updatesCurrent": "У вас остання версія.",
+  "settings.updatesStaged":
+    "Оновлення завантажено. Воно запуститься під час наступного відкриття OpenMedia.",
+  "settings.updatesAppAvailable": "Доступна OpenMedia {version}.",
+  "settings.updatesInstall": "Установити й перезапустити",
+  "settings.updatesInstalling": "Установлення…",
   "settings.language": "Мова",
   "settings.languageNote":
     "Мова тексту застосунку та напрям письма. Залиште системну, щоб йти за пристроєм.",

@@ -18,6 +18,7 @@ import { localeInfo } from "../i18n/locales";
 import { useT } from "../i18n/useT";
 import { PaywallSheet } from "../features/paywall/PaywallSheet";
 import { useEntitlementStore } from "../features/paywall/store";
+import { updates } from "../shared/ipc";
 
 /** Heavy screens load after the first page shows; most launches never open them. */
 const loadSettings = () => import("../features/settings/SettingsScreen");
@@ -91,6 +92,7 @@ export function App() {
     void load()
       .then(() => hideSplashWhen(firstPageShowing, useApp.subscribe), hideSplash)
       .then(() => {
+        void updates.confirm().catch(() => undefined);
         loadSecondary();
         void Promise.all([loadSettings(), loadStats()]);
         setIdle(true);
