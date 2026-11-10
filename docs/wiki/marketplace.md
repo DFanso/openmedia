@@ -120,7 +120,7 @@ Existing D1 submissions migrate to the held state and start a fresh 14-day clock
 
 ### Privacy
 
-- The device sends: nothing until the user opens the Marketplace. Then a GET. Installs send the recipe id only. Submissions send what the user chose to share.
+- The device sends nothing until the user opens the Marketplace. Then it fetches the signed catalog; visible recipe rows may also fetch a site's favicon directly from its first valid HTTPS host if that icon is not cached. That site sees the device's connection and IP address. Installs send the recipe id only. Submissions send what the user chose to share.
 - No account, device id, or analytics SDK. The Worker stores no IP address, and Workers Logs stay off. Cloudflare itself necessarily sees the connection (the same is true of any host); the store privacy label and privacy page must say so.
 - The user can turn install counting off on the Marketplace page (`marketplace_set_counting`). The install is then not reported.
 

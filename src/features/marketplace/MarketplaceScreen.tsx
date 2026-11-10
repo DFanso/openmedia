@@ -1,8 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { library } from "../../shared/ipc";
+import { registrableDomain } from "../../shared/site";
 import { useApp } from "../../app/store";
 import { describeError } from "../../i18n/errors";
 import type { MessageKey } from "../../i18n/messages";
 import { useT } from "../../i18n/useT";
+import { SiteTile } from "../../shared/SiteTile";
+import { faviconPageUrlForHost, useIconForUrl, setIconCache } from "../../shared/siteIcons";
 import { Screen } from "../../shared/Screen";
 import { Switch } from "../settings/Switch";
 import { Group, field, primaryButton, quietButton } from "../settings/ui";
@@ -24,6 +28,20 @@ const REASONS: { reason: ReportReason; label: MessageKey }[] = [
   { reason: "spam", label: "market.report.spam" },
   { reason: "other", label: "market.report.other" },
 ];
+
+const iconRequests = new Map<string, Promise<void>>();
+
+function fetchMarketplaceIcon(url: string): void {
+  const host = new URL(url).hostname;
+  const key = registrableDomain(host);
+  if (iconRequests.has(key)) return;
+  const request = library
+    .refreshIcons([url])
+    .then(setIconCache)
+    .catch(() => {})
+    .finally(() => iconRequests.delete(key));
+  iconRequests.set(key, request);
+}
 
 /** Recipes other people made, checked automatically and listed after the hold period. Opened from Settings. */
 export function MarketplaceScreen() {
@@ -138,16 +156,39 @@ function ListView({ listing, error, onRetry, onOpen, onShare }: ListViewProps) {
 
 function ItemRow({ item, onOpen }: { item: MarketItem; onOpen: () => void }) {
   const t = useT();
+  const iconUrl = item.hosts.map(faviconPageUrlForHost).find(Boolean);
+  const icon = useIconForUrl(iconUrl ?? "", []);
+  const row = useRef<HTMLButtonElement>(null);
   const state = item.installedVersion
     ? t(item.updateAvailable ? "market.update" : "market.added")
     : null;
 
+  useEffect(() => {
+    const element = row.current;
+    if (!element || !iconUrl || icon) return;
+    const load = () => fetchMarketplaceIcon(iconUrl);
+    if (typeof IntersectionObserver === "undefined") {
+      load();
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        observer.disconnect();
+        load();
+      }
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [icon, iconUrl]);
+
   return (
     <button
+      ref={row}
       type="button"
       onClick={onOpen}
       className="flex w-full items-center gap-3 px-4 py-3.5 text-start active:bg-paper/[0.05]"
     >
+      <SiteTile name={item.name} icon={icon} />
       <span className="min-w-0 flex-1">
         <span className="block truncate text-base font-medium">{item.name}</span>
         <span className="block truncate text-sm text-paper/55">
