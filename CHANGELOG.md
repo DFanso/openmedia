@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-10
 
+### fix(shell): keep floating back and main buttons apart
+
+**Problem:** Dragging both controls to the same edge and height let them overlap.
+
+**Change:** The back button moves to the nearest safe vertical position when it would collide with the main floating button, and follows the main button's saved position as it moves.
+
+**Verified:** `yarn ts:check`, `yarn vitest run src/features/fab/geometry.test.ts` (63 tests), `yarn eslint` on changed TypeScript files, and Prettier on changed files.
+
 ### fix(ai): accept safe CSS restyles and classify malformed answers
 
 **Problem:** The assistant only generated hide rules, so style requests such as grayscale were rejected; exhausted schema retries surfaced as an unexplained raw error.
