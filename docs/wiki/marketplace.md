@@ -1,6 +1,6 @@
 # Recipe Marketplace and Sharing
 
-> **Status: Partially implemented.** Device side (`src-tauri/src/recipes/share.rs`, `src-tauri/src/catalog/`, `src-tauri/src/share_commands.rs`, shell UI in `src/features/marketplace/`) is implemented. The Worker lives in [`openmedia-worker`](https://github.com/skepjandi/openmedia-worker); it checks submissions automatically, holds every accepted one for 14 days and publishes it itself. **Nothing is deployed** and no Cloudflare resource exists yet; the only end-to-end run was against a local Worker (see [Verified results](#verified-results)). Decision record: [Roadmap](./roadmap.md#decision-log), 2026-11-10.
+> **Status: Partially implemented.** Device side (`src-tauri/src/recipes/share.rs`, `src-tauri/src/catalog/`, `src-tauri/src/share_commands.rs`, shell UI in `src/features/marketplace/`) is implemented. The Worker lives in [`openmedia-worker`](https://github.com/skepjandi/openmedia-worker); this branch adds automatic checks, a 14-day public hold and scheduled publishing. The existing Worker and Cloudflare resources are deployed per maintainer report; **this branch's automated publishing path is not deployed or production-verified**. See [Verified results](#verified-results). Decision record: [Roadmap](./roadmap.md#decision-log), 2026-11-10.
 
 Two ways to move recipes between people:
 
@@ -126,14 +126,14 @@ Existing D1 submissions migrate to the held state and start a fresh 14-day clock
 
 ### Store policy
 
-A catalog of user-submitted content counts as user-generated content for App Store and Play review. **This design does not claim to satisfy either store's rules**, and it removes exactly the control the guidelines lean on most.
+A catalog of user-submitted content counts as user-generated content for App Store and Play review. **This design does not claim to satisfy either store's rules.** Automatic schema and risk checks are not reliable detection of harmful or deceptive intent; the public 14-day hold is not moderation.
 
-- **Apple, App Store Review Guideline 1.2 (User-Generated Content)** (<https://developer.apple.com/app-store/review/guidelines/#user-generated-content>): a filtering mechanism to screen out objectionable material, a mechanism for reporting objectionable material and for blocking abusive users, and published contact details. The guideline asks for a filter **before** the material reaches other users; this design removed the person who did that filtering and left only the 14-day hold.
-- **Google Play, User Generated Content policy** (<https://support.google.com/googleplay/android-developer/answer/9876937>): ongoing moderation of user content, with in-app report and block controls, a moderator role and evidence of the moderation procedure.
+- **Apple, App Store Review Guideline 1.2 (User-Generated Content)** (<https://developer.apple.com/app-store/review/guidelines/#user-generated-content>): a method to filter objectionable material before posting, report content with timely responses, block abusive users and publish contact details. The Worker rejects invalid recipe structures before storage, but those checks cannot reliably detect objectionable or deceptive recipes.
+- **Google Play, User Generated Content policy** (<https://support.google.com/googleplay/android-developer/answer/9876937>): users must accept terms before uploading; the service needs robust, effective, ongoing moderation, in-app reporting and blocking controls. This design has no upload-time terms acceptance, human moderation or user-to-user blocking.
 
 What exists today: an in-app report action (`POST /reports`), removal of a recipe through the signed revocation list and through editing D1 and the catalog by an operator, and a public 14-day window in which a report can arrive before a recipe is published. What does **not** exist: a person reviewing each submission, and a way for one user to block another submitter.
 
-**Open risk.** The stores may reject this design for the missing pre-publication filtering and the missing user-blocking control. Re-read both policies before submitting, and be ready to add a moderation path, a block list, or a human review step.
+**Open risk.** The stores may reject this design because automated structural checks cannot reliably screen objectionable content, and the app has no user-blocking control. Re-read both policies before submitting; the current design intentionally has no human approval step.
 
 ### Cost (estimates, Cloudflare list prices checked 2026-11-10)
 
@@ -148,7 +148,7 @@ Sources: Workers, D1 and R2 pricing pages. Egress is free on R2 and D1. The cost
 
 ## Verified results
 
-2026-11-10, on a Mac, nothing deployed:
+2026-11-10 pre-automation baseline, verified locally on a Mac. The maintainer later reported the original Worker and Cloudflare resources deployed; this branch's automation is not production-verified.
 
 - **App repo, full contract:** `yarn verify` passed (`ts:check`, `lint`, `format:check`, `suffix:check`, 302 Vitest tests incl. every locale's keys; `cargo fmt --check`, `cargo clippy --workspace --all-targets -D warnings`, 238 app tests, 29 siteview tests). The curator CLI and its 43 tests were removed afterwards; the app and siteview counts above are the ones that remain.
 - **Shell UI:** the new screens are type-checked and linted but **not rendered or driven** on a device, a simulator or in a browser.
