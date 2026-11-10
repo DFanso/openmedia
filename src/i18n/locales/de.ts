@@ -204,6 +204,18 @@ export const de: Messages = {
   "settings.guide": "Erststart-Anleitung",
   "settings.guideNote": "Markiert sie als ungesehen und zeigt sie jetzt erneut an.",
   "settings.replay": "Erneut anzeigen",
+  "settings.updates": "Updates",
+  "settings.updatesNote":
+    "OpenMedia fragt GitHub nach Updates für die eigenen Bildschirme. Es werden keine Informationen über dich oder dein Surfverhalten gesendet, und jedes Update wird vor der Verwendung auf diesem Gerät signiert und geprüft.",
+  "settings.updatesVersion": "Version {version}",
+  "settings.updatesCheck": "Nach Updates suchen",
+  "settings.updatesChecking": "Suche läuft…",
+  "settings.updatesCurrent": "Du hast die neueste Version.",
+  "settings.updatesStaged":
+    "Update heruntergeladen. Es startet beim nächsten Öffnen von OpenMedia.",
+  "settings.updatesAppAvailable": "OpenMedia {version} ist verfügbar.",
+  "settings.updatesInstall": "Installieren und neu starten",
+  "settings.updatesInstalling": "Installiere…",
   "settings.language": "Sprache",
   "settings.languageNote":
     "Die Sprache der App-Texte und die Richtung, in der sie geschrieben werden. Bleibe auf der Systemsprache, um die Einstellung deines Geräts zu übernehmen.",

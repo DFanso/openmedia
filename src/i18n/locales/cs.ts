@@ -209,6 +209,17 @@ export const cs: Messages = {
   "settings.guide": "Průvodce prvním spuštěním",
   "settings.guideNote": "Označí ho jako neviděný a hned ho zobrazí znovu.",
   "settings.replay": "Přehrát",
+  "settings.updates": "Aktualizace",
+  "settings.updatesNote":
+    "OpenMedia žádá GitHub o aktualizace vlastních obrazovek. Neodesílají se žádné údaje o vás ani o vašem prohlížení a každá aktualizace je před použitím podepsána a ověřena na tomto zařízení.",
+  "settings.updatesVersion": "Verze {version}",
+  "settings.updatesCheck": "Zkontrolovat aktualizace",
+  "settings.updatesChecking": "Kontroluji…",
+  "settings.updatesCurrent": "Máte nejnovější verzi.",
+  "settings.updatesStaged": "Aktualizace byla stažena. Spustí se při příštím otevření OpenMedia.",
+  "settings.updatesAppAvailable": "Je k dispozici OpenMedia {version}.",
+  "settings.updatesInstall": "Nainstalovat a restartovat",
+  "settings.updatesInstalling": "Instaluji…",
   "settings.language": "Jazyk",
   "settings.languageNote":
     "Jazyk textů v aplikaci a směr, kterým se píší. Ponechte systémový jazyk, aby aplikace následovala zařízení.",

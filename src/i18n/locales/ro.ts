@@ -209,6 +209,18 @@ export const ro: Messages = {
   "settings.guide": "Ghid de primă utilizare",
   "settings.guideNote": "Îl marchează ca nevăzut și îl afișează din nou acum.",
   "settings.replay": "Redă din nou",
+  "settings.updates": "Actualizări",
+  "settings.updatesNote":
+    "OpenMedia cere de la GitHub actualizări pentru propriile ecrane. Nu se trimite nimic despre tine sau despre navigarea ta, iar fiecare actualizare este semnată și verificată pe acest dispozitiv înainte de a fi folosită.",
+  "settings.updatesVersion": "Versiunea {version}",
+  "settings.updatesCheck": "Caută actualizări",
+  "settings.updatesChecking": "Se verifică…",
+  "settings.updatesCurrent": "Ai cea mai recentă versiune.",
+  "settings.updatesStaged":
+    "Actualizarea a fost descărcată. Pornește la următoarea deschidere a OpenMedia.",
+  "settings.updatesAppAvailable": "OpenMedia {version} este disponibil.",
+  "settings.updatesInstall": "Instalează și repornește",
+  "settings.updatesInstalling": "Se instalează…",
   "settings.language": "Limbă",
   "settings.languageNote":
     "Limba textelor din aplicație și direcția în care sunt scrise. Lasă limba sistemului pentru a urma dispozitivul.",

@@ -205,6 +205,18 @@ export const id: Messages = {
   "settings.guide": "Panduan pertama kali",
   "settings.guideNote": "Menandai belum dilihat dan menampilkannya lagi sekarang.",
   "settings.replay": "Ulangi",
+  "settings.updates": "Pembaruan",
+  "settings.updatesNote":
+    "OpenMedia meminta pembaruan untuk layarnya sendiri ke GitHub. Tidak ada data tentang Anda atau penjelajahan Anda yang dikirim, dan setiap pembaruan ditandatangani serta diperiksa di perangkat ini sebelum digunakan.",
+  "settings.updatesVersion": "Versi {version}",
+  "settings.updatesCheck": "Periksa pembaruan",
+  "settings.updatesChecking": "Memeriksa…",
+  "settings.updatesCurrent": "Anda memakai versi terbaru.",
+  "settings.updatesStaged":
+    "Pembaruan telah diunduh. Pembaruan dimulai saat Anda membuka OpenMedia berikutnya.",
+  "settings.updatesAppAvailable": "OpenMedia {version} tersedia.",
+  "settings.updatesInstall": "Pasang dan mulai ulang",
+  "settings.updatesInstalling": "Memasang…",
   "settings.language": "Bahasa",
   "settings.languageNote":
     "Bahasa teks aplikasi, dan arah penulisannya. Biarkan mengikuti bahasa sistem agar sesuai perangkat.",

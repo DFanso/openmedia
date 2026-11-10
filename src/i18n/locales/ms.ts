@@ -206,6 +206,18 @@ export const ms: Messages = {
   "settings.guide": "Panduan kali pertama",
   "settings.guideNote": "Menandakan sebagai belum dilihat dan memaparkannya sekarang.",
   "settings.replay": "Ulang tayang",
+  "settings.updates": "Kemas kini",
+  "settings.updatesNote":
+    "OpenMedia meminta kemas kini untuk skrinnya sendiri daripada GitHub. Tiada apa-apa tentang anda atau penyemakan imbas anda dihantar, dan setiap kemas kini ditandatangani serta disemak pada peranti ini sebelum digunakan.",
+  "settings.updatesVersion": "Versi {version}",
+  "settings.updatesCheck": "Semak kemas kini",
+  "settings.updatesChecking": "Menyemak…",
+  "settings.updatesCurrent": "Anda mempunyai versi terkini.",
+  "settings.updatesStaged":
+    "Kemas kini telah dimuat turun. Ia bermula pada kali seterusnya anda membuka OpenMedia.",
+  "settings.updatesAppAvailable": "OpenMedia {version} tersedia.",
+  "settings.updatesInstall": "Pasang dan mulakan semula",
+  "settings.updatesInstalling": "Memasang…",
   "settings.language": "Bahasa",
   "settings.languageNote":
     "Bahasa teks aplikasi dan arah tulisan. Biarkan pada bahasa sistem untuk mengikut peranti.",

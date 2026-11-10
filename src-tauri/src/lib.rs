@@ -9,8 +9,10 @@ mod entitlement;
 pub mod error;
 mod incognito;
 mod library;
+mod ota;
 pub mod recipes;
 mod secrets;
+mod self_update;
 mod share_commands;
 mod sites;
 mod usage;
@@ -21,9 +23,15 @@ use tauri::Manager;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 #[allow(clippy::expect_used, reason = "a failed startup is unrecoverable")]
 pub fn run() {
+    let ota = ota::Ota::new();
+    let mut context = tauri::generate_context!();
+    ota::OtaAssets::install(&mut context, ota.clone());
     let builder = tauri::Builder::default()
+        .manage(ota.clone())
         .plugin(tauri_plugin_siteview::init())
         .plugin(tauri_plugin_billing::init());
+    #[cfg(all(desktop, feature = "self-update"))]
+    let builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
     #[cfg(target_os = "macos")]
     let builder = builder.on_menu_event(desktop_menu::handle);
     builder
@@ -58,6 +66,7 @@ pub fn run() {
             app.manage(commands::Secrets(Box::new(secrets::KeychainStore)));
             app.manage(entitlement::Entitlement::from_build());
             entitlement::start(app.handle());
+            ota::check_after_launch(app.handle());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -138,7 +147,12 @@ pub fn run() {
             commands::chat_save,
             commands::chat_delete,
             commands::chat_clear,
+            ota::commands::ota_status,
+            ota::commands::ota_confirm,
+            ota::commands::ota_check,
+            self_update::app_update_check,
+            self_update::app_update_install,
         ])
-        .run(tauri::generate_context!())
+        .run(context)
         .expect("error while running tauri application");
 }

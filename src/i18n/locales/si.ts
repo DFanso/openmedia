@@ -205,6 +205,17 @@ export const si: Messages = {
   "settings.guide": "පළමු ධාවන මාර්ගෝපදේශය",
   "settings.guideNote": "එය නොදැක ඇති ලෙස සලකුණු කර දැන් නැවත පෙන්වනු ලැබේ.",
   "settings.replay": "නැවත පෙන්වන්න",
+  "settings.updates": "යාවත්කාලීන",
+  "settings.updatesNote":
+    "OpenMedia තමන්ගේම තිර සඳහා යාවත්කාලීන GitHub වෙතින් ඉල්ලයි. ඔබ ගැන හෝ ඔබේ බ්‍රවුස් කිරීම ගැන කිසිවක් යවනු නොලැබේ, සහ සෑම යාවත්කාලීනයක්ම භාවිතයට පෙර මෙම උපාංගයේදී අත්සන් කර පරීක්ෂා කරනු ලැබේ.",
+  "settings.updatesVersion": "අනුවාදය {version}",
+  "settings.updatesCheck": "යාවත්කාලීන පරීක්ෂා කරන්න",
+  "settings.updatesChecking": "පරීක්ෂා කරමින්…",
+  "settings.updatesCurrent": "ඔබ සතුව ඇත්තේ නවතම අනුවාදයයි.",
+  "settings.updatesStaged": "යාවත්කාලීනය බාගත කළා. ඊළඟ වතාවේ OpenMedia විවෘත කරන විට එය ආරම්භ වේ.",
+  "settings.updatesAppAvailable": "OpenMedia {version} ලබා ගත හැකිය.",
+  "settings.updatesInstall": "ස්ථාපනය කර නැවත ආරම්භ කරන්න",
+  "settings.updatesInstalling": "ස්ථාපනය කරමින්…",
   "settings.language": "භාෂාව",
   "settings.languageNote":
     "ඇප් එකේ ලියුණු භාෂාව සහ එය ලියන දිශාව. උපේකරණයට අනුගමනය වීමට පද්ධතියේ භාෂාවෙන් තබන්න.",

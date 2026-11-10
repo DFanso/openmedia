@@ -205,6 +205,18 @@ export const vi: Messages = {
   "settings.guide": "Hướng dẫn lần đầu",
   "settings.guideNote": "Đánh dấu là chưa xem và hiện lại ngay bây giờ.",
   "settings.replay": "Xem lại",
+  "settings.updates": "Cập nhật",
+  "settings.updatesNote":
+    "OpenMedia yêu cầu GitHub các bản cập nhật cho chính màn hình của mình. Không có thông tin nào về bạn hoặc việc duyệt web của bạn được gửi đi, và mỗi bản cập nhật đều được ký và kiểm tra trên thiết bị này trước khi sử dụng.",
+  "settings.updatesVersion": "Phiên bản {version}",
+  "settings.updatesCheck": "Kiểm tra cập nhật",
+  "settings.updatesChecking": "Đang kiểm tra…",
+  "settings.updatesCurrent": "Bạn đang dùng phiên bản mới nhất.",
+  "settings.updatesStaged":
+    "Đã tải xuống bản cập nhật. Bản này sẽ chạy vào lần tiếp theo bạn mở OpenMedia.",
+  "settings.updatesAppAvailable": "OpenMedia {version} đã sẵn sàng.",
+  "settings.updatesInstall": "Cài đặt và khởi động lại",
+  "settings.updatesInstalling": "Đang cài đặt…",
   "settings.language": "Ngôn ngữ",
   "settings.languageNote":
     "Ngôn ngữ của chữ trong ứng dụng, và chiều viết. Để theo ngôn ngữ hệ thống để bám theo máy.",

@@ -203,6 +203,17 @@ export const bn: Messages = {
   "settings.guide": "প্রথমবারের নির্দেশিকা",
   "settings.guideNote": "অদেখা হিসেবে চিহ্নিত করে এখন আবার দেখায়।",
   "settings.replay": "আবার দেখুন",
+  "settings.updates": "আপডেট",
+  "settings.updatesNote":
+    "OpenMedia তার নিজের স্ক্রিনের আপডেটের জন্য GitHub-কে অনুরোধ করে। আপনার বা আপনার ব্রাউজিং সম্পর্কে কিছুই পাঠানো হয় না, এবং প্রতিটি আপডেট ব্যবহারের আগে এই ডিভাইসে স্বাক্ষরিত ও যাচাই করা হয়।",
+  "settings.updatesVersion": "সংস্করণ {version}",
+  "settings.updatesCheck": "আপডেট খুঁজুন",
+  "settings.updatesChecking": "খোঁজা হচ্ছে…",
+  "settings.updatesCurrent": "আপনার কাছে সর্বশেষ সংস্করণ আছে।",
+  "settings.updatesStaged": "আপডেট ডাউনলোড হয়েছে। পরের বার OpenMedia খুললে এটি শুরু হবে।",
+  "settings.updatesAppAvailable": "OpenMedia {version} উপলব্ধ।",
+  "settings.updatesInstall": "ইনস্টল করে রিস্টার্ট করুন",
+  "settings.updatesInstalling": "ইনস্টল হচ্ছে…",
   "settings.language": "ভাষা",
   "settings.languageNote":
     "অ্যাপের লেখার ভাষা এবং লেখার দিক। ডিভাইসের সঙ্গে মানাতে সিস্টেমের ভাষায় রাখুন।",

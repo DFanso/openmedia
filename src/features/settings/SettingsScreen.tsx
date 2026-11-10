@@ -15,6 +15,7 @@ import { MarginSlider } from "./MarginSlider";
 import { MarketplaceLinks } from "../marketplace/Links";
 import { RecipesLink } from "./RecipesScreen";
 import { Switch } from "./Switch";
+import { UpdatesSection } from "./UpdatesSection";
 import { Picker } from "./Picker";
 import { Group, Section, primaryButton, quietButton } from "./ui";
 
@@ -36,6 +37,7 @@ export function SettingsScreen() {
         <IncognitoFavoritesSection />
         <IncognitoRecipesSection />
         <AiSection />
+        <UpdatesSection />
         <DataSection />
       </div>
     </Screen>

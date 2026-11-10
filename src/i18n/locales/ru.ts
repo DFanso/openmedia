@@ -210,6 +210,18 @@ export const ru: Messages = {
   "settings.guide": "Руководство при первом запуске",
   "settings.guideNote": "Отмечает его как непросмотренное и показывает снова прямо сейчас.",
   "settings.replay": "Показать снова",
+  "settings.updates": "Обновления",
+  "settings.updatesNote":
+    "OpenMedia запрашивает у GitHub обновления собственных экранов. Ничего о вас и вашем просмотре не отправляется, а каждое обновление перед использованием подписывается и проверяется на этом устройстве.",
+  "settings.updatesVersion": "Версия {version}",
+  "settings.updatesCheck": "Проверить обновления",
+  "settings.updatesChecking": "Проверка…",
+  "settings.updatesCurrent": "У вас последняя версия.",
+  "settings.updatesStaged":
+    "Обновление загружено. Оно запустится при следующем открытии OpenMedia.",
+  "settings.updatesAppAvailable": "Доступна OpenMedia {version}.",
+  "settings.updatesInstall": "Установить и перезапустить",
+  "settings.updatesInstalling": "Установка…",
   "settings.language": "Язык",
   "settings.languageNote":
     "Язык текста приложения и направление письма. Оставьте системный, чтобы следовать устройству.",

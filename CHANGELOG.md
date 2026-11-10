@@ -14,6 +14,16 @@ All notable changes to OpenMedia are documented here.
 
 **Change:** The logo no longer floats; it stays exactly where the launch screen draws it. The glow and the expanding rings behind it still animate.
 
+### feat(ota): over-the-air updates, from the CLI or GitHub Actions
+
+**Area:** `feat(ota)`
+
+Signed web-layer bundles reach every platform without a store release: the app downloads one for its own version from a GitHub release, verifies its Ed25519 signature, and serves it from the next launch, falling back to the embedded shell if it fails to load twice. Direct-distribution desktop builds can also replace themselves through `tauri-plugin-updater` (Cargo feature `self-update`; store builds never include it). Settings gets an Updates section.
+
+`yarn ota keygen|web|app|manifest|all` builds, signs and publishes from your machine; `.github/workflows/ota.yml` runs the same commands (web on pushes to `main`, desktop on `v*` tags). The release assets must be public for the app to download them. See [Updates](docs/wiki/updates.md).
+
+**Verified:** `cargo test --lib ota` (19), `cargo clippy --workspace --all-targets -- -D warnings` with and without `--features self-update`, Vitest, and a macOS debug build that activated and confirmed a hand-placed bundle. Not verified: a real publish, a signed desktop installer, and any mobile device.
+
 ### fix(shell): keep floating back and main buttons apart
 
 **Problem:** Dragging both controls to the same edge and height let them overlap.

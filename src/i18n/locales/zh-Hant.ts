@@ -193,6 +193,17 @@ export const zhHant: Messages = {
   "settings.guide": "初次使用指南",
   "settings.guideNote": "標記為未閱讀並立即再次顯示。",
   "settings.replay": "重新查看",
+  "settings.updates": "更新",
+  "settings.updatesNote":
+    "OpenMedia 會向 GitHub 要求自身介面的更新。不會傳送任何關於你或你瀏覽行為的資訊，每個更新在使用前都會在此裝置上進行簽署並驗證。",
+  "settings.updatesVersion": "版本 {version}",
+  "settings.updatesCheck": "檢查更新",
+  "settings.updatesChecking": "正在檢查…",
+  "settings.updatesCurrent": "你已使用最新版本。",
+  "settings.updatesStaged": "更新已下載，將在你下次開啟 OpenMedia 時啟動。",
+  "settings.updatesAppAvailable": "OpenMedia {version} 現已可用。",
+  "settings.updatesInstall": "安裝並重新啟動",
+  "settings.updatesInstalling": "正在安裝…",
   "settings.language": "語言",
   "settings.languageNote":
     "App 文字使用的語言，以及書寫方向。維持「跟隨系統語言」就會配合裝置設定。",

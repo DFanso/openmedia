@@ -212,6 +212,18 @@ export const ta: Messages = {
   "settings.guide": "முதல் முறை வழிகாட்டல்",
   "settings.guideNote": "அதைப் பார்க்கப்படாததாகக் குறித்து, இப்போது மீண்டும் காட்டுகிறது.",
   "settings.replay": "மீண்டும் இயக்கு",
+  "settings.updates": "புதுப்பிப்புகள்",
+  "settings.updatesNote":
+    "OpenMedia தனது சொந்தத் திரைகளுக்கான புதுப்பிப்புகளை GitHub-இடம் கேட்கிறது. உங்களைப் பற்றியோ உங்கள் உலாவலைப் பற்றியோ எதுவும் அனுப்பப்படாது, ஒவ்வொரு புதுப்பிப்பும் பயன்படுத்தும் முன் இந்தச் சாதனத்தில் கையொப்பமிடப்பட்டுச் சரிபார்க்கப்படும்.",
+  "settings.updatesVersion": "பதிப்பு {version}",
+  "settings.updatesCheck": "புதுப்பிப்புகளைச் சரிபார்",
+  "settings.updatesChecking": "சரிபார்க்கிறது…",
+  "settings.updatesCurrent": "உங்களிடம் சமீபத்திய பதிப்பு உள்ளது.",
+  "settings.updatesStaged":
+    "புதுப்பிப்பு பதிவிறக்கப்பட்டது. அடுத்த முறை OpenMedia-வைத் திறக்கும்போது தொடங்கும்.",
+  "settings.updatesAppAvailable": "OpenMedia {version} கிடைக்கிறது.",
+  "settings.updatesInstall": "நிறுவி மறுதொடக்கு",
+  "settings.updatesInstalling": "நிறுவுகிறது…",
   "settings.language": "மொழி",
   "settings.languageNote":
     "செயலியின் உரையின் மொழி, அது எழுதப்படும் திசை. சாதனத்தின் மொழியில் வைத்திருந்தால், சாதனத்தைப் பின்பற்றும்.",

@@ -53,6 +53,10 @@ pub enum Error {
     Secret(String),
     #[error("{0}")]
     Connection(String),
+    #[error("over-the-air update: {0}")]
+    Ota(String),
+    #[error("This build is updated through its store.")]
+    SelfUpdateUnavailable,
     #[error("ad blocking failed: {0}")]
     AdBlock(String),
     #[error("library lock poisoned")]

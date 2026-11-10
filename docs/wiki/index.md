@@ -29,6 +29,7 @@ OpenMedia is a Tauri v2 app for browsing websites in native web views and custom
 | [Roadmap](./roadmap.md) | Phased build plan with exit criteria, spikes, decision log, risks |
 | [Recipe Marketplace](./marketplace.md) | Export/import and the automatically published, signed Cloudflare marketplace: tags, official publishing, ratings, comments, abuse rules, threat model, API, signed index, flows, cost |
 | [Development Guide](./development-guide.md) | Toolchain, commands, and conventions |
+| [Updates (OTA)](./updates.md) | Over-the-air updates: signed web bundles for every platform and desktop self-update, published by `yarn ota` or GitHub Actions |
 | [Store Builds](./store-builds.md) | iOS App Store and Android Google Play build, signing, and release steps |
 
 ## Quick Start
