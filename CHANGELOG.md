@@ -16,6 +16,16 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** `cargo test --lib ai::` (79 passed), `cargo fmt --all`, focused Vitest (3 passed), ESLint and Prettier on edited files.
 
+**PR:** #96
+
+### chore(ci): keep CI lint-only and move other web checks to pre-commit
+
+**Problem:** Formatting and tests ran on every CI build, although CI only needs to enforce linting.
+
+**Change:** CI now runs `yarn lint` only. Husky runs `yarn format:check` and `yarn test` before each commit.
+
+**Verified:** `yarn lint`, `yarn format:check`, and `yarn test` (351 Vitest tests); the pre-commit hook runs formatting and tests.
+
 **PR:** n/a
 
 ### fix(marketplace): render recipe notes as Markdown, in a faded preview
