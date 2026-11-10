@@ -26,7 +26,7 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** `yarn lint`, `yarn format:check`, and `yarn test` (351 Vitest tests); the pre-commit hook runs formatting and tests.
 
-**PR:** n/a
+**PR:** #95
 
 ### fix(marketplace): render recipe notes as Markdown, in a faded preview
 
