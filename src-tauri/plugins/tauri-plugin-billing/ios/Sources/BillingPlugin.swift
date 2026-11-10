@@ -51,10 +51,6 @@ struct OfferingsView: Encodable {
   let packages: [PackageView]
 }
 
-struct SimulatorView: Encodable {
-  let isSimulator: Bool
-}
-
 struct AppUserView: Encodable {
   let appUserId: String
 }
@@ -71,14 +67,6 @@ class BillingPlugin: Plugin {
   private var entitlementId: String?
   private var events: Channel?
   private var streamTask: Task<Void, Never>?
-
-  @objc public func isSimulator(_ invoke: Invoke) throws {
-    #if targetEnvironment(simulator)
-      invoke.resolve(SimulatorView(isSimulator: true))
-    #else
-      invoke.resolve(SimulatorView(isSimulator: false))
-    #endif
-  }
 
   @objc public func configure(_ invoke: Invoke) throws {
     let args = try invoke.parseArgs(ConfigureArgs.self)

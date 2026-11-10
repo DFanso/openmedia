@@ -1,13 +1,12 @@
 use std::{collections::HashMap, env, path::Path};
 
-const BUILD_KEYS: [&str; 7] = [
+const BUILD_KEYS: [&str; 6] = [
     "OPENMEDIA_MARKET_URL",
     "OPENMEDIA_CATALOG_KEYS",
     "OPENMEDIA_RC_KEY_IOS",
     "OPENMEDIA_RC_KEY_MACOS",
     "OPENMEDIA_RC_KEY_ANDROID",
     "OPENMEDIA_DEV_ENTITLEMENT",
-    "EXPO_PUBLIC_FORCE_ENABLE_PRO_ON_SIMULATOR",
 ];
 
 fn main() {

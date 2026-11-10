@@ -16,10 +16,7 @@
 //! can start a purchase itself.
 
 use std::{
-    sync::{
-        Mutex, MutexGuard, PoisonError,
-        atomic::{AtomicBool, Ordering},
-    },
+    sync::{Mutex, MutexGuard, PoisonError},
     thread,
     time::Duration,
 };
@@ -55,10 +52,6 @@ const SDK_KEY: Option<&str> = None;
 
 #[cfg(any(target_os = "ios", target_os = "android", target_os = "macos"))]
 const DEV_OVERRIDE: Option<&str> = option_env!("OPENMEDIA_DEV_ENTITLEMENT");
-
-#[cfg(any(target_os = "ios", target_os = "android"))]
-const SIMULATOR_PRO_OVERRIDE: Option<&str> =
-    option_env!("EXPO_PUBLIC_FORCE_ENABLE_PRO_ON_SIMULATOR");
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -100,13 +93,6 @@ fn dev_override(raw: Option<&str>, debug_build: bool) -> Option<Status> {
         "free" => Some(Status::Free),
         _ => None,
     }
-}
-
-/// This override is opt-in, debug-only, and later accepted only when native code confirms a
-/// simulator/emulator.
-#[cfg(any(test, target_os = "ios", target_os = "android"))]
-fn simulator_pro_override_requested(raw: Option<&str>, debug_build: bool) -> bool {
-    debug_build && raw.is_some_and(|value| value.trim().eq_ignore_ascii_case("true"))
 }
 
 struct Machine {
@@ -205,8 +191,6 @@ impl Machine {
 pub struct Entitlement {
     machine: Mutex<Machine>,
     api_key: Option<String>,
-    simulator_override_requested: bool,
-    simulator_override: AtomicBool,
     /// Held while configuring so two callers never configure the store twice.
     native_ready: Mutex<bool>,
 }
@@ -219,16 +203,7 @@ impl Entitlement {
         let forced = dev_override(DEV_OVERRIDE, cfg!(debug_assertions));
         #[cfg(not(any(target_os = "ios", target_os = "android", target_os = "macos")))]
         let forced = Some(Status::Pro);
-        #[cfg(any(target_os = "ios", target_os = "android"))]
-        let mut entitlement = Self::new(SDK_KEY, forced);
-        #[cfg(not(any(target_os = "ios", target_os = "android")))]
-        let entitlement = Self::new(SDK_KEY, forced);
-        #[cfg(any(target_os = "ios", target_os = "android"))]
-        {
-            entitlement.simulator_override_requested =
-                simulator_pro_override_requested(SIMULATOR_PRO_OVERRIDE, cfg!(debug_assertions));
-        }
-        entitlement
+        Self::new(SDK_KEY, forced)
     }
 
     fn new(raw_key: Option<&str>, forced: Option<Status>) -> Self {
@@ -236,32 +211,19 @@ impl Entitlement {
         Self {
             machine: Mutex::new(Machine::new(api_key.is_some(), forced)),
             api_key,
-            simulator_override_requested: false,
-            simulator_override: AtomicBool::new(false),
             native_ready: Mutex::new(false),
         }
     }
 
     pub fn view(&self) -> EntitlementView {
-        let mut view = self.machine().view();
-        if self.simulator_override.load(Ordering::Acquire) {
-            view.status = Status::Pro;
-        }
-        view
+        self.machine().view()
     }
 
     pub fn require_pro(&self) -> Result<()> {
-        if self.simulator_override.load(Ordering::Acquire) {
-            return Ok(());
-        }
         match self.machine().status() {
             Status::Pro => Ok(()),
             Status::Loading | Status::Free => Err(Error::ProRequired),
         }
-    }
-
-    fn enable_simulator_override(&self) {
-        self.simulator_override.store(true, Ordering::Release);
     }
 
     fn machine(&self) -> MutexGuard<'_, Machine> {
@@ -343,16 +305,6 @@ pub fn start(app: &AppHandle) {
             }
         }
     });
-    if handle.state::<Entitlement>().simulator_override_requested {
-        let simulator_handle = handle.clone();
-        tauri::async_runtime::spawn_blocking(move || {
-            let entitlement = simulator_handle.state::<Entitlement>();
-            if simulator_handle.billing().is_simulator().unwrap_or(false) {
-                entitlement.enable_simulator_override();
-                let _ = simulator_handle.emit(CHANGED_EVENT, entitlement.view());
-            }
-        });
-    }
     if handle.state::<Entitlement>().api_key.is_none() {
         return;
     }
@@ -607,29 +559,6 @@ mod tests {
         assert_eq!(dev_override(Some("free"), false), None);
         assert_eq!(dev_override(Some("other"), true), None);
         assert_eq!(dev_override(None, true), None);
-    }
-
-    #[test]
-    fn simulator_override_requires_explicit_debug_opt_in() {
-        assert!(simulator_pro_override_requested(Some(" true "), true));
-        assert!(simulator_pro_override_requested(Some("TRUE"), true));
-        assert!(!simulator_pro_override_requested(Some("true"), false));
-        assert!(!simulator_pro_override_requested(Some("1"), true));
-        assert!(!simulator_pro_override_requested(None, true));
-    }
-
-    #[test]
-    fn simulator_override_grants_only_the_runtime_entitlement_view() {
-        let entitlement = Entitlement::new(None, None);
-        assert_eq!(entitlement.view().status, Status::Free);
-        assert!(!entitlement.view().configured);
-        assert!(matches!(entitlement.require_pro(), Err(Error::ProRequired)));
-
-        entitlement.enable_simulator_override();
-
-        assert_eq!(entitlement.view().status, Status::Pro);
-        assert!(!entitlement.view().configured);
-        assert!(entitlement.require_pro().is_ok());
     }
 
     #[test]
