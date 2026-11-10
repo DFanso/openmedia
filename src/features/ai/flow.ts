@@ -1,26 +1,38 @@
-import type { PreparedRequest, Proposal } from "./ipc";
+import type { ActivityStep, PreparedRequest, Proposal } from "./ipc";
 import { classifyError, nothingMatched, type AssistantError } from "./errors";
+
+/** What every request in flight carries: who it is, what was asked, and what has happened so far. */
+interface Live {
+  /** Names the turn in the chat that this request becomes. */
+  turnId: string;
+  request: string;
+  steps: ActivityStep[];
+  /** The provider asked, known once the request is prepared. */
+  provider: string | null;
+}
 
 /** One request, from the user's words to a saved switch. */
 export type AssistantState =
   | { status: "idle"; draft: string }
-  | { status: "preparing"; request: string }
-  | { status: "preview"; request: string; prepared: PreparedRequest }
-  | { status: "sending"; request: string; prepared: PreparedRequest }
-  | { status: "proposal"; request: string; proposal: Proposal }
-  | { status: "accepting"; request: string; proposal: Proposal }
-  | { status: "accepted"; request: string; proposal: Proposal }
-  | { status: "rejected"; request: string }
+  | ({ status: "preparing" } & Live)
+  | ({ status: "preview"; prepared: PreparedRequest } & Live)
+  | ({ status: "sending"; prepared: PreparedRequest } & Live)
+  | ({ status: "proposal"; proposal: Proposal } & Live)
+  | ({ status: "accepting"; proposal: Proposal } & Live)
+  | ({ status: "accepted"; proposal: Proposal } & Live)
+  | ({ status: "rejected"; proposal: Proposal } & Live)
   /** `jobId` is a prepared request Rust still holds; it must be dropped when leaving. */
-  | { status: "error"; request: string; error: AssistantError; jobId: string | null };
+  | ({ status: "error"; error: AssistantError; jobId: string | null } & Live);
 
 export type AssistantEvent =
-  | { type: "submit"; request: string }
+  | { type: "submit"; request: string; turnId: string }
   /** The user typing in the empty bar: the text stays in the state, so it survives a round trip. */
   | { type: "edit"; text: string }
   /** `preview` false (the user turned the preview off) goes straight to sending. */
   | { type: "prepared"; prepared: PreparedRequest; preview: boolean }
   | { type: "send" }
+  /** Rust reported a step while the model works. */
+  | { type: "activity"; step: ActivityStep }
   | { type: "proposed"; proposal: Proposal }
   | { type: "accept" }
   | { type: "accepted" }
@@ -58,6 +70,24 @@ export function matchedNothing(proposal: Proposal): boolean {
 
 const requestOf = (state: AssistantState): string => ("request" in state ? state.request : "");
 
+const readingPage: ActivityStep = {
+  kind: "readPage",
+  status: "running",
+  round: 0,
+  matched: null,
+  total: null,
+};
+
+/** A step replaces the earlier report of the same kind and round (running, then done), else it is added. */
+export function withStep(steps: ActivityStep[], step: ActivityStep): ActivityStep[] {
+  const index = steps.findIndex((s) => s.kind === step.kind && s.round === step.round);
+  if (index === -1) return [...steps, step];
+  return steps.map((s, i) => (i === index ? step : s));
+}
+
+const failRunning = (steps: ActivityStep[]): ActivityStep[] =>
+  steps.map((step) => (step.status === "running" ? { ...step, status: "failed" } : step));
+
 /** Events that do not fit the current state are ignored, so a late async result cannot revive a cancelled request. */
 export function assistantReducer(state: AssistantState, event: AssistantEvent): AssistantState {
   switch (event.type) {
@@ -67,34 +97,61 @@ export function assistantReducer(state: AssistantState, event: AssistantEvent): 
       if (state.status !== "idle" && state.status !== "error" && state.status !== "rejected") {
         return state;
       }
-      return { status: "preparing", request };
+      return {
+        status: "preparing",
+        turnId: event.turnId,
+        request,
+        steps: [readingPage],
+        provider: null,
+      };
     }
     case "edit":
       return state.status === "idle" ? { status: "idle", draft: event.text } : state;
-    case "prepared":
+    case "prepared": {
       if (state.status !== "preparing") return state;
-      return event.preview
-        ? { status: "preview", request: state.request, prepared: event.prepared }
-        : { status: "sending", request: state.request, prepared: event.prepared };
+      const { turnId, request } = state;
+      const steps = withStep(state.steps, {
+        ...readingPage,
+        status: "done",
+        total: event.prepared.tokenEstimate,
+      });
+      return {
+        status: event.preview ? "preview" : "sending",
+        turnId,
+        request,
+        steps,
+        provider: event.prepared.providerName,
+        prepared: event.prepared,
+      };
+    }
     case "send":
       return state.status === "preview" ? { ...state, status: "sending" } : state;
-    case "proposed":
+    case "activity":
+      return state.status === "sending"
+        ? { ...state, steps: withStep(state.steps, event.step) }
+        : state;
+    case "proposed": {
       if (state.status !== "sending") return state;
+      const { turnId, request, steps, provider } = state;
       if (matchedNothing(event.proposal)) {
         return {
           status: "error",
-          request: state.request,
+          turnId,
+          request,
+          steps,
+          provider,
           error: nothingMatched(),
           jobId: event.proposal.id,
         };
       }
-      return { status: "proposal", request: state.request, proposal: event.proposal };
+      return { status: "proposal", turnId, request, steps, provider, proposal: event.proposal };
+    }
     case "accept":
       return state.status === "proposal" ? { ...state, status: "accepting" } : state;
     case "accepted":
       return state.status === "accepting" ? { ...state, status: "accepted" } : state;
     case "reject":
-      return state.status === "proposal" ? { status: "rejected", request: state.request } : state;
+      return state.status === "proposal" ? { ...state, status: "rejected" } : state;
     case "failed": {
       if (state.status === "idle" || state.status === "accepted" || state.status === "rejected") {
         return state;
@@ -107,7 +164,10 @@ export function assistantReducer(state: AssistantState, event: AssistantEvent): 
             : null;
       return {
         status: "error",
+        turnId: state.turnId,
         request: requestOf(state),
+        steps: failRunning(state.steps),
+        provider: state.provider,
         error: classifyError(event.error),
         jobId,
       };

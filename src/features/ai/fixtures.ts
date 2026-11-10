@@ -4,6 +4,9 @@ export const prepared: PreparedRequest = {
   id: "job-1",
   providerName: "Anthropic",
   model: "claude-x",
+  domain: "youtube.com",
+  recipeId: null,
+  recipeName: null,
   payload: "SYSTEM\n\nUSER",
   tokenEstimate: 1234,
 };

@@ -1,6 +1,6 @@
 # AI Assistant (BYOK)
 
-> **Status: Implemented (core).** Built: provider settings, key storage and connection test; the two provider adapters, the prompt, the page snapshot with its redaction pass, and the validated patch (`src-tauri/src/ai/{snapshot,redact,prompt,patch,provider,anthropic,openai}.rs`, see [Implemented: core modules](#implemented-core-modules)); and the shell flow. Not built: the "include page text" setting, Gemini's native `responseSchema` adapter, and repair of stale rules.
+> **Status: Implemented (core).** Built: provider settings, key storage and connection test; the two provider adapters, the prompt, the page snapshot with its redaction pass, and the validated patch (`src-tauri/src/ai/{snapshot,redact,prompt,patch,provider,anthropic,openai}.rs`, see [Implemented: core modules](#implemented-core-modules)); the shell flow; and the chat: saved per site and recipe, with the steps of every request ([Implemented: the chat](#implemented-the-chat)). Not built: the "include page text" setting, Gemini's native `responseSchema` adapter, and repair of stale rules.
 
 The user brings their own API key. The assistant turns a plain-language request ("remove the Reels tab and suggested posts, keep stories") into a validated recipe patch for the page they are looking at. With no key configured, everything else (installed recipes, picker, manual editing) still works.
 
@@ -140,4 +140,44 @@ Missing/invalid key · rate limit/quota · provider/network failure · model ref
 
 ## Implemented: shell flow
 
-The shell side lives in `src/features/ai/` and `CommandBar`. Typed text that is a web address opens it; other text becomes a request (needs an active provider with a key and an open site, else a one-line message with a button to Settings > AI assistant). The flow is a pure reducer: idle, preparing (`ai_prepare`), preview of the exact payload with provider, model and token estimate (skipped when the setting `aiPreview` is off; Settings > "Preview what is sent before sending"), sending (`ai_send`), proposal (page already shows the ephemeral preview; Accept / Reject / Ask again), then accepted (sites reload, "Open in Settings") or rejected. Errors map to a fixed set of shell-written messages with Retry, and a proposal whose rules all matched nothing is shown as "nothing matched". See [UI Design: AI assistant](./ui-design.md#ai-assistant).
+The shell side lives in `src/features/ai/` and `CommandBar`. Typed text that is a web address opens it; other text becomes a request (needs an active provider with a key and an open site, else a one-line message with a button to Settings > AI assistant). The flow is a pure reducer: idle, preparing (`ai_prepare`), preview of the exact payload with provider, model and token estimate (skipped when the setting `aiPreview` is off; Settings > "Preview what is sent before sending"), sending (`ai_send`), proposal (page already shows the ephemeral preview; Accept / Reject / Ask again), then accepted (sites reload, "Open in Settings") or rejected. Errors map to a fixed set of shell-written messages with Retry, and a proposal whose rules all matched nothing is shown as "nothing matched". Every turn of the flow is kept in the chat of the site, so the conversation survives closing the bar; see [Implemented: the chat](#implemented-the-chat). See [UI Design: AI assistant](./ui-design.md#ai-assistant).
+
+## Implemented: the chat
+
+The assistant is a chat, not a one-shot form. The bar keeps the turns of the site on screen, so
+closing it and coming back continues the same conversation.
+
+**Where a chat belongs.** A chat belongs to a site (its registrable domain, `youtube.com` for
+`m.youtube.com` and `www.youtube.com`) and, as soon as the assistant has proposed something, to
+the recipe that proposal is about (`market.official.youtube`, or the `custom.<domain>` recipe the
+user's own switch lives in). Reopening the assistant on that site continues that site's most
+recent chat; a chat started on another site never appears in it.
+
+**What a turn keeps.** The words the user typed, the steps the assistant took, and how the turn
+ended: proposed, accepted, rejected, or failed with the shell's error class. The page snapshot,
+the exact payload and the provider's answer are never kept. A turn that is still waiting for an
+answer when the app closes is shown as *not applied*: its preview is gone from the page.
+
+**What the assistant is doing.** Every request reports its steps while it runs, so the chat shows
+the work instead of "Asking <provider>…": reading the page (with the token estimate after
+redaction), asking the provider, checking the answer against the safety rules, previewing the
+rules on the page, counting how many rules found something, and asking again when a rule found
+nothing or the answer was not valid. The steps are counted in Rust (`src-tauri/src/ai/activity.rs`)
+and travel over a Tauri channel (`ai_send`'s `on_activity`); the shell writes the sentence for
+each. Only counts and fixed kinds travel, so nothing from the page or the model is shown as a step.
+
+**Continuing.** The next request in a chat carries the earlier turns to the model: the user's own
+words and how each ended (applied, rejected, failed), the last four of them. Nothing the model or
+the page said is carried over.
+
+**Buttons.** The header of the chat has *Chat history* (the chats of the site on screen, each with
+its recipe and date, and a button to delete one) and *New chat* (a blank chat for the site).
+
+**Erasing.** Settings > Data has "AI chats" with a count and a *Clear chats* button (with a
+confirm step) that deletes every saved chat. The commands are `chat_list`, `chat_save`,
+`chat_delete` and `chat_clear`; they are shell-only, like every other app command.
+
+**Where they live.** `chats.json` in the app's data directory, beside `library.json` and
+`usage.json`: at most 60 chats, 40 turns each, with every string cut to a fixed length. Nothing
+in it leaves the device. Incognito chats live in the shell only: Rust writes nothing while
+incognito is on, and switching modes drops them.

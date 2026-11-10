@@ -7,7 +7,10 @@ import {
   type AssistantEvent,
   type AssistantState,
 } from "../features/ai/flow";
+import { earlierOf } from "../features/ai/chat";
+import { selectActiveChat, useChat } from "../features/ai/chatStore";
 import { assistant as assistantIpc, type PreparedRequest } from "../features/ai/ipc";
+import { siteOf } from "../shared/site";
 import { incognito as incognitoIpc } from "../features/incognito/ipc";
 import {
   applyState,
@@ -168,7 +171,7 @@ export interface AppStore {
   /** The text in the command bar, kept in the state so "Ask again" can hand it back. */
   editRequest: (text: string) => void;
   /** Reads the open page and builds the request; the user sees it before it is sent. */
-  submitRequest: (request: string) => Promise<void>;
+  submitRequest: (request: string, turnId?: string) => Promise<void>;
   /** The user read the payload and pressed Send. */
   confirmSend: () => Promise<void>;
   acceptProposal: () => Promise<void>;
@@ -333,8 +336,19 @@ export const useApp = create<AppStore>((set, get) => {
     get().trimSessions("routine");
   };
 
-  const dispatch = (event: AssistantEvent) =>
+  /** Incognito chats live only in memory: switching modes drops them and loads the saved ones again. */
+  const resetChats = () => {
+    useChat.getState().forget();
+    void useChat.getState().load();
+  };
+
+  /** Applies an event, and keeps the request in the chat whenever it reached a state worth keeping. */
+  const dispatch = (event: AssistantEvent) => {
+    const before = get().assistant;
     set((current) => ({ assistant: assistantReducer(current.assistant, event) }));
+    const after = get().assistant;
+    if (after !== before) useChat.getState().keep(after);
+  };
 
   /** Adds `url` to history (Rust skips it while incognito) and fetches its icon. */
   const recordHistory = (url: string): Promise<void> =>
@@ -357,7 +371,12 @@ export const useApp = create<AppStore>((set, get) => {
 
   const runSend = async (prepared: PreparedRequest) => {
     try {
-      const proposal = await assistantIpc.send(prepared.id);
+      const proposal = await assistantIpc.send(prepared.id, (step) => {
+        const live = get().assistant;
+        if (live.status === "sending" && live.prepared.id === prepared.id) {
+          dispatch({ type: "activity", step });
+        }
+      });
       const current = get().assistant;
       if (current.status !== "sending" || current.prepared.id !== prepared.id) {
         dropJob(prepared.id);
@@ -717,12 +736,18 @@ export const useApp = create<AppStore>((set, get) => {
 
     editRequest: (text) => dispatch({ type: "edit", text }),
 
-    submitRequest: async (request) => {
-      dispatch({ type: "submit", request });
+    submitRequest: async (request, turnId = crypto.randomUUID()) => {
+      dispatch({ type: "submit", request, turnId });
       const started = get().assistant;
       if (started.status !== "preparing") return;
+      const url = selectPage(get())?.url;
+      const domain = url ? siteOf(url) : null;
+      if (domain) useChat.getState().begin(domain);
+      const earlier = earlierOf(selectActiveChat(useChat.getState()), turnId);
       try {
-        const prepared = await assistantIpc.prepare(started.request);
+        const prepared = await assistantIpc.prepare(started.request, earlier);
+        // The site Rust read from the page is the authority for which chat this is.
+        useChat.getState().begin(prepared.domain);
         const current = get().assistant;
         if (current.status !== "preparing" || current.request !== started.request) {
           dropJob(prepared.id);
@@ -770,7 +795,9 @@ export const useApp = create<AppStore>((set, get) => {
     },
 
     cancelAssistant: (keepText) => {
-      dropJob(pendingJobId(get().assistant));
+      const current = get().assistant;
+      dropJob(pendingJobId(current));
+      if (current.status === "proposal") dispatch({ type: "reject" });
       dispatch({ type: "reset", keepText });
     },
 
@@ -778,7 +805,7 @@ export const useApp = create<AppStore>((set, get) => {
       const current = get().assistant;
       if (current.status !== "error") return;
       dropJob(current.jobId);
-      await get().submitRequest(current.request);
+      await get().submitRequest(current.request, current.turnId);
     },
 
     enterIncognito: async () => {
@@ -795,6 +822,7 @@ export const useApp = create<AppStore>((set, get) => {
           return;
         }
         set({ incognito: { active: true, favorites, busy: false }, error: null });
+        resetChats();
         get().trimSessions("routine");
         applyIcons();
         void fetchIcons(favorites.map((favorite) => favorite.url));
@@ -810,6 +838,7 @@ export const useApp = create<AppStore>((set, get) => {
       try {
         await incognitoIpc.exit();
         set({ incognito: { active: false, favorites: [], busy: false }, incognitoSites: [] });
+        resetChats();
         get().trimSessions("routine");
       } catch (error) {
         setIncognitoBusy(false);
