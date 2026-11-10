@@ -312,6 +312,8 @@ export const sv: Messages = {
   "market.tag.desktop": "Dator",
   "market.filters": "Filtrera efter tagg",
   "market.noMatch": "Inget matchar de här filtren.",
+  "market.search": "Sök recept",
+  "market.searchNone": "Inga recept matchar din sökning.",
   "market.rating.none": "Inga betyg ännu",
   "market.rate": "Ditt betyg",
   "market.rateStars": "Ge {count} stjärna | Ge {count} stjärnor",

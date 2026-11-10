@@ -318,6 +318,8 @@ export const fr: Messages = {
   "market.tag.desktop": "Ordinateur",
   "market.filters": "Filtrer par étiquette",
   "market.noMatch": "Rien ne correspond à ces filtres.",
+  "market.search": "Rechercher des recettes",
+  "market.searchNone": "Aucune recette ne correspond à votre recherche.",
   "market.rating.none": "Aucune note pour l’instant",
   "market.rate": "Votre note",
   "market.rateStars": "Donner {count} étoile | Donner {count} étoiles",

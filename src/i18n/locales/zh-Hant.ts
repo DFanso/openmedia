@@ -292,6 +292,8 @@ export const zhHant: Messages = {
   "market.tag.desktop": "桌面版",
   "market.filters": "依標籤篩選",
   "market.noMatch": "沒有符合這些篩選條件的內容。",
+  "market.search": "搜尋配方",
+  "market.searchNone": "沒有符合搜尋的配方。",
   "market.rating.none": "尚無評分",
   "market.rate": "你的評分",
   "market.rateStars": "評 {count} 顆星",

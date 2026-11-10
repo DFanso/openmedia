@@ -314,6 +314,8 @@ export const uk: Messages = {
   "market.tag.desktop": "Комп’ютер",
   "market.filters": "Фільтр за тегами",
   "market.noMatch": "Нічого не відповідає цим фільтрам.",
+  "market.search": "Пошук рецептів",
+  "market.searchNone": "Немає рецептів, що відповідають вашому запиту.",
   "market.rating.none": "Оцінок ще немає",
   "market.rate": "Ваша оцінка",
   "market.rateStars":

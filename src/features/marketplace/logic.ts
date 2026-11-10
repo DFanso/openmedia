@@ -44,12 +44,31 @@ export function matchesFilter(tags: readonly string[], filter: ReadonlySet<Marke
   });
 }
 
-/** The items the filter lets through, official ones first; each group keeps the server's order. */
+/**
+ * True when every word of the query appears, case-insensitively and literally, in the item's name,
+ * author, summary, hosts or tags. A blank query matches everything.
+ */
+export function matchesSearch(item: MarketItem, query: string): boolean {
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return true;
+  const haystack = [item.name, item.author, item.summary, ...item.hosts, ...item.tags]
+    .join("\n")
+    .toLowerCase();
+  return words.every((word) => haystack.includes(word));
+}
+
+/**
+ * The items the filter and the search let through, official ones first; each group keeps the
+ * server's order.
+ */
 export function visibleItems(
   items: readonly MarketItem[],
   filter: ReadonlySet<MarketTag>,
+  query = "",
 ): MarketItem[] {
-  const shown = items.filter((item) => matchesFilter(item.tags, filter));
+  const shown = items.filter(
+    (item) => matchesFilter(item.tags, filter) && matchesSearch(item, query),
+  );
   const rank = (item: MarketItem) => (item.tags.includes("official") ? 0 : 1);
   return shown
     .map((item, index) => ({ item, index }))

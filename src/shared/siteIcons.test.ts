@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import type { Favorite } from "./ipc";
 import {
+  bundledIconForHosts,
   hasBundledIcon,
   faviconPageUrlForHost,
   iconForUrl,
@@ -29,6 +30,26 @@ describe("the icons that ship with the app", () => {
         expect(hasBundledIcon(host), `${recipe.id}: no icon for ${host}`).toBe(true);
       }
     }
+  });
+});
+
+describe("bundledIconForHosts", () => {
+  it("gives every official recipe its icon by homepage or hosts", () => {
+    const recipes = Object.values(RECIPES);
+    expect(recipes.length).toBeGreaterThanOrEqual(18);
+    for (const recipe of recipes) {
+      const hosts = recipe.match.map((pattern) => new URL(pattern).hostname);
+      expect(bundledIconForHosts([recipe.meta.homepage, ...hosts]), recipe.id).toBeTruthy();
+      expect(bundledIconForHosts([recipe.meta.homepage]), `${recipe.id} homepage`).toBeTruthy();
+    }
+  });
+
+  it("tries the later entries, handles wildcards and skips unknown or empty ones", () => {
+    const twitter = bundledIconForHosts(["x.com"]);
+    expect(twitter).toBeTruthy();
+    expect(bundledIconForHosts([null, undefined, "", "unknown.example", "*.x.com"])).toBe(twitter);
+    expect(bundledIconForHosts(["https://web.telegram.org/k/"])).toBeTruthy();
+    expect(bundledIconForHosts(["unknown.example", null])).toBeUndefined();
   });
 });
 

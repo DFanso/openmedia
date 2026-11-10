@@ -317,6 +317,8 @@ export const el: Messages = {
   "market.tag.desktop": "Υπολογιστής",
   "market.filters": "Φιλτράρισμα ανά ετικέτα",
   "market.noMatch": "Τίποτα δεν ταιριάζει με αυτά τα φίλτρα.",
+  "market.search": "Αναζήτηση συνταγών",
+  "market.searchNone": "Καμία συνταγή δεν ταιριάζει με την αναζήτησή σας.",
   "market.rating.none": "Καμία βαθμολογία ακόμη",
   "market.rate": "Η βαθμολογία σας",
   "market.rateStars": "Βαθμολογία {count} αστέρι | Βαθμολογία {count} αστέρια",

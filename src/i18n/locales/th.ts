@@ -295,6 +295,8 @@ export const th: Messages = {
   "market.tag.desktop": "เดสก์ท็อป",
   "market.filters": "กรองตามแท็ก",
   "market.noMatch": "ไม่มีรายการที่ตรงกับตัวกรองเหล่านี้",
+  "market.search": "ค้นหาสูตร",
+  "market.searchNone": "ไม่มีสูตรที่ตรงกับการค้นหาของคุณ",
   "market.rating.none": "ยังไม่มีคะแนน",
   "market.rate": "คะแนนของคุณ",
   "market.rateStars": "ให้ {count} ดาว",

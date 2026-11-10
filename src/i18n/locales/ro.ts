@@ -312,6 +312,8 @@ export const ro: Messages = {
   "market.tag.desktop": "Desktop",
   "market.filters": "Filtrează după etichetă",
   "market.noMatch": "Nimic nu se potrivește cu aceste filtre.",
+  "market.search": "Caută rețete",
+  "market.searchNone": "Nicio rețetă nu se potrivește căutării tale.",
   "market.rating.none": "Încă fără evaluări",
   "market.rate": "Evaluarea ta",
   "market.rateStars": "Acordă {count} stea | Acordă {count} stele | Acordă {count} de stele",

@@ -300,6 +300,8 @@ export const ar: Messages = {
   "market.tag.desktop": "سطح المكتب",
   "market.filters": "التصفية حسب الوسم",
   "market.noMatch": "لا شيء يطابق هذه المرشحات.",
+  "market.search": "ابحث في الوصفات",
+  "market.searchNone": "لا توجد وصفات تطابق بحثك.",
   "market.rating.none": "لا تقييمات بعد",
   "market.rate": "تقييمك",
   "market.rateStars":

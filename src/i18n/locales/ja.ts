@@ -309,6 +309,8 @@ export const ja: Messages = {
   "market.tag.desktop": "デスクトップ",
   "market.filters": "タグで絞り込む",
   "market.noMatch": "これらの条件に一致するものはありません。",
+  "market.search": "レシピを検索",
+  "market.searchNone": "検索に一致するレシピはありません。",
   "market.rating.none": "評価はまだありません",
   "market.rate": "あなたの評価",
   "market.rateStars": "星{count}つで評価",

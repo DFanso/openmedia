@@ -316,6 +316,8 @@ export const pt: Messages = {
   "market.tag.desktop": "Computador",
   "market.filters": "Filtrar por tag",
   "market.noMatch": "Nada corresponde a esses filtros.",
+  "market.search": "Pesquisar receitas",
+  "market.searchNone": "Nenhuma receita corresponde à sua pesquisa.",
   "market.rating.none": "Ainda sem avaliações",
   "market.rate": "Sua avaliação",
   "market.rateStars": "Avaliar com {count} estrela | Avaliar com {count} estrelas",

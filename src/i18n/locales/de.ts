@@ -309,6 +309,8 @@ export const de: Messages = {
   "market.tag.desktop": "Desktop",
   "market.filters": "Nach Tag filtern",
   "market.noMatch": "Nichts passt zu diesen Filtern.",
+  "market.search": "Rezepte suchen",
+  "market.searchNone": "Keine Rezepte passen zu deiner Suche.",
   "market.rating.none": "Noch keine Bewertungen",
   "market.rate": "Deine Bewertung",
   "market.rateStars": "{count} Stern vergeben | {count} Sterne vergeben",

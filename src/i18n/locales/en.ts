@@ -310,6 +310,8 @@ export const en = {
   "market.tag.desktop": "Desktop",
   "market.filters": "Filter by tag",
   "market.noMatch": "Nothing matches these filters.",
+  "market.search": "Search recipes",
+  "market.searchNone": "No recipes match your search.",
   "market.rating.none": "No ratings yet",
   "market.rate": "Your rating",
   "market.rateStars": "Rate {count} star | Rate {count} stars",

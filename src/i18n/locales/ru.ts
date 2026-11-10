@@ -313,6 +313,8 @@ export const ru: Messages = {
   "market.tag.desktop": "Компьютер",
   "market.filters": "Фильтр по тегу",
   "market.noMatch": "Ничего не подходит под эти фильтры.",
+  "market.search": "Поиск рецептов",
+  "market.searchNone": "Нет рецептов, подходящих под ваш запрос.",
   "market.rating.none": "Оценок пока нет",
   "market.rate": "Ваша оценка",
   "market.rateStars":

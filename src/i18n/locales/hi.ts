@@ -306,6 +306,8 @@ export const hi: Messages = {
   "market.tag.desktop": "डेस्कटॉप",
   "market.filters": "टैग से फ़िल्टर करें",
   "market.noMatch": "इन फ़िल्टर से कुछ मेल नहीं खाता।",
+  "market.search": "रेसिपी खोजें",
+  "market.searchNone": "आपकी खोज से कोई रेसिपी मेल नहीं खाती।",
   "market.rating.none": "अभी कोई रेटिंग नहीं",
   "market.rate": "आपकी रेटिंग",
   "market.rateStars": "{count} स्टार दें | {count} स्टार दें",
