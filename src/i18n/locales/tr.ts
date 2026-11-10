@@ -248,9 +248,10 @@ export const tr: Messages = {
   "recipes.imported": "Uygulamanın dışından eklendi. Sitenin eski haline dönmek için kaldırın.",
 
   "market.title": "Pazar yeri",
-  "market.linkNote": "Başkalarının tarifleri, listelenmeden önce kontrol edilir",
+  "market.linkNote":
+    "Başkalarının tarifleri, otomatik olarak kontrol edilir ve 14 gün sonra yayımlanır",
   "market.note":
-    "Başkaları tarafından hazırlanan ve listelenmeden önce bir kişi tarafından kontrol edilen tarifler. Bir şey eklenmeden önce her kuralı görürsünüz.",
+    "Başkaları tarafından hazırlanan tarifler. Sunucu her tarifi otomatik olarak kontrol eder; kontrolü geçen tarif hemen herkese açık listeye girer ve gönderildikten 14 gün sonra yayımlanır. Bir şey eklenmeden önce her kuralı görürsünüz.",
   "market.loading": "Yükleniyor…",
   "market.empty": "Henüz listelenen bir şey yok.",
   "market.add": "Ekle",
@@ -275,13 +276,13 @@ export const tr: Messages = {
   "market.reported": "Teşekkürler, bildirim gönderildi.",
   "market.share": "Tariflerinizden birini paylaşın",
   "market.share.note":
-    "Her tarif listelenmeden önce bir kişi tarafından kontrol edilir. Yeni sürümler yalnızca bu cihazdan gönderilebilir.",
+    "Sunucu her tarifi otomatik olarak kontrol eder. Kontrolü geçen tarif hemen herkese açık listeye girer ve gönderildikten 14 gün sonra yayımlanır. Yeni sürümler yalnızca bu cihazdan gönderilebilir.",
   "market.share.recipe": "Tarif",
   "market.share.name": "Pazar yerindeki ad",
   "market.share.summary": "Tek satırlık özet",
   "market.share.author": "Adınız",
-  "market.share.send": "İncelemeye gönder",
-  "market.share.sent": "Gönderildi. Bir kişi kontrol ettikten sonra listelenir.",
+  "market.share.send": "Pazar yerine gönder",
+  "market.share.sent": "Gönderildi. Herkese açık listede ve 14 gün içinde yayımlanacak.",
   "market.counting": "Tarif eklediğimde pazar yerine bildir",
   "market.countingNote":
     "Yalnızca tarifin adı gönderilir, sizinle ilgili hiçbir şey gönderilmez. “… kişi ekledi” sayılarını oluşturur.",

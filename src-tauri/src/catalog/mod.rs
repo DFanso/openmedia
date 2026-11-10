@@ -51,7 +51,7 @@ pub struct Item {
 #[serde(rename_all = "camelCase")]
 pub struct Listing {
     pub items: Vec<Item>,
-    /// Names of installed recipes the curator withdrew; they were removed from this device.
+    /// Names of installed recipes that were withdrawn; they were removed from this device.
     pub withdrawn: Vec<String>,
 }
 
@@ -127,8 +127,9 @@ impl Catalog {
         self.market()?.report(id, &entry.version, reason).await
     }
 
-    /// Sends one of the user's own recipes for review under `market.<slug>`. The recipe is
-    /// checked here exactly as the curator and every device will check it.
+    /// Sends one of the user's own recipes to the marketplace under `market.<slug>`. The recipe
+    /// is checked here exactly as the server and every device will check it. The server checks it
+    /// automatically and holds it before it is published; no person reviews it.
     pub async fn submit(
         &self,
         recipes: &Recipes,

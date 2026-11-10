@@ -235,8 +235,9 @@ export const zhHans: Messages = {
   "recipes.imported": "从应用外添加。移除它即可恢复网站原本的样子。",
 
   "market.title": "配方市场",
-  "market.linkNote": "来自其他人的配方，上架前经过审核",
-  "market.note": "由其他人制作、上架前经人工审核的配方。添加任何内容之前，你都能看到每一条规则。",
+  "market.linkNote": "来自其他人的配方，自动检查，14 天后上架",
+  "market.note":
+    "由其他人制作的配方。服务器会自动检查每个配方；通过检查的配方立即进入公开列表，并在发送 14 天后上架。添加任何内容之前，你都能看到每一条规则。",
   "market.loading": "加载中…",
   "market.empty": "目前还没有上架内容。",
   "market.add": "添加",
@@ -260,13 +261,14 @@ export const zhHans: Messages = {
   "market.report.other": "其他",
   "market.reported": "谢谢，报告已发送。",
   "market.share": "分享你的一个配方",
-  "market.share.note": "每个配方上架前都会经人工审核。新版本只能从此设备发送。",
+  "market.share.note":
+    "服务器会自动检查每个配方。通过检查的配方立即进入公开列表，并在发送 14 天后上架。新版本只能从此设备发送。",
   "market.share.recipe": "配方",
   "market.share.name": "在市场中的名称",
   "market.share.summary": "一句话简介",
   "market.share.author": "你的名字",
-  "market.share.send": "提交审核",
-  "market.share.sent": "已发送。经人工审核后即会上架。",
+  "market.share.send": "发送到市场",
+  "market.share.sent": "已发送。已进入公开列表，14 天后上架。",
   "market.counting": "添加配方时通知市场",
   "market.countingNote": "只发送配方名称，不包含任何与你有关的信息。它用于生成“已添加”的人数。",
 

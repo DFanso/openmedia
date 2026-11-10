@@ -249,9 +249,10 @@ export const nl: Messages = {
     "Van buiten de app toegevoegd. Verwijder het om de site weer te laten zoals hij was.",
 
   "market.title": "Marktplaats",
-  "market.linkNote": "Recepten van anderen, gecontroleerd voordat ze worden getoond",
+  "market.linkNote":
+    "Recepten van anderen, automatisch gecontroleerd en 14 dagen later gepubliceerd",
   "market.note":
-    "Recepten gemaakt door anderen en door een persoon gecontroleerd voordat ze worden getoond. Je ziet elke regel voordat er iets wordt toegevoegd.",
+    "Recepten gemaakt door anderen. De server controleert elk recept automatisch; recepten die de controle doorstaan verschijnen meteen in de openbare lijst en worden 14 dagen na het versturen gepubliceerd. Je ziet elke regel voordat er iets wordt toegevoegd.",
   "market.loading": "Laden…",
   "market.empty": "Er staat nog niets in de lijst.",
   "market.add": "Toevoegen",
@@ -276,13 +277,14 @@ export const nl: Messages = {
   "market.reported": "Bedankt, de melding is verstuurd.",
   "market.share": "Deel een van je recepten",
   "market.share.note":
-    "Een persoon controleert elk recept voordat het wordt getoond. Nieuwe versies kunnen alleen vanaf dit apparaat worden verstuurd.",
+    "De server controleert elk recept automatisch. Recepten die de controle doorstaan verschijnen meteen in de openbare lijst en worden 14 dagen na het versturen gepubliceerd. Nieuwe versies kunnen alleen vanaf dit apparaat worden verstuurd.",
   "market.share.recipe": "Recept",
   "market.share.name": "Naam op de marktplaats",
   "market.share.summary": "Samenvatting in één regel",
   "market.share.author": "Je naam",
-  "market.share.send": "Versturen ter beoordeling",
-  "market.share.sent": "Verstuurd. Het wordt getoond zodra een persoon het heeft gecontroleerd.",
+  "market.share.send": "Naar de marktplaats sturen",
+  "market.share.sent":
+    "Verstuurd. Het staat in de openbare lijst en wordt over 14 dagen gepubliceerd.",
   "market.counting": "De marktplaats laten weten wanneer ik een recept toevoeg",
   "market.countingNote":
     "Alleen de naam van het recept wordt verstuurd, niets over jou. Hiermee worden de aantallen bij “Toegevoegd door” bepaald.",

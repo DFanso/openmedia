@@ -77,8 +77,8 @@ pub async fn marketplace_report(
     catalog.report(&recipe_id, reason).await
 }
 
-/// Sends one of the user's own recipes for review. The reply says whether this was the first
-/// submission under that name; the edit token itself never reaches the shell.
+/// Sends one of the user's own recipes to the marketplace. The reply says whether this was the
+/// first submission under that name; the edit token itself never reaches the shell.
 #[tauri::command]
 pub async fn marketplace_submit(
     catalog: State<'_, Catalog>,

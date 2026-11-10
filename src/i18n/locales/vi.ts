@@ -244,9 +244,9 @@ export const vi: Messages = {
   "recipes.imported": "Được thêm từ bên ngoài ứng dụng. Gỡ bỏ để trở về như trang vốn có.",
 
   "market.title": "Chợ công thức",
-  "market.linkNote": "Công thức của người khác, được kiểm tra trước khi đăng",
+  "market.linkNote": "Công thức của người khác, được kiểm tra tự động và đăng sau 14 ngày",
   "market.note":
-    "Công thức do người khác tạo và được một người kiểm tra trước khi đăng. Bạn xem mọi quy tắc trước khi có gì được thêm.",
+    "Công thức do người khác tạo. Máy chủ kiểm tra tự động mọi công thức; công thức vượt qua kiểm tra sẽ xuất hiện ngay trong danh sách công khai và được đăng 14 ngày sau khi gửi. Bạn xem mọi quy tắc trước khi có gì được thêm.",
   "market.loading": "Đang tải…",
   "market.empty": "Chưa có gì được đăng.",
   "market.add": "Thêm",
@@ -271,13 +271,13 @@ export const vi: Messages = {
   "market.reported": "Cảm ơn, báo cáo đã được gửi.",
   "market.share": "Chia sẻ một công thức của bạn",
   "market.share.note":
-    "Mỗi công thức đều được một người kiểm tra trước khi đăng. Chỉ có thể gửi phiên bản mới từ thiết bị này.",
+    "Máy chủ kiểm tra tự động mọi công thức. Công thức vượt qua kiểm tra sẽ xuất hiện ngay trong danh sách công khai và được đăng 14 ngày sau khi gửi. Chỉ có thể gửi phiên bản mới từ thiết bị này.",
   "market.share.recipe": "Công thức",
   "market.share.name": "Tên trên chợ",
   "market.share.summary": "Tóm tắt một dòng",
   "market.share.author": "Tên của bạn",
-  "market.share.send": "Gửi để duyệt",
-  "market.share.sent": "Đã gửi. Công thức sẽ được đăng sau khi có người kiểm tra.",
+  "market.share.send": "Gửi đến chợ",
+  "market.share.sent": "Đã gửi. Đã có trong danh sách công khai và sẽ được đăng sau 14 ngày.",
   "market.counting": "Báo cho chợ khi tôi thêm công thức",
   "market.countingNote":
     "Chỉ gửi tên công thức, không có gì về bạn. Dữ liệu này tạo nên số liệu “Đã được … người thêm”.",

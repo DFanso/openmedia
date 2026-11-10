@@ -252,9 +252,10 @@ export const es: Messages = {
     "Añadida desde fuera de la app. Quítala para que el sitio vuelva a ser como era.",
 
   "market.title": "Mercado",
-  "market.linkNote": "Recetas de otras personas, revisadas antes de publicarse",
+  "market.linkNote":
+    "Recetas de otras personas, revisadas automáticamente y publicadas 14 días después",
   "market.note":
-    "Recetas creadas por otras personas y revisadas por una persona antes de publicarse. Ves cada regla antes de añadir nada.",
+    "Recetas creadas por otras personas. El servidor revisa cada receta automáticamente; las que pasan la revisión aparecen de inmediato en la lista pública y se publican 14 días después de enviarlas. Ves cada regla antes de añadir nada.",
   "market.loading": "Cargando…",
   "market.empty": "Aún no hay nada publicado.",
   "market.add": "Añadir",
@@ -279,13 +280,13 @@ export const es: Messages = {
   "market.reported": "Gracias, se envió el informe.",
   "market.share": "Comparte una de tus recetas",
   "market.share.note":
-    "Una persona revisa cada receta antes de publicarla. Las versiones nuevas solo se pueden enviar desde este dispositivo.",
+    "El servidor revisa cada receta automáticamente. Las que pasan la revisión aparecen de inmediato en la lista pública y se publican 14 días después de enviarlas. Las versiones nuevas solo se pueden enviar desde este dispositivo.",
   "market.share.recipe": "Receta",
   "market.share.name": "Nombre en el mercado",
   "market.share.summary": "Resumen en una línea",
   "market.share.author": "Tu nombre",
-  "market.share.send": "Enviar para revisión",
-  "market.share.sent": "Enviada. Se publicará cuando una persona la revise.",
+  "market.share.send": "Enviar al mercado",
+  "market.share.sent": "Enviada. Está en la lista pública y se publica en 14 días.",
   "market.counting": "Avisar al mercado cuando añada una receta",
   "market.countingNote":
     "Solo se envía el nombre de la receta, nada sobre ti. Con eso se calculan los números de «Añadida por».",

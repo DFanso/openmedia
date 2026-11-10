@@ -249,9 +249,9 @@ export const pl: Messages = {
   "recipes.imported": "Dodano spoza aplikacji. Usuń go, aby wrócić do stanu witryny sprzed zmian.",
 
   "market.title": "Sklep",
-  "market.linkNote": "Przepisy od innych osób, sprawdzone przed dodaniem do listy",
+  "market.linkNote": "Przepisy od innych osób, sprawdzane automatycznie i publikowane po 14 dniach",
   "market.note":
-    "Przepisy stworzone przez inne osoby i sprawdzone przez człowieka przed dodaniem do listy. Każdą regułę zobaczysz, zanim cokolwiek zostanie dodane.",
+    "Przepisy stworzone przez inne osoby. Serwer sprawdza każdy przepis automatycznie; te, które przejdą kontrolę, od razu pojawiają się na publicznej liście i są publikowane 14 dni po wysłaniu. Każdą regułę zobaczysz, zanim cokolwiek zostanie dodane.",
   "market.loading": "Wczytywanie…",
   "market.empty": "Na razie nic nie ma na liście.",
   "market.add": "Dodaj",
@@ -276,13 +276,13 @@ export const pl: Messages = {
   "market.reported": "Dziękujemy, zgłoszenie zostało wysłane.",
   "market.share": "Udostępnij jeden ze swoich przepisów",
   "market.share.note":
-    "Człowiek sprawdza każdy przepis, zanim trafi na listę. Nowe wersje można wysyłać tylko z tego urządzenia.",
+    "Serwer sprawdza każdy przepis automatycznie. Te, które przejdą kontrolę, od razu pojawiają się na publicznej liście i są publikowane 14 dni po wysłaniu. Nowe wersje można wysyłać tylko z tego urządzenia.",
   "market.share.recipe": "Przepis",
   "market.share.name": "Nazwa w sklepie",
   "market.share.summary": "Podsumowanie w jednym zdaniu",
   "market.share.author": "Twoje imię",
-  "market.share.send": "Wyślij do sprawdzenia",
-  "market.share.sent": "Wysłano. Przepis pojawi się na liście, gdy człowiek go sprawdzi.",
+  "market.share.send": "Wyślij na rynek",
+  "market.share.sent": "Wysłano. Jest na publicznej liście i zostanie opublikowane za 14 dni.",
   "market.counting": "Powiadamiaj sklep, gdy dodam przepis",
   "market.countingNote":
     "Wysyłana jest tylko nazwa przepisu, nic o Tobie. Na tej podstawie powstają liczby przy „Dodało”.",

@@ -246,9 +246,9 @@ export const de: Messages = {
     "Von außerhalb der App hinzugefügt. Entferne es, damit die Website wieder so ist wie vorher.",
 
   "market.title": "Marktplatz",
-  "market.linkNote": "Rezepte von anderen, vor der Aufnahme geprüft",
+  "market.linkNote": "Rezepte von anderen, automatisch geprüft und 14 Tage später veröffentlicht",
   "market.note":
-    "Rezepte, die andere erstellt haben und die vor der Aufnahme von einem Menschen geprüft wurden. Du siehst jede Regel, bevor etwas hinzugefügt wird.",
+    "Rezepte, die andere erstellt haben. Der Server prüft jedes Rezept automatisch; ein bestandenes Rezept steht sofort in der öffentlichen Liste und wird 14 Tage nach dem Senden veröffentlicht. Du siehst jede Regel, bevor etwas hinzugefügt wird.",
   "market.loading": "Wird geladen…",
   "market.empty": "Noch nichts aufgelistet.",
   "market.add": "Hinzufügen",
@@ -273,13 +273,14 @@ export const de: Messages = {
   "market.reported": "Danke, die Meldung wurde gesendet.",
   "market.share": "Eines deiner Rezepte teilen",
   "market.share.note":
-    "Jedes Rezept wird vor der Aufnahme von einem Menschen geprüft. Neue Versionen können nur von diesem Gerät aus gesendet werden.",
+    "Der Server prüft jedes Rezept automatisch. Ein Rezept, das die Prüfung besteht, steht sofort in der öffentlichen Liste und wird 14 Tage nach dem Senden veröffentlicht. Neue Versionen können nur von diesem Gerät aus gesendet werden.",
   "market.share.recipe": "Rezept",
   "market.share.name": "Name im Marktplatz",
   "market.share.summary": "Zusammenfassung in einer Zeile",
   "market.share.author": "Dein Name",
-  "market.share.send": "Zur Prüfung senden",
-  "market.share.sent": "Gesendet. Es wird aufgelistet, sobald ein Mensch es geprüft hat.",
+  "market.share.send": "An den Marktplatz senden",
+  "market.share.sent":
+    "Gesendet. Steht in der öffentlichen Liste und wird in 14 Tagen veröffentlicht.",
   "market.counting": "Dem Marktplatz melden, wenn ich ein Rezept hinzufüge",
   "market.countingNote":
     "Es wird nur der Name des Rezepts gesendet, nichts über dich. Daraus entstehen die Zahlen bei „Hinzugefügt von“.",

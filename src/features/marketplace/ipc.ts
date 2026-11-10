@@ -42,7 +42,7 @@ export interface MarketItem {
 
 export interface MarketListing {
   items: MarketItem[];
-  /** Names of installed recipes the curator withdrew; Rust already removed them. */
+  /** Names of installed recipes that were withdrawn; Rust already removed them. */
   withdrawn: string[];
 }
 

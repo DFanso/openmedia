@@ -110,7 +110,9 @@ pub fn public_key_of(pkcs8: &[u8]) -> Result<[u8; PUBLIC_KEY_BYTES]> {
         .map_err(|_| Error::Catalog("not a valid signing key".into()))
 }
 
-/// Serializes and signs an index. The curator runs this; the app never does.
+/// Serializes and signs an index. The Worker holds the signing key and publishes the catalog;
+/// the app never signs in production. This is the reference implementation of the format and
+/// the source of the test fixtures.
 pub fn sign(index: &Index, pkcs8: &[u8]) -> Result<SignedIndex> {
     check_index(index)?;
     let pair = Ed25519KeyPair::from_pkcs8(pkcs8)
@@ -238,7 +240,7 @@ pub fn entry<'a>(index: &'a Index, id: &str) -> Option<&'a Entry> {
     index.recipes.iter().find(|entry| entry.id == id)
 }
 
-/// Whether the curator withdrew exactly this recipe file.
+/// Whether this recipe file was withdrawn in the catalog.
 pub fn is_revoked(index: &Index, id: &str, sha256: &str) -> bool {
     index
         .revoked

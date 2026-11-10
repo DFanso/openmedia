@@ -255,9 +255,10 @@ export const fr: Messages = {
     "Ajoutée depuis l’extérieur de l’app. Retirez-la pour que le site redevienne comme avant.",
 
   "market.title": "Marché",
-  "market.linkNote": "Des recettes d’autres personnes, vérifiées avant d’être listées",
+  "market.linkNote":
+    "Des recettes d’autres personnes, vérifiées automatiquement et publiées 14 jours après",
   "market.note":
-    "Des recettes créées par d’autres personnes et vérifiées par une personne avant d’être listées. Vous voyez chaque règle avant que quoi que ce soit ne soit ajouté.",
+    "Des recettes créées par d’autres personnes. Le serveur vérifie chaque recette automatiquement ; celles qui passent la vérification apparaissent aussitôt dans la liste publique et sont publiées 14 jours après l’envoi. Vous voyez chaque règle avant que quoi que ce soit ne soit ajouté.",
   "market.loading": "Chargement…",
   "market.empty": "Rien n’est encore listé.",
   "market.add": "Ajouter",
@@ -282,13 +283,13 @@ export const fr: Messages = {
   "market.reported": "Merci, le signalement a été envoyé.",
   "market.share": "Partager l’une de vos recettes",
   "market.share.note":
-    "Une personne vérifie chaque recette avant qu’elle soit listée. Les nouvelles versions ne peuvent être envoyées que depuis cet appareil.",
+    "Le serveur vérifie chaque recette automatiquement. Celles qui passent la vérification apparaissent aussitôt dans la liste publique et sont publiées 14 jours après l’envoi. Les nouvelles versions ne peuvent être envoyées que depuis cet appareil.",
   "market.share.recipe": "Recette",
   "market.share.name": "Nom sur le marché",
   "market.share.summary": "Résumé en une ligne",
   "market.share.author": "Votre nom",
-  "market.share.send": "Envoyer pour vérification",
-  "market.share.sent": "Envoyée. Elle sera listée une fois vérifiée par une personne.",
+  "market.share.send": "Envoyer au marché",
+  "market.share.sent": "Envoyée. Elle est dans la liste publique et sera publiée dans 14 jours.",
   "market.counting": "Prévenir le marché quand j’ajoute une recette",
   "market.countingNote":
     "Seul le nom de la recette est envoyé, rien sur vous. Il sert à calculer les chiffres « Ajoutée par ».",

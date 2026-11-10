@@ -247,9 +247,9 @@ export const ja: Messages = {
   "recipes.imported": "アプリの外から追加されました。外すと、サイトは元の状態に戻ります。",
 
   "market.title": "マーケットプレイス",
-  "market.linkNote": "ほかの人のレシピ（掲載前に確認済み）",
+  "market.linkNote": "ほかの人のレシピ（自動チェックされ、14日後に公開）",
   "market.note":
-    "ほかの人が作ったレシピで、掲載前に人が確認しています。追加する前に、すべてのルールを確認できます。",
+    "ほかの人が作ったレシピです。サーバーが自動でチェックし、通ったレシピはすぐに公開リストに載り、送信から14日後に公開されます。追加する前に、すべてのルールを確認できます。",
   "market.loading": "読み込み中…",
   "market.empty": "まだ何も掲載されていません。",
   "market.add": "追加",
@@ -274,13 +274,13 @@ export const ja: Messages = {
   "market.reported": "報告を送信しました。ありがとうございます。",
   "market.share": "自分のレシピを共有",
   "market.share.note":
-    "掲載前に、すべてのレシピを人が確認します。新しいバージョンはこの端末からのみ送信できます。",
+    "サーバーがすべてのレシピを自動でチェックします。チェックを通ったレシピはすぐに公開リストに載り、送信から14日後に公開されます。新しいバージョンはこの端末からのみ送信できます。",
   "market.share.recipe": "レシピ",
   "market.share.name": "マーケットプレイスでの名前",
   "market.share.summary": "一行の概要",
   "market.share.author": "あなたの名前",
-  "market.share.send": "審査に送信",
-  "market.share.sent": "送信しました。人が確認すると掲載されます。",
+  "market.share.send": "マーケットプレイスへ送信",
+  "market.share.sent": "送信しました。公開リストに載り、14日後に公開されます。",
   "market.counting": "レシピを追加したらマーケットプレイスに知らせる",
   "market.countingNote":
     "送信されるのはレシピの名前だけで、あなたに関する情報は含まれません。「追加」の人数の集計に使われます。",

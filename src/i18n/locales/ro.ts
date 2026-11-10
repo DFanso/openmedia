@@ -251,9 +251,9 @@ export const ro: Messages = {
   "recipes.imported": "Adăugată din afara aplicației. Elimin-o ca să revii la cum era site-ul.",
 
   "market.title": "Magazin",
-  "market.linkNote": "Rețete de la alte persoane, verificate înainte de a fi listate",
+  "market.linkNote": "Rețete de la alte persoane, verificate automat și publicate după 14 zile",
   "market.note":
-    "Rețete create de alte persoane și verificate de un om înainte de a fi listate. Vezi fiecare regulă înainte de a se adăuga ceva.",
+    "Rețete create de alte persoane. Serverul verifică automat fiecare rețetă; cele care trec verificarea apar imediat în lista publică și sunt publicate la 14 zile după trimitere. Vezi fiecare regulă înainte de a se adăuga ceva.",
   "market.loading": "Se încarcă…",
   "market.empty": "Încă nu este nimic listat.",
   "market.add": "Adaugă",
@@ -278,13 +278,13 @@ export const ro: Messages = {
   "market.reported": "Mulțumim, raportul a fost trimis.",
   "market.share": "Distribuie una dintre rețetele tale",
   "market.share.note":
-    "Un om verifică fiecare rețetă înainte de a fi listată. Versiuni noi pot fi trimise doar de pe acest dispozitiv.",
+    "Serverul verifică automat fiecare rețetă. Cele care trec verificarea apar imediat în lista publică și sunt publicate la 14 zile după trimitere. Versiuni noi pot fi trimise doar de pe acest dispozitiv.",
   "market.share.recipe": "Rețetă",
   "market.share.name": "Numele în magazin",
   "market.share.summary": "Rezumat într-o singură linie",
   "market.share.author": "Numele tău",
-  "market.share.send": "Trimite spre verificare",
-  "market.share.sent": "Trimisă. Va fi listată după ce o verifică un om.",
+  "market.share.send": "Trimite pe piață",
+  "market.share.sent": "Trimisă. Este în lista publică și se publică în 14 zile.",
   "market.counting": "Anunță magazinul când adaug o rețetă",
   "market.countingNote":
     "Se trimite doar numele rețetei, nimic despre tine. Din el se formează numerele „Adăugată de”.",

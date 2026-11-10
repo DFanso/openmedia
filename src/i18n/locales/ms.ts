@@ -246,9 +246,10 @@ export const ms: Messages = {
   "recipes.imported": "Ditambah dari luar aplikasi. Buang untuk mengembalikan laman seperti asal.",
 
   "market.title": "Pasaran",
-  "market.linkNote": "Resipi daripada orang lain, disemak sebelum disenaraikan",
+  "market.linkNote":
+    "Resipi daripada orang lain, disemak secara automatik dan diterbitkan 14 hari kemudian",
   "market.note":
-    "Resipi yang dibuat oleh orang lain dan disemak oleh seseorang sebelum disenaraikan. Anda melihat setiap peraturan sebelum apa-apa ditambah.",
+    "Resipi yang dibuat oleh orang lain. Pelayan menyemak setiap resipi secara automatik; resipi yang lulus akan serta-merta muncul dalam senarai awam dan diterbitkan 14 hari selepas dihantar. Anda melihat setiap peraturan sebelum apa-apa ditambah.",
   "market.loading": "Memuatkan…",
   "market.empty": "Belum ada yang disenaraikan.",
   "market.add": "Tambah",
@@ -273,13 +274,13 @@ export const ms: Messages = {
   "market.reported": "Terima kasih, laporan telah dihantar.",
   "market.share": "Kongsi salah satu resipi anda",
   "market.share.note":
-    "Seseorang menyemak setiap resipi sebelum disenaraikan. Versi baharu hanya boleh dihantar dari peranti ini.",
+    "Pelayan menyemak setiap resipi secara automatik. Resipi yang lulus akan serta-merta muncul dalam senarai awam dan diterbitkan 14 hari selepas dihantar. Versi baharu hanya boleh dihantar dari peranti ini.",
   "market.share.recipe": "Resipi",
   "market.share.name": "Nama dalam pasaran",
   "market.share.summary": "Ringkasan satu baris",
   "market.share.author": "Nama anda",
-  "market.share.send": "Hantar untuk semakan",
-  "market.share.sent": "Dihantar. Resipi akan disenaraikan setelah disemak oleh seseorang.",
+  "market.share.send": "Hantar ke pasaran",
+  "market.share.sent": "Dihantar. Sudah ada dalam senarai awam dan akan diterbitkan dalam 14 hari.",
   "market.counting": "Beritahu pasaran apabila saya menambah resipi",
   "market.countingNote":
     "Hanya nama resipi dihantar, tiada apa-apa tentang anda. Ia menghasilkan nombor “Ditambah oleh”.",

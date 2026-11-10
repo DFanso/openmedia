@@ -25,7 +25,7 @@ const REASONS: { reason: ReportReason; label: MessageKey }[] = [
   { reason: "other", label: "market.report.other" },
 ];
 
-/** Recipes other people made, listed after a person checked them. Opened from Settings. */
+/** Recipes other people made, checked automatically and listed after the hold period. Opened from Settings. */
 export function MarketplaceScreen() {
   const open = useApp((s) => s.sheet === "marketplace");
   return open ? <MarketplaceBody /> : null;
@@ -289,7 +289,7 @@ const slugOf = (name: string): string =>
     .replace(/^-+|-+$/g, "")
     .slice(0, 40);
 
-/** Sends one of the user's own recipes for a person to check. Only their own are offered. */
+/** Sends one of the user's own recipes to the marketplace. Only their own are offered. */
 function SubmitView() {
   const sites = useApp((s) => s.sites);
   const own = sites.filter((site) => site.origin === "user" || site.origin === "ai");

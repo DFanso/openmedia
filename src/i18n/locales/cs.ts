@@ -250,9 +250,9 @@ export const cs: Messages = {
   "recipes.imported": "Přidáno zvenčí aplikace. Odeberte ho a web bude zase vypadat jako dřív.",
 
   "market.title": "Tržiště",
-  "market.linkNote": "Recepty od jiných lidí, před zveřejněním zkontrolované",
+  "market.linkNote": "Recepty od jiných lidí, kontrolované automaticky a zveřejněné po 14 dnech",
   "market.note":
-    "Recepty vytvořené jinými lidmi a před zveřejněním zkontrolované člověkem. Každé pravidlo uvidíte dřív, než se cokoli přidá.",
+    "Recepty vytvořené jinými lidmi. Server každý recept zkontroluje automaticky; ten, který projde, se hned objeví ve veřejném seznamu a zveřejní se 14 dní po odeslání. Každé pravidlo uvidíte dřív, než se cokoli přidá.",
   "market.loading": "Načítání…",
   "market.empty": "Zatím nic není zveřejněno.",
   "market.add": "Přidat",
@@ -277,13 +277,13 @@ export const cs: Messages = {
   "market.reported": "Děkujeme, hlášení bylo odesláno.",
   "market.share": "Sdílet jeden z vašich receptů",
   "market.share.note":
-    "Každý recept před zveřejněním zkontroluje člověk. Nové verze lze odesílat jen z tohoto zařízení.",
+    "Server každý recept zkontroluje automaticky. Recept, který projde, se hned objeví ve veřejném seznamu a zveřejní se 14 dní po odeslání. Nové verze lze odesílat jen z tohoto zařízení.",
   "market.share.recipe": "Recept",
   "market.share.name": "Název na tržišti",
   "market.share.summary": "Shrnutí na jeden řádek",
   "market.share.author": "Vaše jméno",
-  "market.share.send": "Odeslat ke kontrole",
-  "market.share.sent": "Odesláno. Zveřejní se, jakmile ho člověk zkontroluje.",
+  "market.share.send": "Odeslat na tržiště",
+  "market.share.sent": "Odesláno. Je ve veřejném seznamu a zveřejní se za 14 dní.",
   "market.counting": "Dát tržišti vědět, když přidám recept",
   "market.countingNote":
     "Odesílá se jen název receptu, nic o vás. Z toho vznikají čísla „Přidalo“.",

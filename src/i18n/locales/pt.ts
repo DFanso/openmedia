@@ -252,9 +252,10 @@ export const pt: Messages = {
   "recipes.imported": "Adicionada de fora do app. Remova-a para voltar ao estado original do site.",
 
   "market.title": "Mercado",
-  "market.linkNote": "Receitas de outras pessoas, verificadas antes de serem listadas",
+  "market.linkNote":
+    "Receitas de outras pessoas, verificadas automaticamente e publicadas 14 dias depois",
   "market.note":
-    "Receitas feitas por outras pessoas e verificadas por um humano antes de serem listadas. Você vê todas as regras antes de qualquer coisa ser adicionada.",
+    "Receitas feitas por outras pessoas. O servidor verifica cada receita automaticamente; as que passam na verificação aparecem logo na lista pública e são publicadas 14 dias depois do envio. Você vê todas as regras antes de qualquer coisa ser adicionada.",
   "market.loading": "Carregando…",
   "market.empty": "Ainda não há nada listado.",
   "market.add": "Adicionar",
@@ -279,13 +280,13 @@ export const pt: Messages = {
   "market.reported": "Obrigado, o relatório foi enviado.",
   "market.share": "Compartilhar uma das suas receitas",
   "market.share.note":
-    "Uma pessoa verifica cada receita antes de ela ser listada. Novas versões só podem ser enviadas deste dispositivo.",
+    "O servidor verifica cada receita automaticamente. As que passam na verificação aparecem logo na lista pública e são publicadas 14 dias depois do envio. Novas versões só podem ser enviadas deste dispositivo.",
   "market.share.recipe": "Receita",
   "market.share.name": "Nome no mercado",
   "market.share.summary": "Resumo em uma linha",
   "market.share.author": "Seu nome",
-  "market.share.send": "Enviar para revisão",
-  "market.share.sent": "Enviada. Ela será listada assim que uma pessoa verificar.",
+  "market.share.send": "Enviar ao mercado",
+  "market.share.sent": "Enviada. Está na lista pública e será publicada em 14 dias.",
   "market.counting": "Avisar o mercado quando eu adicionar uma receita",
   "market.countingNote":
     "Só o nome da receita é enviado, nada sobre você. Ele gera os números de “Adicionada por”.",

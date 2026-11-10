@@ -21,7 +21,8 @@ struct Data {
     /// later catalog can find it.
     installed: BTreeMap<String, String>,
     /// Marketplace recipe id to the token that lets this device submit new versions of it. It
-    /// grants a place in the review queue, never publication.
+    /// lets a new version be submitted; the server still checks and holds every submission
+    /// before it is published.
     edit_tokens: BTreeMap<String, String>,
     count_installs: bool,
 }

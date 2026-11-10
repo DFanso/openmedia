@@ -236,8 +236,9 @@ export const zhHant: Messages = {
   "recipes.imported": "從 App 外部加入。移除它即可恢復網站原本的樣子。",
 
   "market.title": "配方市集",
-  "market.linkNote": "來自其他人的配方，上架前經過審核",
-  "market.note": "由其他人製作、上架前經人工審核的配方。加入任何內容之前，你都能看到每一條規則。",
+  "market.linkNote": "來自其他人的配方，自動檢查，14 天後上架",
+  "market.note":
+    "由其他人製作的配方。伺服器會自動檢查每個配方；通過檢查的配方立即進入公開清單，並在送出 14 天後上架。加入任何內容之前，你都能看到每一條規則。",
   "market.loading": "載入中…",
   "market.empty": "目前還沒有上架內容。",
   "market.add": "加入",
@@ -261,13 +262,14 @@ export const zhHant: Messages = {
   "market.report.other": "其他",
   "market.reported": "謝謝，回報已送出。",
   "market.share": "分享你的其中一個配方",
-  "market.share.note": "每個配方上架前都會經人工審核。新版本只能從此裝置送出。",
+  "market.share.note":
+    "伺服器會自動檢查每個配方。通過檢查的配方立即進入公開清單，並在送出 14 天後上架。新版本只能從此裝置送出。",
   "market.share.recipe": "配方",
   "market.share.name": "在市集中的名稱",
   "market.share.summary": "一句話簡介",
   "market.share.author": "你的名字",
-  "market.share.send": "送交審核",
-  "market.share.sent": "已送出。經人工審核後即會上架。",
+  "market.share.send": "傳送至市集",
+  "market.share.sent": "已送出。已進入公開清單，14 天後上架。",
   "market.counting": "加入配方時通知市集",
   "market.countingNote": "只會傳送配方名稱，不含任何與你有關的資訊。它用於產生「已加入」的人數。",
 

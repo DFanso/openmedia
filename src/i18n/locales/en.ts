@@ -248,9 +248,9 @@ export const en = {
   "recipes.imported": "Added from outside the app. Remove it to go back to how the site was.",
 
   "market.title": "Marketplace",
-  "market.linkNote": "Recipes from other people, checked before they are listed",
+  "market.linkNote": "Recipes from other people, checked automatically and published 14 days later",
   "market.note":
-    "Recipes made by other people and checked by a person before they are listed. You see every rule before anything is added.",
+    "Recipes made by other people. The server checks every recipe automatically; a recipe that passes appears in the public list at once and is published 14 days after it is sent. You see every rule before anything is added.",
   "market.loading": "Loading…",
   "market.empty": "Nothing is listed yet.",
   "market.add": "Add",
@@ -275,13 +275,13 @@ export const en = {
   "market.reported": "Thanks, the report was sent.",
   "market.share": "Share one of your recipes",
   "market.share.note":
-    "A person checks every recipe before it is listed. New versions can be sent from this device only.",
+    "The server checks every recipe automatically. A recipe that passes appears in the public list at once and is published 14 days after it is sent. New versions can be sent from this device only.",
   "market.share.recipe": "Recipe",
   "market.share.name": "Name in the marketplace",
   "market.share.summary": "One-line summary",
   "market.share.author": "Your name",
-  "market.share.send": "Send for review",
-  "market.share.sent": "Sent. It is listed once a person has checked it.",
+  "market.share.send": "Send to the marketplace",
+  "market.share.sent": "Sent. It is in the public list and is published in 14 days.",
   "market.counting": "Tell the marketplace when I add a recipe",
   "market.countingNote":
     "Only the recipe's name is sent, nothing about you. It makes the “Added by” numbers.",

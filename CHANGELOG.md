@@ -8,6 +8,16 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-10
 
+### refactor(marketplace): publish automatically, drop the curator and the manual approval step
+
+**What:** A submitted recipe is now checked by the Worker itself, held for 14 days in a public Upcoming feed and published automatically afterwards. There is no approval queue and no person in the loop, and the catalog signing key is a Cloudflare Worker secret.
+
+**Change:** `src-tauri/tools/curator/` is deleted; the Cargo workspace loses its `tools/*` member and `Cargo.lock` loses the curator crate and `clap`. The app is unchanged where it matters: it still verifies the Ed25519 signature, the SHA-256 pin and the recipe schema, and the shell still shows the rule-by-rule review before an install, so nothing is applied without the user seeing every rule. The marketplace copy in all 29 languages now says the check is automatic and the recipe is published 14 days after it is sent, instead of claiming a person checks it. The wiki's marketplace, security and roadmap pages, `AGENTS.md` and `.env.example` describe the automatic flow, the Worker-held key and the limits: no policy can prove a recipe is benign and a selector can hide important page content, and the stores' user-generated-content rules (Apple 1.2, Play UGC) expect filtering and user blocking that this design does not provide.
+
+**Verified:** by inspection only — no build, test or lint was run for this change; the reviewer should run `yarn verify`. **Not verified:** the new copy on a device; the Worker's 14-day hold, scheduled promotion and Upcoming feed; any deploy.
+
+**PR:** n/a
+
 ### feat(favorites): a notify switch for each quick-access favorite
 
 **Problem:** every quick-access favorite raised a local notification when its unread count rose, and the only way to stop one site was to turn the app's notifications off in iOS Settings.

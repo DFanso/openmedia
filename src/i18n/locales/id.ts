@@ -245,9 +245,9 @@ export const id: Messages = {
     "Ditambahkan dari luar aplikasi. Keluarkan untuk mengembalikan situs seperti semula.",
 
   "market.title": "Pasar",
-  "market.linkNote": "Resep dari orang lain, diperiksa sebelum dicantumkan",
+  "market.linkNote": "Resep dari orang lain, diperiksa otomatis dan diterbitkan 14 hari kemudian",
   "market.note":
-    "Resep buatan orang lain yang diperiksa oleh seseorang sebelum dicantumkan. Anda melihat setiap aturan sebelum apa pun ditambahkan.",
+    "Resep buatan orang lain. Server memeriksa setiap resep secara otomatis; resep yang lolos langsung muncul di daftar publik dan diterbitkan 14 hari setelah dikirim. Anda melihat setiap aturan sebelum apa pun ditambahkan.",
   "market.loading": "Memuat…",
   "market.empty": "Belum ada yang dicantumkan.",
   "market.add": "Tambah",
@@ -272,13 +272,13 @@ export const id: Messages = {
   "market.reported": "Terima kasih, laporan telah dikirim.",
   "market.share": "Bagikan salah satu resep Anda",
   "market.share.note":
-    "Seseorang memeriksa setiap resep sebelum dicantumkan. Versi baru hanya bisa dikirim dari perangkat ini.",
+    "Server memeriksa setiap resep secara otomatis. Resep yang lolos langsung muncul di daftar publik dan diterbitkan 14 hari setelah dikirim. Versi baru hanya bisa dikirim dari perangkat ini.",
   "market.share.recipe": "Resep",
   "market.share.name": "Nama di pasar",
   "market.share.summary": "Ringkasan satu baris",
   "market.share.author": "Nama Anda",
-  "market.share.send": "Kirim untuk ditinjau",
-  "market.share.sent": "Terkirim. Resep akan dicantumkan setelah diperiksa oleh seseorang.",
+  "market.share.send": "Kirim ke marketplace",
+  "market.share.sent": "Terkirim. Sudah ada di daftar publik dan diterbitkan dalam 14 hari.",
   "market.counting": "Beri tahu pasar saat saya menambahkan resep",
   "market.countingNote":
     "Hanya nama resep yang dikirim, tidak ada yang tentang Anda. Ini menghasilkan angka “Ditambahkan oleh”.",

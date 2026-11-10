@@ -245,9 +245,9 @@ export const ko: Messages = {
   "recipes.imported": "앱 외부에서 추가되었습니다. 제거하면 사이트가 원래대로 돌아갑니다.",
 
   "market.title": "마켓플레이스",
-  "market.linkNote": "다른 사람이 만든 레시피, 등록 전에 확인됨",
+  "market.linkNote": "다른 사람이 만든 레시피, 자동으로 검사하고 14일 후 공개",
   "market.note":
-    "다른 사람이 만들고 등록 전에 사람이 확인한 레시피입니다. 무언가를 추가하기 전에 모든 규칙을 볼 수 있습니다.",
+    "다른 사람이 만든 레시피입니다. 서버가 모든 레시피를 자동으로 검사하고, 검사를 통과한 레시피는 바로 공개 목록에 오르며 보낸 지 14일 후에 공개됩니다. 무언가를 추가하기 전에 모든 규칙을 볼 수 있습니다.",
   "market.loading": "불러오는 중…",
   "market.empty": "아직 등록된 항목이 없습니다.",
   "market.add": "추가",
@@ -272,13 +272,13 @@ export const ko: Messages = {
   "market.reported": "감사합니다. 신고가 전송되었습니다.",
   "market.share": "내 레시피 공유하기",
   "market.share.note":
-    "모든 레시피는 등록 전에 사람이 확인합니다. 새 버전은 이 기기에서만 보낼 수 있습니다.",
+    "서버가 모든 레시피를 자동으로 검사합니다. 검사를 통과한 레시피는 바로 공개 목록에 오르며 보낸 지 14일 후에 공개됩니다. 새 버전은 이 기기에서만 보낼 수 있습니다.",
   "market.share.recipe": "레시피",
   "market.share.name": "마켓플레이스에 표시될 이름",
   "market.share.summary": "한 줄 요약",
   "market.share.author": "내 이름",
-  "market.share.send": "검토 요청 보내기",
-  "market.share.sent": "전송되었습니다. 사람이 확인하면 등록됩니다.",
+  "market.share.send": "마켓플레이스로 보내기",
+  "market.share.sent": "보냈습니다. 공개 목록에 오르고 14일 후 공개됩니다.",
   "market.counting": "레시피를 추가하면 마켓플레이스에 알리기",
   "market.countingNote":
     "레시피 이름만 전송되며 사용자에 관한 정보는 전혀 보내지 않습니다. “추가함” 숫자를 만드는 데 쓰입니다.",

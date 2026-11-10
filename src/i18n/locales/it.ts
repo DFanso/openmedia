@@ -253,9 +253,10 @@ export const it: Messages = {
   "recipes.imported": "Aggiunta dall’esterno dell’app. Rimuovila per tornare al sito com’era.",
 
   "market.title": "Marketplace",
-  "market.linkNote": "Ricette di altre persone, controllate prima di essere elencate",
+  "market.linkNote":
+    "Ricette di altre persone, controllate automaticamente e pubblicate 14 giorni dopo",
   "market.note":
-    "Ricette create da altre persone e controllate da una persona prima di essere elencate. Vedi ogni regola prima che venga aggiunto qualcosa.",
+    "Ricette create da altre persone. Il server controlla ogni ricetta automaticamente; quelle che superano il controllo compaiono subito nell’elenco pubblico e vengono pubblicate 14 giorni dopo l’invio. Vedi ogni regola prima che venga aggiunto qualcosa.",
   "market.loading": "Caricamento…",
   "market.empty": "Non c’è ancora nulla in elenco.",
   "market.add": "Aggiungi",
@@ -280,13 +281,13 @@ export const it: Messages = {
   "market.reported": "Grazie, la segnalazione è stata inviata.",
   "market.share": "Condividi una delle tue ricette",
   "market.share.note":
-    "Una persona controlla ogni ricetta prima che venga elencata. Le nuove versioni possono essere inviate solo da questo dispositivo.",
+    "Il server controlla ogni ricetta automaticamente. Quelle che superano il controllo compaiono subito nell’elenco pubblico e vengono pubblicate 14 giorni dopo l’invio. Le nuove versioni possono essere inviate solo da questo dispositivo.",
   "market.share.recipe": "Ricetta",
   "market.share.name": "Nome nel marketplace",
   "market.share.summary": "Riepilogo in una riga",
   "market.share.author": "Il tuo nome",
-  "market.share.send": "Invia per la revisione",
-  "market.share.sent": "Inviata. Sarà elencata dopo il controllo di una persona.",
+  "market.share.send": "Invia al marketplace",
+  "market.share.sent": "Inviata. È nell’elenco pubblico e viene pubblicata tra 14 giorni.",
   "market.counting": "Avvisa il marketplace quando aggiungo una ricetta",
   "market.countingNote":
     "Viene inviato solo il nome della ricetta, nulla su di te. Serve a calcolare i numeri di “Aggiunta da”.",

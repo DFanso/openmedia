@@ -249,9 +249,9 @@ export const sv: Messages = {
     "Tillagt utanför appen. Ta bort det för att gå tillbaka till hur webbplatsen var.",
 
   "market.title": "Marknadsplats",
-  "market.linkNote": "Recept från andra, kontrollerade innan de listas",
+  "market.linkNote": "Recept från andra, kontrollerade automatiskt och publicerade efter 14 dagar",
   "market.note":
-    "Recept gjorda av andra och kontrollerade av en människa innan de listas. Du ser varje regel innan något läggs till.",
+    "Recept gjorda av andra. Servern kontrollerar varje recept automatiskt; recept som klarar kontrollen syns direkt i den offentliga listan och publiceras 14 dagar efter att de skickats. Du ser varje regel innan något läggs till.",
   "market.loading": "Läser in…",
   "market.empty": "Inget är listat ännu.",
   "market.add": "Lägg till",
@@ -276,13 +276,13 @@ export const sv: Messages = {
   "market.reported": "Tack, rapporten skickades.",
   "market.share": "Dela ett av dina recept",
   "market.share.note":
-    "En människa kontrollerar varje recept innan det listas. Nya versioner kan bara skickas från den här enheten.",
+    "Servern kontrollerar varje recept automatiskt. Recept som klarar kontrollen syns direkt i den offentliga listan och publiceras 14 dagar efter att de skickats. Nya versioner kan bara skickas från den här enheten.",
   "market.share.recipe": "Recept",
   "market.share.name": "Namn på marknadsplatsen",
   "market.share.summary": "Sammanfattning på en rad",
   "market.share.author": "Ditt namn",
-  "market.share.send": "Skicka för granskning",
-  "market.share.sent": "Skickat. Det listas när en människa har kontrollerat det.",
+  "market.share.send": "Skicka till marknadsplatsen",
+  "market.share.sent": "Skickat. Det syns i den offentliga listan och publiceras om 14 dagar.",
   "market.counting": "Berätta för marknadsplatsen när jag lägger till ett recept",
   "market.countingNote":
     "Bara receptets namn skickas, inget om dig. Det ger siffrorna för ”Tillagt av”.",
