@@ -47,10 +47,19 @@ import {
   useIconCache,
 } from "../shared/siteIcons";
 
-export type Sheet = "none" | "assistant" | "history" | "stats" | "settings" | "recipes" | "paywall";
+export type Sheet =
+  | "none"
+  | "assistant"
+  | "history"
+  | "stats"
+  | "settings"
+  | "recipes"
+  | "marketplace"
+  | "share"
+  | "paywall";
 
 /** Pages that open on top of Settings. Closing one returns to Settings, which stays mounted beneath it. */
-const SETTINGS_CHILDREN: readonly Sheet[] = ["recipes", "paywall"];
+const SETTINGS_CHILDREN: readonly Sheet[] = ["recipes", "marketplace", "share", "paywall"];
 const isSettingsChild = (sheet: Sheet): boolean => SETTINGS_CHILDREN.includes(sheet);
 
 type SheetState = Pick<AppStore, "sheet" | "sheetParent">;

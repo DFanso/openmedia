@@ -61,7 +61,7 @@ export const sv: Messages = {
   "stats.empty": "Inget har registrerats för den här perioden ännu. Tid på en webbplats visas här.",
   "stats.privateTitle": "Privat på den här telefonen",
   "stats.privateBody":
-    "Den här informationen stannar på den här telefonen och skickas aldrig någonstans. OpenMedia har ingen server och sparar ingen kopia. Endast webbplatsnamn, avsnittsnamn (som ”Watch” eller ”Shorts”) och sekunder lagras: aldrig fullständiga adresser, sökningar eller sidtitlar. Tryck på en webbplats för att se vilka delar av den du använde.",
+    "Den här informationen stannar på den här telefonen och skickas aldrig någonstans. OpenMedia sparar ingen kopia. Endast webbplatsnamn, avsnittsnamn (som ”Watch” eller ”Shorts”) och sekunder lagras: aldrig fullständiga adresser, sökningar eller sidtitlar. Tryck på en webbplats för att se vilka delar av den du använde.",
   "stats.clearAll": "Rensa all statistik",
   "stats.clear": "Rensa statistik",
   "stats.durationSeconds": "{value} s",
@@ -244,6 +244,64 @@ export const sv: Messages = {
   "recipes.ownMargin": "Den här webbplatsen har en egen marginal.",
   "recipes.siteMarginLabel": "Nedre marginal för {name}",
   "recipes.useSharedMargin": "Använd den delade marginalen",
+
+  "recipes.imported":
+    "Tillagt utanför appen. Ta bort det för att gå tillbaka till hur webbplatsen var.",
+
+  "market.title": "Marknadsplats",
+  "market.linkNote": "Recept från andra, kontrollerade innan de listas",
+  "market.note":
+    "Recept gjorda av andra och kontrollerade av en människa innan de listas. Du ser varje regel innan något läggs till.",
+  "market.loading": "Läser in…",
+  "market.empty": "Inget är listat ännu.",
+  "market.add": "Lägg till",
+  "market.update": "Uppdatera",
+  "market.added": "Tillagt",
+  "market.by": "av {author}",
+  "market.addedBy": "Tillagt av {count}",
+  "market.withdrawn": "Borttaget från den här enheten eftersom det drogs tillbaka: {names}",
+  "market.review.version": "Version {version}",
+  "market.review.replaces": "Ersätter din version {version}",
+  "market.review.sites": "Fungerar på",
+  "market.review.options": "Reglage",
+  "market.review.rules": "Vad det ändrar",
+  "market.review.hides": "Döljer",
+  "market.review.restyles": "Ändrar utseendet",
+  "market.report": "Rapportera ett problem",
+  "market.report.harmful": "Skadligt",
+  "market.report.broken": "Trasigt",
+  "market.report.misleading": "Missvisande",
+  "market.report.spam": "Skräppost",
+  "market.report.other": "Något annat",
+  "market.reported": "Tack, rapporten skickades.",
+  "market.share": "Dela ett av dina recept",
+  "market.share.note":
+    "En människa kontrollerar varje recept innan det listas. Nya versioner kan bara skickas från den här enheten.",
+  "market.share.recipe": "Recept",
+  "market.share.name": "Namn på marknadsplatsen",
+  "market.share.summary": "Sammanfattning på en rad",
+  "market.share.author": "Ditt namn",
+  "market.share.send": "Skicka för granskning",
+  "market.share.sent": "Skickat. Det listas när en människa har kontrollerat det.",
+  "market.counting": "Berätta för marknadsplatsen när jag lägger till ett recept",
+  "market.countingNote":
+    "Bara receptets namn skickas, inget om dig. Det ger siffrorna för ”Tillagt av”.",
+
+  "share.link": "Importera och exportera",
+  "share.linkNote": "Flytta recept mellan enheter som text",
+  "share.import": "Importera",
+  "share.importNote":
+    "Klistra bara in recept från personer du litar på. Du ser varje regel innan något läggs till.",
+  "share.paste": "Klistra in recept här",
+  "share.review": "Granska",
+  "share.addSelected": "Lägg till markerade",
+  "share.export": "Exportera",
+  "share.exportNote":
+    "Kopierar dina egna recept som text som vem som helst kan importera. Dina reglage och inställningar ingår inte.",
+  "share.copy": "Kopiera",
+  "share.copied": "Kopierat",
+  "share.copyFailed": "Det gick inte att kopiera. Markera texten nedan och kopiera den.",
+  "share.none": "Du har inga egna recept ännu.",
 
   "ai.title": "AI-assistent",
   "ai.note":

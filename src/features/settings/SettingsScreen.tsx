@@ -10,6 +10,7 @@ import { AiSection } from "./AiSection";
 import { FavoritesSection } from "./FavoritesSection";
 import { IncognitoFavoritesSection, IncognitoRecipesSection } from "./IncognitoSections";
 import { MarginSlider } from "./MarginSlider";
+import { MarketplaceLinks } from "../marketplace/Links";
 import { RecipesLink } from "./RecipesScreen";
 import { Switch } from "./Switch";
 import { Picker } from "./Picker";
@@ -28,6 +29,7 @@ export function SettingsScreen() {
         <LanguageSection />
         <BrowsingSection />
         <RecipesLink />
+        <MarketplaceLinks />
         <FavoritesSection />
         <IncognitoFavoritesSection />
         <IncognitoRecipesSection />

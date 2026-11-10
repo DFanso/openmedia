@@ -1,0 +1,27 @@
+[package]
+name = "openmedia-curator"
+version = "0.1.0"
+description = "Maintainer tool: review, approve, reject, revoke and sign the OpenMedia recipe catalog"
+authors = ["OpenMedia contributors"]
+license = "MPL-2.0"
+repository = "https://github.com/skepjandi/openmedia"
+edition = "2024"
+rust-version = "1.90"
+publish = false
+
+[[bin]]
+name = "curator"
+path = "src/main.rs"
+
+[dependencies]
+openmedia = { path = "../.." }
+base64 = "0.22"
+clap = { version = "4", features = ["derive", "env"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tempfile = "3"
+thiserror = "2"
+zeroize = "1.9.1"
+
+[lints]
+workspace = true

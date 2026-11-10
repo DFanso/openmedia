@@ -2,13 +2,16 @@ mod compile;
 mod matcher;
 mod schema;
 mod selector;
+mod share;
 
 pub use compile::{OptionChoices, page_script};
 pub use schema::{Meta, OptionGroup, Origin, Recipe, Rule, SiteOption, Target};
 pub(crate) use selector::validate_selector;
+pub(crate) use share::{MARKET_PREFIX, MAX_RECIPE_BYTES, is_catalog_id, is_plain_text, is_version};
+pub use share::{RecipePreview, preview as preview_recipe};
 
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, HashSet},
     fs,
     path::PathBuf,
     sync::{PoisonError, RwLock},
@@ -64,6 +67,7 @@ pub struct Recipes {
     dir: PathBuf,
     forks: RwLock<BTreeMap<String, Recipe>>,
     custom: RwLock<BTreeMap<String, Recipe>>,
+    imported: RwLock<BTreeMap<String, Recipe>>,
 }
 
 /// Ids of recipes the user or the assistant made for a site the app ships no recipe for.
@@ -77,6 +81,7 @@ impl Recipes {
         let bundled = bundled()?;
         let mut forks = BTreeMap::new();
         let mut custom = BTreeMap::new();
+        let mut imported = BTreeMap::new();
         for entry in fs::read_dir(&dir).into_iter().flatten().flatten() {
             let path = entry.path();
             if path.extension().is_none_or(|extension| extension != "json") {
@@ -89,6 +94,8 @@ impl Recipes {
                 forks.insert(fork.id.clone(), fork);
             } else if let Ok(recipe) = parse_custom(&text) {
                 custom.insert(recipe.id.clone(), recipe);
+            } else if let Ok(recipe) = share::parse_shared(text.as_bytes(), share::Source::Stored) {
+                imported.insert(recipe.id.clone(), recipe);
             }
         }
         Ok(Self {
@@ -96,16 +103,19 @@ impl Recipes {
             dir,
             forks: RwLock::new(forks),
             custom: RwLock::new(custom),
+            imported: RwLock::new(imported),
         })
     }
 
     pub fn all(&self) -> Vec<Recipe> {
         let forks = self.forks.read().unwrap_or_else(PoisonError::into_inner);
         let custom = self.custom.read().unwrap_or_else(PoisonError::into_inner);
+        let imported = self.imported.read().unwrap_or_else(PoisonError::into_inner);
         self.bundled
             .iter()
             .map(|recipe| forks.get(&recipe.id).unwrap_or(recipe).clone())
             .chain(custom.values().cloned())
+            .chain(imported.values().cloned())
             .collect()
     }
 
@@ -200,6 +210,99 @@ impl Recipes {
             .insert(saved.id.clone(), saved.clone());
         Ok(saved)
     }
+
+    /// The text a user can share: recipes they made or changed, never the ones the app ships.
+    pub fn export(&self, ids: &[String]) -> Result<String> {
+        if ids.is_empty() {
+            return Err(Error::Recipe("choose at least one recipe".into()));
+        }
+        let recipes = ids
+            .iter()
+            .map(|id| {
+                self.get(id)
+                    .filter(|recipe| recipe.origin != Origin::Bundled)
+                    .ok_or(Error::UnknownSite)
+            })
+            .collect::<Result<Vec<_>>>()?;
+        share::export_bundle(&recipes)
+    }
+
+    /// What a pasted bundle would add, for the review screen. Nothing is saved.
+    pub fn preview_import(&self, text: &str) -> Result<Vec<RecipePreview>> {
+        Ok(share::parse_bundle(text)?
+            .iter()
+            .map(|recipe| share::preview(recipe, self.imported_version(&recipe.id).as_deref()))
+            .collect())
+    }
+
+    /// Saves the chosen recipes of a pasted bundle. The bundle is parsed and validated again, so
+    /// only what the review screen could have shown is ever saved.
+    pub fn save_imported(&self, text: &str, ids: &[String]) -> Result<Vec<Recipe>> {
+        let wanted: HashSet<&str> = ids.iter().map(String::as_str).collect();
+        let chosen: Vec<Recipe> = share::parse_bundle(text)?
+            .into_iter()
+            .filter(|recipe| wanted.contains(recipe.id.as_str()))
+            .collect();
+        if chosen.is_empty() || chosen.len() != wanted.len() {
+            return Err(Error::Recipe("choose recipes from the bundle".into()));
+        }
+        chosen
+            .into_iter()
+            .map(|recipe| self.store_imported(recipe))
+            .collect()
+    }
+
+    /// Deletes an imported recipe; its saved switches are left behind and are harmless.
+    pub fn remove_imported(&self, id: &str) -> Result<()> {
+        if self.imported_version(id).is_none() {
+            return Err(Error::UnknownSite);
+        }
+        match fs::remove_file(self.dir.join(format!("{id}.json"))) {
+            Err(error) if error.kind() != std::io::ErrorKind::NotFound => return Err(error.into()),
+            _ => {}
+        }
+        self.imported
+            .write()
+            .unwrap_or_else(PoisonError::into_inner)
+            .remove(id);
+        Ok(())
+    }
+
+    /// Saves a recipe downloaded from the marketplace. `catalog::check_download` must already
+    /// have tied it to the signed index; this only refuses anything that is not a `market.`
+    /// recipe labelled imported.
+    pub fn save_catalog(&self, recipe: Recipe) -> Result<Recipe> {
+        if !recipe.id.starts_with(share::MARKET_PREFIX) || recipe.origin != Origin::Imported {
+            return Err(Error::UnknownSite);
+        }
+        self.store_imported(recipe)
+    }
+
+    pub fn imported_version(&self, id: &str) -> Option<String> {
+        self.imported
+            .read()
+            .unwrap_or_else(PoisonError::into_inner)
+            .get(id)
+            .map(|recipe| recipe.version.clone())
+    }
+
+    fn store_imported(&self, recipe: Recipe) -> Result<Recipe> {
+        write_atomically(
+            &self.dir.join(format!("{}.json", recipe.id)),
+            &serde_json::to_vec_pretty(&recipe)?,
+        )?;
+        self.imported
+            .write()
+            .unwrap_or_else(PoisonError::into_inner)
+            .insert(recipe.id.clone(), recipe.clone());
+        Ok(recipe)
+    }
+}
+
+/// A recipe file downloaded from the marketplace: its own claims about origin are ignored and its
+/// id must be a `market.` one.
+pub fn parse_catalog_recipe(bytes: &[u8]) -> Result<Recipe> {
+    share::parse_shared(bytes, share::Source::Catalog)
 }
 
 fn parse_fork(bundled: &[Recipe], text: &str) -> Result<Recipe> {
@@ -617,5 +720,99 @@ mod tests {
             assert!(recipes.save_made(&bad).is_err(), "{}", bad.id);
         }
         assert_eq!(recipes.all().len(), bundled().unwrap().len());
+    }
+
+    fn shared_bundle(id: &str, version: &str) -> String {
+        format!(
+            r#"{{"openmediaBundle":1,"recipes":[{{"schema":1,"id":"{id}","name":"example.org","version":"{version}","origin":"bundled","match":["https://*.example.org/*"],
+              "options":[{{"id":"mine","label":"Mine","description":"d","group":"content","default":true}}],
+              "rules":[{{"id":"r","label":"l","type":"hide","option":"mine","target":{{"css":".x"}}}}]}}]}}"#
+        )
+    }
+
+    #[test]
+    fn an_imported_recipe_applies_survives_a_restart_and_can_be_removed() {
+        let dir = tempfile::tempdir().unwrap();
+        let folder = dir.path().join("recipes");
+        let recipes = Recipes::load(folder.clone()).unwrap();
+        let text = shared_bundle("reddit.default", "1.0.0");
+        let previews = recipes.preview_import(&text).unwrap();
+        assert_eq!(previews[0].id, "imported.reddit.default");
+        assert_eq!(previews[0].replaces, None);
+        assert_eq!(recipes.all().len(), bundled().unwrap().len());
+
+        let saved = recipes
+            .save_imported(&text, &["imported.reddit.default".to_owned()])
+            .unwrap();
+        assert_eq!(saved[0].origin, Origin::Imported);
+        assert_eq!(
+            recipes.get("reddit.default").unwrap().origin,
+            Origin::Bundled
+        );
+        assert!(
+            recipes
+                .script(&OptionChoices::new())
+                .unwrap()
+                .contains(".x{display:none!important}")
+        );
+
+        let restarted = Recipes::load(folder.clone()).unwrap();
+        assert_eq!(
+            restarted.get("imported.reddit.default"),
+            Some(saved[0].clone())
+        );
+        let newer = shared_bundle("reddit.default", "1.1.0");
+        let preview = restarted.preview_import(&newer).unwrap();
+        assert_eq!(preview[0].replaces.as_deref(), Some("1.0.0"));
+
+        restarted
+            .remove_imported("imported.reddit.default")
+            .unwrap();
+        assert!(restarted.get("imported.reddit.default").is_none());
+        assert!(
+            Recipes::load(folder)
+                .unwrap()
+                .get("imported.reddit.default")
+                .is_none()
+        );
+        assert!(
+            restarted
+                .remove_imported("imported.reddit.default")
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn saving_an_import_needs_ids_that_are_in_the_bundle() {
+        let dir = tempfile::tempdir().unwrap();
+        let recipes = Recipes::load(dir.path().join("recipes")).unwrap();
+        let text = shared_bundle("calm.example", "1.0.0");
+        assert!(recipes.save_imported(&text, &[]).is_err());
+        assert!(
+            recipes
+                .save_imported(&text, &["imported.other".to_owned()])
+                .is_err()
+        );
+        assert!(recipes.get("imported.other").is_none());
+    }
+
+    #[test]
+    fn only_recipes_the_user_made_or_changed_can_be_exported() {
+        let dir = tempfile::tempdir().unwrap();
+        let recipes = Recipes::load(dir.path().join("recipes")).unwrap();
+        assert!(recipes.export(&["reddit.default".to_owned()]).is_err());
+        assert!(recipes.export(&[]).is_err());
+        recipes
+            .save_made(&custom_recipe("custom.example.org", "user"))
+            .unwrap();
+        let text = recipes.export(&["custom.example.org".to_owned()]).unwrap();
+        let reimported = Recipes::load(dir.path().join("elsewhere")).unwrap();
+        let saved = reimported
+            .save_imported(&text, &["imported.custom.example.org".to_owned()])
+            .unwrap();
+        assert_eq!(
+            saved[0].rules,
+            recipes.get("custom.example.org").unwrap().rules
+        );
     }
 }
