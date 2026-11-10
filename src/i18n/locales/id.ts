@@ -307,6 +307,8 @@ export const id: Messages = {
   "market.tag.desktop": "Desktop",
   "market.filters": "Filter menurut tag",
   "market.noMatch": "Tidak ada yang cocok dengan filter ini.",
+  "market.search": "Cari resep",
+  "market.searchNone": "Tidak ada resep yang cocok dengan pencarian Anda.",
   "market.rating.none": "Belum ada peringkat",
   "market.rate": "Peringkat Anda",
   "market.rateStars": "Beri {count} bintang",

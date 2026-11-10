@@ -311,6 +311,8 @@ export const cs: Messages = {
   "market.tag.desktop": "Počítač",
   "market.filters": "Filtrovat podle štítku",
   "market.noMatch": "Těmto filtrům nic neodpovídá.",
+  "market.search": "Hledat recepty",
+  "market.searchNone": "Hledání neodpovídá žádný recept.",
   "market.rating.none": "Zatím žádná hodnocení",
   "market.rate": "Vaše hodnocení",
   "market.rateStars":

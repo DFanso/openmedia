@@ -319,6 +319,8 @@ export const ta: Messages = {
   "market.tag.desktop": "டெஸ்க்டாப்",
   "market.filters": "குறிச்சொல்லால் வடிகட்டு",
   "market.noMatch": "இந்த வடிகட்டிகளுக்குப் பொருந்துவது எதுவும் இல்லை.",
+  "market.search": "ரெசிபிகளைத் தேடு",
+  "market.searchNone": "உன் தேடலுக்குப் பொருந்தும் ரெசிபி எதுவும் இல்லை.",
   "market.rating.none": "இன்னும் மதிப்பீடுகள் இல்லை",
   "market.rate": "உன் மதிப்பீடு",
   "market.rateStars": "{count} நட்சத்திரம் கொடு | {count} நட்சத்திரங்கள் கொடு",

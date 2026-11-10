@@ -307,6 +307,8 @@ export const si: Messages = {
   "market.tag.desktop": "ඩෙස්ක්ටොප්",
   "market.filters": "ටැග් අනුව පෙරන්න",
   "market.noMatch": "මෙම පෙරහන් වලට කිසිවක් ගැළපෙන්නේ නැත.",
+  "market.search": "ක්‍රම සොයන්න",
+  "market.searchNone": "ඔබේ සෙවුමට ගැළපෙන ක්‍රමයක් නැත.",
   "market.rating.none": "තවම ශ්‍රේණිගත කිරීම් නැත",
   "market.rate": "ඔබගේ ශ්‍රේණිගත කිරීම",
   "market.rateStars": "තරු {count}ක් දෙන්න | තරු {count}ක් දෙන්න",

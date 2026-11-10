@@ -310,6 +310,8 @@ export const ms: Messages = {
   "market.tag.desktop": "Desktop",
   "market.filters": "Tapis mengikut teg",
   "market.noMatch": "Tiada yang sepadan dengan penapis ini.",
+  "market.search": "Cari resipi",
+  "market.searchNone": "Tiada resipi sepadan dengan carian anda.",
   "market.rating.none": "Belum ada penilaian",
   "market.rate": "Penilaian anda",
   "market.rateStars": "Beri {count} bintang",

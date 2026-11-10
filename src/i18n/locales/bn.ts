@@ -304,6 +304,8 @@ export const bn: Messages = {
   "market.tag.desktop": "ডেস্কটপ",
   "market.filters": "ট্যাগ অনুযায়ী ছাঁকুন",
   "market.noMatch": "এই ফিল্টারের সাথে কিছু মেলেনি।",
+  "market.search": "রেসিপি খুঁজুন",
+  "market.searchNone": "আপনার অনুসন্ধানের সাথে কোনো রেসিপি মেলেনি।",
   "market.rating.none": "এখনো কোনো রেটিং নেই",
   "market.rate": "আপনার রেটিং",
   "market.rateStars": "{count} স্টার দিন | {count} স্টার দিন",

@@ -7,6 +7,7 @@ import {
   formatRating,
   knownTags,
   matchesFilter,
+  matchesSearch,
   platformTag,
   toggleTag,
   visibleItems,
@@ -136,5 +137,51 @@ describe("backTarget", () => {
     expect(backTarget({ kind: "submit" })).toEqual({ kind: "list" });
     expect(backTarget({ kind: "blocked" })).toEqual({ kind: "list" });
     expect(backTarget({ kind: "list" })).toBe("close");
+  });
+});
+
+describe("matchesSearch", () => {
+  const found: MarketItem = {
+    ...item("x", ["official", "desktop"]),
+    name: "Discord Web",
+    author: "OpenMedia",
+    summary: "Chat on the web",
+    hosts: ["discord.com", "*.discord.gg"],
+  };
+
+  it("matches every word in any field, in any order", () => {
+    expect(matchesSearch(found, "chat discord")).toBe(true);
+    expect(matchesSearch(found, "openmedia web")).toBe(true);
+    expect(matchesSearch(found, "discord telegram")).toBe(false);
+  });
+
+  it("ignores case and surrounding space", () => {
+    expect(matchesSearch(found, "  DISCORD  ")).toBe(true);
+  });
+
+  it("matches tags and hosts", () => {
+    expect(matchesSearch(found, "official")).toBe(true);
+    expect(matchesSearch(found, "discord.gg")).toBe(true);
+    expect(matchesSearch(found, "community")).toBe(false);
+  });
+
+  it("matches everything when the query is blank", () => {
+    expect(matchesSearch(found, "")).toBe(true);
+    expect(matchesSearch(found, "   ")).toBe(true);
+  });
+
+  it("treats regular-expression characters literally", () => {
+    expect(matchesSearch(found, ".*")).toBe(false);
+    expect(matchesSearch(found, "(")).toBe(false);
+    expect(matchesSearch(found, "[a-z]+")).toBe(false);
+    expect(matchesSearch({ ...found, summary: "C++ (beta)" }, "c++ (beta)")).toBe(true);
+  });
+
+  it("combines with the tag filter", () => {
+    const items = [found, { ...item("y", ["community", "desktop"]), name: "Discord Lite" }];
+    const filter = new Set(["official"] as const);
+    expect(visibleItems(items, filter, "discord").map((entry) => entry.id)).toEqual(["x"]);
+    expect(visibleItems(items, new Set(), "lite").map((entry) => entry.id)).toEqual(["y"]);
+    expect(visibleItems(items, filter, "lite")).toEqual([]);
   });
 });

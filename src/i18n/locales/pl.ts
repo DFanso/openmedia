@@ -310,6 +310,8 @@ export const pl: Messages = {
   "market.tag.desktop": "Komputerowe",
   "market.filters": "Filtruj według tagu",
   "market.noMatch": "Nic nie pasuje do tych filtrów.",
+  "market.search": "Szukaj przepisów",
+  "market.searchNone": "Żaden przepis nie pasuje do wyszukiwania.",
   "market.rating.none": "Brak ocen",
   "market.rate": "Twoja ocena",
   "market.rateStars":

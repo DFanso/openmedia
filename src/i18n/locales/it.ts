@@ -317,6 +317,8 @@ export const it: Messages = {
   "market.tag.desktop": "Desktop",
   "market.filters": "Filtra per tag",
   "market.noMatch": "Nessun risultato per questi filtri.",
+  "market.search": "Cerca ricette",
+  "market.searchNone": "Nessuna ricetta corrisponde alla tua ricerca.",
   "market.rating.none": "Ancora nessuna valutazione",
   "market.rate": "La tua valutazione",
   "market.rateStars": "Assegna {count} stella | Assegna {count} stelle",

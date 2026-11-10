@@ -314,6 +314,8 @@ export const es: Messages = {
   "market.tag.desktop": "Escritorio",
   "market.filters": "Filtrar por etiqueta",
   "market.noMatch": "Nada coincide con estos filtros.",
+  "market.search": "Buscar recetas",
+  "market.searchNone": "Ninguna receta coincide con tu búsqueda.",
   "market.rating.none": "Aún sin valoraciones",
   "market.rate": "Tu valoración",
   "market.rateStars": "Dar {count} estrella | Dar {count} estrellas",

@@ -291,6 +291,8 @@ export const zhHans: Messages = {
   "market.tag.desktop": "桌面端",
   "market.filters": "按标签筛选",
   "market.noMatch": "没有符合这些筛选条件的内容。",
+  "market.search": "搜索配方",
+  "market.searchNone": "没有与搜索匹配的配方。",
   "market.rating.none": "暂无评分",
   "market.rate": "你的评分",
   "market.rateStars": "评 {count} 星",

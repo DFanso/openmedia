@@ -312,6 +312,8 @@ export const tr: Messages = {
   "market.tag.desktop": "Masaüstü",
   "market.filters": "Etikete göre filtrele",
   "market.noMatch": "Bu filtrelerle eşleşen bir şey yok.",
+  "market.search": "Tarif ara",
+  "market.searchNone": "Aramanızla eşleşen tarif yok.",
   "market.rating.none": "Henüz puan yok",
   "market.rate": "Puanınız",
   "market.rateStars": "{count} yıldız ver | {count} yıldız ver",

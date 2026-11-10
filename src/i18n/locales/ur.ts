@@ -313,6 +313,8 @@ export const ur: Messages = {
   "market.tag.desktop": "ڈیسک ٹاپ",
   "market.filters": "ٹیگ کے مطابق فلٹر کریں",
   "market.noMatch": "ان فلٹرز سے کچھ میل نہیں کھاتا۔",
+  "market.search": "ریسپیز تلاش کریں",
+  "market.searchNone": "آپ کی تلاش سے کوئی ریسپی مطابقت نہیں رکھتی۔",
   "market.rating.none": "ابھی کوئی ریٹنگ نہیں",
   "market.rate": "آپ کی ریٹنگ",
   "market.rateStars":

@@ -7,7 +7,12 @@ import type { MessageKey } from "../../i18n/messages";
 import { useT } from "../../i18n/useT";
 import { ProIcon } from "../../shared/icons";
 import { SiteTile } from "../../shared/SiteTile";
-import { faviconPageUrlForHost, useIconForUrl, setIconCache } from "../../shared/siteIcons";
+import {
+  bundledIconForHosts,
+  faviconPageUrlForHost,
+  useIconForUrl,
+  setIconCache,
+} from "../../shared/siteIcons";
 import { Screen } from "../../shared/Screen";
 import { useEntitlementStore } from "../paywall/store";
 import { Switch } from "../settings/Switch";
@@ -77,6 +82,7 @@ function MarketplaceBody() {
   const [view, setView] = useState<MarketView>({ kind: "list" });
   const [listing, setListing] = useState<MarketListing | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
   const [filter, setFilter] = useState(() =>
     defaultFilter(platformTag(navigator.userAgent, navigator.maxTouchPoints)),
   );
@@ -115,6 +121,8 @@ function MarketplaceBody() {
         <ListView
           listing={listing}
           filter={filter}
+          query={query}
+          onQuery={setQuery}
           onToggleTag={(tag) => setFilter((current) => toggleTag(current, tag))}
           error={error}
           onRetry={() => {
@@ -149,6 +157,8 @@ function MarketplaceBody() {
 interface ListViewProps {
   listing: MarketListing | null;
   filter: ReadonlySet<MarketTag>;
+  query: string;
+  onQuery: (query: string) => void;
   onToggleTag: (tag: MarketTag) => void;
   error: string | null;
   onRetry: () => void;
@@ -160,6 +170,8 @@ interface ListViewProps {
 function ListView({
   listing,
   filter,
+  query,
+  onQuery,
   onToggleTag,
   error,
   onRetry,
@@ -169,7 +181,7 @@ function ListView({
 }: ListViewProps) {
   const t = useT();
   const isPro = useEntitlementStore((s) => s.status === "pro");
-  const items = listing ? visibleItems(listing.items, filter) : [];
+  const items = listing ? visibleItems(listing.items, filter, query) : [];
 
   return (
     <div className="flex flex-col gap-5">
@@ -190,6 +202,18 @@ function ListView({
           {t("market.withdrawn", { names: listing.withdrawn.join(", ") })}
         </p>
       )}
+      <input
+        type="search"
+        value={query}
+        onChange={(event) => onQuery(event.target.value)}
+        aria-label={t("market.search")}
+        placeholder={t("market.search")}
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="off"
+        spellCheck={false}
+        className={field}
+      />
       <div role="group" aria-label={t("market.filters")} className="flex flex-wrap gap-2 px-1">
         {FILTER_TAGS.map((tag) => (
           <button
@@ -211,7 +235,9 @@ function ListView({
         <p className="px-1 text-sm text-paper/55">{t("market.empty")}</p>
       )}
       {listing && listing.items.length > 0 && items.length === 0 && (
-        <p className="px-1 text-sm text-paper/55">{t("market.noMatch")}</p>
+        <p className="px-1 text-sm text-paper/55">
+          {t(query.trim() ? "market.searchNone" : "market.noMatch")}
+        </p>
       )}
       {items.length > 0 && (
         <Group>
@@ -241,7 +267,8 @@ function ListView({
 function ItemRow({ item, onOpen }: { item: MarketItem; onOpen: () => void }) {
   const t = useT();
   const iconUrl = item.hosts.map(faviconPageUrlForHost).find(Boolean);
-  const icon = useIconForUrl(iconUrl ?? "", []);
+  const fetched = useIconForUrl(iconUrl ?? "", []);
+  const icon = bundledIconForHosts([item.homepage, ...item.hosts]) ?? fetched;
   const row = useRef<HTMLButtonElement>(null);
   const state = item.installedVersion
     ? t(item.updateAvailable ? "market.update" : "market.added")

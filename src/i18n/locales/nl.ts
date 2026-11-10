@@ -315,6 +315,8 @@ export const nl: Messages = {
   "market.tag.desktop": "Desktop",
   "market.filters": "Filteren op tag",
   "market.noMatch": "Niets komt overeen met deze filters.",
+  "market.search": "Recepten zoeken",
+  "market.searchNone": "Geen recepten komen overeen met je zoekopdracht.",
   "market.rating.none": "Nog geen beoordelingen",
   "market.rate": "Jouw beoordeling",
   "market.rateStars": "Geef {count} ster | Geef {count} sterren",

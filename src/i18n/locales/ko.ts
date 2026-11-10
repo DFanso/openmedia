@@ -307,6 +307,8 @@ export const ko: Messages = {
   "market.tag.desktop": "데스크톱",
   "market.filters": "태그로 필터링",
   "market.noMatch": "이 필터와 일치하는 항목이 없습니다.",
+  "market.search": "레시피 검색",
+  "market.searchNone": "검색과 일치하는 레시피가 없습니다.",
   "market.rating.none": "아직 평점이 없습니다",
   "market.rate": "내 평점",
   "market.rateStars": "별 {count}개 주기",

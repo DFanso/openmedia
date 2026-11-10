@@ -39,6 +39,25 @@ export function hasBundledIcon(host: string): boolean {
 }
 
 /**
+ * The bundled icon of the first of these hosts or addresses that has one. Entries may be a bare
+ * host, a `*.` wildcard host or an http(s) address; anything else is skipped.
+ */
+export function bundledIconForHosts(
+  entries: readonly (string | null | undefined)[],
+): string | undefined {
+  for (const entry of entries) {
+    if (!entry) continue;
+    const host = (
+      /^https?:\/\//i.test(entry) ? hostOf(entry) : entry.replace(/^\*\./, "")
+    )?.toLowerCase();
+    if (!host) continue;
+    const icon = BUNDLED_ICON_BY_DOMAIN[host] ?? BUNDLED_ICON_BY_DOMAIN[registrableDomain(host)];
+    if (icon) return icon;
+  }
+  return undefined;
+}
+
+/**
  * The icon of a site, from wherever it is known: the one that ships with the app, else the one
  * the app fetched from the site, else the one of a favorite on the same site.
  */
