@@ -9,7 +9,8 @@ use serde_json::{Value, json};
 
 use crate::error::{Error, Result};
 use crate::recipes::{
-    Meta, OptionGroup, Origin, Recipe, Rule, SiteOption, Target, validate_selector,
+    Meta, OptionGroup, Origin, Recipe, Rule, SiteOption, Target, current_platform_tag,
+    validate_selector,
 };
 use tauri_plugin_siteview::site::registrable_domain;
 
@@ -317,9 +318,16 @@ pub fn option_id_for(label: &str, recipe: Option<&Recipe>) -> String {
     unique(if base.is_empty() { "custom" } else { &base }, &taken)
 }
 
-/// The full recipe to save for a new option. With a base recipe the result is a copy of it with the
-/// option and its rules appended (origin `ai`; saving it as a fork stamps `forkedFrom`). Without
-/// one it is a fresh `custom.<host_domain>` recipe matching the whole site. The option is on by
+/// Whether `recipe` is one the user's own assistant made, which a new switch may be added to.
+/// Installed recipes (`market.`, `imported.`) are never edited.
+pub fn is_made(recipe: &Recipe) -> bool {
+    recipe.id.starts_with("custom.")
+}
+
+/// The full recipe to save for a new option. With a made base recipe (`custom.`) the result is a
+/// copy of it with the option and its rules appended (origin `ai`). With no base, or an installed
+/// one, it is a fresh `custom.<host_domain>` recipe matching the whole site, tagged with this
+/// platform. The option is on by
 /// default, because the user asked for it. The result has passed [`Recipe::parse`].
 ///
 /// An `existingOption` patch changes no recipe, so it is refused here: the caller only turns the
@@ -335,10 +343,15 @@ pub fn apply_patch(base: Option<&Recipe>, host_domain: &str, patch: &Patch) -> R
     else {
         return Err(reject("an existing option needs no new recipe"));
     };
+    let base = base.filter(|base| is_made(base));
     let mut recipe = match base {
         Some(base) => {
             let mut copy = base.clone();
             copy.origin = Origin::Ai;
+            let platform = current_platform_tag();
+            if !copy.tags.iter().any(|tag| tag == platform) {
+                copy.tags.push(platform.to_owned());
+            }
             copy
         }
         None => custom_recipe(host_domain)?,
@@ -391,6 +404,7 @@ fn custom_recipe(domain: &str) -> Result<Recipe> {
         name: domain.clone(),
         version: "1.0.0".to_owned(),
         origin: Origin::Ai,
+        tags: vec![current_platform_tag().to_owned()],
         matches: vec![format!("https://*.{domain}/*")],
         options: Vec::new(),
         rules: Vec::new(),
@@ -400,7 +414,6 @@ fn custom_recipe(domain: &str) -> Result<Recipe> {
             last_verified: None,
             notes: Some("Created by the in-app assistant.".to_owned()),
         }),
-        forked_from: None,
     })
 }
 
@@ -431,13 +444,12 @@ pub fn option_css(recipe: &Recipe, option_id: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::recipes::bundled;
+    use crate::recipes::official_recipes;
 
     fn youtube() -> Recipe {
-        bundled()
-            .unwrap()
+        official_recipes()
             .into_iter()
-            .find(|r| r.id == "youtube.default")
+            .find(|r| r.id == "market.official.youtube")
             .unwrap()
     }
 
@@ -656,38 +668,53 @@ mod tests {
     }
 
     #[test]
-    fn a_bundled_base_becomes_a_fork_shaped_recipe() {
+    fn a_switch_for_an_installed_recipe_goes_into_a_new_custom_recipe_beside_it() {
         let base = youtube();
         let patch = parse_patch(&new_option(json!([
             {"label": "Stories row", "selector": "ytm-stories-shelf"},
             {"label": "Stories tab", "selector": "ytm-pivot-bar-item-renderer:has(.pivot-stories)"}
         ])), Some(&base)).unwrap();
         let recipe = apply_patch(Some(&base), "youtube.com", &patch).unwrap();
-        assert_eq!(recipe.id, base.id);
+        assert_eq!(recipe.id, "custom.youtube.com");
         assert_eq!(recipe.origin, Origin::Ai);
-        assert_eq!(recipe.options.len(), base.options.len() + 1);
-        assert_eq!(recipe.rules.len(), base.rules.len() + 2);
-        assert_eq!(
-            &recipe.rules[..base.rules.len()],
-            &base.rules[..],
-            "existing rules are untouched"
-        );
-        let option = recipe.options.last().unwrap();
+        assert_eq!(recipe.tags, [current_platform_tag()]);
+        assert_eq!(recipe.options.len(), 1);
+        assert_eq!(recipe.rules.len(), 2);
+        let option = &recipe.options[0];
         assert_eq!(option.id, "hide-the-stories-row");
         assert!(option.enabled_by_default);
         assert_eq!(option.group, OptionGroup::Content);
-        let new_rules: Vec<&Rule> = recipe
-            .rules
-            .iter()
-            .filter(|r| r.option() == Some("hide-the-stories-row"))
-            .collect();
-        assert_eq!(new_rules.len(), 2);
         assert!(
-            matches!(new_rules[0], Rule::Hide { id, .. } if id == "hide-the-stories-row-stories-row")
+            matches!(&recipe.rules[0], Rule::Hide { id, option, .. } if id == "hide-the-stories-row-stories-row" && option.as_deref() == Some("hide-the-stories-row"))
         );
-        // It round-trips through the same parser the library uses for forks.
         let again = Recipe::parse(&serde_json::to_string(&recipe).unwrap()).unwrap();
         assert_eq!(again, recipe);
+    }
+
+    #[test]
+    fn a_made_base_is_extended_and_gains_this_platforms_tag() {
+        let patch = parse_patch(&new_option(one_rule("div.promo")), None).unwrap();
+        let mut made = apply_patch(None, "example.com", &patch).unwrap();
+        let other = if current_platform_tag() == "mobile" {
+            "desktop"
+        } else {
+            "mobile"
+        };
+        made.tags = vec![other.to_owned()];
+        let mut other_switch: Value =
+            serde_json::from_str(&new_option(one_rule("div.other"))).unwrap();
+        other_switch["label"] = json!("Hide the other banner");
+        let patch = parse_patch(&other_switch.to_string(), Some(&made)).unwrap();
+        let extended = apply_patch(Some(&made), "example.com", &patch).unwrap();
+        assert_eq!(extended.id, made.id);
+        assert_eq!(extended.options.len(), 2);
+        assert!(
+            extended
+                .tags
+                .iter()
+                .any(|tag| tag == current_platform_tag())
+        );
+        assert!(extended.tags.iter().any(|tag| tag == other));
     }
 
     #[test]
@@ -697,7 +724,7 @@ mod tests {
         v["label"] = json!("Hide the Stories row!");
         let patch = parse_patch(&v.to_string(), Some(&base)).unwrap();
         let once = apply_patch(Some(&base), "youtube.com", &patch).unwrap();
-        // Applying the same request again, now against the fork, cannot collide.
+        // Applying the same request again, now against the made recipe, cannot collide.
         let mut v2 = v.clone();
         v2["label"] = json!("Hide the stories row");
         let again_patch = parse_patch(&v2.to_string(), Some(&base)).unwrap();
@@ -722,7 +749,7 @@ mod tests {
         assert_eq!(recipe.options.len(), 1);
         assert!(recipe.options[0].enabled_by_default);
         assert_eq!(recipe.homepage(), Some("https://example.com/"));
-        assert!(recipe.forked_from.is_none());
+        assert_eq!(recipe.tags, [current_platform_tag()]);
         for bad in [
             "",
             "localhost",

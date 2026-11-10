@@ -153,6 +153,25 @@ export const en = {
   "onboarding.step4Title": "Make it yours.",
   "onboarding.step4Body":
     "Drag the button to either edge and it stays there. Change your favorites in Settings, and replay this guide there any time.",
+  "onboarding.quickTitle": "What do you need in quick access?",
+  "onboarding.quickBody":
+    "Pick the sites you open most. OpenMedia adds their official recipes and puts them on your button.",
+  "onboarding.quickLoading": "Loading the official recipes…",
+  "onboarding.quickEmpty":
+    "No official recipes are listed for this device yet. You can add some later from the Marketplace.",
+  "onboarding.quickCount": "{count} of {limit} chosen",
+  "onboarding.quickProHint": "That is the most your plan allows. Pro has more slots.",
+  "onboarding.applying": "Adding…",
+  "onboarding.partial": "Could not add: {names}. You can add them later from the Marketplace.",
+  "onboarding.marketTitle": "A marketplace of recipes.",
+  "onboarding.marketBody": "Find more recipes in Settings, under Marketplace.",
+  "onboarding.marketOfficial":
+    "Official recipes are made by OpenMedia. Community recipes are uploaded by people like you.",
+  "onboarding.marketChecked":
+    "Every recipe is checked automatically and held for 14 days before it is listed.",
+  "onboarding.marketReview": "You review every rule a recipe adds before it is added.",
+  "onboarding.marketPro":
+    "Uploading, exporting and commenting need Pro. Adding, importing and rating are free.",
 
   "settings.title": "Settings",
   "settings.close": "Close settings",
@@ -228,6 +247,9 @@ export const en = {
   "recipes.title": "Recipes",
   "recipes.note":
     "Ready-made recipes for popular sites. Install prompts and pop-ups that block the page are hidden by default; Reels, Shorts and suggestions are shown until you hide them. Star a recipe to add its site to your favorites.",
+  "recipes.empty":
+    "You have no recipes yet. Find ready-made ones for popular sites in the Marketplace.",
+  "recipes.openMarket": "Open the Marketplace",
   "recipes.annoyances": "Annoyances · hidden by default",
   "recipes.content": "Content · shown until you hide it",
   "recipes.groupAnnoyance": "Annoyance",
@@ -237,9 +259,6 @@ export const en = {
   "recipes.options": "{name} options",
   "recipes.addFavorite": "Add {name} to favorites",
   "recipes.removeFavorite": "Remove {name} from favorites",
-  "recipes.customized": "This recipe is your changed copy, so app updates leave it alone.",
-  "recipes.originalUpdated": "The app's original has been updated since you changed it.",
-  "recipes.restore": "Restore the original",
   "recipes.bottomMargin": "Bottom margin",
   "recipes.sharedMargin": "Uses the shared margin. Move the slider to give this site its own.",
   "recipes.ownMargin": "This site has its own margin.",
@@ -285,6 +304,30 @@ export const en = {
   "market.counting": "Tell the marketplace when I add a recipe",
   "market.countingNote":
     "Only the recipe's name is sent, nothing about you. It makes the “Added by” numbers.",
+  "market.tag.official": "Official",
+  "market.tag.community": "Community",
+  "market.tag.mobile": "Mobile",
+  "market.tag.desktop": "Desktop",
+  "market.filters": "Filter by tag",
+  "market.noMatch": "Nothing matches these filters.",
+  "market.rating.none": "No ratings yet",
+  "market.rate": "Your rating",
+  "market.rateStars": "Rate {count} star | Rate {count} stars",
+  "market.comments": "Comments",
+  "market.comments.loading": "Loading comments…",
+  "market.comments.none": "No comments yet.",
+  "market.comments.you": "You",
+  "market.comments.write": "Write a comment",
+  "market.comments.rules": "No links or contact details. Up to 280 characters.",
+  "market.comments.post": "Post",
+  "market.comments.proPrompt": "Commenting is a Pro feature. Everyone can read comments.",
+  "market.comments.report": "Report",
+  "market.comments.reported": "Reported",
+  "market.comments.block": "Block",
+  "market.comments.blocked": "Blocked commenters",
+  "market.comments.blockedNote": "You do not see comments from the people listed here.",
+  "market.comments.blockedNone": "You have not blocked anyone.",
+  "market.comments.unblock": "Unblock",
 
   "share.link": "Import and export",
   "share.linkNote": "Move recipes between devices as text",
@@ -362,7 +405,6 @@ export const en = {
   "assistant.reject": "Reject",
   "assistant.accept": "Accept",
   "assistant.switchExists": "This switch already exists",
-  "assistant.savedAsCopy": "saved as your changed copy",
   "assistant.matched": "matched {count}",
   "assistant.requestQuote": "“{request}”",
   "assistant.unmatched":

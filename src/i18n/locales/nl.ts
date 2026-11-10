@@ -151,6 +151,27 @@ export const nl: Messages = {
   "onboarding.step4Title": "Maak het van jou.",
   "onboarding.step4Body":
     "Sleep de knop naar een van de randen en hij blijft daar staan. Wijzig je favorieten in Instellingen, en speel deze handleiding daar op elk moment opnieuw af.",
+  "onboarding.quickTitle": "Wat heb je nodig in snelle toegang?",
+  "onboarding.quickBody":
+    "Kies de sites die je het vaakst opent. OpenMedia voegt hun officiële recepten toe en zet ze op je knop.",
+  "onboarding.quickLoading": "De officiële recepten laden…",
+  "onboarding.quickEmpty":
+    "Voor dit apparaat staan er nog geen officiële recepten in de lijst. Je kunt er later wat toevoegen via de Marktplaats.",
+  "onboarding.quickCount": "{count} van {limit} gekozen",
+  "onboarding.quickProHint": "Dat is het maximum van je abonnement. Pro heeft meer plekken.",
+  "onboarding.applying": "Toevoegen…",
+  "onboarding.partial":
+    "Kon niet toevoegen: {names}. Je kunt ze later toevoegen via de Marktplaats.",
+  "onboarding.marketTitle": "Een marktplaats vol recepten.",
+  "onboarding.marketBody": "Meer recepten vind je in Instellingen, onder Marktplaats.",
+  "onboarding.marketOfficial":
+    "Officiële recepten zijn gemaakt door OpenMedia. Communityrecepten worden geüpload door mensen zoals jij.",
+  "onboarding.marketChecked":
+    "Elk recept wordt automatisch gecontroleerd en 14 dagen vastgehouden voordat het in de lijst komt.",
+  "onboarding.marketReview":
+    "Je bekijkt elke regel die een recept toevoegt voordat die wordt toegevoegd.",
+  "onboarding.marketPro":
+    "Uploaden, exporteren en reageren vereisen Pro. Toevoegen, importeren en beoordelen is gratis.",
 
   "settings.title": "Instellingen",
   "settings.close": "Instellingen sluiten",
@@ -236,9 +257,6 @@ export const nl: Messages = {
   "recipes.options": "Opties voor {name}",
   "recipes.addFavorite": "{name} toevoegen aan favorieten",
   "recipes.removeFavorite": "{name} verwijderen uit favorieten",
-  "recipes.customized": "Dit recept is jouw aangepaste kopie, dus app-updates laten het ongemoeid.",
-  "recipes.originalUpdated": "Het origineel van de app is bijgewerkt sinds je het hebt aangepast.",
-  "recipes.restore": "Origineel herstellen",
   "recipes.bottomMargin": "Ondermarge",
   "recipes.sharedMargin":
     "Gebruikt de gedeelde marge. Beweeg de schuifregelaar om deze site een eigen marge te geven.",
@@ -247,6 +265,9 @@ export const nl: Messages = {
   "recipes.useSharedMargin": "Gedeelde marge gebruiken",
   "recipes.imported":
     "Van buiten de app toegevoegd. Verwijder het om de site weer te laten zoals hij was.",
+  "recipes.empty":
+    "Je hebt nog geen recepten. Vind kant-en-klare recepten voor populaire sites op de Marktplaats.",
+  "recipes.openMarket": "Open de Marktplaats",
 
   "market.title": "Marktplaats",
   "market.linkNote":
@@ -288,6 +309,30 @@ export const nl: Messages = {
   "market.counting": "De marktplaats laten weten wanneer ik een recept toevoeg",
   "market.countingNote":
     "Alleen de naam van het recept wordt verstuurd, niets over jou. Hiermee worden de aantallen bij “Toegevoegd door” bepaald.",
+  "market.tag.official": "Officieel",
+  "market.tag.community": "Community",
+  "market.tag.mobile": "Mobiel",
+  "market.tag.desktop": "Desktop",
+  "market.filters": "Filteren op tag",
+  "market.noMatch": "Niets komt overeen met deze filters.",
+  "market.rating.none": "Nog geen beoordelingen",
+  "market.rate": "Jouw beoordeling",
+  "market.rateStars": "Geef {count} ster | Geef {count} sterren",
+  "market.comments": "Reacties",
+  "market.comments.loading": "Reacties laden…",
+  "market.comments.none": "Nog geen reacties.",
+  "market.comments.you": "Jij",
+  "market.comments.write": "Schrijf een reactie",
+  "market.comments.rules": "Geen links of contactgegevens. Maximaal 280 tekens.",
+  "market.comments.post": "Plaatsen",
+  "market.comments.proPrompt": "Reageren is een Pro-functie. Iedereen kan reacties lezen.",
+  "market.comments.report": "Melden",
+  "market.comments.reported": "Gemeld",
+  "market.comments.block": "Blokkeren",
+  "market.comments.blocked": "Geblokkeerde reageerders",
+  "market.comments.blockedNote": "Je ziet geen reacties van de mensen die hier staan.",
+  "market.comments.blockedNone": "Je hebt niemand geblokkeerd.",
+  "market.comments.unblock": "Deblokkeren",
 
   "share.link": "Importeren en exporteren",
   "share.linkNote": "Verplaats recepten als tekst tussen apparaten",
@@ -367,7 +412,6 @@ export const nl: Messages = {
   "assistant.reject": "Afwijzen",
   "assistant.accept": "Accepteren",
   "assistant.switchExists": "Deze schakelaar bestaat al",
-  "assistant.savedAsCopy": "opgeslagen als jouw aangepaste kopie",
   "assistant.matched": "{count} gevonden",
   "assistant.requestQuote": "“{request}”",
   "assistant.unmatched":

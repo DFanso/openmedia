@@ -155,10 +155,10 @@ mod tests {
 
     #[test]
     fn the_two_sets_give_the_page_different_scripts_only_when_their_choices_differ() {
-        let recipes = Recipes::bundled_only();
+        let recipes = Recipes::official_installed();
         let normal = crate::recipes::OptionChoices::new();
         let incognito = crate::recipes::OptionChoices::from([(
-            "youtube.default".to_owned(),
+            "market.official.youtube".to_owned(),
             [("shorts".to_owned(), true)].into(),
         )]);
         assert_eq!(

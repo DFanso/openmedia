@@ -78,12 +78,8 @@ export interface SiteSettings {
   options: SiteOption[];
   /** The site's own bottom margin, or null to use the shared one. */
   bottomMargin: number | null;
-  /** The site runs on the user's own changed copy of the bundled recipe (a fork). */
-  customized: boolean;
-  /** The app now ships a different version than the one the copy was made from. */
-  originalUpdated: boolean;
-  /** Who the recipe is from. Anything but `bundled` can be shared; `imported` can be removed. */
-  origin: "bundled" | "user" | "ai" | "imported";
+  /** Who the recipe is from; `imported` (a pasted bundle or the marketplace) can be removed. */
+  origin: "user" | "ai" | "imported";
 }
 
 export type ProviderKind = "anthropic" | "openAiCompatible";
@@ -172,8 +168,6 @@ export const library = {
    */
   setSiteOption: (recipeId: string, optionId: string, enabled: boolean, incognito: boolean) =>
     command("set_site_option", { recipeId, optionId, enabled, incognito }),
-  /** Drops the changed copy so the bundled recipe applies again; see `restore_recipe_original`. */
-  restoreRecipeOriginal: (recipeId: string) => command("restore_recipe_original", { recipeId }),
   setBottomMargin: (pixels: number) => command("set_bottom_margin", { pixels }),
   setSiteBottomMargin: (recipeId: string, pixels: number | null) =>
     command("set_site_bottom_margin", { recipeId, pixels }),
@@ -206,7 +200,7 @@ export interface SectionUsage {
 
 export interface SiteUsage {
   host: string;
-  /** The bundled recipe's name for the site, when there is one. */
+  /** The installed recipe's name for the site, when there is one. */
   name: string | null;
   seconds: number;
   sections: SectionUsage[];

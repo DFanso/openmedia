@@ -8,6 +8,16 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-10
 
+### docs(marketplace): tags, official recipes, ratings, Pro comments, Pro upload and export, abuse rules
+
+**Problem:** The marketplace had no way to tell our recipes from users', shipped its best recipes inside the app, and had no ratings, comments or limits for contributors; the wiki did not describe any of this.
+
+**Change:** The wiki now carries the contract as built (Design where noted, not deployed): platform `tags` inside every recipe and an origin tag (`official`/`community`) added only by the Worker; no bundled recipes and no recipe forks (origins are `user`, `ai`, `imported`; the assistant writes a separate `custom.<domain>` recipe beside an installed one); official recipes in `recipes/official/`, published as `market.official.<site>` by an operator SQL script through the Worker's official mode, and onboarding that replaces the favorites with the user's installed quick-access picks (4 free, 6 Pro); 1 to 5 star ratings and Pro-only comments with the abuse rules and the Worker's real limits (IPv6 /64 limiter keys, 60 RevenueCat lookups per minute, 24-hour identity age, caps checked atomically); Pro-verified uploads and comments (the Worker checks RevenueCat; export and onboarding slots are client-side only); the privacy change (RevenueCat app user id on Pro actions, stored only as a SHA-256 hash and a bearer secret for those actions, plus a random device token and Turnstile on the landing page); new threat-model rows; and the store-policy status for user comments (filtering, reporting and blocking only partly addressed, no human moderation, still an open risk). `AGENTS.md` invariant 1, the paywall, security, architecture, UI, AI, recipe-format and roadmap pages are updated to match; the roadmap decision log has the 2026-11-10 row.
+
+**Verified (all local):** `yarn verify` in the app (type check, lint, format, 323 Vitest tests incl. every locale’s keys, `cargo fmt --check`, `clippy -D warnings`, 284 app and 29 siteview Rust tests); the macOS Swift billing package builds; Worker 335 tests, type check and format check; landing 29 tests, format check and build, plus a headless-browser run with stubbed fetch and a stubbed Turnstile; an end-to-end run of the real Worker under `wrangler dev --local` (migrations 0001-0004, the official-recipes SQL, the cron publisher) read by the real Rust client, which accepted the signed index with 18 official entries, installed one recipe, and refused a catalog signed by another key. **Not verified:** the iOS and Android native `appUserId` code; anything on a device; RevenueCat, Turnstile, Cloudflare, D1 and R2 behaviour; deployment; the new screens rendered in the real app.
+
+**PR:** #88 (app), openmedia-worker #4, openmedia-landing #8
+
 ### refactor(marketplace): publish automatically, drop the curator and the manual approval step
 
 **What:** A submitted recipe is now checked by the Worker itself, held for 14 days in a public Upcoming feed and published automatically afterwards. There is no approval queue and no person in the loop, and the catalog signing key is a Cloudflare Worker secret.

@@ -7,10 +7,8 @@ import type { SiteSettings } from "../../shared/ipc";
 import { Group } from "../settings/ui";
 import { marketplace, sharing } from "./ipc";
 
-/** The rows in Settings that open the Marketplace (when this build has one) and Import and export. */
-export function MarketplaceLinks() {
-  const openSheet = useApp((s) => s.openSheet);
-  const t = useT();
+/** Whether this build has a marketplace address and keys. */
+export function useMarketplaceAvailable(): boolean {
   const [available, setAvailable] = useState(false);
 
   useEffect(() => {
@@ -19,6 +17,15 @@ export function MarketplaceLinks() {
       .then((status) => setAvailable(status.available))
       .catch(() => setAvailable(false));
   }, []);
+
+  return available;
+}
+
+/** The rows in Settings that open the Marketplace (when this build has one) and Import and export. */
+export function MarketplaceLinks() {
+  const openSheet = useApp((s) => s.openSheet);
+  const t = useT();
+  const available = useMarketplaceAvailable();
 
   return (
     <Group>

@@ -151,6 +151,27 @@ export const ur: Messages = {
   "onboarding.step4Title": "اسے اپنا بنائیں۔",
   "onboarding.step4Body":
     "بٹن کو کسی بھی کنارے تک گھسیٹیں، وہ وہیں ہی رہے گا۔ اپنی پسندیدہ ترتیبات میں بدلیں اور یہ رہنمائی کہیں بھی دوبارہ دیکھ سکتے ہیں۔",
+  "onboarding.quickTitle": "فوری رسائی میں آپ کو کیا چاہیے؟",
+  "onboarding.quickBody":
+    "وہ سائٹس چنیں جو آپ سب سے زیادہ کھولتے ہیں۔ OpenMedia ان کی سرکاری ریسپیز شامل کرتا ہے اور انہیں آپ کے بٹن پر رکھ دیتا ہے۔",
+  "onboarding.quickLoading": "سرکاری ریسپیز لوڈ ہو رہی ہیں…",
+  "onboarding.quickEmpty":
+    "اس آلے کے لیے ابھی کوئی سرکاری ریسپی فہرست میں نہیں ہے۔ آپ بعد میں ریسپی بازار سے شامل کر سکتے ہیں۔",
+  "onboarding.quickCount": "{limit} میں سے {count} منتخب",
+  "onboarding.quickProHint": "آپ کا پلان اس سے زیادہ کی اجازت نہیں دیتا۔ Pro میں مزید خانے ہیں۔",
+  "onboarding.applying": "شامل ہو رہی ہیں…",
+  "onboarding.partial":
+    "شامل نہیں ہو سکیں: {names}۔ آپ انہیں بعد میں ریسپی بازار سے شامل کر سکتے ہیں۔",
+  "onboarding.marketTitle": "ریسپیز کا بازار۔",
+  "onboarding.marketBody": "مزید ریسپیز ترتیبات میں، ریسپی بازار کے تحت تلاش کریں۔",
+  "onboarding.marketOfficial":
+    "سرکاری ریسپیز OpenMedia بناتا ہے۔ کمیونٹی ریسپیز آپ جیسے لوگ اپ لوڈ کرتے ہیں۔",
+  "onboarding.marketChecked":
+    "ہر ریسپی خودکار طور پر جانچی جاتی ہے اور فہرست میں آنے سے پہلے 14 دن روکی جاتی ہے۔",
+  "onboarding.marketReview":
+    "ریسپی جو قاعدہ بھی شامل کرتی ہے، اسے شامل ہونے سے پہلے آپ خود دیکھتے ہیں۔",
+  "onboarding.marketPro":
+    "اپ لوڈ، برآمد اور تبصرے کے لیے Pro درکار ہے۔ شامل کرنا، درآمد اور ریٹنگ مفت ہیں۔",
 
   "settings.title": "ترتیبات",
   "settings.close": "ترتیبات بند کریں",
@@ -227,6 +248,9 @@ export const ur: Messages = {
   "recipes.title": "ریسپیز",
   "recipes.note":
     "مقبول سائٹس کے لیے ریسپیز۔ انسٹال کرنے کے اشارے اور پاپ اپ جو صفحہ روکتے ہیں، طے شدہ طور پر چھپے ہوتے ہیں؛ Reels، شارٹس اور تجاویز دکھائی جاتی ہیں جب تک آپ انہیں نہ چھپاتے۔ کسی ریسپی کو ستارہ دے کر اس کی سائٹ پسندیدہ میں شامل کریں۔",
+  "recipes.empty":
+    "آپ کے پاس ابھی کوئی ریسپی نہیں۔ مقبول سائٹس کی تیار ریسپیز ریسپی بازار میں تلاش کریں۔",
+  "recipes.openMarket": "ریسپی بازار کھولیں",
   "recipes.annoyances": "پریشان کن چیزیں · طے شدہ طور پر چھپی ہوئی",
   "recipes.content": "مواد · چھپانے تک دکھایا جاتا ہے",
   "recipes.groupAnnoyance": "پریشان کن",
@@ -236,9 +260,6 @@ export const ur: Messages = {
   "recipes.options": "{name} کے اختیارات",
   "recipes.addFavorite": "{name} کو پسندیدہ میں شامل کریں",
   "recipes.removeFavorite": "{name} کو پسندیدہ سے ہٹائیں",
-  "recipes.customized": "یہ ریسپی آپ کی تبدیل کردہ نقل ہے، اس لیے ایپ اپ ڈیٹ اسے نہیں چھیںتے۔",
-  "recipes.originalUpdated": "آپ کی تبدیلی کے بعد سے ایپ کی اصل ریسپی اپ ڈیٹ ہو چکی ہے۔",
-  "recipes.restore": "اصل بحال کریں",
   "recipes.bottomMargin": "نیچے کا مارجن",
   "recipes.sharedMargin":
     "مشترکہ مارجن استعمال ہوتا ہے۔ سلائیڈر کو ہلائیں تاکہ اس سائٹ کا اپنا مارجن ہو۔",
@@ -286,6 +307,31 @@ export const ur: Messages = {
   "market.counting": "ریسپی شامل کرنے پر بازار کو بتائیں",
   "market.countingNote":
     "صرف ریسپی کا نام بھیجا جاتا ہے، آپ کے بارے میں کچھ نہیں۔ اسی سے “شامل کرنے والے” کی تعداد بنتی ہے۔",
+  "market.tag.official": "سرکاری",
+  "market.tag.community": "کمیونٹی",
+  "market.tag.mobile": "موبائل",
+  "market.tag.desktop": "ڈیسک ٹاپ",
+  "market.filters": "ٹیگ کے مطابق فلٹر کریں",
+  "market.noMatch": "ان فلٹرز سے کچھ میل نہیں کھاتا۔",
+  "market.rating.none": "ابھی کوئی ریٹنگ نہیں",
+  "market.rate": "آپ کی ریٹنگ",
+  "market.rateStars":
+    "{count} ستارہ دیں | {count} ستارہ دیں | {count} ستارے دیں | {count} ستارے دیں | {count} ستارے دیں | {count} ستارہ دیں",
+  "market.comments": "تبصرے",
+  "market.comments.loading": "تبصرے لوڈ ہو رہے ہیں…",
+  "market.comments.none": "ابھی کوئی تبصرہ نہیں۔",
+  "market.comments.you": "آپ",
+  "market.comments.write": "تبصرہ لکھیں",
+  "market.comments.rules": "کوئی لنک یا رابطے کی تفصیل نہیں۔ زیادہ سے زیادہ 280 حروف۔",
+  "market.comments.post": "پوسٹ کریں",
+  "market.comments.proPrompt": "تبصرہ کرنا Pro کی خصوصیت ہے۔ تبصرے ہر کوئی پڑھ سکتا ہے۔",
+  "market.comments.report": "رپورٹ کریں",
+  "market.comments.reported": "رپورٹ ہو گیا",
+  "market.comments.block": "بلاک کریں",
+  "market.comments.blocked": "بلاک کیے گئے تبصرہ نگار",
+  "market.comments.blockedNote": "یہاں درج لوگوں کے تبصرے آپ کو نظر نہیں آتے۔",
+  "market.comments.blockedNone": "آپ نے کسی کو بلاک نہیں کیا۔",
+  "market.comments.unblock": "بلاک ہٹائیں",
 
   "share.link": "درآمد اور برآمد",
   "share.linkNote": "ریسپیز کو متن کی شکل میں ایک آلے سے دوسرے میں منتقل کریں",
@@ -364,7 +410,6 @@ export const ur: Messages = {
   "assistant.reject": "مسترد کریں",
   "assistant.accept": "قبول کریں",
   "assistant.switchExists": "یہ سوئچ پہلے سے موجود ہے",
-  "assistant.savedAsCopy": "آپ کی تبدیل کردہ نقل کے طور پر محفوظ",
   "assistant.matched": "{count} سے مطابقت",
   "assistant.requestQuote": "”{request}”",
   "assistant.unmatched":

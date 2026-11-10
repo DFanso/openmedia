@@ -14,7 +14,6 @@ export const proposal: Proposal = {
   summary: "Hide the suggested videos",
   recipeId: "youtube",
   recipeName: "YouTube",
-  forked: true,
   option: {
     id: null,
     label: "Hide suggested videos",

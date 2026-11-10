@@ -153,6 +153,25 @@ export const es: Messages = {
   "onboarding.step4Title": "Hazlo tuyo.",
   "onboarding.step4Body":
     "Arrastra el botón a cualquiera de los bordes y se quedará ahí. Cambia tus favoritos en Ajustes y vuelve a ver esta guía cuando quieras.",
+  "onboarding.quickTitle": "¿Qué necesitas en el acceso rápido?",
+  "onboarding.quickBody":
+    "Elige los sitios que más abres. OpenMedia añade sus recetas oficiales y las pone en tu botón.",
+  "onboarding.quickLoading": "Cargando las recetas oficiales…",
+  "onboarding.quickEmpty":
+    "Todavía no hay recetas oficiales para este dispositivo. Puedes añadir algunas más tarde desde el Mercado.",
+  "onboarding.quickCount": "{count} de {limit} elegidos",
+  "onboarding.quickProHint": "Es el máximo que permite tu plan. Pro tiene más espacios.",
+  "onboarding.applying": "Añadiendo…",
+  "onboarding.partial": "No se pudo añadir: {names}. Puedes añadirlas más tarde desde el Mercado.",
+  "onboarding.marketTitle": "Un mercado de recetas.",
+  "onboarding.marketBody": "Encuentra más recetas en Ajustes, en Mercado.",
+  "onboarding.marketOfficial":
+    "Las recetas oficiales las crea OpenMedia. Las de la comunidad las suben personas como tú.",
+  "onboarding.marketChecked":
+    "Cada receta se comprueba automáticamente y se retiene 14 días antes de aparecer en la lista.",
+  "onboarding.marketReview": "Revisas cada regla que añade una receta antes de que se añada.",
+  "onboarding.marketPro":
+    "Subir, exportar y comentar requieren Pro. Añadir, importar y valorar son gratis.",
 
   "settings.title": "Ajustes",
   "settings.close": "Cerrar ajustes",
@@ -229,6 +248,9 @@ export const es: Messages = {
   "recipes.title": "Recetas",
   "recipes.note":
     "Recetas listas para usar de sitios populares. Los avisos de instalación y los pop-ups que bloquean la página están ocultos de forma predeterminada; Reels, Shorts y las sugerencias se muestran hasta que los ocultes. Marca una receta con una estrella para añadir su sitio a tus favoritos.",
+  "recipes.empty":
+    "Aún no tienes recetas. Encuentra recetas ya hechas para sitios populares en el Mercado.",
+  "recipes.openMarket": "Abrir el Mercado",
   "recipes.annoyances": "Molestias · ocultas de forma predeterminada",
   "recipes.content": "Contenido · se muestra hasta que lo ocultes",
   "recipes.groupAnnoyance": "Molestia",
@@ -238,10 +260,6 @@ export const es: Messages = {
   "recipes.options": "Opciones de {name}",
   "recipes.addFavorite": "Añadir {name} a favoritos",
   "recipes.removeFavorite": "Quitar {name} de favoritos",
-  "recipes.customized":
-    "Esta receta es tu copia modificada, así que las actualizaciones de la app no la tocan.",
-  "recipes.originalUpdated": "El original de la app se ha actualizado desde que lo modificaste.",
-  "recipes.restore": "Restaurar el original",
   "recipes.bottomMargin": "Margen inferior",
   "recipes.sharedMargin":
     "Usa el margen compartido. Mueve el control deslizante para darle a este sitio un margen propio.",
@@ -290,6 +308,30 @@ export const es: Messages = {
   "market.counting": "Avisar al mercado cuando añada una receta",
   "market.countingNote":
     "Solo se envía el nombre de la receta, nada sobre ti. Con eso se calculan los números de «Añadida por».",
+  "market.tag.official": "Oficial",
+  "market.tag.community": "Comunidad",
+  "market.tag.mobile": "Móvil",
+  "market.tag.desktop": "Escritorio",
+  "market.filters": "Filtrar por etiqueta",
+  "market.noMatch": "Nada coincide con estos filtros.",
+  "market.rating.none": "Aún sin valoraciones",
+  "market.rate": "Tu valoración",
+  "market.rateStars": "Dar {count} estrella | Dar {count} estrellas",
+  "market.comments": "Comentarios",
+  "market.comments.loading": "Cargando comentarios…",
+  "market.comments.none": "Aún no hay comentarios.",
+  "market.comments.you": "Tú",
+  "market.comments.write": "Escribir un comentario",
+  "market.comments.rules": "Sin enlaces ni datos de contacto. Hasta 280 caracteres.",
+  "market.comments.post": "Publicar",
+  "market.comments.proPrompt": "Comentar es una función Pro. Todos pueden leer los comentarios.",
+  "market.comments.report": "Denunciar",
+  "market.comments.reported": "Denunciado",
+  "market.comments.block": "Bloquear",
+  "market.comments.blocked": "Autores bloqueados",
+  "market.comments.blockedNote": "No ves los comentarios de las personas que aparecen aquí.",
+  "market.comments.blockedNone": "No has bloqueado a nadie.",
+  "market.comments.unblock": "Desbloquear",
 
   "share.link": "Importar y exportar",
   "share.linkNote": "Mueve recetas entre dispositivos como texto",
@@ -370,7 +412,6 @@ export const es: Messages = {
   "assistant.reject": "Rechazar",
   "assistant.accept": "Aceptar",
   "assistant.switchExists": "Este interruptor ya existe",
-  "assistant.savedAsCopy": "guardada como tu copia modificada",
   "assistant.matched": "{count} coincidencias",
   "assistant.requestQuote": "“{request}”",
   "assistant.unmatched":

@@ -145,6 +145,27 @@ export const de: Messages = {
   "onboarding.step4Title": "Mach es zu deinem.",
   "onboarding.step4Body":
     "Zieh die Schaltfläche an einen der beiden Ränder, und sie bleibt dort. Ändere deine Favoriten in den Einstellungen und spiele diese Anleitung dort jederzeit erneut ab.",
+  "onboarding.quickTitle": "Was brauchst du im Schnellzugriff?",
+  "onboarding.quickBody":
+    "Wähle die Websites, die du am häufigsten öffnest. OpenMedia fügt ihre offiziellen Rezepte hinzu und legt sie auf deine Schaltfläche.",
+  "onboarding.quickLoading": "Offizielle Rezepte werden geladen…",
+  "onboarding.quickEmpty":
+    "Für dieses Gerät sind noch keine offiziellen Rezepte gelistet. Du kannst später welche im Marktplatz hinzufügen.",
+  "onboarding.quickCount": "{count} von {limit} gewählt",
+  "onboarding.quickProHint": "Mehr erlaubt dein Tarif nicht. Mit Pro gibt es mehr Plätze.",
+  "onboarding.applying": "Wird hinzugefügt…",
+  "onboarding.partial":
+    "Konnte nicht hinzugefügt werden: {names}. Du kannst sie später im Marktplatz hinzufügen.",
+  "onboarding.marketTitle": "Ein Marktplatz für Rezepte.",
+  "onboarding.marketBody": "Weitere Rezepte findest du in den Einstellungen unter Marktplatz.",
+  "onboarding.marketOfficial":
+    "Offizielle Rezepte stammen von OpenMedia. Community-Rezepte werden von Leuten wie dir hochgeladen.",
+  "onboarding.marketChecked":
+    "Jedes Rezept wird automatisch geprüft und 14 Tage zurückgehalten, bevor es gelistet wird.",
+  "onboarding.marketReview":
+    "Du prüfst jede Regel, die ein Rezept hinzufügt, bevor sie hinzugefügt wird.",
+  "onboarding.marketPro":
+    "Hochladen, Exportieren und Kommentieren erfordern Pro. Hinzufügen, Importieren und Bewerten sind kostenlos.",
 
   "settings.title": "Einstellungen",
   "settings.close": "Einstellungen schließen",
@@ -222,6 +243,9 @@ export const de: Messages = {
   "recipes.title": "Rezepte",
   "recipes.note":
     "Fertige Rezepte für beliebte Websites. Installationshinweise und Pop-ups, die die Seite blockieren, werden standardmäßig ausgeblendet; Reels, Shorts und Vorschläge werden angezeigt, bis du sie ausblendest. Markiere ein Rezept mit einem Stern, um die Website deinen Favoriten hinzuzufügen.",
+  "recipes.empty":
+    "Du hast noch keine Rezepte. Fertige Rezepte für beliebte Websites findest du im Marktplatz.",
+  "recipes.openMarket": "Marktplatz öffnen",
   "recipes.annoyances": "Störungen · standardmäßig ausgeblendet",
   "recipes.content": "Inhalte · angezeigt, bis du sie ausblendest",
   "recipes.groupAnnoyance": "Störung",
@@ -231,11 +255,6 @@ export const de: Messages = {
   "recipes.options": "Optionen für {name}",
   "recipes.addFavorite": "{name} zu Favoriten hinzufügen",
   "recipes.removeFavorite": "{name} aus Favoriten entfernen",
-  "recipes.customized":
-    "Dieses Rezept ist deine geänderte Kopie, daher bleibt es bei App-Updates unverändert.",
-  "recipes.originalUpdated":
-    "Das Original in der App wurde aktualisiert, seitdem du es geändert hast.",
-  "recipes.restore": "Original wiederherstellen",
   "recipes.bottomMargin": "Unterer Rand",
   "recipes.sharedMargin":
     "Verwendet den gemeinsamen Rand. Verschiebe den Regler, um dieser Website einen eigenen zu geben.",
@@ -284,6 +303,30 @@ export const de: Messages = {
   "market.counting": "Dem Marktplatz melden, wenn ich ein Rezept hinzufüge",
   "market.countingNote":
     "Es wird nur der Name des Rezepts gesendet, nichts über dich. Daraus entstehen die Zahlen bei „Hinzugefügt von“.",
+  "market.tag.official": "Offiziell",
+  "market.tag.community": "Community",
+  "market.tag.mobile": "Mobil",
+  "market.tag.desktop": "Desktop",
+  "market.filters": "Nach Tag filtern",
+  "market.noMatch": "Nichts passt zu diesen Filtern.",
+  "market.rating.none": "Noch keine Bewertungen",
+  "market.rate": "Deine Bewertung",
+  "market.rateStars": "{count} Stern vergeben | {count} Sterne vergeben",
+  "market.comments": "Kommentare",
+  "market.comments.loading": "Kommentare werden geladen…",
+  "market.comments.none": "Noch keine Kommentare.",
+  "market.comments.you": "Du",
+  "market.comments.write": "Kommentar schreiben",
+  "market.comments.rules": "Keine Links oder Kontaktdaten. Bis zu 280 Zeichen.",
+  "market.comments.post": "Senden",
+  "market.comments.proPrompt": "Kommentieren ist eine Pro-Funktion. Alle können Kommentare lesen.",
+  "market.comments.report": "Melden",
+  "market.comments.reported": "Gemeldet",
+  "market.comments.block": "Blockieren",
+  "market.comments.blocked": "Blockierte Kommentierende",
+  "market.comments.blockedNote": "Kommentare der hier aufgeführten Personen siehst du nicht.",
+  "market.comments.blockedNone": "Du hast niemanden blockiert.",
+  "market.comments.unblock": "Blockierung aufheben",
 
   "share.link": "Import und Export",
   "share.linkNote": "Rezepte als Text zwischen Geräten übertragen",
@@ -353,7 +396,6 @@ export const de: Messages = {
   "assistant.reject": "Ablehnen",
   "assistant.accept": "Annehmen",
   "assistant.switchExists": "Dieser Schalter existiert bereits",
-  "assistant.savedAsCopy": "als deine geänderte Kopie gespeichert",
   "assistant.matched": "{count} Übereinstimmungen",
   "assistant.requestQuote": "„{request}“",
   "assistant.unmatched":

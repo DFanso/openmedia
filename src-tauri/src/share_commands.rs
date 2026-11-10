@@ -6,13 +6,19 @@ use tauri::{AppHandle, State};
 
 use crate::catalog::Catalog;
 use crate::commands::reload_script;
+use crate::entitlement::Entitlement;
 use crate::error::Result;
 use crate::library::Library;
 use crate::recipes::{RecipePreview, Recipes};
 
-/// The bundle text for recipes the user made or changed.
+/// The bundle text for the chosen recipes. Exporting is a Pro feature; importing stays free.
 #[tauri::command]
-pub fn export_recipes(recipes: State<'_, Recipes>, recipe_ids: Vec<String>) -> Result<String> {
+pub fn export_recipes(
+    recipes: State<'_, Recipes>,
+    entitlement: State<'_, Entitlement>,
+    recipe_ids: Vec<String>,
+) -> Result<String> {
+    entitlement.require_pro()?;
     recipes.export(&recipe_ids)
 }
 

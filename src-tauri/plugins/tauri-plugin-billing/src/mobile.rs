@@ -98,6 +98,13 @@ impl<R: Runtime> Billing<R> {
         self.run("restore", ())
     }
 
+    /// RevenueCat's anonymous app user id. Only the Rust side ever sees it: the marketplace
+    /// Worker uses it to ask RevenueCat whether this device is Pro. Needs `configure` first.
+    pub fn app_user_id(&self) -> Result<Option<String>> {
+        let response: AppUserResponse = self.run("appUserId", ())?;
+        Ok(Some(response.app_user_id))
+    }
+
     /// Reports the native runtime type without exposing a new Tauri command.
     pub fn is_simulator(&self) -> Result<bool> {
         let response: SimulatorResponse = self.run("isSimulator", ())?;

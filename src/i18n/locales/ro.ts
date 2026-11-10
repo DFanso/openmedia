@@ -151,6 +151,26 @@ export const ro: Messages = {
   "onboarding.step4Title": "Fă-l al tău.",
   "onboarding.step4Body":
     "Trage butonul spre oricare margine și rămâne acolo. Schimbă-ți favoritele în Setări și redă acest ghid din nou oricând, tot acolo.",
+  "onboarding.quickTitle": "Ce ai nevoie la acces rapid?",
+  "onboarding.quickBody":
+    "Alege site-urile pe care le deschizi cel mai des. OpenMedia le adaugă rețetele oficiale și le pune pe butonul tău.",
+  "onboarding.quickLoading": "Se încarcă rețetele oficiale…",
+  "onboarding.quickEmpty":
+    "Încă nu sunt listate rețete oficiale pentru acest dispozitiv. Poți adăuga câteva mai târziu din Magazin.",
+  "onboarding.quickCount": "{count} din {limit} alese",
+  "onboarding.quickProHint": "Acesta este maximul permis de planul tău. Pro are mai multe locuri.",
+  "onboarding.applying": "Se adaugă…",
+  "onboarding.partial": "Nu s-au putut adăuga: {names}. Le poți adăuga mai târziu din Magazin.",
+  "onboarding.marketTitle": "Un magazin de rețete.",
+  "onboarding.marketBody": "Găsești mai multe rețete în Setări, la Magazin.",
+  "onboarding.marketOfficial":
+    "Rețetele oficiale sunt create de OpenMedia. Rețetele comunității sunt încărcate de oameni ca tine.",
+  "onboarding.marketChecked":
+    "Fiecare rețetă este verificată automat și reținută 14 zile înainte de a fi listată.",
+  "onboarding.marketReview":
+    "Verifici fiecare regulă pe care o adaugă o rețetă înainte ca aceasta să fie adăugată.",
+  "onboarding.marketPro":
+    "Încărcarea, exportul și comentariile necesită Pro. Adăugarea, importul și evaluarea sunt gratuite.",
 
   "settings.title": "Setări",
   "settings.close": "Închide setările",
@@ -227,6 +247,9 @@ export const ro: Messages = {
   "recipes.title": "Rețete",
   "recipes.note":
     "Rețete gata făcute pentru site-uri populare. Mesajele de instalare și ferestrele pop-up care blochează pagina sunt ascunse implicit; Reels, Shorts și sugestiile sunt afișate până când le ascunzi. Marchează o rețetă cu stea pentru a adăuga site-ul ei la favorite.",
+  "recipes.empty":
+    "Încă nu ai rețete. Găsești rețete gata făcute pentru site-uri populare în Magazin.",
+  "recipes.openMarket": "Deschide Magazinul",
   "recipes.annoyances": "Elemente deranjante · ascunse implicit",
   "recipes.content": "Conținut · afișat până îl ascunzi",
   "recipes.groupAnnoyance": "Deranjant",
@@ -236,11 +259,6 @@ export const ro: Messages = {
   "recipes.options": "Opțiuni {name}",
   "recipes.addFavorite": "Adaugă {name} la favorite",
   "recipes.removeFavorite": "Elimină {name} din favorite",
-  "recipes.customized":
-    "Această rețetă este copia ta modificată, așa că actualizările aplicației nu o ating.",
-  "recipes.originalUpdated":
-    "Originalul din aplicație a fost actualizat de când ai făcut modificarea.",
-  "recipes.restore": "Restaurează originalul",
   "recipes.bottomMargin": "Margine inferioară",
   "recipes.sharedMargin":
     "Folosește marginea comună. Mută glisorul pentru a da acestui site una proprie.",
@@ -288,6 +306,30 @@ export const ro: Messages = {
   "market.counting": "Anunță magazinul când adaug o rețetă",
   "market.countingNote":
     "Se trimite doar numele rețetei, nimic despre tine. Din el se formează numerele „Adăugată de”.",
+  "market.tag.official": "Oficiale",
+  "market.tag.community": "Comunitate",
+  "market.tag.mobile": "Mobil",
+  "market.tag.desktop": "Desktop",
+  "market.filters": "Filtrează după etichetă",
+  "market.noMatch": "Nimic nu se potrivește cu aceste filtre.",
+  "market.rating.none": "Încă fără evaluări",
+  "market.rate": "Evaluarea ta",
+  "market.rateStars": "Acordă {count} stea | Acordă {count} stele | Acordă {count} de stele",
+  "market.comments": "Comentarii",
+  "market.comments.loading": "Se încarcă comentariile…",
+  "market.comments.none": "Încă nu sunt comentarii.",
+  "market.comments.you": "Tu",
+  "market.comments.write": "Scrie un comentariu",
+  "market.comments.rules": "Fără linkuri sau date de contact. Până la 280 de caractere.",
+  "market.comments.post": "Postează",
+  "market.comments.proPrompt": "Comentariile sunt o funcție Pro. Oricine poate citi comentariile.",
+  "market.comments.report": "Raportează",
+  "market.comments.reported": "Raportat",
+  "market.comments.block": "Blochează",
+  "market.comments.blocked": "Autori blocați",
+  "market.comments.blockedNote": "Nu vezi comentariile persoanelor listate aici.",
+  "market.comments.blockedNone": "Nu ai blocat pe nimeni.",
+  "market.comments.unblock": "Deblochează",
 
   "share.link": "Import și export",
   "share.linkNote": "Mută rețetele între dispozitive sub formă de text",
@@ -367,7 +409,6 @@ export const ro: Messages = {
   "assistant.reject": "Respinge",
   "assistant.accept": "Acceptă",
   "assistant.switchExists": "Acest comutator există deja",
-  "assistant.savedAsCopy": "salvat drept copia ta modificată",
   "assistant.matched": "potrivite: {count}",
   "assistant.requestQuote": "„{request}”",
   "assistant.unmatched":

@@ -152,6 +152,27 @@ export const uk: Messages = {
   "onboarding.step4Title": "Зробіть його своїм.",
   "onboarding.step4Body":
     "Перетягніть кнопку до будь-якого краю — і вона залишиться там. Змінюйте обране в налаштуваннях і переглядайте цей посібник будь-коли.",
+  "onboarding.quickTitle": "Що вам потрібно під рукою?",
+  "onboarding.quickBody":
+    "Виберіть сайти, які відкриваєте найчастіше. OpenMedia додасть їхні офіційні рецепти й розмістить їх на вашій кнопці.",
+  "onboarding.quickLoading": "Завантаження офіційних рецептів…",
+  "onboarding.quickEmpty":
+    "Для цього пристрою ще немає офіційних рецептів. Ви можете додати їх пізніше в Магазині рецептів.",
+  "onboarding.quickCount": "Вибрано {count} з {limit}",
+  "onboarding.quickProHint": "Це максимум, який дозволяє ваш план. У Pro слотів більше.",
+  "onboarding.applying": "Додавання…",
+  "onboarding.partial":
+    "Не вдалося додати: {names}. Ви можете додати їх пізніше в Магазині рецептів.",
+  "onboarding.marketTitle": "Магазин рецептів.",
+  "onboarding.marketBody": "Більше рецептів шукайте в Налаштуваннях, у розділі «Магазин рецептів».",
+  "onboarding.marketOfficial":
+    "Офіційні рецепти створює OpenMedia. Рецепти спільноти завантажують такі люди, як ви.",
+  "onboarding.marketChecked":
+    "Кожен рецепт автоматично перевіряється й утримується 14 днів, перш ніж потрапить до списку.",
+  "onboarding.marketReview":
+    "Ви переглядаєте кожне правило, яке додає рецепт, перш ніж його буде додано.",
+  "onboarding.marketPro":
+    "Для завантаження, експорту та коментування потрібен Pro. Додавати, імпортувати й оцінювати можна безкоштовно.",
 
   "settings.title": "Налаштування",
   "settings.close": "Закрити налаштування",
@@ -227,6 +248,9 @@ export const uk: Messages = {
   "recipes.title": "Рецепти",
   "recipes.note":
     "Рецепти для популярних сайтів. Запити на встановлення та спливаючі вікна, що заважають сторінці, приховані за замовчуванням; Reels, Shorts і рекомендації показуються, доки ви їх не приховаєте. Поставте зірку рецепту, щоб додати його сайт до обраного.",
+  "recipes.empty":
+    "У вас ще немає рецептів. Готові рецепти для популярних сайтів знайдете в Магазині рецептів.",
+  "recipes.openMarket": "Відкрити Магазин рецептів",
   "recipes.annoyances": "Подразники · приховані за замовчуванням",
   "recipes.content": "Контент · показується, доки ви його не приховаєте",
   "recipes.groupAnnoyance": "Подразник",
@@ -236,9 +260,6 @@ export const uk: Messages = {
   "recipes.options": "Налаштування {name}",
   "recipes.addFavorite": "Додати {name} до обраного",
   "recipes.removeFavorite": "Прибрати {name} з обраного",
-  "recipes.customized": "Це ваша змінена копія, тож оновлення застосунку її не чіпають.",
-  "recipes.originalUpdated": "Оригінал у застосунку оновили відтоді, як ви його змінили.",
-  "recipes.restore": "Повернути оригінал",
   "recipes.bottomMargin": "Нижнє поле",
   "recipes.sharedMargin":
     "Використовує спільне поле. Посуньте повзунок, щоб дати цьому сайту власне.",
@@ -287,6 +308,31 @@ export const uk: Messages = {
   "market.counting": "Повідомляти магазину, коли я додаю рецепт",
   "market.countingNote":
     "Надсилається лише назва рецепта, нічого про вас. Із цього складаються числа «Додали».",
+  "market.tag.official": "Офіційні",
+  "market.tag.community": "Спільноти",
+  "market.tag.mobile": "Мобільні",
+  "market.tag.desktop": "Комп’ютер",
+  "market.filters": "Фільтр за тегами",
+  "market.noMatch": "Нічого не відповідає цим фільтрам.",
+  "market.rating.none": "Оцінок ще немає",
+  "market.rate": "Ваша оцінка",
+  "market.rateStars":
+    "Поставити {count} зірку | Поставити {count} зірки | Поставити {count} зірок | Поставити {count} зірки",
+  "market.comments": "Коментарі",
+  "market.comments.loading": "Завантаження коментарів…",
+  "market.comments.none": "Коментарів ще немає.",
+  "market.comments.you": "Ви",
+  "market.comments.write": "Написати коментар",
+  "market.comments.rules": "Без посилань і контактних даних. До 280 символів.",
+  "market.comments.post": "Опублікувати",
+  "market.comments.proPrompt": "Коментування — функція Pro. Читати коментарі можуть усі.",
+  "market.comments.report": "Поскаржитися",
+  "market.comments.reported": "Скаргу надіслано",
+  "market.comments.block": "Заблокувати",
+  "market.comments.blocked": "Заблоковані автори коментарів",
+  "market.comments.blockedNote": "Ви не бачите коментарів від людей зі цього списку.",
+  "market.comments.blockedNone": "Ви ще нікого не блокували.",
+  "market.comments.unblock": "Розблокувати",
 
   "share.link": "Імпорт і експорт",
   "share.linkNote": "Переносьте рецепти між пристроями у вигляді тексту",
@@ -366,7 +412,6 @@ export const uk: Messages = {
   "assistant.reject": "Відхилити",
   "assistant.accept": "Прийняти",
   "assistant.switchExists": "Такий перемикач уже є",
-  "assistant.savedAsCopy": "збережено як ваша змінена копія",
   "assistant.matched": "збігів: {count}",
   "assistant.requestQuote": "«{request}»",
   "assistant.unmatched":

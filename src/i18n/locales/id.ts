@@ -146,6 +146,27 @@ export const id: Messages = {
   "onboarding.step4Title": "Buat jadi milik Anda.",
   "onboarding.step4Body":
     "Seret tombol ke tepi kiri atau kanan dan tombol itu akan tetap di sana. Ubah favorit Anda di Pengaturan, dan ulangi panduan ini kapan saja di sana.",
+  "onboarding.quickTitle": "Apa yang Anda butuhkan di akses cepat?",
+  "onboarding.quickBody":
+    "Pilih situs yang paling sering Anda buka. OpenMedia menambahkan resep resminya dan menaruhnya di tombol Anda.",
+  "onboarding.quickLoading": "Memuat resep resmi…",
+  "onboarding.quickEmpty":
+    "Belum ada resep resmi untuk perangkat ini. Anda dapat menambahkannya nanti dari Pasar.",
+  "onboarding.quickCount": "{count} dari {limit} dipilih",
+  "onboarding.quickProHint": "Itu batas maksimum paket Anda. Pro punya lebih banyak slot.",
+  "onboarding.applying": "Menambahkan…",
+  "onboarding.partial":
+    "Tidak dapat menambahkan: {names}. Anda dapat menambahkannya nanti dari Pasar.",
+  "onboarding.marketTitle": "Pasar resep.",
+  "onboarding.marketBody": "Temukan lebih banyak resep di Pengaturan, di bagian Pasar.",
+  "onboarding.marketOfficial":
+    "Resep resmi dibuat oleh OpenMedia. Resep komunitas diunggah oleh orang-orang seperti Anda.",
+  "onboarding.marketChecked":
+    "Setiap resep diperiksa secara otomatis dan ditahan selama 14 hari sebelum dicantumkan.",
+  "onboarding.marketReview":
+    "Anda meninjau setiap aturan yang ditambahkan sebuah resep sebelum aturan itu ditambahkan.",
+  "onboarding.marketPro":
+    "Mengunggah, mengekspor, dan berkomentar memerlukan Pro. Menambahkan, mengimpor, dan memberi peringkat gratis.",
 
   "settings.title": "Pengaturan",
   "settings.close": "Tutup pengaturan",
@@ -231,10 +252,6 @@ export const id: Messages = {
   "recipes.options": "Opsi {name}",
   "recipes.addFavorite": "Tambahkan {name} ke favorit",
   "recipes.removeFavorite": "Hapus {name} dari favorit",
-  "recipes.customized":
-    "Resep ini adalah salinan yang Anda ubah, jadi pembaruan aplikasi tidak menyentuhnya.",
-  "recipes.originalUpdated": "Versi asli aplikasi sudah diperbarui sejak Anda mengubahnya.",
-  "recipes.restore": "Kembalikan yang asli",
   "recipes.bottomMargin": "Margin bawah",
   "recipes.sharedMargin":
     "Memakai margin bersama. Geser slider untuk memberi situs ini margin sendiri.",
@@ -243,6 +260,8 @@ export const id: Messages = {
   "recipes.useSharedMargin": "Pakai margin bersama",
   "recipes.imported":
     "Ditambahkan dari luar aplikasi. Keluarkan untuk mengembalikan situs seperti semula.",
+  "recipes.empty": "Anda belum punya resep. Temukan resep siap pakai untuk situs populer di Pasar.",
+  "recipes.openMarket": "Buka Pasar",
 
   "market.title": "Pasar",
   "market.linkNote": "Resep dari orang lain, diperiksa otomatis dan diterbitkan 14 hari kemudian",
@@ -282,6 +301,31 @@ export const id: Messages = {
   "market.counting": "Beri tahu pasar saat saya menambahkan resep",
   "market.countingNote":
     "Hanya nama resep yang dikirim, tidak ada yang tentang Anda. Ini menghasilkan angka “Ditambahkan oleh”.",
+  "market.tag.official": "Resmi",
+  "market.tag.community": "Komunitas",
+  "market.tag.mobile": "Seluler",
+  "market.tag.desktop": "Desktop",
+  "market.filters": "Filter menurut tag",
+  "market.noMatch": "Tidak ada yang cocok dengan filter ini.",
+  "market.rating.none": "Belum ada peringkat",
+  "market.rate": "Peringkat Anda",
+  "market.rateStars": "Beri {count} bintang",
+  "market.comments": "Komentar",
+  "market.comments.loading": "Memuat komentar…",
+  "market.comments.none": "Belum ada komentar.",
+  "market.comments.you": "Anda",
+  "market.comments.write": "Tulis komentar",
+  "market.comments.rules": "Tanpa tautan atau detail kontak. Maksimal 280 karakter.",
+  "market.comments.post": "Kirim",
+  "market.comments.proPrompt": "Berkomentar adalah fitur Pro. Semua orang dapat membaca komentar.",
+  "market.comments.report": "Laporkan",
+  "market.comments.reported": "Dilaporkan",
+  "market.comments.block": "Blokir",
+  "market.comments.blocked": "Pengomentar yang diblokir",
+  "market.comments.blockedNote":
+    "Anda tidak melihat komentar dari orang-orang yang tercantum di sini.",
+  "market.comments.blockedNone": "Anda belum memblokir siapa pun.",
+  "market.comments.unblock": "Buka blokir",
 
   "share.link": "Impor dan ekspor",
   "share.linkNote": "Pindahkan resep antarperangkat sebagai teks",
@@ -359,7 +403,6 @@ export const id: Messages = {
   "assistant.reject": "Tolak",
   "assistant.accept": "Terima",
   "assistant.switchExists": "Sakelar ini sudah ada",
-  "assistant.savedAsCopy": "tersimpan sebagai salinan milik Anda",
   "assistant.matched": "cocok {count}",
   "assistant.requestQuote": "“{request}”",
   "assistant.unmatched": "{count} aturan tidak cocok dengan apa pun di halaman ini.",

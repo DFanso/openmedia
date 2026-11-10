@@ -147,6 +147,25 @@ export const hi: Messages = {
   "onboarding.step4Title": "इसे अपना बनाएँ।",
   "onboarding.step4Body":
     "बटन को किसी भी किनारे तक खींचें, वहाँ वह रह जाएगा। अपनी पसंदीदा सूची सेटिंग्स में बदलें, और यह मार्गदर्शिका वहीं कभी भी दोहराएँ।",
+  "onboarding.quickTitle": "क्विक एक्सेस में आपको क्या चाहिए?",
+  "onboarding.quickBody":
+    "आप जो साइटें सबसे ज़्यादा खोलते हैं, उन्हें चुनें। OpenMedia उनकी आधिकारिक रेसिपी जोड़ देता है और उन्हें आपके बटन पर रख देता है।",
+  "onboarding.quickLoading": "आधिकारिक रेसिपी लोड हो रही हैं…",
+  "onboarding.quickEmpty":
+    "इस डिवाइस के लिए अभी कोई आधिकारिक रेसिपी सूचीबद्ध नहीं है। आप बाद में मार्केटप्लेस से कुछ जोड़ सकते हैं।",
+  "onboarding.quickCount": "{limit} में से {count} चुनी गईं",
+  "onboarding.quickProHint": "आपके प्लान में इतनी ही जगह है। Pro में और स्लॉट मिलते हैं।",
+  "onboarding.applying": "जोड़ी जा रही हैं…",
+  "onboarding.partial": "जोड़ नहीं सके: {names}। आप इन्हें बाद में मार्केटप्लेस से जोड़ सकते हैं।",
+  "onboarding.marketTitle": "रेसिपी का मार्केटप्लेस।",
+  "onboarding.marketBody": "और रेसिपी सेटिंग्स में, मार्केटप्लेस के अंदर मिलेंगी।",
+  "onboarding.marketOfficial":
+    "आधिकारिक रेसिपी OpenMedia बनाता है। कम्युनिटी रेसिपी आप जैसे लोग अपलोड करते हैं।",
+  "onboarding.marketChecked":
+    "हर रेसिपी अपने आप जाँची जाती है और सूची में आने से पहले 14 दिन रोकी जाती है।",
+  "onboarding.marketReview": "रेसिपी जो भी नियम जोड़ती है, जोड़ने से पहले आप उसे देखते हैं।",
+  "onboarding.marketPro":
+    "अपलोड करने, एक्सपोर्ट करने और टिप्पणी करने के लिए Pro चाहिए। जोड़ना, इम्पोर्ट करना और रेटिंग देना मुफ़्त है।",
 
   "settings.title": "सेटिंग्स",
   "settings.close": "सेटिंग्स बंद करें",
@@ -232,9 +251,6 @@ export const hi: Messages = {
   "recipes.options": "{name} विकल्प",
   "recipes.addFavorite": "{name} को पसंदीदा में जोड़ें",
   "recipes.removeFavorite": "{name} को पसंदीदा से हटाएँ",
-  "recipes.customized": "यह रेसिपी आपकी बदली हुई प्रति है, इसलिए ऐप के अपडेट इसे नहीं छेड़ते।",
-  "recipes.originalUpdated": "आपके बदलने के बाद से ऐप का मूल संस्करण अपडेट हो चुका है।",
-  "recipes.restore": "मूल संस्करण वहाँ लाएँ",
   "recipes.bottomMargin": "निचली मार्जिन",
   "recipes.sharedMargin":
     "साझा निचली मार्जिन का उपयोग हो रहा है। इस साइट को अलग मार्जिन देने के लिए स्लाइडर हिलाएँ।",
@@ -242,6 +258,9 @@ export const hi: Messages = {
   "recipes.siteMarginLabel": "{name} की निचली मार्जिन",
   "recipes.useSharedMargin": "साझा निचली मार्जिन का उपयोग करें",
   "recipes.imported": "ऐप के बाहर से जोड़ी गई। साइट को पहले जैसा करने के लिए इसे निकालें।",
+  "recipes.empty":
+    "अभी आपके पास कोई रेसिपी नहीं है। लोकप्रिय साइटों की तैयार रेसिपी मार्केटप्लेस में मिलेंगी।",
+  "recipes.openMarket": "मार्केटप्लेस खोलें",
 
   "market.title": "मार्केटप्लेस",
   "market.linkNote": "दूसरों की बनाई रेसिपी, अपने आप जाँची जाती हैं और 14 दिन बाद प्रकाशित",
@@ -281,6 +300,30 @@ export const hi: Messages = {
   "market.counting": "रेसिपी जोड़ने पर मार्केटप्लेस को बताएँ",
   "market.countingNote":
     "केवल रेसिपी का नाम भेजा जाता है, आपके बारे में कुछ नहीं। इससे “द्वारा जोड़ी गई” की संख्याएँ बनती हैं।",
+  "market.tag.official": "आधिकारिक",
+  "market.tag.community": "कम्युनिटी",
+  "market.tag.mobile": "मोबाइल",
+  "market.tag.desktop": "डेस्कटॉप",
+  "market.filters": "टैग से फ़िल्टर करें",
+  "market.noMatch": "इन फ़िल्टर से कुछ मेल नहीं खाता।",
+  "market.rating.none": "अभी कोई रेटिंग नहीं",
+  "market.rate": "आपकी रेटिंग",
+  "market.rateStars": "{count} स्टार दें | {count} स्टार दें",
+  "market.comments": "टिप्पणियाँ",
+  "market.comments.loading": "टिप्पणियाँ लोड हो रही हैं…",
+  "market.comments.none": "अभी कोई टिप्पणी नहीं।",
+  "market.comments.you": "आप",
+  "market.comments.write": "टिप्पणी लिखें",
+  "market.comments.rules": "कोई लिंक या संपर्क विवरण नहीं। अधिकतम 280 अक्षर।",
+  "market.comments.post": "पोस्ट करें",
+  "market.comments.proPrompt": "टिप्पणी करना Pro सुविधा है। टिप्पणियाँ सब पढ़ सकते हैं।",
+  "market.comments.report": "रिपोर्ट करें",
+  "market.comments.reported": "रिपोर्ट किया गया",
+  "market.comments.block": "ब्लॉक करें",
+  "market.comments.blocked": "ब्लॉक किए गए टिप्पणीकार",
+  "market.comments.blockedNote": "यहाँ सूचीबद्ध लोगों की टिप्पणियाँ आपको नहीं दिखतीं।",
+  "market.comments.blockedNone": "आपने किसी को ब्लॉक नहीं किया है।",
+  "market.comments.unblock": "अनब्लॉक करें",
 
   "share.link": "आयात और निर्यात",
   "share.linkNote": "रेसिपी को टेक्स्ट के रूप में एक डिवाइस से दूसरे में ले जाएँ",
@@ -359,7 +402,6 @@ export const hi: Messages = {
   "assistant.reject": "ठुकराएँ",
   "assistant.accept": "स्वीकारें",
   "assistant.switchExists": "यह स्विच पहले से मौजूद है",
-  "assistant.savedAsCopy": "आपकी बदली हुई प्रति के रूप में सहेजा गया",
   "assistant.matched": "{count} से मेल खाता",
   "assistant.requestQuote": "“{request}”",
   "assistant.unmatched":

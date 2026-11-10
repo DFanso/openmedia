@@ -87,7 +87,7 @@ pub struct SectionUsage {
 #[serde(rename_all = "camelCase")]
 pub struct SiteUsage {
     pub host: String,
-    /// The bundled recipe's name for the site, when one covers it; filled in by the command.
+    /// The name of the recipe that covers the site, when one does; filled in by the command.
     pub name: Option<String>,
     pub seconds: u64,
     pub sections: Vec<SectionUsage>,

@@ -129,7 +129,7 @@ pub fn record_usage(
     usage.record(&day, &host, &section, seconds)
 }
 
-/// Totals for the last `days` days ending at `today`, with bundled recipe names for known sites.
+/// Totals for the last `days` days ending at `today`, with recipe names for sites a recipe covers.
 #[tauri::command]
 pub fn get_usage(
     usage: State<'_, Usage>,
@@ -374,34 +374,6 @@ pub(crate) fn reload_script(app: &AppHandle, library: &Library, recipes: &Recipe
     Ok(())
 }
 
-/// Saves a changed copy of a bundled site's recipe (a fork) and applies it. The copy lives in the
-/// app data folder, so app updates never overwrite it. Called by the step that accepts the
-/// assistant's or the user's change; the recipe is validated in Rust and must be a copy of a
-/// bundled recipe with origin `user` or `ai`. Async for the same reason as `open_site`.
-#[tauri::command]
-pub async fn save_recipe_fork(
-    app: AppHandle,
-    library: State<'_, Library>,
-    recipes: State<'_, Recipes>,
-    recipe: String,
-) -> Result<()> {
-    recipes.save_fork(&recipe)?;
-    reload_script(&app, &library, &recipes)
-}
-
-/// Drops the user's changed copy so the bundled recipe applies again. Async for the same reason
-/// as `open_site`.
-#[tauri::command]
-pub async fn restore_recipe_original(
-    app: AppHandle,
-    library: State<'_, Library>,
-    recipes: State<'_, Recipes>,
-    recipe_id: String,
-) -> Result<()> {
-    recipes.restore_original(&recipe_id)?;
-    reload_script(&app, &library, &recipes)
-}
-
 #[tauri::command]
 pub fn set_bottom_margin(library: State<'_, Library>, pixels: u32) -> Result<()> {
     library.set_bottom_margin(pixels)
@@ -627,9 +599,6 @@ pub async fn ai_prepare(
                     .ok()
                     .and_then(|url| recipes.for_url(&url));
                 RecipeContext {
-                    base_is_bundled: base
-                        .as_ref()
-                        .is_some_and(|recipe| recipes.bundled_version(&recipe.id).is_some()),
                     option_states: base
                         .as_ref()
                         .and_then(|recipe| choices.get(&recipe.id).cloned())
@@ -657,8 +626,8 @@ pub async fn ai_send(
     agent::send(&agent, &LivePage(&app), &LiveModel { config, key }, id).await
 }
 
-/// Saves the previewed change: a new switch in a changed copy of the site's recipe, or a new
-/// recipe for a site the app has none for. Then the page reloads under it.
+/// Saves the previewed change as a `custom.` recipe of the user's own; installed recipes are never
+/// edited. Then the page reloads under it.
 #[tauri::command]
 pub async fn ai_accept(
     app: AppHandle,

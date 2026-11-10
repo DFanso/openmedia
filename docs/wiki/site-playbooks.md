@@ -1,6 +1,6 @@
 # Site Playbooks
 
-> **Status: Implemented for 18 sites.** The first five (Instagram, Facebook, X, Reddit, YouTube) are the default favorites; Threads, Telegram, Douyin, Messenger, Discord, Kuaishou, LinkedIn, WhatsApp, Snapchat, Pinterest, Weibo, TikTok and Twitch were added later from logged-out research only. WeChat and QQ have no recipe: their logged-out pages offer nothing to hide. The recipes are `recipes/bundled/<site>.json`; their DOM fixtures are in `recipes/fixtures/`. This page is the knowledge behind them, written so that a weaker model (the in-app assistant, see [AI Assistant](./ai-assistant.md)) can write correct selectors for these sites and for new ones. When a selector here stops matching, fix the recipe and this page together.
+> **Status: Implemented for 18 sites.** The first five are Instagram, Facebook, X, Reddit and YouTube; Threads, Telegram, Douyin, Messenger, Discord, Kuaishou, LinkedIn, WhatsApp, Snapchat, Pinterest, Weibo, TikTok and Twitch were added later from logged-out research only. WeChat and QQ have no recipe: their logged-out pages offer nothing to hide. The recipes are `recipes/official/<site>.json` (published to the marketplace as `market.official.<site>`, not embedded in the app); their DOM fixtures are in `recipes/fixtures/`. This page is the knowledge behind them, written so that a weaker model (the in-app assistant, see [AI Assistant](./ai-assistant.md)) can write correct selectors for these sites and for new ones. When a selector here stops matching, fix the recipe and this page together.
 
 Researched 2026-11-07 with an iPhone user agent at 390×844 in headless Chromium (not WebKit, so iOS rendering of these selectors is untested), logged out, plus community filter lists. **Nobody on this team could log in during research, so every logged-in selector below is `SOURCE` or `INFERRED`, not `LIVE`.** On-device checks on a real, logged-in account remain the user's.
 
@@ -14,7 +14,7 @@ Evidence tags used everywhere:
 
 ## How options and defaults work
 
-See [Recipe Format: Options](./recipe-format.md#options-user-facing-toggles). In short: Settings → Recipes shows one switch per option; ON means hidden. **Annoyances** (install prompts, pop-ups that block the page, scroll locks, ad slots) default ON; **content** (Reels, Shorts, Stories, suggestions, feeds) defaults OFF. A test enforces the policy for every bundled recipe. Changing a switch recompiles the script and applies it to the page at once, without a reload. The user's choices are stored as overrides, so a release can change a default without migrating anyone who never touched the switch.
+See [Recipe Format: Options](./recipe-format.md#options-user-facing-toggles). In short: Settings → Recipes shows one switch per option; ON means hidden. **Annoyances** (install prompts, pop-ups that block the page, scroll locks, ad slots) default ON; **content** (Reels, Shorts, Stories, suggestions, feeds) defaults OFF. A test enforces the policy for every official recipe. Changing a switch recompiles the script and applies it to the page at once, without a reload. The user's choices are stored as overrides, so a release can change a default without migrating anyone who never touched the switch.
 
 ## Desktop and mobile are different pages
 

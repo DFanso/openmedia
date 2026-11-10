@@ -152,6 +152,25 @@ export const pl: Messages = {
   "onboarding.step4Title": "Dopasuj do siebie.",
   "onboarding.step4Body":
     "Przeciągnij przycisk na dowolną krawędź, a tam zostanie. Zmieniaj ulubione w Ustawieniach, gdzie możesz też w każdej chwili odtworzyć ten przewodnik.",
+  "onboarding.quickTitle": "Czego potrzebujesz w szybkim dostępie?",
+  "onboarding.quickBody":
+    "Wybierz witryny, które otwierasz najczęściej. OpenMedia doda ich oficjalne przepisy i umieści je na Twoim przycisku.",
+  "onboarding.quickLoading": "Wczytywanie oficjalnych przepisów…",
+  "onboarding.quickEmpty":
+    "Dla tego urządzenia nie ma jeszcze oficjalnych przepisów. Możesz dodać je później ze Sklepu.",
+  "onboarding.quickCount": "Wybrano {count} z {limit}",
+  "onboarding.quickProHint": "To maksimum w Twoim planie. Pro ma więcej miejsc.",
+  "onboarding.applying": "Dodawanie…",
+  "onboarding.partial": "Nie udało się dodać: {names}. Możesz je dodać później ze Sklepu.",
+  "onboarding.marketTitle": "Sklep z przepisami.",
+  "onboarding.marketBody": "Więcej przepisów znajdziesz w Ustawieniach, w sekcji Sklep.",
+  "onboarding.marketOfficial":
+    "Oficjalne przepisy tworzy OpenMedia. Przepisy społeczności przesyłają osoby takie jak Ty.",
+  "onboarding.marketChecked":
+    "Każdy przepis jest sprawdzany automatycznie i wstrzymywany na 14 dni, zanim trafi na listę.",
+  "onboarding.marketReview": "Przed dodaniem przepisu sprawdzasz każdą regułę, którą wprowadza.",
+  "onboarding.marketPro":
+    "Przesyłanie, eksport i komentowanie wymagają Pro. Dodawanie, import i ocenianie są bezpłatne.",
 
   "settings.title": "Ustawienia",
   "settings.close": "Zamknij ustawienia",
@@ -227,6 +246,9 @@ export const pl: Messages = {
   "recipes.title": "Przepisy",
   "recipes.note":
     "Przepisy dla popularnych witryn. Monity o instalację i wyskakujące okna zasłaniające stronę są domyślnie ukryte; Reels, Shorts i sugestie są widoczne, dopóki ich nie ukryjesz. Oznacz przepis gwiazdką, aby dodać jego witrynę do ulubionych.",
+  "recipes.empty":
+    "Nie masz jeszcze żadnych przepisów. Gotowe przepisy do popularnych witryn znajdziesz w Sklepie.",
+  "recipes.openMarket": "Otwórz Sklep",
   "recipes.annoyances": "Uciążliwości · domyślnie ukryte",
   "recipes.content": "Treści · widoczne, dopóki ich nie ukryjesz",
   "recipes.groupAnnoyance": "Uciążliwość",
@@ -236,10 +258,6 @@ export const pl: Messages = {
   "recipes.options": "Opcje: {name}",
   "recipes.addFavorite": "Dodaj {name} do ulubionych",
   "recipes.removeFavorite": "Usuń {name} z ulubionych",
-  "recipes.customized":
-    "Ten przepis to Twoja zmieniona kopia, więc aktualizacje aplikacji jej nie ruszają.",
-  "recipes.originalUpdated": "Oryginał w aplikacji został zaktualizowany po Twojej zmianie.",
-  "recipes.restore": "Przywróć oryginał",
   "recipes.bottomMargin": "Dolny margines",
   "recipes.sharedMargin": "Używa wspólnego marginesu. Przesuń suwak, aby ta witryna miała własny.",
   "recipes.ownMargin": "Ta witryna ma własny margines.",
@@ -286,6 +304,31 @@ export const pl: Messages = {
   "market.counting": "Powiadamiaj sklep, gdy dodam przepis",
   "market.countingNote":
     "Wysyłana jest tylko nazwa przepisu, nic o Tobie. Na tej podstawie powstają liczby przy „Dodało”.",
+  "market.tag.official": "Oficjalne",
+  "market.tag.community": "Społeczność",
+  "market.tag.mobile": "Mobilne",
+  "market.tag.desktop": "Komputerowe",
+  "market.filters": "Filtruj według tagu",
+  "market.noMatch": "Nic nie pasuje do tych filtrów.",
+  "market.rating.none": "Brak ocen",
+  "market.rate": "Twoja ocena",
+  "market.rateStars":
+    "Oceń: {count} gwiazdka | Oceń: {count} gwiazdki | Oceń: {count} gwiazdek | Oceń: {count} gwiazdki",
+  "market.comments": "Komentarze",
+  "market.comments.loading": "Wczytywanie komentarzy…",
+  "market.comments.none": "Brak komentarzy.",
+  "market.comments.you": "Ty",
+  "market.comments.write": "Napisz komentarz",
+  "market.comments.rules": "Bez linków i danych kontaktowych. Do 280 znaków.",
+  "market.comments.post": "Opublikuj",
+  "market.comments.proPrompt": "Komentowanie jest funkcją Pro. Komentarze może czytać każdy.",
+  "market.comments.report": "Zgłoś",
+  "market.comments.reported": "Zgłoszono",
+  "market.comments.block": "Zablokuj",
+  "market.comments.blocked": "Zablokowani komentujący",
+  "market.comments.blockedNote": "Nie widzisz komentarzy od osób wymienionych tutaj.",
+  "market.comments.blockedNone": "Nikogo nie zablokowano.",
+  "market.comments.unblock": "Odblokuj",
 
   "share.link": "Import i eksport",
   "share.linkNote": "Przenoś przepisy między urządzeniami jako tekst",
@@ -365,7 +408,6 @@ export const pl: Messages = {
   "assistant.reject": "Odrzuć",
   "assistant.accept": "Zaakceptuj",
   "assistant.switchExists": "Ten przełącznik już istnieje",
-  "assistant.savedAsCopy": "zapisano jako Twoją zmienioną kopię",
   "assistant.matched": "dopasowano: {count}",
   "assistant.requestQuote": "„{request}”",
   "assistant.unmatched":

@@ -152,6 +152,26 @@ export const ru: Messages = {
   "onboarding.step4Title": "Сделайте его своим.",
   "onboarding.step4Body":
     "Перетащите кнопку к любому краю — и она останется там. Меняйте избранное в настройках и пересматривайте это руководство в любой момент.",
+  "onboarding.quickTitle": "Что вам нужно в быстром доступе?",
+  "onboarding.quickBody":
+    "Выберите сайты, которые вы открываете чаще всего. OpenMedia добавит их официальные рецепты и поместит их на вашу кнопку.",
+  "onboarding.quickLoading": "Загрузка официальных рецептов…",
+  "onboarding.quickEmpty":
+    "Для этого устройства пока нет официальных рецептов. Вы сможете добавить их позже из Каталога.",
+  "onboarding.quickCount": "Выбрано {count} из {limit}",
+  "onboarding.quickProHint": "Это максимум для вашего тарифа. В Pro мест больше.",
+  "onboarding.applying": "Добавление…",
+  "onboarding.partial": "Не удалось добавить: {names}. Вы сможете добавить их позже из Каталога.",
+  "onboarding.marketTitle": "Каталог рецептов.",
+  "onboarding.marketBody": "Больше рецептов — в Настройках, в разделе «Каталог».",
+  "onboarding.marketOfficial":
+    "Официальные рецепты создаёт OpenMedia. Рецепты сообщества загружают такие же люди, как вы.",
+  "onboarding.marketChecked":
+    "Каждый рецепт автоматически проверяется и выдерживается 14 дней, прежде чем попасть в список.",
+  "onboarding.marketReview":
+    "Перед добавлением рецепта вы просматриваете каждое правило, которое он вносит.",
+  "onboarding.marketPro":
+    "Для загрузки, экспорта и комментариев нужен Pro. Добавлять, импортировать и оценивать можно бесплатно.",
 
   "settings.title": "Настройки",
   "settings.close": "Закрыть настройки",
@@ -228,6 +248,9 @@ export const ru: Messages = {
   "recipes.title": "Рецепты",
   "recipes.note":
     "Рецепты для популярных сайтов. Запросы на установку и всплывающие окна, мешающие странице, скрыты по умолчанию; Reels, Shorts и рекомендации показываются, пока вы их не скроете. Поставьте звезду рецепту, чтобы добавить его сайт в избранное.",
+  "recipes.empty":
+    "У вас пока нет рецептов. Готовые рецепты для популярных сайтов есть в Каталоге.",
+  "recipes.openMarket": "Открыть Каталог",
   "recipes.annoyances": "Раздражители · скрыты по умолчанию",
   "recipes.content": "Контент · показывается, пока вы его не скроете",
   "recipes.groupAnnoyance": "Раздражитель",
@@ -237,9 +260,6 @@ export const ru: Messages = {
   "recipes.options": "Настройки {name}",
   "recipes.addFavorite": "Добавить {name} в избранное",
   "recipes.removeFavorite": "Убрать {name} из избранного",
-  "recipes.customized": "Это ваша изменённая копия, поэтому обновления приложения её не трогают.",
-  "recipes.originalUpdated": "Оригинал в приложении обновили с тех пор, как вы его изменили.",
-  "recipes.restore": "Вернуть оригинал",
   "recipes.bottomMargin": "Нижнее поле",
   "recipes.sharedMargin": "Использует общее поле. Сдвиньте ползунок, чтобы дать этому сайту своё.",
   "recipes.ownMargin": "У этого сайта своё нижнее поле.",
@@ -287,6 +307,31 @@ export const ru: Messages = {
   "market.counting": "Сообщать каталогу, когда я добавляю рецепт",
   "market.countingNote":
     "Отправляется только название рецепта, ничего о вас. Из него складываются числа «Добавили».",
+  "market.tag.official": "Официальные",
+  "market.tag.community": "Сообщество",
+  "market.tag.mobile": "Мобильные",
+  "market.tag.desktop": "Компьютер",
+  "market.filters": "Фильтр по тегу",
+  "market.noMatch": "Ничего не подходит под эти фильтры.",
+  "market.rating.none": "Оценок пока нет",
+  "market.rate": "Ваша оценка",
+  "market.rateStars":
+    "Оценка: {count} звезда | Оценка: {count} звезды | Оценка: {count} звёзд | Оценка: {count} звезды",
+  "market.comments": "Комментарии",
+  "market.comments.loading": "Загрузка комментариев…",
+  "market.comments.none": "Комментариев пока нет.",
+  "market.comments.you": "Вы",
+  "market.comments.write": "Написать комментарий",
+  "market.comments.rules": "Без ссылок и контактных данных. До 280 символов.",
+  "market.comments.post": "Отправить",
+  "market.comments.proPrompt": "Комментировать можно с Pro. Читать комментарии может любой.",
+  "market.comments.report": "Пожаловаться",
+  "market.comments.reported": "Жалоба отправлена",
+  "market.comments.block": "Заблокировать",
+  "market.comments.blocked": "Заблокированные авторы",
+  "market.comments.blockedNote": "Вы не видите комментарии людей из этого списка.",
+  "market.comments.blockedNone": "Вы никого не заблокировали.",
+  "market.comments.unblock": "Разблокировать",
 
   "share.link": "Импорт и экспорт",
   "share.linkNote": "Переносите рецепты между устройствами в виде текста",
@@ -366,7 +411,6 @@ export const ru: Messages = {
   "assistant.reject": "Отклонить",
   "assistant.accept": "Принять",
   "assistant.switchExists": "Такой переключатель уже есть",
-  "assistant.savedAsCopy": "сохранено как ваша изменённая копия",
   "assistant.matched": "совпадений: {count}",
   "assistant.requestQuote": "«{request}»",
   "assistant.unmatched":

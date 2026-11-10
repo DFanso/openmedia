@@ -150,6 +150,25 @@ export const ja: Messages = {
   "onboarding.step4Title": "自分好みに。",
   "onboarding.step4Body":
     "ボタンを端までドラッグすると、そのままその場に留まります。お気に入りは設定で変更でき、このガイドはいつでももう一度読めます。",
+  "onboarding.quickTitle": "クイックアクセスに何が必要ですか？",
+  "onboarding.quickBody":
+    "よく開くサイトを選んでください。OpenMedia が公式レシピを追加し、ボタンに置きます。",
+  "onboarding.quickLoading": "公式レシピを読み込み中…",
+  "onboarding.quickEmpty":
+    "このデバイス向けの公式レシピはまだありません。あとでマーケットプレイスから追加できます。",
+  "onboarding.quickCount": "{limit} 件中 {count} 件を選択",
+  "onboarding.quickProHint": "ご利用のプランの上限です。Pro ならスロットが増えます。",
+  "onboarding.applying": "追加中…",
+  "onboarding.partial": "追加できませんでした: {names}。あとでマーケットプレイスから追加できます。",
+  "onboarding.marketTitle": "レシピのマーケットプレイス。",
+  "onboarding.marketBody": "ほかのレシピは、設定の「マーケットプレイス」で探せます。",
+  "onboarding.marketOfficial":
+    "公式レシピは OpenMedia が作成します。コミュニティレシピはあなたのような人たちがアップロードしたものです。",
+  "onboarding.marketChecked":
+    "すべてのレシピは自動でチェックされ、14日間保留されてから一覧に載ります。",
+  "onboarding.marketReview": "レシピが追加するルールは、追加する前にすべて確認できます。",
+  "onboarding.marketPro":
+    "アップロード、エクスポート、コメントには Pro が必要です。追加、インポート、評価は無料です。",
 
   "settings.title": "設定",
   "settings.close": "設定を閉じる",
@@ -235,9 +254,6 @@ export const ja: Messages = {
   "recipes.options": "{name}のオプション",
   "recipes.addFavorite": "{name}をお気に入りに追加",
   "recipes.removeFavorite": "{name}をお気に入りから外す",
-  "recipes.customized": "このレシピは変更済みのコピーなので、アプリの更新でもそのままです。",
-  "recipes.originalUpdated": "変更以来、アプリの元のレシピが更新されました。",
-  "recipes.restore": "元に戻す",
   "recipes.bottomMargin": "下余白",
   "recipes.sharedMargin":
     "共通の下余白を使います。スライダーを動かすと、このサイト専用の値になります。",
@@ -245,6 +261,9 @@ export const ja: Messages = {
   "recipes.siteMarginLabel": "{name}の下余白",
   "recipes.useSharedMargin": "共通の下余白を使う",
   "recipes.imported": "アプリの外から追加されました。外すと、サイトは元の状態に戻ります。",
+  "recipes.empty":
+    "レシピはまだありません。人気サイト向けの既成レシピがマーケットプレイスにあります。",
+  "recipes.openMarket": "マーケットプレイスを開く",
 
   "market.title": "マーケットプレイス",
   "market.linkNote": "ほかの人のレシピ（自動チェックされ、14日後に公開）",
@@ -284,6 +303,30 @@ export const ja: Messages = {
   "market.counting": "レシピを追加したらマーケットプレイスに知らせる",
   "market.countingNote":
     "送信されるのはレシピの名前だけで、あなたに関する情報は含まれません。「追加」の人数の集計に使われます。",
+  "market.tag.official": "公式",
+  "market.tag.community": "コミュニティ",
+  "market.tag.mobile": "モバイル",
+  "market.tag.desktop": "デスクトップ",
+  "market.filters": "タグで絞り込む",
+  "market.noMatch": "これらの条件に一致するものはありません。",
+  "market.rating.none": "評価はまだありません",
+  "market.rate": "あなたの評価",
+  "market.rateStars": "星{count}つで評価",
+  "market.comments": "コメント",
+  "market.comments.loading": "コメントを読み込み中…",
+  "market.comments.none": "コメントはまだありません。",
+  "market.comments.you": "あなた",
+  "market.comments.write": "コメントを書く",
+  "market.comments.rules": "リンクや連絡先は書けません。280文字までです。",
+  "market.comments.post": "投稿",
+  "market.comments.proPrompt": "コメントは Pro 機能です。コメントはだれでも読めます。",
+  "market.comments.report": "報告",
+  "market.comments.reported": "報告済み",
+  "market.comments.block": "ブロック",
+  "market.comments.blocked": "ブロックしたユーザー",
+  "market.comments.blockedNote": "ここに表示されている人のコメントは表示されません。",
+  "market.comments.blockedNone": "ブロックしているユーザーはいません。",
+  "market.comments.unblock": "ブロック解除",
 
   "share.link": "読み込みと書き出し",
   "share.linkNote": "レシピをテキストとして端末間で移す",
@@ -363,7 +406,6 @@ export const ja: Messages = {
   "assistant.reject": "却下",
   "assistant.accept": "承認",
   "assistant.switchExists": "このスイッチはすでに存在します",
-  "assistant.savedAsCopy": "変更したコピーとして保存されました",
   "assistant.matched": "{count} 件が一致",
   "assistant.requestQuote": "「{request}」",
   "assistant.unmatched": "{count} 件のルールがこのページでは何も一致しませんでした。",

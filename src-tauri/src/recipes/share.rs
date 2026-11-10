@@ -1,5 +1,5 @@
 //! Recipes that come from outside the app: pasted bundles and marketplace downloads. Everything
-//! in them is the sender's claim, so the sender's `origin`, `forkedFrom` and id prefix are
+//! in them is the sender's claim, so the sender's `origin` and id prefix are
 //! replaced before validation, and the text that the review screen will show is checked for
 //! characters that could disguise it.
 
@@ -22,7 +22,9 @@ pub const MAX_RECIPE_BYTES: usize = 256 * 1024;
 const MAX_ID_CHARS: usize = 80;
 const MAX_NAME_CHARS: usize = 60;
 const MAX_AUTHOR_CHARS: usize = 60;
-const MAX_NOTES_CHARS: usize = 500;
+/// Equal to the Worker's `MAX_NOTES`: authors' research notes can be long.
+const MAX_NOTES_CHARS: usize = 4000;
+const MAX_OPTION_TEXT_CHARS: usize = 500;
 const MAX_RULE_LABEL_CHARS: usize = 80;
 const MAX_MATCH_PATTERNS: usize = 20;
 
@@ -30,7 +32,7 @@ const MAX_MATCH_PATTERNS: usize = 20;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Source {
     /// A pasted bundle: the id is moved under `imported.` so it can never replace another
-    /// recipe, bundled or not.
+    /// recipe, such as an installed marketplace one.
     File,
     /// A marketplace download, already checked against the signed catalog: the id must be
     /// `market.` and is kept.
@@ -80,16 +82,9 @@ pub struct RulePreview {
 }
 
 pub fn export_bundle(recipes: &[Recipe]) -> Result<String> {
-    let recipes = recipes
-        .iter()
-        .map(|recipe| Recipe {
-            forked_from: None,
-            ..recipe.clone()
-        })
-        .collect();
     let bundle = Bundle {
         openmedia_bundle: BUNDLE_FORMAT,
-        recipes,
+        recipes: recipes.to_vec(),
     };
     Ok(serde_json::to_string_pretty(&bundle)?)
 }
@@ -144,7 +139,6 @@ fn parse_value(value: serde_json::Value, source: Source) -> Result<Recipe> {
     let mut recipe: Recipe =
         serde_json::from_value(value).map_err(|e| Error::Recipe(e.to_string()))?;
     recipe.origin = Origin::Imported;
-    recipe.forked_from = None;
     recipe.id = shared_id(source, &recipe.id)?;
     recipe.validate()?;
     check_shared(&recipe)?;
@@ -212,7 +206,8 @@ fn check_shared(recipe: &Recipe) -> Result<()> {
         Rule::Hide { label, .. } | Rule::Css { label, .. } => label,
     });
     let unsafe_text = option_texts.chain(rule_labels).any(|text| {
-        !is_plain_text(text, MAX_RULE_LABEL_CHARS.max(MAX_NOTES_CHARS)) || text.trim().is_empty()
+        !is_plain_text(text, MAX_RULE_LABEL_CHARS.max(MAX_OPTION_TEXT_CHARS))
+            || text.trim().is_empty()
     });
     if unsafe_text {
         return Err(Error::Recipe(format!(
@@ -334,7 +329,7 @@ mod tests {
         format!(
             r#"{{
                 "schema": 1, "id": "{id}", "name": "Calm", "version": "1.0.0",
-                "origin": "user", "match": ["https://*.example.com/*"],
+                "origin": "user", "tags": ["mobile"], "match": ["https://*.example.com/*"],
                 "options": [{{"id": "shorts", "label": "Hide shorts", "description": "The shorts shelf.",
                               "group": "content", "default": false}}],
                 "rules": [{{"id": "r1", "label": "Shelf", "type": "hide", "option": "shorts",
@@ -356,23 +351,41 @@ mod tests {
     }
 
     #[test]
-    fn a_file_cannot_claim_to_be_bundled_to_skip_the_broad_match_refusal() {
-        let json = recipe_json("calm", "")
-            .replace("\"user\"", "\"bundled\"")
-            .replace("https://*.example.com/*", "https://*/*");
-        assert!(file(&json).is_err());
+    fn a_file_cannot_use_a_broad_match_and_cannot_claim_a_removed_origin() {
+        let broad = recipe_json("calm", "").replace("https://*.example.com/*", "https://*/*");
+        assert!(file(&broad).is_err());
+        let bundled = recipe_json("calm", "").replace("\"user\"", "\"bundled\"");
+        assert!(file(&bundled).is_err());
     }
 
     #[test]
-    fn a_file_is_always_imported_and_never_a_fork() {
-        let json = recipe_json("calm", ", \"forkedFrom\": \"1.0.0\"").replace("\"user\"", "\"ai\"");
-        let recipe = file(&json).unwrap();
-        assert_eq!(recipe.origin, Origin::Imported);
-        assert_eq!(recipe.forked_from, None);
+    fn a_file_is_always_imported_whatever_origin_it_claims() {
+        let json = recipe_json("calm", "").replace("\"user\"", "\"ai\"");
+        assert_eq!(file(&json).unwrap().origin, Origin::Imported);
     }
 
     #[test]
-    fn a_file_id_is_moved_under_imported_so_it_cannot_replace_a_bundled_recipe() {
+    fn an_import_needs_valid_platform_tags() {
+        assert!(file(&recipe_json("calm", "")).is_ok());
+        let without = recipe_json("calm", "").replace("\"tags\": [\"mobile\"],", "");
+        assert!(file(&without).is_err());
+        for bad in [
+            "[]",
+            "[\"official\"]",
+            "[\"community\"]",
+            "[\"mobile\", \"mobile\"]",
+            "[\"tv\"]",
+            "[\"mobile\", \"desktop\", \"desktop\"]",
+        ] {
+            let json = recipe_json("calm", "").replace("[\"mobile\"],", &format!("{bad},"));
+            assert!(file(&json).is_err(), "{bad}");
+        }
+        let both = recipe_json("calm", "").replace("[\"mobile\"],", "[\"desktop\", \"mobile\"],");
+        assert_eq!(file(&both).unwrap().tags, ["desktop", "mobile"]);
+    }
+
+    #[test]
+    fn a_file_id_is_moved_under_imported_so_it_cannot_replace_an_installed_recipe() {
         assert_eq!(
             file(&recipe_json("instagram.default", "")).unwrap().id,
             "imported.instagram.default"
@@ -423,6 +436,13 @@ mod tests {
     }
 
     #[test]
+    fn notes_may_be_long_but_not_longer_than_the_cap() {
+        let notes = |len: usize| format!(r#", "meta": {{"notes": "{}"}}"#, "n".repeat(len));
+        assert!(file(&recipe_json("calm", &notes(MAX_NOTES_CHARS))).is_ok());
+        assert!(file(&recipe_json("calm", &notes(MAX_NOTES_CHARS + 1))).is_err());
+    }
+
+    #[test]
     fn script_rules_and_unknown_fields_are_refused() {
         let script = recipe_json("calm", "").replace("\"type\": \"hide\"", "\"type\": \"script\"");
         assert!(file(&script).is_err());
@@ -436,18 +456,11 @@ mod tests {
     }
 
     #[test]
-    fn a_bundle_round_trips_and_drops_fork_ancestry() {
-        let mut recipe = file(&recipe_json("calm", "")).unwrap();
-        recipe.forked_from = Some("9.9.9".into());
-        let text = export_bundle(&[recipe.clone()]).unwrap();
-        assert!(!text.contains("forkedFrom"));
-        assert_eq!(
-            parse_bundle(&text).unwrap(),
-            vec![Recipe {
-                forked_from: None,
-                ..recipe
-            }]
-        );
+    fn a_bundle_round_trips_and_exports_the_tags() {
+        let recipe = file(&recipe_json("calm", "")).unwrap();
+        let text = export_bundle(std::slice::from_ref(&recipe)).unwrap();
+        assert!(text.contains("\"tags\""));
+        assert_eq!(parse_bundle(&text).unwrap(), vec![recipe]);
     }
 
     #[test]

@@ -24,8 +24,6 @@ export interface Proposal {
   summary: string;
   recipeId: string;
   recipeName: string;
-  /** Accepting saves a changed copy of a bundled recipe. */
-  forked: boolean;
   option: { id: string | null; label: string; description: string; group: OptionGroup };
   rules: ProposalRule[];
   /** Rules that matched nothing. */

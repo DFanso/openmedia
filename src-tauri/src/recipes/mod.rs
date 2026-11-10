@@ -5,7 +5,9 @@ mod selector;
 mod share;
 
 pub use compile::{OptionChoices, page_script};
-pub use schema::{Meta, OptionGroup, Origin, Recipe, Rule, SiteOption, Target};
+pub use schema::{
+    Meta, OptionGroup, Origin, Recipe, Rule, SiteOption, Target, current_platform_tag,
+};
 pub(crate) use selector::validate_selector;
 pub(crate) use share::{MARKET_PREFIX, MAX_RECIPE_BYTES, is_catalog_id, is_plain_text, is_version};
 pub use share::{RecipePreview, preview as preview_recipe};
@@ -22,64 +24,25 @@ use url::Url;
 use crate::error::{Error, Result};
 use crate::library::write_atomically;
 
-const BUNDLED: &[&str] = &[
-    include_str!("../../../recipes/bundled/instagram.json"),
-    include_str!("../../../recipes/bundled/facebook.json"),
-    include_str!("../../../recipes/bundled/twitter.json"),
-    include_str!("../../../recipes/bundled/reddit.json"),
-    include_str!("../../../recipes/bundled/youtube.json"),
-    include_str!("../../../recipes/bundled/threads.json"),
-    include_str!("../../../recipes/bundled/telegram.json"),
-    include_str!("../../../recipes/bundled/douyin.json"),
-    include_str!("../../../recipes/bundled/messenger.json"),
-    include_str!("../../../recipes/bundled/discord.json"),
-    include_str!("../../../recipes/bundled/kuaishou.json"),
-    include_str!("../../../recipes/bundled/linkedin.json"),
-    include_str!("../../../recipes/bundled/whatsapp.json"),
-    include_str!("../../../recipes/bundled/snapchat.json"),
-    include_str!("../../../recipes/bundled/pinterest.json"),
-    include_str!("../../../recipes/bundled/weibo.json"),
-    include_str!("../../../recipes/bundled/tiktok.json"),
-    include_str!("../../../recipes/bundled/twitch.json"),
-];
+const MAX_MADE_BYTES: usize = 256 * 1024;
 
-const MAX_FORK_BYTES: usize = 256 * 1024;
+/// Ids of recipes the user or the assistant made. The app ships no recipes of its own: every
+/// other recipe is installed from the marketplace or imported from a file.
+const CUSTOM_PREFIX: &str = "custom.";
 
-/// Test-only: the bundled recipes with no fork folder.
-#[cfg(test)]
-impl Recipes {
-    pub fn bundled_only() -> Self {
-        Self::load(PathBuf::from("/nonexistent/openmedia-test")).unwrap()
-    }
-}
-
-pub fn bundled() -> Result<Vec<Recipe>> {
-    BUNDLED.iter().map(|json| Recipe::parse(json)).collect()
-}
-
-/// The recipes in effect: the ones the app ships with, each replaced by the user's customized copy
-/// (a fork) when one exists. A fork is a file in `dir`, written when the user or the assistant
-/// changes a bundled recipe; app updates replace the bundled recipes but never touch these files,
-/// so a user's changes survive an update. The page script is compiled on demand, because it
-/// depends on the user's toggles.
+/// The recipes in effect: the ones the user or the assistant made (`custom.`) and the ones
+/// installed or imported (`market.`, `imported.`). Files live in `dir`, so app updates never touch
+/// them. The page script is compiled on demand, because it depends on the user's toggles.
 pub struct Recipes {
-    bundled: Vec<Recipe>,
     dir: PathBuf,
-    forks: RwLock<BTreeMap<String, Recipe>>,
     custom: RwLock<BTreeMap<String, Recipe>>,
     imported: RwLock<BTreeMap<String, Recipe>>,
 }
 
-/// Ids of recipes the user or the assistant made for a site the app ships no recipe for.
-const CUSTOM_PREFIX: &str = "custom.";
-
 impl Recipes {
-    /// Loads the bundled recipes and every valid fork or custom recipe in `dir`. A file that is
-    /// unreadable, invalid, or neither a fork of a bundled recipe nor a `custom.` recipe is skipped,
-    /// so a damaged file can never stop the app from starting; the bundled recipe applies instead.
+    /// Loads every valid recipe in `dir`. A file that is unreadable or invalid is skipped, so a
+    /// damaged file can never stop the app from starting. A fresh install has no recipes.
     pub fn load(dir: PathBuf) -> Result<Self> {
-        let bundled = bundled()?;
-        let mut forks = BTreeMap::new();
         let mut custom = BTreeMap::new();
         let mut imported = BTreeMap::new();
         for entry in fs::read_dir(&dir).into_iter().flatten().flatten() {
@@ -90,56 +53,42 @@ impl Recipes {
             let Ok(text) = fs::read_to_string(&path) else {
                 continue;
             };
-            if let Ok(fork) = parse_fork(&bundled, &text) {
-                forks.insert(fork.id.clone(), fork);
-            } else if let Ok(recipe) = parse_custom(&text) {
+            if let Ok(recipe) = parse_custom(&text) {
                 custom.insert(recipe.id.clone(), recipe);
             } else if let Ok(recipe) = share::parse_shared(text.as_bytes(), share::Source::Stored) {
                 imported.insert(recipe.id.clone(), recipe);
             }
         }
         Ok(Self {
-            bundled,
             dir,
-            forks: RwLock::new(forks),
             custom: RwLock::new(custom),
             imported: RwLock::new(imported),
         })
     }
 
+    /// Made recipes first, then installed ones, each in id order.
     pub fn all(&self) -> Vec<Recipe> {
-        let forks = self.forks.read().unwrap_or_else(PoisonError::into_inner);
         let custom = self.custom.read().unwrap_or_else(PoisonError::into_inner);
         let imported = self.imported.read().unwrap_or_else(PoisonError::into_inner);
-        self.bundled
-            .iter()
-            .map(|recipe| forks.get(&recipe.id).unwrap_or(recipe).clone())
-            .chain(custom.values().cloned())
-            .chain(imported.values().cloned())
-            .collect()
+        custom.values().chain(imported.values()).cloned().collect()
     }
 
     pub fn get(&self, id: &str) -> Option<Recipe> {
         self.all().into_iter().find(|recipe| recipe.id == id)
     }
 
-    /// The version of the recipe the app currently ships under this id.
-    pub fn bundled_version(&self, id: &str) -> Option<&str> {
-        self.bundled
-            .iter()
-            .find(|recipe| recipe.id == id)
-            .map(|recipe| recipe.version.as_str())
+    /// The first recipe whose `match` patterns cover this page: a made one before an installed one.
+    pub fn for_url(&self, url: &Url) -> Option<Recipe> {
+        self.all().into_iter().find(|recipe| recipe.covers(url))
     }
 
-    /// The recipe whose `match` patterns cover this page.
-    pub fn for_url(&self, url: &Url) -> Option<Recipe> {
-        self.all().into_iter().find(|recipe| {
-            recipe
-                .matches
-                .iter()
-                .filter_map(|pattern| matcher::Matcher::parse(pattern).ok())
-                .any(|matcher| matcher.matches(url))
-        })
+    /// Every recipe that covers this page. A made recipe and an installed one can both cover a
+    /// site; both apply.
+    pub fn covering(&self, url: &Url) -> Vec<Recipe> {
+        self.all()
+            .into_iter()
+            .filter(|recipe| recipe.covers(url))
+            .collect()
     }
 
     /// The script injected into every site view: all recipes, matched by the page itself.
@@ -147,59 +96,10 @@ impl Recipes {
         page_script(&self.all(), choices)
     }
 
-    /// Saves a changed copy of a bundled recipe. The copy keeps the bundled recipe's id and
-    /// replaces it from now on. It is validated like any recipe, must not claim to be bundled, and
-    /// records the bundled version it came from so Settings can say when the original has moved on.
-    pub fn save_fork(&self, json: &str) -> Result<Recipe> {
-        if json.len() > MAX_FORK_BYTES {
-            return Err(Error::Recipe("the recipe is too large".into()));
-        }
-        let mut fork = Recipe::parse(json)?;
-        let base = self
-            .bundled
-            .iter()
-            .find(|recipe| recipe.id == fork.id)
-            .ok_or(Error::UnknownSite)?;
-        if !matches!(fork.origin, Origin::User | Origin::Ai) {
-            return Err(Error::Recipe("a fork must have origin user or ai".into()));
-        }
-        fork.forked_from = Some(base.version.clone());
-        write_atomically(
-            &self.dir.join(format!("{}.json", fork.id)),
-            &serde_json::to_vec_pretty(&fork)?,
-        )?;
-        self.forks
-            .write()
-            .unwrap_or_else(PoisonError::into_inner)
-            .insert(fork.id.clone(), fork.clone());
-        Ok(fork)
-    }
-
-    /// Drops the customized copy; the bundled recipe applies again.
-    pub fn restore_original(&self, id: &str) -> Result<()> {
-        if self.bundled_version(id).is_none() {
-            return Err(Error::UnknownSite);
-        }
-        match fs::remove_file(self.dir.join(format!("{id}.json"))) {
-            Err(error) if error.kind() != std::io::ErrorKind::NotFound => return Err(error.into()),
-            _ => {}
-        }
-        self.forks
-            .write()
-            .unwrap_or_else(PoisonError::into_inner)
-            .remove(id);
-        Ok(())
-    }
-
-    /// Saves a recipe the assistant (or the user) made: a changed copy of a bundled recipe if the
-    /// id is a bundled one, otherwise a `custom.` recipe for a site the app ships none for. It is
-    /// validated again here, whatever produced it.
+    /// Saves a recipe the assistant made: a `custom.` recipe. It is validated again here,
+    /// whatever produced it.
     pub fn save_made(&self, recipe: &Recipe) -> Result<Recipe> {
-        let json = serde_json::to_string(recipe)?;
-        if self.bundled_version(&recipe.id).is_some() {
-            return self.save_fork(&json);
-        }
-        let saved = parse_custom(&json)?;
+        let saved = parse_custom(&serde_json::to_string(recipe)?)?;
         write_atomically(
             &self.dir.join(format!("{}.json", saved.id)),
             &serde_json::to_vec_pretty(&saved)?,
@@ -211,18 +111,14 @@ impl Recipes {
         Ok(saved)
     }
 
-    /// The text a user can share: recipes they made or changed, never the ones the app ships.
+    /// The text a user can share: any recipe on the device, as a bundle.
     pub fn export(&self, ids: &[String]) -> Result<String> {
         if ids.is_empty() {
             return Err(Error::Recipe("choose at least one recipe".into()));
         }
         let recipes = ids
             .iter()
-            .map(|id| {
-                self.get(id)
-                    .filter(|recipe| recipe.origin != Origin::Bundled)
-                    .ok_or(Error::UnknownSite)
-            })
+            .map(|id| self.get(id).ok_or(Error::UnknownSite))
             .collect::<Result<Vec<_>>>()?;
         share::export_bundle(&recipes)
     }
@@ -305,20 +201,8 @@ pub fn parse_catalog_recipe(bytes: &[u8]) -> Result<Recipe> {
     share::parse_shared(bytes, share::Source::Catalog)
 }
 
-fn parse_fork(bundled: &[Recipe], text: &str) -> Result<Recipe> {
-    let fork = Recipe::parse(text)?;
-    let is_fork = fork.forked_from.is_some()
-        && matches!(fork.origin, Origin::User | Origin::Ai)
-        && bundled.iter().any(|recipe| recipe.id == fork.id);
-    if is_fork {
-        Ok(fork)
-    } else {
-        Err(Error::UnknownSite)
-    }
-}
-
 fn parse_custom(text: &str) -> Result<Recipe> {
-    if text.len() > MAX_FORK_BYTES {
+    if text.len() > MAX_MADE_BYTES {
         return Err(Error::Recipe("the recipe is too large".into()));
     }
     let recipe = Recipe::parse(text)?;
@@ -329,13 +213,48 @@ fn parse_custom(text: &str) -> Result<Recipe> {
                     .chars()
                     .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '.' || c == '-')
         });
-    if id_is_safe
-        && matches!(recipe.origin, Origin::User | Origin::Ai)
-        && recipe.forked_from.is_none()
-    {
+    if id_is_safe && matches!(recipe.origin, Origin::User | Origin::Ai) {
         Ok(recipe)
     } else {
         Err(Error::UnknownSite)
+    }
+}
+
+/// Test-only: the official recipe files, read the way the app reads a marketplace download.
+#[cfg(test)]
+pub(crate) fn official_recipes() -> Vec<Recipe> {
+    let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../recipes/official");
+    let mut files: Vec<_> = fs::read_dir(dir)
+        .unwrap()
+        .map(|entry| entry.unwrap().path())
+        .filter(|path| {
+            path.extension()
+                .is_some_and(|extension| extension == "json")
+        })
+        .collect();
+    files.sort();
+    files
+        .iter()
+        .map(|path| {
+            share::parse_shared(&fs::read(path).unwrap(), share::Source::Catalog)
+                .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
+        })
+        .collect()
+}
+
+/// Test-only: every official recipe installed, as if the user had installed them all.
+#[cfg(test)]
+impl Recipes {
+    pub fn official_installed() -> Self {
+        let imported = official_recipes()
+            .into_iter()
+            .map(|recipe| (recipe.id.clone(), recipe))
+            .collect();
+        Self {
+            dir: PathBuf::from("/nonexistent/openmedia-test"),
+            custom: RwLock::new(BTreeMap::new()),
+            imported: RwLock::new(imported),
+        }
     }
 }
 
@@ -349,20 +268,66 @@ mod tests {
     use super::schema::Rule;
     use super::*;
 
+    const OFFICIAL_PREFIX: &str = "market.official.";
+
+    fn site_of(recipe: &Recipe) -> &str {
+        recipe.id.strip_prefix(OFFICIAL_PREFIX).unwrap()
+    }
+
+    fn fixture_names(site: &str) -> Vec<String> {
+        let fixtures_root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../recipes/fixtures");
+        fs::read_dir(fixtures_root.join(site))
+            .unwrap_or_else(|_| panic!("site {site} has no fixtures"))
+            .map(|entry| entry.unwrap().file_name().to_string_lossy().into_owned())
+            .collect()
+    }
+
     #[test]
-    fn every_bundled_recipe_parses_and_validates() {
-        let recipes = bundled().unwrap();
+    fn every_official_recipe_parses_validates_and_is_named_for_its_site() {
+        let recipes = official_recipes();
         assert!(!recipes.is_empty());
         let mut ids: Vec<_> = recipes.iter().map(|r| r.id.as_str()).collect();
         ids.sort_unstable();
         ids.dedup();
         assert_eq!(ids.len(), recipes.len());
+        let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../recipes/official");
+        for recipe in &recipes {
+            assert!(recipe.id.starts_with(OFFICIAL_PREFIX), "{}", recipe.id);
+            assert!(dir.join(format!("{}.json", site_of(recipe))).exists());
+            assert!(recipe.homepage().is_some(), "{} has no homepage", recipe.id);
+        }
+    }
+
+    #[test]
+    fn official_files_carry_a_name_the_worker_accepts_as_origin() {
+        let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../recipes/official");
+        for entry in fs::read_dir(dir).unwrap() {
+            let text = fs::read_to_string(entry.unwrap().path()).unwrap();
+            let value: serde_json::Value = serde_json::from_str(&text).unwrap();
+            assert_eq!(value["origin"], "user");
+        }
+    }
+
+    #[test]
+    fn official_platform_tags_follow_the_fixtures() {
+        for recipe in official_recipes() {
+            let names = fixture_names(site_of(&recipe));
+            let mut expected = Vec::new();
+            if names.iter().any(|name| name.starts_with("desktop-")) {
+                expected.push("desktop");
+            }
+            if names.iter().any(|name| !name.starts_with("desktop-")) {
+                expected.push("mobile");
+            }
+            let mut tags: Vec<&str> = recipe.tags.iter().map(String::as_str).collect();
+            tags.sort_unstable();
+            assert_eq!(tags, expected, "{}", recipe.id);
+        }
     }
 
     fn fixture_pages(recipe: &Recipe) -> Vec<Html> {
         let fixtures_root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../recipes/fixtures");
-        let site = recipe.id.split('.').next().unwrap();
-        let pages: Vec<Html> = fs::read_dir(fixtures_root.join(site))
+        let pages: Vec<Html> = fs::read_dir(fixtures_root.join(site_of(recipe)))
             .unwrap_or_else(|_| panic!("recipe {} has no fixtures", recipe.id))
             .map(|entry| Html::parse_document(&fs::read_to_string(entry.unwrap().path()).unwrap()))
             .collect();
@@ -373,7 +338,7 @@ mod tests {
     #[test]
     fn no_hide_rule_touches_an_element_a_fixture_marks_data_keep_or_its_ancestors() {
         let keep = Selector::parse("[data-keep]").unwrap();
-        for recipe in bundled().unwrap() {
+        for recipe in official_recipes() {
             for page in fixture_pages(&recipe) {
                 let mut hidden = std::collections::HashSet::new();
                 for rule in &recipe.rules {
@@ -403,9 +368,9 @@ mod tests {
     }
 
     #[test]
-    fn every_bundled_rule_matches_something_in_its_dom_fixtures() {
+    fn every_official_rule_matches_something_in_its_dom_fixtures() {
         let mut unmatched = Vec::new();
-        for recipe in bundled().unwrap() {
+        for recipe in official_recipes() {
             let pages = fixture_pages(&recipe);
             for rule in &recipe.rules {
                 let (Rule::Hide { target, .. } | Rule::Css { target, .. }) = rule;
@@ -425,7 +390,7 @@ mod tests {
         );
     }
 
-    const TOGGLED: &str = r#"{"schema":1,"id":"t.default","name":"T","version":"1.0.0","origin":"bundled","match":["https://t.example/*"],
+    const TOGGLED: &str = r#"{"schema":1,"id":"t.default","name":"T","version":"1.0.0","origin":"user","tags":["desktop"],"match":["https://t.example/*"],
       "options":[
         {"id":"nag","label":"Nag","description":"d","group":"annoyance","default":true},
         {"id":"feed","label":"Feed","description":"d","group":"content","default":false}],
@@ -486,97 +451,18 @@ mod tests {
         assert!(!script.contains(".feed"));
     }
 
-    fn fork_json(id: &str, origin: &str, css: &str) -> String {
-        format!(
-            r#"{{"schema":1,"id":"{id}","name":"Reddit","version":"1.0.0","origin":"{origin}","forkedFrom":"0.0.1","match":["https://*.reddit.com/*"],
-              "options":[{{"id":"mine","label":"Mine","description":"d","group":"content","default":true}}],
-              "rules":[{{"id":"r","label":"l","type":"hide","option":"mine","target":{{"css":"{css}"}}}}]}}"#
-        )
-    }
-
     #[test]
-    fn a_fork_replaces_its_bundled_recipe_and_survives_a_restart_until_restored() {
+    fn a_fresh_install_has_no_recipes_and_no_script_rules() {
         let dir = tempfile::tempdir().unwrap();
         let recipes = Recipes::load(dir.path().join("recipes")).unwrap();
-        let before = recipes.get("reddit.default").unwrap();
-        assert_eq!(before.forked_from, None);
-
-        let saved = recipes
-            .save_fork(&fork_json("reddit.default", "ai", ".mine-only"))
-            .unwrap();
-        assert_eq!(
-            saved.forked_from.as_deref(),
-            recipes.bundled_version("reddit.default"),
-            "the recorded base is the bundled version, not what the JSON claimed"
-        );
-        let script = recipes.script(&OptionChoices::new()).unwrap();
-        assert!(script.contains(".mine-only"));
-        assert!(
-            !script.contains("shreddit-ad-post"),
-            "the bundled rules are gone"
-        );
-        assert_eq!(recipes.all().len(), bundled().unwrap().len());
-
-        let restarted = Recipes::load(dir.path().join("recipes")).unwrap();
-        assert_eq!(restarted.get("reddit.default"), Some(saved));
-
-        restarted.restore_original("reddit.default").unwrap();
-        assert_eq!(restarted.get("reddit.default"), Some(before));
-        let after_restore = Recipes::load(dir.path().join("recipes")).unwrap();
-        assert_eq!(
-            after_restore.get("reddit.default").unwrap().forked_from,
-            None
-        );
-    }
-
-    #[test]
-    fn only_user_or_ai_copies_of_bundled_recipes_can_be_saved_and_nothing_is_written_otherwise() {
-        let dir = tempfile::tempdir().unwrap();
-        let folder = dir.path().join("recipes");
-        let recipes = Recipes::load(folder.clone()).unwrap();
-        for json in [
-            fork_json("reddit.default", "bundled", "a"),
-            fork_json("reddit.default", "imported", "a"),
-            fork_json("nothing.default", "ai", "a"),
-            fork_json("reddit.default", "ai", "a{x}"),
-        ] {
-            assert!(recipes.save_fork(&json).is_err(), "{json}");
-        }
-        assert!(recipes.save_fork(&"x".repeat(MAX_FORK_BYTES + 1)).is_err());
-        assert!(!folder.exists() || fs::read_dir(&folder).unwrap().next().is_none());
-        assert!(recipes.restore_original("nothing.default").is_err());
-        assert_eq!(recipes.get("reddit.default").unwrap().forked_from, None);
-    }
-
-    #[test]
-    fn a_damaged_or_stale_fork_file_is_ignored_instead_of_stopping_startup() {
-        let dir = tempfile::tempdir().unwrap();
-        let folder = dir.path().join("recipes");
-        fs::create_dir_all(&folder).unwrap();
-        fs::write(folder.join("reddit.default.json"), "{ not json").unwrap();
-        fs::write(
-            folder.join("old.default.json"),
-            fork_json("old.default", "user", "a"),
-        )
-        .unwrap();
-        fs::write(
-            folder.join("youtube.default.json"),
-            fork_json("youtube.default", "bundled", "a"),
-        )
-        .unwrap();
-        fs::write(folder.join("notes.txt"), "hello").unwrap();
-        let recipes = Recipes::load(folder).unwrap();
-        assert!(
-            recipes
-                .all()
-                .iter()
-                .all(|recipe| recipe.forked_from.is_none())
-        );
+        assert!(recipes.all().is_empty());
+        let page = Url::parse("https://www.reddit.com/r/rust/").unwrap();
+        assert_eq!(recipes.for_url(&page), None);
     }
 
     #[test]
     fn a_page_belongs_to_the_recipe_that_matches_its_url() {
-        let recipes = Recipes::bundled_only();
+        let recipes = Recipes::official_installed();
         let page = |url: &str| {
             recipes
                 .for_url(&Url::parse(url).unwrap())
@@ -584,14 +470,14 @@ mod tests {
         };
         assert_eq!(
             page("https://www.reddit.com/r/rust/").as_deref(),
-            Some("reddit.default")
+            Some("market.official.reddit")
         );
         assert_eq!(page("https://example.com/"), None);
     }
 
     #[test]
     fn annoyances_start_on_and_content_starts_off() {
-        for recipe in bundled().unwrap() {
+        for recipe in official_recipes() {
             assert!(!recipe.options.is_empty(), "{} has no options", recipe.id);
             for option in &recipe.options {
                 assert_eq!(
@@ -605,11 +491,39 @@ mod tests {
         }
     }
 
+    fn with_tags(tags: &str) -> String {
+        format!(
+            r#"{{"schema":1,"id":"x.y","name":"n","version":"1.0.0","origin":"user","tags":{tags},"match":["https://a.com/*"],"rules":[{{"id":"r","label":"l","type":"hide","target":{{"css":"a"}}}}]}}"#
+        )
+    }
+
+    #[test]
+    fn tags_are_required_one_or_two_unique_platform_tags() {
+        for good in [r#"["mobile"]"#, r#"["desktop"]"#, r#"["mobile","desktop"]"#] {
+            assert!(Recipe::parse(&with_tags(good)).is_ok(), "{good}");
+        }
+        for bad in [
+            "[]",
+            r#"["official"]"#,
+            r#"["community"]"#,
+            r#"["mobile","official"]"#,
+            r#"["mobile","mobile"]"#,
+            r#"["tablet"]"#,
+            r#"["Mobile"]"#,
+            r#"["mobile","desktop","desktop"]"#,
+            "null",
+        ] {
+            assert!(Recipe::parse(&with_tags(bad)).is_err(), "{bad}");
+        }
+        let missing = with_tags("[]").replace(r#""tags":[],"#, "");
+        assert!(Recipe::parse(&missing).is_err());
+    }
+
     #[test]
     fn options_must_be_used_and_rules_may_only_name_options_that_exist() {
         let with = |rules: &str, options: &str| {
             format!(
-                r#"{{"schema":1,"id":"x.y","name":"n","version":"1.0.0","origin":"user","match":["https://a.com/*"],"options":[{options}],"rules":[{rules}]}}"#
+                r#"{{"schema":1,"id":"x.y","name":"n","version":"1.0.0","origin":"user","tags":["mobile"],"match":["https://a.com/*"],"options":[{options}],"rules":[{rules}]}}"#
             )
         };
         let option = |id: &str| {
@@ -645,7 +559,7 @@ mod tests {
     fn unsupported_or_unsafe_recipes_are_refused() {
         let base = |extra: &str| {
             format!(
-                r#"{{"schema":1,"id":"x.y","name":"n","version":"1.0.0","origin":"user","match":["https://a.com/*"],"rules":[{extra}]}}"#
+                r#"{{"schema":1,"id":"x.y","name":"n","version":"1.0.0","origin":"user","tags":["mobile"],"match":["https://a.com/*"],"rules":[{extra}]}}"#
             )
         };
         let hide = |css: &str| {
@@ -671,11 +585,12 @@ mod tests {
         assert!(
             Recipe::parse(&base(&hide("a")).replace("https://a.com/*", "https://*/*")).is_err()
         );
+        assert!(Recipe::parse(&base(&hide("a")).replace("\"user\"", "\"bundled\"")).is_err());
     }
 
     fn custom_recipe(id: &str, origin: &str) -> Recipe {
         Recipe::parse(&format!(
-            r#"{{"schema":1,"id":"{id}","name":"example.org","version":"1.0.0","origin":"{origin}","match":["https://*.example.org/*"],
+            r#"{{"schema":1,"id":"{id}","name":"example.org","version":"1.0.0","origin":"{origin}","tags":["mobile"],"match":["https://*.example.org/*"],
               "options":[{{"id":"mine","label":"Mine","description":"d","group":"content","default":true}}],
               "rules":[{{"id":"r","label":"l","type":"hide","option":"mine","target":{{"css":".x"}}}}]}}"#
         ))
@@ -683,14 +598,14 @@ mod tests {
     }
 
     #[test]
-    fn a_made_recipe_for_an_unbundled_site_is_listed_applied_and_survives_a_restart() {
+    fn a_made_recipe_is_listed_applied_and_survives_a_restart() {
         let dir = tempfile::tempdir().unwrap();
         let folder = dir.path().join("recipes");
         let recipes = Recipes::load(folder.clone()).unwrap();
         let saved = recipes
             .save_made(&custom_recipe("custom.example.org", "ai"))
             .unwrap();
-        assert_eq!(recipes.all().len(), bundled().unwrap().len() + 1);
+        assert_eq!(recipes.all().len(), 1);
         let page = Url::parse("https://www.example.org/a").unwrap();
         assert_eq!(recipes.for_url(&page).map(|r| r.id), Some(saved.id.clone()));
         assert!(
@@ -704,27 +619,42 @@ mod tests {
     }
 
     #[test]
-    fn a_made_recipe_for_a_bundled_site_becomes_a_fork_and_bad_ids_or_origins_are_refused() {
+    fn a_made_recipe_needs_a_custom_id_and_a_user_or_ai_origin() {
         let dir = tempfile::tempdir().unwrap();
-        let recipes = Recipes::load(dir.path().join("recipes")).unwrap();
-        let fork = recipes
-            .save_made(&custom_recipe("reddit.default", "ai"))
-            .unwrap();
-        assert!(fork.forked_from.is_some());
+        let folder = dir.path().join("recipes");
+        let recipes = Recipes::load(folder.clone()).unwrap();
         for bad in [
             custom_recipe("other.example.org", "ai"),
+            custom_recipe("market.official.reddit", "ai"),
             custom_recipe("custom.Example/../x", "ai"),
-            custom_recipe("custom.example.org", "bundled"),
             custom_recipe("custom.example.org", "imported"),
         ] {
             assert!(recipes.save_made(&bad).is_err(), "{}", bad.id);
         }
-        assert_eq!(recipes.all().len(), bundled().unwrap().len());
+        assert!(recipes.all().is_empty());
+        assert!(!folder.exists() || fs::read_dir(&folder).unwrap().next().is_none());
+    }
+
+    #[test]
+    fn a_damaged_or_stale_file_is_ignored_instead_of_stopping_startup() {
+        let dir = tempfile::tempdir().unwrap();
+        let folder = dir.path().join("recipes");
+        fs::create_dir_all(&folder).unwrap();
+        fs::write(folder.join("broken.json"), "{ not json").unwrap();
+        // The old format: no tags and a removed origin.
+        fs::write(
+            folder.join("youtube.default.json"),
+            r#"{"schema":1,"id":"youtube.default","name":"YouTube","version":"1.0.0","origin":"bundled","match":["https://*.youtube.com/*"],"rules":[{"id":"r","label":"l","type":"hide","target":{"css":"a"}}]}"#,
+        )
+        .unwrap();
+        fs::write(folder.join("notes.txt"), "hello").unwrap();
+        let recipes = Recipes::load(folder).unwrap();
+        assert!(recipes.all().is_empty());
     }
 
     fn shared_bundle(id: &str, version: &str) -> String {
         format!(
-            r#"{{"openmediaBundle":1,"recipes":[{{"schema":1,"id":"{id}","name":"example.org","version":"{version}","origin":"bundled","match":["https://*.example.org/*"],
+            r#"{{"openmediaBundle":1,"recipes":[{{"schema":1,"id":"{id}","name":"example.org","version":"{version}","origin":"user","tags":["mobile"],"match":["https://*.example.org/*"],
               "options":[{{"id":"mine","label":"Mine","description":"d","group":"content","default":true}}],
               "rules":[{{"id":"r","label":"l","type":"hide","option":"mine","target":{{"css":".x"}}}}]}}]}}"#
         )
@@ -739,16 +669,12 @@ mod tests {
         let previews = recipes.preview_import(&text).unwrap();
         assert_eq!(previews[0].id, "imported.reddit.default");
         assert_eq!(previews[0].replaces, None);
-        assert_eq!(recipes.all().len(), bundled().unwrap().len());
+        assert!(recipes.all().is_empty());
 
         let saved = recipes
             .save_imported(&text, &["imported.reddit.default".to_owned()])
             .unwrap();
         assert_eq!(saved[0].origin, Origin::Imported);
-        assert_eq!(
-            recipes.get("reddit.default").unwrap().origin,
-            Origin::Bundled
-        );
         assert!(
             recipes
                 .script(&OptionChoices::new())
@@ -797,15 +723,16 @@ mod tests {
     }
 
     #[test]
-    fn only_recipes_the_user_made_or_changed_can_be_exported() {
+    fn a_recipe_on_the_device_can_be_exported_with_its_tags_and_unknown_ids_cannot() {
         let dir = tempfile::tempdir().unwrap();
         let recipes = Recipes::load(dir.path().join("recipes")).unwrap();
-        assert!(recipes.export(&["reddit.default".to_owned()]).is_err());
+        assert!(recipes.export(&["custom.nothing".to_owned()]).is_err());
         assert!(recipes.export(&[]).is_err());
         recipes
             .save_made(&custom_recipe("custom.example.org", "user"))
             .unwrap();
         let text = recipes.export(&["custom.example.org".to_owned()]).unwrap();
+        assert!(text.contains(r#""tags""#));
         let reimported = Recipes::load(dir.path().join("elsewhere")).unwrap();
         let saved = reimported
             .save_imported(&text, &["imported.custom.example.org".to_owned()])
@@ -814,5 +741,22 @@ mod tests {
             saved[0].rules,
             recipes.get("custom.example.org").unwrap().rules
         );
+        assert_eq!(saved[0].tags, ["mobile"]);
+    }
+
+    #[test]
+    fn a_made_and_an_installed_recipe_can_cover_one_page() {
+        let dir = tempfile::tempdir().unwrap();
+        let recipes = Recipes::load(dir.path().join("recipes")).unwrap();
+        recipes
+            .save_made(&custom_recipe("custom.example.org", "ai"))
+            .unwrap();
+        let text = shared_bundle("calm.example", "1.0.0");
+        recipes
+            .save_imported(&text, &["imported.calm.example".to_owned()])
+            .unwrap();
+        let page = Url::parse("https://www.example.org/").unwrap();
+        let ids: Vec<_> = recipes.covering(&page).into_iter().map(|r| r.id).collect();
+        assert_eq!(ids, ["custom.example.org", "imported.calm.example"]);
     }
 }

@@ -49,7 +49,7 @@ pub struct PromptInput<'a> {
     pub request: &'a str,
     pub host: &'a str,
     pub path: &'a str,
-    /// The recipe the page already has, if any (a bundled one or a fork).
+    /// The recipe the page already has, if any (a made one, or one installed from the marketplace).
     pub recipe: Option<&'a Recipe>,
     /// Option id to its current on/off state; an option missing here is shown at its default.
     pub option_states: &'a BTreeMap<String, bool>,
@@ -303,7 +303,7 @@ mod tests {
         redact::redact,
         snapshot::{fixtures::YOUTUBE_LIKE, parse_snapshot},
     };
-    use crate::recipes::bundled;
+    use crate::recipes::official_recipes;
 
     fn snapshot() -> Snapshot {
         let mut snap = parse_snapshot(YOUTUBE_LIKE).unwrap();
@@ -312,10 +312,9 @@ mod tests {
     }
 
     fn youtube() -> Recipe {
-        bundled()
-            .unwrap()
+        official_recipes()
             .into_iter()
-            .find(|r| r.id == "youtube.default")
+            .find(|r| r.id == "market.official.youtube")
             .unwrap()
     }
 

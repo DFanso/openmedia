@@ -147,6 +147,25 @@ export const bn: Messages = {
   "onboarding.step4Title": "নিজের মতো করে সাজান।",
   "onboarding.step4Body":
     "বোতামটি পর্দার যেকোনো প্রান্তে টেনে নিলে সেখানেই থাকবে। সেটিংস থেকে পছন্দের তালিকা পরিবর্তন করুন এবং যেকোনো সময় এই নির্দেশিকাটি আবার দেখুন।",
+  "onboarding.quickTitle": "দ্রুত অ্যাক্সেসে আপনার কী কী দরকার?",
+  "onboarding.quickBody":
+    "যে সাইটগুলো আপনি সবচেয়ে বেশি খোলেন সেগুলো বেছে নিন। OpenMedia তাদের অফিশিয়াল রেসিপি যোগ করে আপনার বোতামে রেখে দেবে।",
+  "onboarding.quickLoading": "অফিশিয়াল রেসিপি লোড হচ্ছে…",
+  "onboarding.quickEmpty":
+    "এই ডিভাইসের জন্য এখনো কোনো অফিশিয়াল রেসিপি তালিকাভুক্ত নেই। পরে মার্কেটপ্লেস থেকে কিছু যোগ করতে পারবেন।",
+  "onboarding.quickCount": "{limit}টির মধ্যে {count}টি বাছাই করা হয়েছে",
+  "onboarding.quickProHint": "আপনার প্ল্যানে এটিই সর্বোচ্চ। Pro-তে আরও জায়গা আছে।",
+  "onboarding.applying": "যোগ করা হচ্ছে…",
+  "onboarding.partial": "যোগ করা যায়নি: {names}। পরে মার্কেটপ্লেস থেকে যোগ করতে পারবেন।",
+  "onboarding.marketTitle": "রেসিপির একটি মার্কেটপ্লেস।",
+  "onboarding.marketBody": "আরও রেসিপি পাবেন সেটিংসে, মার্কেটপ্লেসের অধীনে।",
+  "onboarding.marketOfficial":
+    "অফিশিয়াল রেসিপি OpenMedia বানায়। কমিউনিটি রেসিপি আপনার মতো মানুষেরা আপলোড করেন।",
+  "onboarding.marketChecked":
+    "প্রতিটি রেসিপি স্বয়ংক্রিয়ভাবে যাচাই করা হয় এবং তালিকায় আসার আগে ১৪ দিন আটকে রাখা হয়।",
+  "onboarding.marketReview": "রেসিপি যে নিয়মগুলো যোগ করে, যোগ হওয়ার আগে প্রতিটি আপনি দেখে নেন।",
+  "onboarding.marketPro":
+    "আপলোড, এক্সপোর্ট ও মন্তব্য করতে Pro লাগে। যোগ করা, ইমপোর্ট ও রেটিং বিনামূল্যে।",
 
   "settings.title": "সেটিংস",
   "settings.close": "সেটিংস বন্ধ করুন",
@@ -222,6 +241,8 @@ export const bn: Messages = {
   "recipes.title": "রেসিপি",
   "recipes.note":
     "জনপ্রিয় সাইটের জন্য রেসিপি। ইনস্টল করার প্রম্পট ও পেজে বাধা দেওয়া পপ-আপ শুরুতেই লুকানো থাকে; রিলস, শর্টস ও সুপারিশ দেখানো হয় যতক্ষণ না সেগুলো লুকান। কোনো রেসিপিতে তারকা চিহ্ন দিলে তার সাইট পছন্দের তালিকায় যোগ হবে।",
+  "recipes.empty": "আপনার এখনো কোনো রেসিপি নেই। জনপ্রিয় সাইটের তৈরি রেসিপি মার্কেটপ্লেসে পাবেন।",
+  "recipes.openMarket": "মার্কেটপ্লেস খুলুন",
   "recipes.annoyances": "বিরক্তিকর বিষয় · শুরুতেই লুকানো",
   "recipes.content": "বিষয়বস্তু · লুকানোর আগ পর্যন্ত দেখানো",
   "recipes.groupAnnoyance": "বিরক্তিকর বিষয়",
@@ -231,10 +252,6 @@ export const bn: Messages = {
   "recipes.options": "{name} বিকল্প",
   "recipes.addFavorite": "{name} পছন্দের তালিকায় যোগ করুন",
   "recipes.removeFavorite": "{name} পছন্দের তালিকা থেকে সরান",
-  "recipes.customized":
-    "এই রেসিপিটি আপনার করা পরিবর্তনের কপি, তাই অ্যাপ আপডেট এটিকে অপরিবর্তিত রাখবে।",
-  "recipes.originalUpdated": "আপনি পরিবর্তন করার পর থেকে অ্যাপের মূল রেসিপি আপডেট হয়েছে।",
-  "recipes.restore": "মূল রেসিপি ফিরিয়ে আনুন",
   "recipes.bottomMargin": "নিচের মার্জিন",
   "recipes.sharedMargin":
     "সাধারণ মার্জিন ব্যবহার করে। এই সাইটের নিজস্ব মার্জিন দিতে স্লাইডারটি সরান।",
@@ -281,6 +298,30 @@ export const bn: Messages = {
   "market.counting": "আমি রেসিপি যোগ করলে মার্কেটপ্লেসকে জানান",
   "market.countingNote":
     "শুধু রেসিপির নাম পাঠানো হয়, আপনার সম্পর্কে কিছুই নয়। এর মাধ্যমেই “যোগ করেছেন” সংখ্যাগুলো তৈরি হয়।",
+  "market.tag.official": "অফিশিয়াল",
+  "market.tag.community": "কমিউনিটি",
+  "market.tag.mobile": "মোবাইল",
+  "market.tag.desktop": "ডেস্কটপ",
+  "market.filters": "ট্যাগ অনুযায়ী ছাঁকুন",
+  "market.noMatch": "এই ফিল্টারের সাথে কিছু মেলেনি।",
+  "market.rating.none": "এখনো কোনো রেটিং নেই",
+  "market.rate": "আপনার রেটিং",
+  "market.rateStars": "{count} স্টার দিন | {count} স্টার দিন",
+  "market.comments": "মন্তব্য",
+  "market.comments.loading": "মন্তব্য লোড হচ্ছে…",
+  "market.comments.none": "এখনো কোনো মন্তব্য নেই।",
+  "market.comments.you": "আপনি",
+  "market.comments.write": "মন্তব্য লিখুন",
+  "market.comments.rules": "কোনো লিংক বা যোগাযোগের তথ্য নয়। সর্বোচ্চ ২৮০ অক্ষর।",
+  "market.comments.post": "পোস্ট করুন",
+  "market.comments.proPrompt": "মন্তব্য করা Pro-র সুবিধা। মন্তব্য সবাই পড়তে পারেন।",
+  "market.comments.report": "রিপোর্ট",
+  "market.comments.reported": "রিপোর্ট করা হয়েছে",
+  "market.comments.block": "ব্লক করুন",
+  "market.comments.blocked": "ব্লক করা মন্তব্যকারী",
+  "market.comments.blockedNote": "এখানে তালিকাভুক্ত মানুষদের মন্তব্য আপনি দেখতে পান না।",
+  "market.comments.blockedNone": "আপনি কাউকে ব্লক করেননি।",
+  "market.comments.unblock": "আনব্লক করুন",
 
   "share.link": "ইমপোর্ট ও এক্সপোর্ট",
   "share.linkNote": "টেক্সট হিসেবে ডিভাইসের মধ্যে রেসিপি সরান",
@@ -358,7 +399,6 @@ export const bn: Messages = {
   "assistant.reject": "প্রত্যাখ্যান করুন",
   "assistant.accept": "গ্রহণ করুন",
   "assistant.switchExists": "এই সুইচটি আগে থেকেই আছে",
-  "assistant.savedAsCopy": "আপনার করা পরিবর্তনের কপি হিসেবে সংরক্ষিত",
   "assistant.matched": "{count}টির সঙ্গে মিলেছে",
   "assistant.requestQuote": "“{request}”",
   "assistant.unmatched":

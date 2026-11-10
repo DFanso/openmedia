@@ -98,7 +98,7 @@ describe("incognito mode", () => {
           recipeId: "youtube.default",
           name: "YouTube",
           homepage: null,
-          origin: "bundled",
+          origin: "user",
           favorite: false,
           options: [
             {
@@ -111,8 +111,6 @@ describe("incognito mode", () => {
             },
           ],
           bottomMargin: null,
-          customized: false,
-          originalUpdated: false,
         },
       ],
     });

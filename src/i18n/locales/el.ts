@@ -154,6 +154,27 @@ export const el: Messages = {
   "onboarding.step4Title": "Φτιάξτε το δικό σας.",
   "onboarding.step4Body":
     "Σύρετε το κουμπί σε οποιαδήποτε άκρη και θα παραμείνει εκεί. Αλλάξτε τα αγαπημένα σας στις Ρυθμίσεις και ξαναδείτε αυτόν τον οδηγό όποτε θέλετε.",
+  "onboarding.quickTitle": "Τι χρειάζεστε στη γρήγορη πρόσβαση;",
+  "onboarding.quickBody":
+    "Διαλέξτε τους ιστότοπους που ανοίγετε συχνότερα. Το OpenMedia προσθέτει τις επίσημες συνταγές τους και τις βάζει στο κουμπί σας.",
+  "onboarding.quickLoading": "Φόρτωση των επίσημων συνταγών…",
+  "onboarding.quickEmpty":
+    "Δεν υπάρχουν ακόμη επίσημες συνταγές για αυτή τη συσκευή. Μπορείτε να προσθέσετε αργότερα από την Αγορά.",
+  "onboarding.quickCount": "{count} από {limit} επιλεγμένα",
+  "onboarding.quickProHint":
+    "Αυτό είναι το μέγιστο που επιτρέπει το πακέτο σας. Το Pro έχει περισσότερες θέσεις.",
+  "onboarding.applying": "Προσθήκη…",
+  "onboarding.partial":
+    "Δεν ήταν δυνατή η προσθήκη: {names}. Μπορείτε να τις προσθέσετε αργότερα από την Αγορά.",
+  "onboarding.marketTitle": "Μια αγορά συνταγών.",
+  "onboarding.marketBody": "Βρείτε περισσότερες συνταγές στις Ρυθμίσεις, στην Αγορά.",
+  "onboarding.marketOfficial":
+    "Οι επίσημες συνταγές φτιάχνονται από το OpenMedia. Οι συνταγές της κοινότητας ανεβαίνουν από ανθρώπους σαν εσάς.",
+  "onboarding.marketChecked":
+    "Κάθε συνταγή ελέγχεται αυτόματα και κρατιέται 14 ημέρες πριν εμφανιστεί στη λίστα.",
+  "onboarding.marketReview": "Ελέγχετε κάθε κανόνα που προσθέτει μια συνταγή πριν προστεθεί.",
+  "onboarding.marketPro":
+    "Η μεταφόρτωση, η εξαγωγή και ο σχολιασμός απαιτούν Pro. Η προσθήκη, η εισαγωγή και η βαθμολόγηση είναι δωρεάν.",
 
   "settings.title": "Ρυθμίσεις",
   "settings.close": "Κλείσιμο ρυθμίσεων",
@@ -231,6 +252,8 @@ export const el: Messages = {
   "recipes.title": "Συνταγές",
   "recipes.note":
     "Συνταγές για δημοφιλείς ιστότοπους. Τα μηνύματα εγκατάστασης και τα αναδυόμενα παράθυρα που εμποδίζουν τη σελίδα κρύβονται από προεπιλογή. Τα Reels, τα Shorts και οι προτάσεις εμφανίζονται μέχρι να τα κρύψετε. Βάλτε αστερίσκο σε μια συνταγή για να προσθέσετε τον ιστότοπό της στα αγαπημένα σας.",
+  "recipes.empty": "Δεν έχετε ακόμη συνταγές. Βρείτε έτοιμες για δημοφιλείς ιστότοπους στην Αγορά.",
+  "recipes.openMarket": "Άνοιγμα της Αγοράς",
   "recipes.annoyances": "Ενοχλήσεις · κρυφές από προεπιλογή",
   "recipes.content": "Περιεχόμενο · εμφανίζεται μέχρι να το κρύψετε",
   "recipes.groupAnnoyance": "Ενόχληση",
@@ -240,10 +263,6 @@ export const el: Messages = {
   "recipes.options": "Επιλογές {name}",
   "recipes.addFavorite": "Προσθήκη {name} στα αγαπημένα",
   "recipes.removeFavorite": "Αφαίρεση {name} από τα αγαπημένα",
-  "recipes.customized":
-    "Αυτή η συνταγή είναι το δικό σας αντίγραφο με τις αλλαγές σας, οπότε οι ενημερώσεις της εφαρμογής την αφήνουν ανέπαφη.",
-  "recipes.originalUpdated": "Η αρχική της εφαρμογής έχει ενημερωθεί από τότε που την άλλαξατε.",
-  "recipes.restore": "Επαναφορά της αρχικής",
   "recipes.bottomMargin": "Κάτω περιθώριο",
   "recipes.sharedMargin":
     "Χρησιμοποιεί το κοινό περιθώριο. Σύρετε τον ρυθμιστή για να δώσετε σε αυτό τον ιστότοπο δικό του.",
@@ -292,6 +311,31 @@ export const el: Messages = {
   "market.counting": "Ενημέρωση της αγοράς όταν προσθέτω συνταγή",
   "market.countingNote":
     "Στέλνεται μόνο το όνομα της συνταγής, τίποτα για εσάς. Από αυτό προκύπτουν οι αριθμοί «Προστέθηκε από».",
+  "market.tag.official": "Επίσημη",
+  "market.tag.community": "Κοινότητα",
+  "market.tag.mobile": "Κινητό",
+  "market.tag.desktop": "Υπολογιστής",
+  "market.filters": "Φιλτράρισμα ανά ετικέτα",
+  "market.noMatch": "Τίποτα δεν ταιριάζει με αυτά τα φίλτρα.",
+  "market.rating.none": "Καμία βαθμολογία ακόμη",
+  "market.rate": "Η βαθμολογία σας",
+  "market.rateStars": "Βαθμολογία {count} αστέρι | Βαθμολογία {count} αστέρια",
+  "market.comments": "Σχόλια",
+  "market.comments.loading": "Φόρτωση σχολίων…",
+  "market.comments.none": "Κανένα σχόλιο ακόμη.",
+  "market.comments.you": "Εσείς",
+  "market.comments.write": "Γράψτε ένα σχόλιο",
+  "market.comments.rules": "Χωρίς συνδέσμους ή στοιχεία επικοινωνίας. Έως 280 χαρακτήρες.",
+  "market.comments.post": "Δημοσίευση",
+  "market.comments.proPrompt":
+    "Ο σχολιασμός είναι λειτουργία Pro. Όλοι μπορούν να διαβάσουν τα σχόλια.",
+  "market.comments.report": "Αναφορά",
+  "market.comments.reported": "Αναφέρθηκε",
+  "market.comments.block": "Αποκλεισμός",
+  "market.comments.blocked": "Αποκλεισμένοι σχολιαστές",
+  "market.comments.blockedNote": "Δεν βλέπετε σχόλια από τα άτομα που αναφέρονται εδώ.",
+  "market.comments.blockedNone": "Δεν έχετε αποκλείσει κανέναν.",
+  "market.comments.unblock": "Άρση αποκλεισμού",
 
   "share.link": "Εισαγωγή και εξαγωγή",
   "share.linkNote": "Μετακινήστε συνταγές μεταξύ συσκευών ως κείμενο",
@@ -371,7 +415,6 @@ export const el: Messages = {
   "assistant.reject": "Απόρριψη",
   "assistant.accept": "Αποδοχή",
   "assistant.switchExists": "Αυτός ο διακόπτης υπάρχει ήδη",
-  "assistant.savedAsCopy": "αποθηκεύτηκε ως δικό σας αντίγραφο με τις αλλαγές σας",
   "assistant.matched": "αντιστοίχισε {count}",
   "assistant.requestQuote": "«{request}»",
   "assistant.unmatched":

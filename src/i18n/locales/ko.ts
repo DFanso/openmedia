@@ -149,6 +149,25 @@ export const ko: Messages = {
   "onboarding.step4Title": "내 방식대로.",
   "onboarding.step4Body":
     "버튼을 어느 쪽 끝으로든 끌어놓으면 그 자리에 남습니다. 즐겨찾기는 설정에서 바꾸고, 이 안내는 언제 다시 볼 수 있습니다.",
+  "onboarding.quickTitle": "빠른 실행에 무엇이 필요하세요?",
+  "onboarding.quickBody":
+    "가장 자주 여는 사이트를 고르세요. OpenMedia가 공식 레시피를 추가하고 버튼에 올려 둡니다.",
+  "onboarding.quickLoading": "공식 레시피를 불러오는 중…",
+  "onboarding.quickEmpty":
+    "이 기기용 공식 레시피가 아직 없습니다. 나중에 마켓플레이스에서 추가할 수 있습니다.",
+  "onboarding.quickCount": "{limit}개 중 {count}개 선택됨",
+  "onboarding.quickProHint": "현재 요금제에서 허용하는 최대치입니다. Pro는 슬롯이 더 많습니다.",
+  "onboarding.applying": "추가하는 중…",
+  "onboarding.partial": "추가하지 못했습니다: {names}. 나중에 마켓플레이스에서 추가할 수 있습니다.",
+  "onboarding.marketTitle": "레시피 마켓플레이스.",
+  "onboarding.marketBody": "더 많은 레시피는 설정의 마켓플레이스에서 찾을 수 있습니다.",
+  "onboarding.marketOfficial":
+    "공식 레시피는 OpenMedia가 만듭니다. 커뮤니티 레시피는 여러분 같은 사용자가 올립니다.",
+  "onboarding.marketChecked":
+    "모든 레시피는 자동으로 검사되며, 목록에 오르기 전 14일간 보류됩니다.",
+  "onboarding.marketReview": "레시피가 추가하는 모든 규칙은 추가하기 전에 직접 검토합니다.",
+  "onboarding.marketPro":
+    "업로드, 내보내기, 댓글에는 Pro가 필요합니다. 추가, 가져오기, 평점은 무료입니다.",
 
   "settings.title": "설정",
   "settings.close": "설정 닫기",
@@ -233,9 +252,6 @@ export const ko: Messages = {
   "recipes.options": "{name} 옵션",
   "recipes.addFavorite": "{name} 즐겨찾기에 추가",
   "recipes.removeFavorite": "{name} 즐겨찾기에서 제거",
-  "recipes.customized": "이 레시피는 직접 수정한 사본이라 앱을 업데이트해도 그대로 유지됩니다.",
-  "recipes.originalUpdated": "수정한 이후 앱의 원본 레시피가 업데이트되었습니다.",
-  "recipes.restore": "원본 복원",
   "recipes.bottomMargin": "하단 여백",
   "recipes.sharedMargin":
     "공통 여백을 사용합니다. 슬라이더를 옮기면 이 사이트만 별도의 여백을 갖게 됩니다.",
@@ -243,6 +259,9 @@ export const ko: Messages = {
   "recipes.siteMarginLabel": "{name} 하단 여백",
   "recipes.useSharedMargin": "공통 여백 사용",
   "recipes.imported": "앱 외부에서 추가되었습니다. 제거하면 사이트가 원래대로 돌아갑니다.",
+  "recipes.empty":
+    "아직 레시피가 없습니다. 인기 사이트용 기성 레시피를 마켓플레이스에서 찾아보세요.",
+  "recipes.openMarket": "마켓플레이스 열기",
 
   "market.title": "마켓플레이스",
   "market.linkNote": "다른 사람이 만든 레시피, 자동으로 검사하고 14일 후 공개",
@@ -282,6 +301,30 @@ export const ko: Messages = {
   "market.counting": "레시피를 추가하면 마켓플레이스에 알리기",
   "market.countingNote":
     "레시피 이름만 전송되며 사용자에 관한 정보는 전혀 보내지 않습니다. “추가함” 숫자를 만드는 데 쓰입니다.",
+  "market.tag.official": "공식",
+  "market.tag.community": "커뮤니티",
+  "market.tag.mobile": "모바일",
+  "market.tag.desktop": "데스크톱",
+  "market.filters": "태그로 필터링",
+  "market.noMatch": "이 필터와 일치하는 항목이 없습니다.",
+  "market.rating.none": "아직 평점이 없습니다",
+  "market.rate": "내 평점",
+  "market.rateStars": "별 {count}개 주기",
+  "market.comments": "댓글",
+  "market.comments.loading": "댓글을 불러오는 중…",
+  "market.comments.none": "아직 댓글이 없습니다.",
+  "market.comments.you": "나",
+  "market.comments.write": "댓글 쓰기",
+  "market.comments.rules": "링크나 연락처는 넣을 수 없습니다. 최대 280자입니다.",
+  "market.comments.post": "게시",
+  "market.comments.proPrompt": "댓글 작성은 Pro 기능입니다. 댓글은 누구나 읽을 수 있습니다.",
+  "market.comments.report": "신고",
+  "market.comments.reported": "신고됨",
+  "market.comments.block": "차단",
+  "market.comments.blocked": "차단한 댓글 작성자",
+  "market.comments.blockedNote": "여기에 나열된 사람의 댓글은 보이지 않습니다.",
+  "market.comments.blockedNone": "차단한 사람이 없습니다.",
+  "market.comments.unblock": "차단 해제",
 
   "share.link": "가져오기 및 내보내기",
   "share.linkNote": "레시피를 텍스트로 기기 간에 옮깁니다",
@@ -360,7 +403,6 @@ export const ko: Messages = {
   "assistant.reject": "거부",
   "assistant.accept": "수락",
   "assistant.switchExists": "이미 있는 스위치입니다",
-  "assistant.savedAsCopy": "수정한 사본으로 저장됨",
   "assistant.matched": "{count}개 일치",
   "assistant.requestQuote": "“{request}”",
   "assistant.unmatched": "{count}개의 규칙이 이 페이지에서 어떤 것과도 일치하지 않았습니다.",

@@ -10,8 +10,8 @@ import {
   useIconCache,
 } from "./siteIcons";
 
-/** The bundled recipes, read as data: the test checks the icons against them. */
-const RECIPES = import.meta.glob("../../recipes/bundled/*.json", {
+/** The official recipes, read as data: the test checks the icons against them. */
+const RECIPES = import.meta.glob("../../recipes/official/*.json", {
   eager: true,
   import: "default",
 }) as Record<string, { id: string; meta: { homepage: string }; match: string[] }>;

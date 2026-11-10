@@ -1,5 +1,5 @@
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, BTreeSet},
     fs,
     path::PathBuf,
     sync::{Mutex, PoisonError},
@@ -7,10 +7,13 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
-use crate::error::Result;
+use super::community::{self, MAX_STARS, MIN_STARS};
+use crate::error::{Error, Result};
 use crate::library::write_atomically;
 
 const MAX_TOKEN_CHARS: usize = 64;
+const MAX_BLOCKED: usize = 500;
+const MAX_RATINGS: usize = 5000;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
@@ -25,6 +28,12 @@ struct Data {
     /// before it is published.
     edit_tokens: BTreeMap<String, String>,
     count_installs: bool,
+    /// Random, created on first use. The Worker only ever stores its hash.
+    device_token: Option<String>,
+    /// Recipe id to the stars this device gave it, so the shell can show "my rating".
+    my_ratings: BTreeMap<String, u8>,
+    /// Commenter ids this device hides.
+    blocked_commenters: BTreeSet<String>,
 }
 
 impl Default for Data {
@@ -34,6 +43,9 @@ impl Default for Data {
             installed: BTreeMap::new(),
             edit_tokens: BTreeMap::new(),
             count_installs: true,
+            device_token: None,
+            my_ratings: BTreeMap::new(),
+            blocked_commenters: BTreeSet::new(),
         }
     }
 }
@@ -109,6 +121,64 @@ impl State {
         self.update(|data| data.count_installs = on)
     }
 
+    /// The device token, created and saved the first time it is needed. A stored value that is
+    /// not shaped like a token is replaced.
+    pub fn device_token(&self) -> Result<String> {
+        let mut data = self.data.lock().unwrap_or_else(PoisonError::into_inner);
+        if let Some(token) = data
+            .device_token
+            .as_deref()
+            .filter(|token| community::is_device_token(token))
+        {
+            return Ok(token.to_owned());
+        }
+        let token = community::new_device_token()?;
+        data.device_token = Some(token.clone());
+        write_atomically(&self.path, &serde_json::to_vec_pretty(&*data)?)?;
+        Ok(token)
+    }
+
+    pub fn my_rating(&self, id: &str) -> Option<u8> {
+        self.read(|data| data.my_ratings.get(id).copied())
+    }
+
+    pub fn my_ratings(&self) -> BTreeMap<String, u8> {
+        self.read(|data| data.my_ratings.clone())
+    }
+
+    pub fn set_my_rating(&self, id: &str, stars: u8) -> Result<()> {
+        if !(MIN_STARS..=MAX_STARS).contains(&stars) {
+            return Err(Error::Catalog("a rating is 1 to 5 stars".into()));
+        }
+        self.update(|data| {
+            if data.my_ratings.len() < MAX_RATINGS || data.my_ratings.contains_key(id) {
+                data.my_ratings.insert(id.to_owned(), stars);
+            }
+        })
+    }
+
+    pub fn blocked(&self) -> Vec<String> {
+        self.read(|data| data.blocked_commenters.iter().cloned().collect())
+    }
+
+    pub fn block(&self, commenter: &str) -> Result<()> {
+        if !community::is_commenter_id(commenter) {
+            return Err(Error::Catalog("not a commenter".into()));
+        }
+        if self.read(|data| data.blocked_commenters.len() >= MAX_BLOCKED) {
+            return Err(Error::Catalog("the block list is full".into()));
+        }
+        self.update(|data| {
+            data.blocked_commenters.insert(commenter.to_owned());
+        })
+    }
+
+    pub fn unblock(&self, commenter: &str) -> Result<()> {
+        self.update(|data| {
+            data.blocked_commenters.remove(commenter);
+        })
+    }
+
     fn read<T>(&self, f: impl FnOnce(&Data) -> T) -> T {
         f(&self.data.lock().unwrap_or_else(PoisonError::into_inner))
     }
@@ -170,6 +240,55 @@ mod tests {
         state.set_edit_token("market.c", &"x".repeat(65)).unwrap();
         assert_eq!(state.edit_token("market.b"), None);
         assert_eq!(state.edit_token("market.c"), None);
+    }
+
+    #[test]
+    fn the_device_token_is_made_once_has_the_right_shape_and_survives_a_restart() {
+        let (dir, state) = state();
+        let token = state.device_token().unwrap();
+        assert!(community::is_device_token(&token));
+        assert_eq!(state.device_token().unwrap(), token);
+        let restarted = State::load(dir.path().join("catalog-state.json"));
+        assert_eq!(restarted.device_token().unwrap(), token);
+    }
+
+    #[test]
+    fn a_stored_token_of_the_wrong_shape_is_replaced() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("catalog-state.json");
+        fs::write(&path, r#"{"deviceToken":"short"}"#).unwrap();
+        let state = State::load(path);
+        assert!(community::is_device_token(&state.device_token().unwrap()));
+    }
+
+    #[test]
+    fn the_block_list_persists_stays_sorted_and_only_takes_commenter_ids() {
+        let (dir, state) = state();
+        state.block("bbbbbbbbbb").unwrap();
+        state.block("aaaaaaaaaa").unwrap();
+        state.block("aaaaaaaaaa").unwrap();
+        for bad in ["", "AAAAAAAAAA", "aaaaaaaaa", "aaaaaaaaaaa", "../x"] {
+            assert!(state.block(bad).is_err(), "{bad}");
+        }
+        assert_eq!(state.blocked(), ["aaaaaaaaaa", "bbbbbbbbbb"]);
+        let restarted = State::load(dir.path().join("catalog-state.json"));
+        assert_eq!(restarted.blocked(), ["aaaaaaaaaa", "bbbbbbbbbb"]);
+        restarted.unblock("aaaaaaaaaa").unwrap();
+        assert_eq!(restarted.blocked(), ["bbbbbbbbbb"]);
+        restarted.unblock("cccccccccc").unwrap();
+    }
+
+    #[test]
+    fn my_rating_is_kept_replaced_and_limited_to_one_to_five() {
+        let (dir, state) = state();
+        state.set_my_rating("market.a", 4).unwrap();
+        state.set_my_rating("market.a", 2).unwrap();
+        assert!(state.set_my_rating("market.a", 0).is_err());
+        assert!(state.set_my_rating("market.a", 6).is_err());
+        assert_eq!(state.my_rating("market.a"), Some(2));
+        assert_eq!(state.my_rating("market.b"), None);
+        let restarted = State::load(dir.path().join("catalog-state.json"));
+        assert_eq!(restarted.my_rating("market.a"), Some(2));
     }
 
     #[test]
