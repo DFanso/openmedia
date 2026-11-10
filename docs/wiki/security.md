@@ -30,7 +30,7 @@ The site view loads third-party code we do not control, and our injected engine 
 4. **AI output and imported recipes are untrusted** and validated before use ([Recipe Format](./recipe-format.md#validation-rust-before-anything-reaches-a-webview)).
 5. **No `script` rule from AI.** Script rules need explicit per-recipe user confirmation, keyed by content hash.
 6. **Profile isolation.** Each profile has its own cookie/storage store. The shell webview has none of their data.
-7. **No backend, no telemetry.** The app has no server of ours to leak to; do not add one. The single third-party exception is RevenueCat, reached only from `tauri-plugin-billing` for purchases and restore, with an anonymous app-user ID and no page, URL, key or recipe data ([Paywall](./paywall.md#privacy-and-invariants)).
+7. **No telemetry; one optional server.** The only server of ours is the recipe marketplace ([Marketplace](./marketplace.md)). It is reached only on user action, holds no signing key, and is treated as untrusted by the app. Its install counter carries a recipe id and nothing else. The single third-party exception is RevenueCat, reached only from `tauri-plugin-billing` for purchases and restore, with an anonymous app-user ID and no page, URL, key or recipe data ([Paywall](./paywall.md#privacy-and-invariants)).
 8. **Redact before send; preview by default.**
 
 ## The bridge
@@ -64,7 +64,9 @@ Tauri has reportedly had an advisory where remote-origin iframes could reach IPC
 
 Even without scripts, a recipe can mislead (hide a security warning, hide a "this is not the real site" banner, redirect within origin). Mitigations: schema validation; no cross-origin redirect; broad `match` patterns refused for AI/imported recipes; imported recipes get a rule-by-rule review; recipes apply only to URLs they `match`, and the address/origin indicator is in shell UI the site cannot touch.
 
-Shared community recipes (Phase 5) are static files from a GitHub repo. Integrity: pinned commit hash or signed index, shown author, and review UI before first apply. No dynamic server.
+Shared recipes come in two forms, both untrusted until validated on the device. **Files and pasted text** are re-labelled `imported`, given the `imported.` id prefix and validated like AI output. **Marketplace recipes** are curated before publication and arrive through a catalog index signed with an Ed25519 key whose public half is compiled into the app and whose private half stays with the curator, never on Cloudflare. Each recipe is pinned in the index by SHA-256; the index carries a monotonic sequence number, an expiry and a revocation list. The app verifies, then runs the same Rust validation, then shows the rule-by-rule review. A compromised Worker or bucket can withhold or delay recipes, not forge them. See [Marketplace](./marketplace.md#threat-model).
+
+**Commands and the network.** The new app commands (`export_recipes`, `preview_recipe_import`, `import_recipes`, `remove_imported_recipe`, `marketplace_*`) are shell-only: a site view is a remote origin and the capability names only the `main` webview, as for every other app command. None takes a URL, header or key from the shell; the marketplace address and trusted keys are compile-time constants (`OPENMEDIA_MARKET_URL`, `OPENMEDIA_CATALOG_KEYS`), recipe ids and versions are validated before they enter a request path, and `catalog/client.rs` allows no redirects, no cookies, HTTPS only (loopback HTTP in debug builds), caps every response, and returns fixed error messages. The install counter request has no body.
 
 ## Ad blocking
 

@@ -24,6 +24,16 @@ const loadSettings = () => import("../features/settings/SettingsScreen");
 const loadStats = () => import("../features/stats/StatsSheet");
 const loadOnboarding = () => import("../features/onboarding/Onboarding");
 const loadRecipes = () => import("../features/settings/RecipesScreen");
+const MarketplaceScreen = lazy(() =>
+  import("../features/marketplace/MarketplaceScreen").then((module) => ({
+    default: module.MarketplaceScreen,
+  })),
+);
+const ShareScreen = lazy(() =>
+  import("../features/marketplace/ShareScreen").then((module) => ({
+    default: module.ShareScreen,
+  })),
+);
 const SettingsScreen = lazy(() =>
   loadSettings().then((module) => ({ default: module.SettingsScreen })),
 );
@@ -99,6 +109,8 @@ export function App() {
       <Suspense fallback={null}>
         {(idle || settingsOpen) && <SettingsScreen />}
         {(idle || sheet === "recipes") && <RecipesScreen />}
+        {sheet === "marketplace" && <MarketplaceScreen />}
+        {sheet === "share" && <ShareScreen />}
         {(idle || sheet === "stats") && <StatsSheet />}
         {onboardingOpen && <Onboarding />}
         {sheet === "paywall" && <PaywallSheet />}

@@ -32,6 +32,18 @@ describe("pages opened from Settings", () => {
     expect(useApp.getState().sheet).toBe("settings");
   });
 
+  it.each(["marketplace", "share"] as const)(
+    "returns to Settings from the %s page, keeping Settings mounted beneath it",
+    (page) => {
+      useApp.getState().openSheet("settings");
+      useApp.getState().openSheet(page);
+      expect(useApp.getState().sheet).toBe(page);
+      expect(selectSettingsOpen(useApp.getState())).toBe(true);
+      useApp.getState().closeSheet();
+      expect(useApp.getState().sheet).toBe("settings");
+    },
+  );
+
   it("closes to the page when the paywall was not opened from Settings", () => {
     useApp.getState().openSheet("settings");
     useApp.getState().closeSheet();

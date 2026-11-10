@@ -5,7 +5,7 @@ use url::Url;
 
 use crate::error::{Error, Result};
 use crate::library::{Favorite, FavoriteInput};
-use crate::recipes::{OptionChoices, OptionGroup, Recipes};
+use crate::recipes::{OptionChoices, OptionGroup, Origin, Recipes};
 
 /// One toggle as Settings shows it.
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -34,6 +34,8 @@ pub struct SiteSettings {
     pub bottom_margin: Option<u32>,
     /// The site runs on the user's own changed copy of the bundled recipe.
     pub customized: bool,
+    /// Who the recipe is from. Anything but `bundled` can be shared; `imported` can be removed.
+    pub origin: Origin,
     /// The app now ships a different version than the one the copy was made from.
     pub original_updated: bool,
 }
@@ -76,6 +78,7 @@ pub fn site_settings(
                 options,
                 bottom_margin: margins.get(&recipe.id).copied(),
                 customized,
+                origin: recipe.origin,
                 original_updated: customized
                     && recipes.bundled_version(&recipe.id) != recipe.forked_from.as_deref(),
             }

@@ -2,7 +2,7 @@
 
 > Rules for AI coding agents working in this repository.
 
-OpenMedia is a Tauri v2 app (desktop + iOS + Android) that loads any website in an embedded webview and lets the user reshape it: hide Instagram Reels, strip YouTube Shorts, remove any element on any site. Customizations are declarative **recipes**. An AI assistant generates and repairs recipes using a key the user supplies (BYOK). **There is no backend.**
+OpenMedia is a Tauri v2 app (desktop + iOS + Android) that loads any website in an embedded webview and lets the user reshape it: hide Instagram Reels, strip YouTube Shorts, remove any element on any site. Customizations are declarative **recipes**. An AI assistant generates and repairs recipes using a key the user supplies (BYOK). **No server of ours is needed to use the app.** The only one we operate is the opt-in recipe marketplace (Cloudflare), which can never apply anything to the device by itself.
 
 ## Read the Wiki First
 
@@ -70,7 +70,7 @@ yarn check:rust                                    # cargo fmt --all --check, cl
 
 Violating any of these is a bug regardless of whether tests pass. Details in `docs/wiki/security.md`.
 
-1. **No backend.** No server we operate, no telemetry, no analytics, no crash reporting that leaves the device. The only network destinations are (a) the sites the user opens, (b) the LLM endpoint the user configured, (c) opt-in static GitHub-hosted recipe index and releases, (d) RevenueCat, only from the in-repo billing plugin, for purchase validation and restore (anonymous app-user ID, no account; see `docs/wiki/paywall.md`). Do not add any other SDK that phones home.
+1. **No backend beyond the marketplace; no telemetry.** No analytics, no crash reporting, no identifiers that leave the device. The only network destinations are (a) the sites the user opens, (b) the LLM endpoint the user configured, (c) the opt-in recipe marketplace on Cloudflare (`docs/wiki/marketplace.md`), reached only on user action, HTTPS only, no cookies, no device or account identifier, (d) static GitHub releases, (e) RevenueCat, only from the in-repo billing plugin, for purchase validation and restore (anonymous app-user ID, no account; see `docs/wiki/paywall.md`). The marketplace is untrusted: everything it returns is verified against a signature key compiled into the app and validated again in Rust. The signing key never lives on Cloudflare. Do not add any other SDK that phones home.
 2. **API keys live only in the OS secure store and are read only in Rust.** Never pass a key to any webview, never log it, never write it to recipes, exports, settings JSON, error messages, or test fixtures.
 3. **Site webviews are hostile.** They load arbitrary third-party code. They get no Tauri IPC except the single narrowly-scoped bridge command defined in `security.md`. Adding any command, event, or capability reachable from a site webview needs a `security.md` update and explicit justification in the PR.
 4. **AI output is untrusted input.** Validate it against the recipe schema in Rust before it touches a webview. Script-type rules require explicit per-recipe user confirmation; the AI never gets a path to apply one silently.

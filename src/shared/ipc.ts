@@ -82,6 +82,8 @@ export interface SiteSettings {
   customized: boolean;
   /** The app now ships a different version than the one the copy was made from. */
   originalUpdated: boolean;
+  /** Who the recipe is from. Anything but `bundled` can be shared; `imported` can be removed. */
+  origin: "bundled" | "user" | "ai" | "imported";
 }
 
 export type ProviderKind = "anthropic" | "openAiCompatible";

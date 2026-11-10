@@ -154,11 +154,12 @@ sequenceDiagram
 |------|----------|-------|
 | Favorites, settings, history and provider configuration | `<app_data>/library.json` | No API keys |
 | Usage records and policies | `<app_data>/usage.json` | Local data |
-| User recipe forks | `<app_data>/recipes/` | Bundled recipes are embedded from `recipes/bundled/` |
+| User recipe forks, custom recipes and imported recipes | `<app_data>/recipes/` | Bundled recipes are embedded from `recipes/bundled/` |
+| Marketplace state: newest catalog sequence, installed marketplace recipes and their hashes, edit tokens, install-count switch | `<app_data>/catalog-state.json` | Local data; nothing here is a signing key |
 | API keys | OS secure storage | iOS Keychain; Android Keystore-backed plugin; never returned to the shell |
 | Site cookies/storage | Native webview profile store | Android behavior is not device-verified |
 
-There is no cross-device sync. Recipe export/import is not implemented yet.
+There is no cross-device sync. Recipes move between devices by export/import (`Settings > Import and export`) and the [marketplace](./marketplace.md).
 
 ## Current stack
 
@@ -183,7 +184,7 @@ src/
   shared/               Shared frontend state, IPC helpers, and components
   i18n/                 Localized UI messages
 src-tauri/
-  src/                  Rust app, commands, recipes, AI, storage, usage
+  src/                  Rust app, commands, recipes (incl. `share.rs`), `catalog/` (marketplace client), AI, storage, usage
   plugins/
     tauri-plugin-siteview/  Swift and Kotlin native site views
     tauri-plugin-billing/   Store billing adapters

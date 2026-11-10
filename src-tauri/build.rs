@@ -1,6 +1,8 @@
 use std::{collections::HashMap, env, path::Path};
 
-const BUILD_KEYS: [&str; 5] = [
+const BUILD_KEYS: [&str; 7] = [
+    "OPENMEDIA_MARKET_URL",
+    "OPENMEDIA_CATALOG_KEYS",
     "OPENMEDIA_RC_KEY_IOS",
     "OPENMEDIA_RC_KEY_MACOS",
     "OPENMEDIA_RC_KEY_ANDROID",

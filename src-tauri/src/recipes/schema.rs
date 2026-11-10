@@ -146,7 +146,7 @@ impl Recipe {
             .unwrap_or(option.enabled_by_default)
     }
 
-    fn validate(&self) -> Result<()> {
+    pub(super) fn validate(&self) -> Result<()> {
         if self.schema != SCHEMA_VERSION {
             return Err(Error::Recipe(format!(
                 "recipe {} uses unsupported schema {}",

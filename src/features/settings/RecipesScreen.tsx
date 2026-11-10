@@ -9,6 +9,7 @@ import { SiteTile } from "../../shared/SiteTile";
 import { Screen } from "../../shared/Screen";
 import { MarginSlider } from "./MarginSlider";
 import { Switch } from "./Switch";
+import { ImportedNotice } from "../marketplace/Links";
 import { Group, GroupLabel, quietButton } from "./ui";
 
 const GROUPS: { group: OptionGroup; title: MessageKey }[] = [
@@ -136,6 +137,7 @@ function SiteOptions({ site }: { site: SiteSettings }) {
 
   return (
     <div className="flex flex-col gap-5 border-t border-hair px-3 py-4">
+      <ImportedNotice site={site} />
       {site.customized && (
         <div className="flex flex-col gap-2 rounded-2xl border border-hair px-4 py-3">
           <p className="text-sm leading-snug text-paper/55">

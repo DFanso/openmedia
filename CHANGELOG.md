@@ -16,6 +16,14 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** `tsc`, ESLint, Prettier, 301 Vitest tests (new: the choice survives toggling another site), Rust fmt, clippy and tests (new: persists across reload and defaults on for old data; kept when a recipe's site is starred). **Not verified:** the switch rendering in Settings on a device or simulator, and a suppressed notification end to end (no notification was seen to fire or not fire).
 
+### feat(recipes): import, export and a curated recipe marketplace
+
+**What:** Recipes can be copied to another device as text, and an opt-in Marketplace lists recipes other people made and a person checked. Both end in the same review: every rule is shown before anything is added.
+
+**Change:** `recipes/share.rs` (import/export, forces `origin: imported`, `imported.` ids, rejects spoofing text and uncovered homepages), `catalog/` (Ed25519-signed index verified against keys compiled into the app, SHA-256-pinned downloads, replay and expiry checks, revocation list, state in `catalog-state.json`), shell screens under `features/marketplace/`. The server is a separate Cloudflare Worker repo; the signing key never lives on Cloudflare. This amends the "no backend" invariant (`AGENTS.md`, `security.md`): the marketplace is the one optional server, untrusted by the app.
+
+**Verified:** `cargo test --lib` (all recipe, catalog and share tests), clippy and rustfmt. **Not verified:** any run against a deployed Worker, on a device, or in the simulator; the marketplace stays hidden until a build sets `OPENMEDIA_MARKET_URL` and `OPENMEDIA_CATALOG_KEYS`.
+
 **PR:** n/a
 
 ### fix(siteview): sign-in popups close when the sign-in finishes on macOS

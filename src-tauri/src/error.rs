@@ -33,6 +33,10 @@ pub enum Error {
     UnsupportedVersion(u32),
     #[error("invalid recipe: {0}")]
     Recipe(String),
+    #[error("marketplace: {0}")]
+    Catalog(String),
+    #[error("The marketplace is not available in this build.")]
+    MarketplaceNotConfigured,
     #[error("invalid provider: {0}")]
     InvalidProvider(String),
     #[error("provider not found")]

@@ -1,15 +1,17 @@
 mod ad_block;
 mod ai;
 mod boot;
+pub mod catalog;
 mod commands;
 #[cfg(target_os = "macos")]
 mod desktop_menu;
 mod entitlement;
-mod error;
+pub mod error;
 mod incognito;
 mod library;
-mod recipes;
+pub mod recipes;
 mod secrets;
+mod share_commands;
 mod sites;
 mod usage;
 mod usage_commands;
@@ -34,6 +36,10 @@ pub fn run() {
             app.manage(library);
             app.manage(incognito::Incognito::default());
             app.manage(recipes::Recipes::load(data_dir.join("recipes"))?);
+            app.manage(catalog::Catalog::new(
+                catalog::Market::from_build().ok(),
+                catalog::State::load(data_dir.join("catalog-state.json")),
+            ));
             let ad_block = ad_block::AdBlock::bundled(app.path().app_cache_dir()?.join("ad-block"));
             app.manage(ad_block.clone());
             // The start page opens now, on another thread, while the shell boots; see `boot.rs`.
@@ -91,6 +97,18 @@ pub fn run() {
             commands::set_site_option,
             commands::save_recipe_fork,
             commands::restore_recipe_original,
+            share_commands::export_recipes,
+            share_commands::preview_recipe_import,
+            share_commands::import_recipes,
+            share_commands::remove_imported_recipe,
+            catalog::commands::marketplace_status,
+            catalog::commands::marketplace_set_counting,
+            catalog::commands::marketplace_list,
+            catalog::commands::marketplace_preview,
+            catalog::commands::marketplace_install,
+            catalog::commands::marketplace_uninstall,
+            catalog::commands::marketplace_report,
+            catalog::commands::marketplace_submit,
             commands::set_bottom_margin,
             commands::set_site_bottom_margin,
             commands::bottom_margin_for,

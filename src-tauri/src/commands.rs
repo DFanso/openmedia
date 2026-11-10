@@ -367,7 +367,7 @@ pub(crate) fn current_script(
 
 /// Recompiles the page script from the current recipes and choices and hands it to the open
 /// pages.
-fn reload_script(app: &AppHandle, library: &Library, recipes: &Recipes) -> Result<()> {
+pub(crate) fn reload_script(app: &AppHandle, library: &Library, recipes: &Recipes) -> Result<()> {
     let script = current_script(app, library, recipes)?;
     app.siteview()
         .set_document_start_script(SetDocumentStartScriptRequest { script })?;
