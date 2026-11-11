@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### fix(settings): ask for the check on the incognito recipes row
+
+**Area:** `fix(settings)`
+
+**Change:** The "Incognito recipes" row in Settings now carries the biometric icon and asks for Face ID, Touch ID or the passcode itself, then opens the page, which lists the recipes as plain cards like the normal Recipes page. The page no longer holds a second collapsible gate inside it, and it closes itself when the app goes to the background.
+
+**Verified:** `yarn ts:check`, ESLint, Prettier and 385 frontend tests. **Visual check:** on iPhone 17 Pro Max the page lists the recipes as plain cards, with the Pro check bypassed locally because a simulator build cannot unlock Pro. **Not verified:** the Face ID prompt on a device.
+
 ### fix(hubs): center hub tabs and route combined-page requests
 
 **Area:** `fix(hubs)`

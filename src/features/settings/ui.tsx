@@ -72,8 +72,6 @@ interface LockedSectionProps {
   lockedHint: string;
   /** Tapping opens the paywall, not the biometric check: shows the crown and no chevron. */
   needsPro?: boolean;
-  /** The enclosing Screen already shows the section title. */
-  hideTitle?: boolean;
   /** Asks for the biometric check; true when it passed. */
   unlock: () => Promise<boolean>;
   /** Loads what the section shows, after the check passed and before it opens. */
@@ -92,7 +90,6 @@ export function LockedSection({
   note,
   lockedHint,
   needsPro = false,
-  hideTitle = false,
   unlock,
   onUnlocked,
   onLocked,
@@ -146,7 +143,7 @@ export function LockedSection({
           ) : (
             !open && <BiometricIcon />
           )}
-          {hideTitle ? <span className="sr-only">{title}</span> : title}
+          {title}
         </span>
         {!needsPro && (
           <span aria-hidden="true" className={`text-paper/45 ${open ? "rotate-180" : ""}`}>
