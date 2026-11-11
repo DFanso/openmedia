@@ -153,6 +153,13 @@ describe("routeInput", () => {
         request,
       });
     });
+    it("routes another combined page request without a current page", () => {
+      const request = "make another combined page for messaging";
+      expect(routeInput(request, context({ mode: "chat", pageUrl: null }))).toEqual({
+        kind: "hub",
+        request,
+      });
+    });
 
     it("paywalls free users and requires a provider", () => {
       expect(routeInput("make a hub", context({ mode: "chat", pro: false }))).toEqual({
