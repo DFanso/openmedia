@@ -195,6 +195,8 @@ export const cs: Messages = {
   "settings.bottomMarginLabel": "Spodní okraj pro všechny weby",
   "settings.accessibility": "Přístupnost",
   "guides.read": "Přečíst průvodce",
+  "guides.makeRecipe": "Vytvořit recept",
+  "guides.customizeSite": "Upravit web",
   "settings.data": "Data a nápověda",
   "settings.dataNote":
     "Historie jsou adresy, které jste vyhledali, uložené jen v tomto zařízení. Její vymazání zapomene také poslední stránku, takže aplikace se spustí na vaší první oblíbené stránce. Otevřené stránky, oblíbené a přihlášení zůstanou.",

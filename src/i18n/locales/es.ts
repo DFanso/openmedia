@@ -196,6 +196,8 @@ export const es: Messages = {
   "settings.bottomMarginLabel": "Margen inferior para todos los sitios",
   "settings.accessibility": "Accesibilidad",
   "guides.read": "Leer la guía",
+  "guides.makeRecipe": "Crear una receta",
+  "guides.customizeSite": "Personalizar un sitio",
   "settings.data": "Datos y ayuda",
   "settings.dataNote":
     "El historial son las direcciones que has buscado y se guarda solo en este dispositivo. Al borrarlo también se olvida la última página, así que la app se inicia en tu primer favorito. Las páginas abiertas, los favoritos y las sesiones iniciadas se conservan.",

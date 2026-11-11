@@ -199,6 +199,8 @@ export const it: Messages = {
   "settings.bottomMarginLabel": "Margine inferiore per tutti i siti",
   "settings.accessibility": "Accessibilità",
   "guides.read": "Leggi la guida",
+  "guides.makeRecipe": "Crea una ricetta",
+  "guides.customizeSite": "Personalizza un sito",
   "settings.data": "Dati e assistenza",
   "settings.dataNote":
     "La cronologia è formata dagli indirizzi che hai cercato ed è conservata solo su questo dispositivo. Cancellarla dimentica anche l’ultima pagina, così l’app si apre sul primo preferito. Le pagine aperte, i preferiti e gli accessi restano.",

@@ -180,6 +180,8 @@ export const zhHans: Messages = {
   "settings.bottomMarginLabel": "所有网站的底部边距",
   "settings.accessibility": "辅助功能",
   "guides.read": "阅读指南",
+  "guides.makeRecipe": "创建配方",
+  "guides.customizeSite": "自定义网站",
   "settings.data": "数据与帮助",
   "settings.dataNote":
     "“历史”是你搜索过的网址，只保存在本设备上。清除历史也会忘记上一次的页面，因此应用会从你的第一个收藏开始。已打开的页面、收藏和登录状态会保留。",

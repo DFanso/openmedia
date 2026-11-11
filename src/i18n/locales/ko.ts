@@ -191,6 +191,8 @@ export const ko: Messages = {
   "settings.bottomMarginLabel": "모든 사이트의 하단 여백",
   "settings.accessibility": "손쉬운 사용",
   "guides.read": "가이드 읽기",
+  "guides.makeRecipe": "레시피 만들기",
+  "guides.customizeSite": "사이트 맞춤 설정",
   "settings.data": "데이터 및 도움말",
   "settings.dataNote":
     "기록은 검색한 주소 목록으로, 이 기기에만 남습니다. 지우면 마지막 페이지도 함께 잊어버려 앱이 첫 즐겨찾기부터 시작합니다. 열어 둔 페이지, 즐겨찾기, 로그인은 그대로 유지됩니다.",

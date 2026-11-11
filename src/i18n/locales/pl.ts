@@ -194,6 +194,8 @@ export const pl: Messages = {
   "settings.bottomMarginLabel": "Dolny margines dla wszystkich witryn",
   "settings.accessibility": "Dostępność",
   "guides.read": "Przeczytaj przewodnik",
+  "guides.makeRecipe": "Utwórz przepis",
+  "guides.customizeSite": "Dostosuj stronę",
   "settings.data": "Dane i pomoc",
   "settings.dataNote":
     "Historia to adresy, które wyszukano, przechowywane tylko na tym urządzeniu. Jej wyczyszczenie usuwa też ostatnią stronę, więc aplikacja uruchomi się na pierwszej ulubionej. Otwarte strony, ulubione i logowania zostają.",

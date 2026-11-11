@@ -194,6 +194,8 @@ export const sv: Messages = {
   "settings.bottomMarginLabel": "Nedre marginal för alla webbplatser",
   "settings.accessibility": "Tillgänglighet",
   "guides.read": "Läs guiden",
+  "guides.makeRecipe": "Skapa ett recept",
+  "guides.customizeSite": "Anpassa en webbplats",
   "settings.data": "Data och hjälp",
   "settings.dataNote":
     "Historiken består av adresserna du har sökt efter och sparas bara på den här enheten. När du rensar den glöms också den senaste sidan, så appen startar på din första favorit. Öppna sidor, favoriter och inloggningar finns kvar.",

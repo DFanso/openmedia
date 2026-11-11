@@ -199,6 +199,8 @@ export const fr: Messages = {
   "settings.bottomMarginLabel": "Marge inférieure pour tous les sites",
   "settings.accessibility": "Accessibilité",
   "guides.read": "Lire le guide",
+  "guides.makeRecipe": "Créer une recette",
+  "guides.customizeSite": "Personnaliser un site",
   "settings.data": "Données et aide",
   "settings.dataNote":
     "L’historique contient les adresses que vous avez recherchées et reste uniquement sur cet appareil. L’effacer oublie aussi la dernière page : l’application démarre donc sur votre premier favori. Les pages ouvertes, les favoris et les connexions sont conservés.",

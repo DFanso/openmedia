@@ -196,6 +196,8 @@ export const ur: Messages = {
   "settings.bottomMarginLabel": "تمام سائٹس کے لیے نیچے کا مارجن",
   "settings.accessibility": "رسائی",
   "guides.read": "گائیڈ پڑھیں",
+  "guides.makeRecipe": "نسخہ بنائیں",
+  "guides.customizeSite": "سائٹ کو حسبِ ضرورت بنائیں",
   "settings.data": "ڈیٹا اور مدد",
   "settings.dataNote":
     "تاریخ وہ پتے ہیں جن کی آپ نے تلاش کی، اور صرف اسی ڈیوائس پر رہتے ہیں۔ انہیں صاف کرنے سے آخری صفحہ بھی بھول جاتا ہے، اس لیے ایپ آپ کی پہلی پسندیدہ سے شروع ہوتی ہے۔ کھلے ہوئے صفحات، پسندیدہ اور لاگ ان قائم رہتے ہیں۔",

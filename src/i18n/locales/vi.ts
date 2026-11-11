@@ -191,6 +191,8 @@ export const vi: Messages = {
   "settings.bottomMarginLabel": "Lề dưới cho mọi trang",
   "settings.accessibility": "Trợ năng",
   "guides.read": "Đọc hướng dẫn",
+  "guides.makeRecipe": "Tạo công thức",
+  "guides.customizeSite": "Tùy chỉnh trang web",
   "settings.data": "Dữ liệu và trợ giúp",
   "settings.dataNote":
     "Lịch sử là những địa chỉ bạn đã tìm, chỉ giữ trên thiết bị này. Xóa lịch sử cũng quên trang cuối cùng, nên ứng dụng sẽ mở ở mục yêu thích đầu tiên của bạn. Các trang đang mở, mục yêu thích và đăng nhập vẫn còn.",

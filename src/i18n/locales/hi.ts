@@ -190,6 +190,8 @@ export const hi: Messages = {
   "settings.bottomMarginLabel": "सभी साइटों के लिए निचली मार्जिन",
   "settings.accessibility": "एक्सेसिबिलिटी",
   "guides.read": "गाइड पढ़ें",
+  "guides.makeRecipe": "रेसिपी बनाएँ",
+  "guides.customizeSite": "साइट को कस्टमाइज़ करें",
   "settings.data": "डेटा और मदद",
   "settings.dataNote":
     "इतिहास वे पते हैं जिन्हें आपने खोजा है, वे सिर्फ़ इसी डिवाइस पर रहते हैं। इन्हें मिटाने पर आख़िरी पृष्ठ भी भूल जाता है, इसलिए ऐप आपकी पहली पसंदीदा से शुरू होता है। खुले पृष्ठ, पसंदीदा और लॉगिन बने रहते हैं।",

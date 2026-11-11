@@ -191,6 +191,8 @@ export const id: Messages = {
   "settings.bottomMarginLabel": "Margin bawah untuk semua situs",
   "settings.accessibility": "Aksesibilitas",
   "guides.read": "Baca panduan",
+  "guides.makeRecipe": "Buat resep",
+  "guides.customizeSite": "Sesuaikan situs",
   "settings.data": "Data dan bantuan",
   "settings.dataNote":
     "Riwayat adalah alamat yang pernah Anda cari, disimpan hanya di perangkat ini. Mengosongkannya juga melupakan halaman terakhir, jadi aplikasi mulai dari favorit pertama Anda. Halaman yang terbuka, favorit, dan login tetap ada.",
