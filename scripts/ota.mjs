@@ -139,11 +139,9 @@ function keygen() {
   fs.rmSync(`${updaterKey}.pub`, { force: true });
   const password = env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD ?? "";
   // The password is passed by environment, not on the command line (which `run` prints).
-  run(
-    "yarn",
-    ["tauri", "signer", "generate", "--ci", "--write-keys", updaterKey],
-    { env: { TAURI_SIGNING_PRIVATE_KEY_PASSWORD: password } },
-  );
+  run("yarn", ["tauri", "signer", "generate", "--ci", "--write-keys", updaterKey], {
+    env: { TAURI_SIGNING_PRIVATE_KEY_PASSWORD: password },
+  });
   const overlay = JSON.parse(fs.readFileSync(overlayFile, "utf8"));
   overlay.plugins.updater.pubkey = fs.readFileSync(`${updaterKey}.pub`, "utf8").trim();
   fs.writeFileSync(overlayFile, `${JSON.stringify(overlay, null, 2)}\n`);
