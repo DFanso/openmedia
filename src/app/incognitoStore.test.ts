@@ -60,7 +60,9 @@ describe("incognito mode", () => {
   it("drops an open assistant turn when the mode changes, so it cannot be seen in the other mode", async () => {
     invoke.mockImplementation(async (name: string) => (name === "enter_incognito" ? secret : null));
     await useApp.getState().enterIncognito();
-    useApp.setState({ assistant: { status: "idle", draft: "hide the stories from my private feed" } });
+    useApp.setState({
+      assistant: { status: "idle", draft: "hide the stories from my private feed" },
+    });
 
     await useApp.getState().exitIncognito();
 

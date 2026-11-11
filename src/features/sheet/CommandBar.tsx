@@ -20,7 +20,6 @@ import { INPUT_MODES, MAX_REQUEST_LENGTH, routeInput, type InputMode } from "../
 import { useEntitlementStore } from "../paywall/store";
 import { DEFAULT_SEARCH_ENGINE } from "../../shared/searchEngines";
 
-
 /** Opens from the top so the keyboard never covers it. Addresses open directly; other text is a request for the assistant. */
 export function CommandBar() {
   const open = useApp((s) => s.sheet === "assistant");
