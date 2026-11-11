@@ -404,6 +404,7 @@ pub fn apply_patch(base: Option<&Recipe>, host_domain: &str, patch: &Patch) -> R
                 id,
                 label: rule.label.clone(),
                 option: Some(option_id.clone()),
+                on: None,
                 target: Target {
                     css: rule.selector.clone(),
                 },
@@ -413,6 +414,7 @@ pub fn apply_patch(base: Option<&Recipe>, host_domain: &str, patch: &Patch) -> R
                 id,
                 label: rule.label.clone(),
                 option: Some(option_id.clone()),
+                on: None,
                 target: Target {
                     css: rule.selector.clone(),
                 },
@@ -447,6 +449,7 @@ fn custom_recipe(domain: &str) -> Result<Recipe> {
             last_verified: None,
             notes: Some("Created by the in-app assistant.".to_owned()),
         }),
+        hub: None,
     })
 }
 
