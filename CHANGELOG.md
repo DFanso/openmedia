@@ -16,7 +16,7 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** 33 focused Usage tests and `yarn ts:check`. **Not verified:** Rust usage tests (Cargo hit `ENOSPC` during compilation); Android runtime and SPA history callback behavior.
 
-**PR:** n/a
+**PR:** [#134](https://github.com/skepjandi/openmedia/pull/134)
 ### fix(siteview): keep clicked links in the embedded browser
 
 **Area:** `fix(siteview)`
