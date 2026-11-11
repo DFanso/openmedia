@@ -8,6 +8,15 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### fix(android): ad blocking follows WebKit's rules, and BlockingRules has tests
+
+**Area:** `fix(android)`
+
+**Problem:** wildcard-host rules (`||facebook.com*/impression.php`) were filed under a host that never matched, so they never fired; `if-domain`/`unless-domain` were compared with the request host although WebKit reads them against the document being browsed (every `$domain=` rule behaved backwards); the two bundled lists were merged, so an EasyList exception could cancel an EasyPrivacy block; `BlockingRules` had no tests because it used `android.net.Uri`.
+
+**Change:** a host-anchored rule is filed by host only when the host is fully captured, otherwise it is evaluated for every request; domain conditions use the top document's host (a main-frame load is its own document); each list keeps its own blocks and exceptions; URL parsing is plain string work. New `BlockingRulesTest` covers case, wildcard hosts, domain conditions and per-list exceptions.
+
+**Verified:** `./gradlew :tauri-plugin-siteview:testDebugUnitTest` (all Android unit tests pass). **Not verified:** on a device.
 ### fix(shell): open the shell's own links in the system browser
 
 **Area:** `fix(shell)`
