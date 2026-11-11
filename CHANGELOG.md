@@ -8,6 +8,15 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### fix(android): arm ad blocking on open, pin POST navigations, safer favicons and memory handling
+
+**Area:** `fix(android)`
+
+**Problem:** the Android plugin ignored the rule lists sent with `open`, so nothing was blocked until the user toggled the setting; `shouldOverrideUrlLoading` is not called for POST navigations, so a page could post a form to another domain inside the logged-in view; a small favicon could decode to gigabytes and kill the app; every backgrounding (`TRIM_MEMORY_UI_HIDDEN`) closed all hidden sessions; blocking rules matched case-sensitively while WebKit's `url-filter` does not; `sessions` was read from the WebView request thread while the UI thread changed it; the biometric prompt threw on Android 9/10.
+
+**Change:** `open` loads the rule lists (once per list set); `shouldInterceptRequest` refuses out-of-scope main-frame POSTs after the first load settles; favicon size is read before decoding and `fetch` catches `Throwable`; only real pressure levels report a memory warning; rules compile `CASE_INSENSITIVE`; `sessions` is a synchronized map; the pre-Android-11 prompt gets a negative button.
+
+**Verified:** `./gradlew :tauri-plugin-siteview:compileDebugKotlin` builds. **Not verified:** on a device or emulator; unit tests could not resolve `org.json` offline. **Not fixed here:** wildcard-host rules in the host index, `if-domain` semantics, per-list exceptions, `WebChromeClient` gaps (upload, dialogs, `window.open`), bridge size cap.
 ### fix(ai): keep keys, previews and incognito state where they belong
 
 **Area:** `fix(ai)`
