@@ -7,6 +7,15 @@ All notable changes to OpenMedia are documented here.
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
 ## 2026-11-11
+
+### fix(hubs): center hub tabs and route combined-page requests
+
+**Area:** `fix(hubs)`
+
+**Change:** Hub tabs center when they fit and stay horizontally scrollable when they do not. Chat routes combined-page requests through the existing hub builder.
+
+**Verified:** 17 focused routing tests, `yarn ts:check`, and Prettier. **Visual check:** iPhone 17 Pro Max shows all four hub buttons centered.
+
 ### feat(settings): open incognito recipes on a dedicated page
 
 **Area:** `feat(settings)`
