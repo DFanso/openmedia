@@ -48,7 +48,7 @@ class BlockingRules {
             }
             if (ifDomains != null && ifDomains.none { domainMatches(it, host) }) return false
             if (unlessDomains != null && unlessDomains.any { domainMatches(it, host) }) return false
-            if (literal != null && !url.contains(literal)) return false
+            if (literal != null && !url.contains(literal, ignoreCase = true)) return false
             return pattern.matcher(url).find()
         }
     }
@@ -113,7 +113,7 @@ class BlockingRules {
             val trigger = obj.optJSONObject("trigger") ?: continue
             val filter = trigger.optString("url-filter")
             if (filter.isEmpty()) continue
-            val pattern = runCatching { Pattern.compile(filter) }.getOrNull() ?: continue
+            val pattern = runCatching { Pattern.compile(filter, Pattern.CASE_INSENSITIVE) }.getOrNull() ?: continue
             rules.add(
                 Rule(
                     pattern = pattern,
