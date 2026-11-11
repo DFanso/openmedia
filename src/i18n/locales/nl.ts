@@ -196,6 +196,8 @@ export const nl: Messages = {
   "settings.bottomMarginLabel": "Ondermarge voor alle sites",
   "settings.accessibility": "Toegankelijkheid",
   "guides.read": "Lees de gids",
+  "guides.makeRecipe": "Recept maken",
+  "guides.customizeSite": "Website aanpassen",
   "settings.data": "Gegevens en hulp",
   "settings.dataNote":
     "Geschiedenis bestaat uit de adressen waarnaar je hebt gezocht, alleen op dit apparaat bewaard. Als je die wist, vergeet de app ook de laatste pagina, zodat hij start op je eerste favoriet. Geopende pagina’s, favorieten en inloggegevens blijven bewaard.",

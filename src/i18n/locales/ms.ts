@@ -192,6 +192,8 @@ export const ms: Messages = {
   "settings.bottomMarginLabel": "Margin bawah untuk semua laman",
   "settings.accessibility": "Kebolehcapaian",
   "guides.read": "Baca panduan",
+  "guides.makeRecipe": "Cipta resipi",
+  "guides.customizeSite": "Sesuaikan laman",
   "settings.data": "Data dan bantuan",
   "settings.dataNote":
     "Sejarah ialah alamat yang anda telah cari, disimpan pada peranti ini sahaja. Mengosongkannya turut melupakan halaman terakhir, jadi aplikasi bermula pada kegemaran pertama anda. Halaman yang terbuka, kegemaran dan log masuk kekal.",

@@ -15,6 +15,14 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** 41 focused navigation and localization tests; TypeScript and changed-file formatting; browser-preview navigation and control labels. **Not verified:** native biometric unlock on a device.
 
+### fix(settings): distinguish recipe guide links (#137)
+
+**Area:** `fix(settings)`
+
+**Change:** Give the recipe and site-customization guides distinct, localized labels.
+
+**Verified:** i18n catalog tests (34) and TypeScript check.
+
 ### fix(siteview): keep clicked links in the embedded browser
 
 **Area:** `fix(siteview)`

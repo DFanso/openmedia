@@ -188,6 +188,8 @@ export const ar: Messages = {
   "settings.bottomMarginLabel": "الهامش السفلي لكل المواقع",
   "settings.accessibility": "إمكانية الوصول",
   "guides.read": "اقرأ الدليل",
+  "guides.makeRecipe": "أنشئ وصفة",
+  "guides.customizeSite": "خصّص موقعًا",
   "settings.data": "البيانات والمساعدة",
   "settings.dataNote":
     "السجل هو العناوين التي بحثت عنها، ويُحفظ على هذا الجهاز فقط. مسحه ينسى الصفحة الأخيرة أيضًا، فيبدأ التطبيق من أول موقع في مفضلتك. الصفحات المفتوحة والمفضلة وتسجيلات الدخول تبقى.",

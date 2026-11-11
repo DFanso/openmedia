@@ -196,6 +196,8 @@ export const en = {
   "settings.bottomMarginLabel": "Bottom margin for all sites",
   "settings.accessibility": "Accessibility",
   "guides.read": "Read the guide",
+  "guides.makeRecipe": "Create a recipe",
+  "guides.customizeSite": "Customize a site",
   "settings.data": "Data and help",
   "settings.dataNote":
     "History is the addresses you have searched, kept on this device only. Clearing it also forgets the last page, so the app starts on your first favorite. Open pages, favorites and logins stay.",

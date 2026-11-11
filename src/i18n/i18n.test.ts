@@ -29,6 +29,7 @@ describe("catalog", () => {
             key,
           ).toBe(true);
       }
+      expect(messages["guides.makeRecipe"]).not.toBe(messages["guides.customizeSite"]);
     });
   }
 });

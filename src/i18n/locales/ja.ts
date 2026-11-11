@@ -192,6 +192,8 @@ export const ja: Messages = {
   "settings.bottomMarginLabel": "すべてのサイトの下余白",
   "settings.accessibility": "アクセシビリティ",
   "guides.read": "ガイドを読む",
+  "guides.makeRecipe": "レシピを作成",
+  "guides.customizeSite": "サイトをカスタマイズ",
   "settings.data": "データとヘルプ",
   "settings.dataNote":
     "履歴は検索したアドレスの記録で、この端末にだけ保存されます。消去すると直前に開いたページも忘れるため、アプリは最初のお気に入りから始まります。開いているページとお気に入り、ログインは残ります。",

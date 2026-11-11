@@ -195,6 +195,8 @@ export const ro: Messages = {
   "settings.bottomMarginLabel": "Margine inferioară pentru toate site-urile",
   "settings.accessibility": "Accesibilitate",
   "guides.read": "Citește ghidul",
+  "guides.makeRecipe": "Creează o rețetă",
+  "guides.customizeSite": "Personalizează un site",
   "settings.data": "Date și ajutor",
   "settings.dataNote":
     "Istoricul reprezintă adresele pe care le-ai căutat, păstrate doar pe acest dispozitiv. Ștergerea lui uită și ultima pagină, așa că aplicația pornește cu primul tău favorit. Paginile deschise, favoritele și autentificările rămân.",

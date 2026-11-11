@@ -198,6 +198,8 @@ export const pt: Messages = {
   "settings.bottomMarginLabel": "Margem inferior para todos os sites",
   "settings.accessibility": "Acessibilidade",
   "guides.read": "Ler o guia",
+  "guides.makeRecipe": "Criar uma receita",
+  "guides.customizeSite": "Personalizar um site",
   "settings.data": "Dados e ajuda",
   "settings.dataNote":
     "O histórico são os endereços que você pesquisou e fica apenas neste dispositivo. Limpar o histórico também apaga a última página, então o app inicia no seu primeiro favorito. Páginas abertas, favoritos e logins são mantidos.",

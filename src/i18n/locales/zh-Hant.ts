@@ -180,6 +180,8 @@ export const zhHant: Messages = {
   "settings.bottomMarginLabel": "所有網站的底部邊距",
   "settings.accessibility": "輔助使用",
   "guides.read": "閱讀指南",
+  "guides.makeRecipe": "建立配方",
+  "guides.customizeSite": "自訂網站",
   "settings.data": "資料與說明",
   "settings.dataNote":
     "「記錄」是你搜尋過的網址，只保存在這台裝置上。清除記錄也會忘記上一個頁面，因此 App 會從你的第一個我的最愛開始。開啟中的頁面、我的最愛與登入狀態會保留。",

@@ -190,6 +190,8 @@ export const de: Messages = {
   "settings.bottomMarginLabel": "Unterer Rand für alle Websites",
   "settings.accessibility": "Barrierefreiheit",
   "guides.read": "Anleitung lesen",
+  "guides.makeRecipe": "Rezept erstellen",
+  "guides.customizeSite": "Website anpassen",
   "settings.data": "Daten und Hilfe",
   "settings.dataNote":
     "Der Verlauf enthält die Adressen, nach denen du gesucht hast, und wird nur auf diesem Gerät gespeichert. Wenn du ihn löschst, wird auch die zuletzt geöffnete Seite vergessen, sodass die App mit deinem ersten Favoriten startet. Offene Seiten, Favoriten und Anmeldungen bleiben erhalten.",

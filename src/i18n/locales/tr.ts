@@ -195,6 +195,8 @@ export const tr: Messages = {
   "settings.bottomMarginLabel": "Tüm siteler için alt kenar boşluğu",
   "settings.accessibility": "Erişilebilirlik",
   "guides.read": "Kılavuzu oku",
+  "guides.makeRecipe": "Tarif oluştur",
+  "guides.customizeSite": "Bir siteyi özelleştir",
   "settings.data": "Veri ve yardım",
   "settings.dataNote":
     "Geçmiş, aradığınız adreslerdir ve yalnızca bu cihazda tutulur. Geçmişi temizlemek son sayfayı da unutturur, böylece uygulama ilk favorinizle açılır. Açık sayfalar, favoriler ve oturum açma bilgileri kalır.",
