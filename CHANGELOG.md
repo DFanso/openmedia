@@ -8,6 +8,15 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### fix(command-bar): route hub requests through Chat (#128)
+
+**Area:** `fix(command-bar)`
+
+**Change:** Keep “Experimental” on the Marketplace hub tag only, restore “Hub” elsewhere, and remove the separate Hub command mode. Chat routes hub, site-combination, and multi-site messaging-recipe requests through the existing validated hub builder.
+
+**Verified:** 71 focused route, localization, and marketplace tests; TypeScript and changed-file Prettier checks. Browser DOM smoke confirmed the command bar exposes Auto, Link, Search, and Chat only.
+
+
 ### fix(marketplace): label hubs experimental
 
 **Area:** `fix(marketplace)`

@@ -274,7 +274,7 @@ export const vi: Messages = {
   "recipes.options": "Tùy chọn của {name}",
   "recipes.addFavorite": "Thêm {name} vào yêu thích",
   "recipes.removeFavorite": "Gỡ {name} khỏi yêu thích",
-  "recipes.hub": "Thử nghiệm",
+  "recipes.hub": "Hub",
   "recipes.hubPages": "Các trang",
   "recipes.openHubPage": "Mở {label}",
   "recipes.hubNote":
@@ -331,6 +331,7 @@ export const vi: Messages = {
   "market.tag.community": "Cộng đồng",
   "market.tag.mobile": "Di động",
   "market.tag.desktop": "Máy tính",
+  "market.tag.hub": "Thử nghiệm",
   "market.filters": "Lọc theo thẻ",
   "market.noMatch": "Không có gì khớp với các bộ lọc này.",
   "market.search": "Tìm công thức",

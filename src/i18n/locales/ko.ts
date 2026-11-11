@@ -270,7 +270,7 @@ export const ko: Messages = {
   "recipes.options": "{name} 옵션",
   "recipes.addFavorite": "{name} 즐겨찾기에 추가",
   "recipes.removeFavorite": "{name} 즐겨찾기에서 제거",
-  "recipes.hub": "실험적",
+  "recipes.hub": "허브",
   "recipes.hubPages": "페이지",
   "recipes.openHubPage": "{label} 열기",
   "recipes.hubNote":
@@ -331,6 +331,7 @@ export const ko: Messages = {
   "market.tag.community": "커뮤니티",
   "market.tag.mobile": "모바일",
   "market.tag.desktop": "데스크톱",
+  "market.tag.hub": "실험적",
   "market.filters": "태그로 필터링",
   "market.noMatch": "이 필터와 일치하는 항목이 없습니다.",
   "market.search": "레시피 검색",

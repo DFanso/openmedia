@@ -273,7 +273,7 @@ export const ja: Messages = {
   "recipes.options": "{name}のオプション",
   "recipes.addFavorite": "{name}をお気に入りに追加",
   "recipes.removeFavorite": "{name}をお気に入りから外す",
-  "recipes.hub": "実験的",
+  "recipes.hub": "ハブ",
   "recipes.hubPages": "ページ",
   "recipes.openHubPage": "{label}を開く",
   "recipes.hubNote":
@@ -334,6 +334,7 @@ export const ja: Messages = {
   "market.tag.community": "コミュニティ",
   "market.tag.mobile": "モバイル",
   "market.tag.desktop": "デスクトップ",
+  "market.tag.hub": "実験的",
   "market.filters": "タグで絞り込む",
   "market.noMatch": "これらの条件に一致するものはありません。",
   "market.search": "レシピを検索",

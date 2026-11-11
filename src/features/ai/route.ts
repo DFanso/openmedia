@@ -5,8 +5,8 @@ import { normalizeWebUrl } from "../../shared/url";
 export const MAX_REQUEST_LENGTH = 400;
 
 /** What the user wants the bar to do with the text. `auto` decides from the text itself. */
-export type InputMode = "auto" | "link" | "search" | "chat" | "hub";
-export const INPUT_MODES: readonly InputMode[] = ["auto", "link", "search", "chat", "hub"];
+export type InputMode = "auto" | "link" | "search" | "chat";
+export const INPUT_MODES: readonly InputMode[] = ["auto", "link", "search", "chat"];
 
 export type Route =
   | { kind: "empty" }
@@ -44,6 +44,9 @@ const isSitePage = (url: string | null): boolean => url !== null && /^https?:\/\
 const REQUEST_START =
   /^(hide|remove|block|show|make|change|turn|disable|enable|mute|stop|delete|filter|clean|declutter|get|only|no|don'?t|without|replace|move|dim|collapse|skip|unfollow)\b/i;
 
+const HUB_REQUEST =
+  /\b(?:hub|multi[- ]site|combine)\b|\bnew recipe\b.{0,120}\b(?:messages?|inbox(?:es)?)\b/i;
+
 /** An assistant request. Pro is checked first so a free user is shown the paywall, not setup steps. */
 function assistantRoute(text: string, context: RouteContext): Route {
   if (!context.pro) return { kind: "paywall" };
@@ -64,7 +67,7 @@ function hubRoute(text: string, context: RouteContext): Route {
  *
  * - `link`: opens the text as an address, or says it is not one.
  * - `search`: searches the web for the text.
- * - `chat`: always a request for the assistant.
+ * - `chat`: hub or combination requests use the hub builder; other text is a page-scoped request.
  * - `auto`: an address opens, text that starts like a change request goes to the assistant,
  *   anything else is searched.
  */
@@ -78,9 +81,9 @@ export function routeInput(text: string, context: RouteContext): Route {
     case "search":
       return { kind: "search", url: searchUrl(trimmed, context.searchEngine) };
     case "chat":
-      return assistantRoute(trimmed, context);
-    case "hub":
-      return hubRoute(trimmed, context);
+      return HUB_REQUEST.test(trimmed)
+        ? hubRoute(trimmed, context)
+        : assistantRoute(trimmed, context);
     case "auto":
       if (url) return { kind: "address", url };
       if (REQUEST_START.test(trimmed)) return assistantRoute(trimmed, context);

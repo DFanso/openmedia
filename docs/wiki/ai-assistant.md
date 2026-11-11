@@ -150,6 +150,7 @@ Missing/invalid key · rate limit/quota · provider/network failure · model ref
 ## Implemented: shell flow
 
 The shell side lives in `src/features/ai/` and `CommandBar`. Typed text that is a web address opens it; other text becomes a request (needs an active provider with a key and an open site, else a one-line message with a button to Settings > AI assistant). The flow is a pure reducer: idle, preparing (`ai_prepare`), preview of the exact payload with provider, model and token estimate (skipped when the setting `aiPreview` is off; Settings > "Preview what is sent before sending"), sending (`ai_send`), proposal (page already shows the ephemeral preview; Accept / Reject / Ask again), then accepted (sites reload, "Open in Settings") or rejected. Errors map to a fixed set of shell-written messages with Retry, and a proposal whose rules all matched nothing is shown as "nothing matched". Every turn of the flow is kept in the chat of the site, so the conversation survives closing the bar; see [Implemented: the chat](#implemented-the-chat). See [UI Design: AI assistant](./ui-design.md#ai-assistant).
+In Chat mode, explicit hub/site-combination requests and new messaging-recipe requests route through the existing bounded hub builder (`ai_hub_build`) and show its validated proposal; no separate Hub command-bar mode is needed.
 
 ## Implemented: the chat
 

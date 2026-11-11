@@ -267,7 +267,7 @@ export const ar: Messages = {
   "recipes.options": "خيارات {name}",
   "recipes.addFavorite": "إضافة {name} إلى المفضلة",
   "recipes.removeFavorite": "إزالة {name} من المفضلة",
-  "recipes.hub": "تجريبي",
+  "recipes.hub": "مركز",
   "recipes.hubPages": "الصفحات",
   "recipes.openHubPage": "فتح {label}",
   "recipes.hubNote":
@@ -323,6 +323,7 @@ export const ar: Messages = {
   "market.tag.community": "المجتمع",
   "market.tag.mobile": "الجوال",
   "market.tag.desktop": "سطح المكتب",
+  "market.tag.hub": "تجريبي",
   "market.filters": "التصفية حسب الوسم",
   "market.noMatch": "لا شيء يطابق هذه المرشحات.",
   "market.search": "ابحث في الوصفات",

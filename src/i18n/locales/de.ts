@@ -274,7 +274,7 @@ export const de: Messages = {
   "recipes.options": "Optionen für {name}",
   "recipes.addFavorite": "{name} zu Favoriten hinzufügen",
   "recipes.removeFavorite": "{name} aus Favoriten entfernen",
-  "recipes.hub": "Experimentell",
+  "recipes.hub": "Hub",
   "recipes.hubPages": "Seiten",
   "recipes.openHubPage": "{label} öffnen",
   "recipes.hubNote":
@@ -334,6 +334,7 @@ export const de: Messages = {
   "market.tag.community": "Community",
   "market.tag.mobile": "Mobil",
   "market.tag.desktop": "Desktop",
+  "market.tag.hub": "Experimentell",
   "market.filters": "Nach Tag filtern",
   "market.noMatch": "Nichts passt zu diesen Filtern.",
   "market.search": "Rezepte suchen",

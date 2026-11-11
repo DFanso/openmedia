@@ -270,7 +270,7 @@ export const bn: Messages = {
   "recipes.options": "{name} বিকল্প",
   "recipes.addFavorite": "{name} পছন্দের তালিকায় যোগ করুন",
   "recipes.removeFavorite": "{name} পছন্দের তালিকা থেকে সরান",
-  "recipes.hub": "পরীক্ষামূলক",
+  "recipes.hub": "হাব",
   "recipes.hubPages": "পৃষ্ঠা",
   "recipes.openHubPage": "{label} খুলুন",
   "recipes.hubNote":
@@ -328,6 +328,7 @@ export const bn: Messages = {
   "market.tag.community": "কমিউনিটি",
   "market.tag.mobile": "মোবাইল",
   "market.tag.desktop": "ডেস্কটপ",
+  "market.tag.hub": "পরীক্ষামূলক",
   "market.filters": "ট্যাগ অনুযায়ী ছাঁকুন",
   "market.noMatch": "এই ফিল্টারের সাথে কিছু মেলেনি।",
   "market.search": "রেসিপি খুঁজুন",

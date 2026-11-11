@@ -273,7 +273,7 @@ export const ms: Messages = {
   "recipes.options": "Pilihan {name}",
   "recipes.addFavorite": "Tambah {name} ke kegemaran",
   "recipes.removeFavorite": "Buang {name} daripada kegemaran",
-  "recipes.hub": "Eksperimental",
+  "recipes.hub": "Hab",
   "recipes.hubPages": "Halaman",
   "recipes.openHubPage": "Buka {label}",
   "recipes.hubNote":
@@ -335,6 +335,7 @@ export const ms: Messages = {
   "market.tag.community": "Komuniti",
   "market.tag.mobile": "Mudah alih",
   "market.tag.desktop": "Desktop",
+  "market.tag.hub": "Eksperimental",
   "market.filters": "Tapis mengikut teg",
   "market.noMatch": "Tiada yang sepadan dengan penapis ini.",
   "market.search": "Cari resipi",

@@ -272,7 +272,7 @@ export const si: Messages = {
   "recipes.options": "{name} විකල්ප",
   "recipes.addFavorite": "{name} ආදරණීය අයිතිතයට එකතු කරන්න",
   "recipes.removeFavorite": "{name} ආදරණීය අයිතිතයෙන් ඉවත් කරන්න",
-  "recipes.hub": "පර්යේෂණාත්මක",
+  "recipes.hub": "හබ්",
   "recipes.hubPages": "පිටු",
   "recipes.openHubPage": "{label} විවෘත කරන්න",
   "recipes.hubNote":
@@ -331,6 +331,7 @@ export const si: Messages = {
   "market.tag.community": "ප්‍රජාව",
   "market.tag.mobile": "ජංගම",
   "market.tag.desktop": "ඩෙස්ක්ටොප්",
+  "market.tag.hub": "පර්යේෂණාත්මක",
   "market.filters": "ටැග් අනුව පෙරන්න",
   "market.noMatch": "මෙම පෙරහන් වලට කිසිවක් ගැළපෙන්නේ නැත.",
   "market.search": "ක්‍රම සොයන්න",

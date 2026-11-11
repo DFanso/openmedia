@@ -278,7 +278,7 @@ export const ro: Messages = {
   "recipes.options": "Opțiuni {name}",
   "recipes.addFavorite": "Adaugă {name} la favorite",
   "recipes.removeFavorite": "Elimină {name} din favorite",
-  "recipes.hub": "Experimental",
+  "recipes.hub": "Hub",
   "recipes.hubPages": "Pagini",
   "recipes.openHubPage": "Deschide {label}",
   "recipes.hubNote":
@@ -337,6 +337,7 @@ export const ro: Messages = {
   "market.tag.community": "Comunitate",
   "market.tag.mobile": "Mobil",
   "market.tag.desktop": "Desktop",
+  "market.tag.hub": "Experimental",
   "market.filters": "Filtrează după etichetă",
   "market.noMatch": "Nimic nu se potrivește cu aceste filtre.",
   "market.search": "Caută rețete",

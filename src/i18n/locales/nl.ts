@@ -275,7 +275,7 @@ export const nl: Messages = {
   "recipes.options": "Opties voor {name}",
   "recipes.addFavorite": "{name} toevoegen aan favorieten",
   "recipes.removeFavorite": "{name} verwijderen uit favorieten",
-  "recipes.hub": "Experimenteel",
+  "recipes.hub": "Hub",
   "recipes.hubPages": "Pagina's",
   "recipes.openHubPage": "{label} openen",
   "recipes.hubNote":
@@ -339,6 +339,7 @@ export const nl: Messages = {
   "market.tag.community": "Community",
   "market.tag.mobile": "Mobiel",
   "market.tag.desktop": "Desktop",
+  "market.tag.hub": "Experimenteel",
   "market.filters": "Filteren op tag",
   "market.noMatch": "Niets komt overeen met deze filters.",
   "market.search": "Recepten zoeken",
