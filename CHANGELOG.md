@@ -8,6 +8,15 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### fix(release): unique temp files, keep an unreadable marketplace state, keep secrets off the command line, restrict OTA signing
+
+**Area:** `fix(release)`
+
+**Problem:** `write_atomically` used one temp name per destination, so concurrent writers could persist the wrong content; an unreadable `catalog-state.json` was silently replaced, losing edit tokens that cannot be issued again; `yarn ota keygen --github` printed the OTA private key and the updater password in the echoed command line; the OTA workflow exposed a `contents: write` token to `yarn install` and `yarn test`, and a manual run from any branch could sign and publish.
+
+**Change:** each write gets its own exclusively created, fsynced temp file; an unparsable state file is renamed to `catalog-state.json.corrupt` before defaults are used; secrets go to `gh secret set` on stdin and the password by environment; `GH_TOKEN` is scoped to the steps that publish, and the signing jobs run only from `main` or a `v*` tag.
+
+**Verified:** `cargo test`, `clippy -D warnings` (new tests: concurrent writers, corrupt state). **Not verified:** the workflow (Actions is currently blocked by billing), `yarn ota keygen`.
 ### fix(android): arm ad blocking on open, pin POST navigations, safer favicons and memory handling
 
 **Area:** `fix(android)`
