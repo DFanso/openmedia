@@ -8,6 +8,15 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### fix(ai): a job stays on the page it was prepared on, and Cancel stops it
+
+**Area:** `fix(ai)`
+
+**Problem:** `LivePage` evaluated against whichever site view was active, so approving a request on site A and switching to site B previewed A's selectors on B and, when they matched nothing, read B's page and sent it to the provider; Cancel only removed the job, so a send in flight still touched the page and could make two more paid repair calls.
+
+**Change:** `prepare` names the job inside the page (a random token in the page's symbol registry); before every preview and repair read, `send` checks the token and stops with "The page changed since this request was prepared". `send` also stops after the model answers when the job was cancelled. Not fixed: the recipe scope still comes from the snapshot's host (a hostile page can misreport it on Android/macOS).
+
+**Verified:** `cargo test` (new tests: moved page, cancel during the model call), `clippy -D warnings`. **Not verified:** on a device.
 ### fix(android): ad blocking follows WebKit's rules, and BlockingRules has tests
 
 **Area:** `fix(android)`
