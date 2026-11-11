@@ -8,6 +8,15 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### fix(recipes): bound match patterns, refuse suffix-wide and page-wide recipes, stop writing nulls
+
+**Area:** `fix(recipes)`
+
+**Problem:** a path glob with many `*` becomes a backtracking `.*` regex in the injected page script (7 stars froze a page for 8 s); the device accepted `https://*.com/*` and selectors such as `body:not(.x)` that hide the whole page; the app serialized unset `meta` fields as `null`, which the marketplace Worker refused, so uploads always failed.
+
+**Change:** `Matcher::parse` allows at most 4 `*` in a path and lower-cases the host; a pattern that is a public suffix, or a wildcard over one or over a bare TLD, is refused. `targets_page_root` (shared with the AI patch validator) recognises `html > body`, `body:not()`, `:is(body)`, `html *` and similar; hide rules on the page root, and css rules that hide it, are refused. The `:has(` cap ignores case. `Recipe.meta` and its fields are skipped when unset. ESLint ignores nested `.worktrees`, and the unused `shadow` in `render-store-assets.mjs` is gone.
+
+**Verified:** `cargo test` (321 pass, new tests for each rule), `clippy -D warnings`. **Not verified:** on a device.
 ### fix(shell): the start page loads under the saved theme
 
 **Area:** `fix(shell)`
