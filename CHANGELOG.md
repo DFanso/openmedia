@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+## 2026-11-12
+
+### fix(settings): list hub pages on the incognito recipes page
+
+**Area:** `fix(settings)`
+
+**Change:** A hub card (Messages Hub) on the Incognito recipes page now lists its pages like the normal Recipes page; before, it showed the "Hub" badge and an empty body. The Marketplace "Experimental" tag is unchanged.
+
+**Verified:** `yarn ts:check`, `yarn lint`, Prettier. **Not verified:** on a device or simulator.
+
 ## 2026-11-11
 
 ### fix(settings): ask for the check on the incognito recipes row

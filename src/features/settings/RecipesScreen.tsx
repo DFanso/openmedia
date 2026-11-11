@@ -246,10 +246,12 @@ function HubPages({ hub, onOpen }: { hub: Hub; onOpen: (url: string) => void }) 
 
 function IncognitoSiteOptions({ site }: { site: SiteSettings }) {
   const setIncognitoSiteOption = useApp((s) => s.setIncognitoSiteOption);
+  const openHubTab = useApp((s) => s.openHubTab);
 
   return (
     <div className="flex flex-col gap-5 border-t border-hair px-3 py-4">
       <ImportedNotice site={site} incognito />
+      {site.hub && site.hub.tabs.length > 0 && <HubPages hub={site.hub} onOpen={openHubTab} />}
       <OptionGroups
         site={site}
         onToggle={(optionId, enabled) =>
