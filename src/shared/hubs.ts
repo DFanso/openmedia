@@ -15,15 +15,28 @@ export function tabHost(tab: HubTab): string {
   return hostOf(tab.url) ?? "";
 }
 
+const firstSegment = (url: string): string => {
+  try {
+    return new URL(url).pathname.split("/")[1] ?? "";
+  } catch {
+    return "";
+  }
+};
+
 /**
- * The page of the hub an address belongs to, or -1 when the address is on another site. Pages
+ * The page of the hub an address belongs to, or -1 when the address is on another site or, for
+ * a page that points into one area of its site (`/direct/inbox/`), outside that area. Pages
  * are matched by the site they live on, not by their exact address, so a hub page stays the
- * current one while the user walks around inside it.
+ * current one while the user walks around inside it, and the rest of the site stays a plain page.
  */
 export function tabIndexFor(tabs: readonly HubTab[], url: string): number {
   const site = siteOf(url);
   if (!site) return -1;
-  return tabs.findIndex((tab) => siteOf(tab.url) === site);
+  const area = firstSegment(url);
+  return tabs.findIndex((tab) => {
+    const tabArea = firstSegment(tab.url);
+    return siteOf(tab.url) === site && (tabArea === "" || tabArea === area);
+  });
 }
 
 /**
