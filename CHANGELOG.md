@@ -8,6 +8,15 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### fix(macos): site views refuse permission prompts and bound what they report
+
+**Area:** `fix(macos)`
+
+**Problem:** with no permission handler wry grants camera/microphone requests, and a page could report a multi-megabyte title or address to the shell every 400 ms.
+
+**Change:** the site-view builder denies every permission request; titles are cut at 256 characters and addresses over 4 KiB are not reported.
+
+**Verified:** `clippy -D warnings`, `fmt`. **Not verified:** on a Mac (a normal site still loads and downloads). **Not fixed:** downloads still need no user gesture, and page-opened popups are not tracked per session.
 ### fix(ai): a job stays on the page it was prepared on, and Cancel stops it
 
 **Area:** `fix(ai)`
