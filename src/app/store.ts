@@ -352,12 +352,13 @@ export const useApp = create<AppStore>((set, get) => {
   /**
    * A page the user picked from a list: the live session on that site is reused when there is
    * one, otherwise a new session opens. The page is a site of its own, so it keeps its own
-   * session and its own cookies.
+   * session and its own cookies. A hub page and a favorite on the same site stay separate
+   * sessions, so the Instagram favorite is Instagram and the hub's tab is its inbox.
    */
-  const openPickedPage = (url: string) => {
-    const live = findFavoriteSession(get().sessions, url);
+  const openPickedPage = (url: string, hub = false) => {
+    const live = findFavoriteSession(get().sessions, url, hub);
     if (live) switchTo(live.id);
-    else startSession(url, "favorite");
+    else startSession(url, hub ? "hub" : "favorite");
   };
 
   /** Incognito chats live only in memory: switching modes drops them and loads the saved ones again. */
@@ -520,7 +521,7 @@ export const useApp = create<AppStore>((set, get) => {
 
     openFavorite: (url) => openPickedPage(url),
 
-    openHubTab: (url) => openPickedPage(url),
+    openHubTab: (url) => openPickedPage(url, true),
 
     openHistory: (url) => {
       const live = findTypedSession(get().sessions, url);

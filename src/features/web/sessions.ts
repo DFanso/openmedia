@@ -1,8 +1,8 @@
 import { quickAccess } from "../../shared/favorites";
 import type { SiteViewState } from "../../shared/ipc";
 
-/** Where a session came from: tapped from favorites, typed or picked from history, or restored. */
-export type SessionSource = "favorite" | "typed" | "restored";
+/** Where a session came from: tapped from favorites, typed or picked from history, restored, or opened as a hub page. */
+export type SessionSource = "favorite" | "typed" | "restored" | "hub";
 
 export interface Session {
   id: string;
@@ -73,10 +73,17 @@ export function scopeCovers(scope: string, url: string): boolean {
 /**
  * The live session a favorite should switch to instead of opening again: one on the favorite's
  * site, preferring sessions that came from a favorite and then the most recently used. A session
- * whose domain is not known yet matches only the exact address it was opened with.
+ * whose domain is not known yet matches only the exact address it was opened with. Hub pages
+ * are sessions of their own: a favorite never switches to one (Instagram must not open the
+ * Messages Hub's inbox), and a hub page (`hub`) switches only to another hub session.
  */
-export function findFavoriteSession(sessions: Session[], favoriteUrl: string): Session | undefined {
+export function findFavoriteSession(
+  sessions: Session[],
+  favoriteUrl: string,
+  hub = false,
+): Session | undefined {
   return sessions
+    .filter((s) => (s.source === "hub") === hub)
     .filter((s) => (s.scope ? scopeCovers(s.scope, favoriteUrl) : s.openedUrl === favoriteUrl))
     .sort(
       (a, b) =>

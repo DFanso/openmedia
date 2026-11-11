@@ -12,7 +12,7 @@ All notable changes to OpenMedia are documented here.
 
 **Area:** `fix(hubs)`
 
-**Change:** The Messages Hub bar appeared on every page of Instagram, Facebook, LinkedIn and WhatsApp, so a quick action such as Instagram opened the hub. A hub tab that points into one area of its site (`/direct/inbox/`) now claims only that area; the rest of the site is a plain page.
+**Change:** The Messages Hub bar appeared on every page of Instagram, Facebook, LinkedIn and WhatsApp, so a quick action such as Instagram opened the hub. A hub tab that points into one area of its site (`/direct/inbox/`) now claims only that area; the rest of the site is a plain page. Hub pages also open as sessions of their own, so the Instagram quick action is never answered with the hub's open inbox, and a hub tab never lands on the feed.
 
 **Verified:** `hubs.test.ts`, TypeScript, ESLint. **Not verified:** on a device.
 
