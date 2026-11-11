@@ -7,6 +7,16 @@ All notable changes to OpenMedia are documented here.
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
 ## 2026-11-11
+
+### feat(stats): limit individual site sections
+
+**Area:** `feat(stats)`
+
+**Change:** Usage reminders and daily limits can target a whole site or a normalized first path segment, such as `/reels`. Exhausting a section shields only matching sessions; sibling sections and other sites remain usable. Android forwards WebView history updates to shell URL state for SPA routes.
+
+**Verified:** 33 focused Usage tests and `yarn ts:check`. **Not verified:** Rust usage tests (Cargo hit `ENOSPC` during compilation); Android runtime and SPA history callback behavior.
+
+**PR:** n/a
 ### fix(siteview): keep clicked links in the embedded browser
 
 **Area:** `fix(siteview)`

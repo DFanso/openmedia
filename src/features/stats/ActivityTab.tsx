@@ -8,7 +8,13 @@ import { usage, type SiteUsage, type UsageReport } from "../../shared/ipc";
 import { quietButton, primaryButton } from "../settings/ui";
 import { formatDuration, localDay, sectionLabel } from "./format";
 import { limitStatus } from "./limits";
-import { policyForHost, usageSeconds, useUsageControl } from "./policy";
+import {
+  policyForHost,
+  policyForSection,
+  sectionUsageSeconds,
+  usageSeconds,
+  useUsageControl,
+} from "./policy";
 import { nameForHost, SiteBadge, useFavorites } from "./SiteBadge";
 import { settleUsageWrites } from "./tracker";
 import { statusText, UsageMeter } from "./UsageMeter";
@@ -44,6 +50,7 @@ function SiteRow({
 }) {
   const t = useT();
   const policies = useUsageControl((s) => s.policies);
+  const sectionPolicies = useUsageControl((s) => s.sectionPolicies);
   const [open, setOpen] = useState(false);
   const policy = policyForHost(policies, site.host);
   const meter = showLimit && limitStatus(policy, site.seconds).state !== "none";
@@ -81,17 +88,40 @@ function SiteRow({
       {open && (
         <div className="border-t border-hair px-4 py-3">
           <ul>
-            {site.sections.map((section) => (
-              <li key={section.section} className="py-1.5">
-                <span className="flex items-baseline justify-between gap-3 text-sm">
-                  <span className="truncate text-paper/85">{sectionLabel(section.section, t)}</span>
-                  <span className="shrink-0 text-paper/60 tabular-nums">
-                    {formatDuration(section.seconds, t)}
+            {site.sections.map((section) => {
+              const partPolicy = policyForSection(sectionPolicies, site.host, section.section);
+              const partMeter =
+                showLimit && limitStatus(partPolicy, section.seconds).state !== "none";
+              return (
+                <li key={section.section} className="py-1.5">
+                  <span className="flex items-baseline justify-between gap-3 text-sm">
+                    <span className="truncate text-paper/85">
+                      {sectionLabel(section.section, t)}
+                    </span>
+                    <span className="shrink-0 text-paper/60 tabular-nums">
+                      {formatDuration(section.seconds, t)}
+                    </span>
                   </span>
-                </span>
-                <Bar share={section.seconds / site.seconds} />
-              </li>
-            ))}
+                  {partMeter ? (
+                    <span className="mt-2 block">
+                      <UsageMeter spentSeconds={section.seconds} policy={partPolicy} compact />
+                      <span className="mt-1 block text-xs text-paper/55">
+                        {statusText(limitStatus(partPolicy, section.seconds), t)}
+                      </span>
+                    </span>
+                  ) : (
+                    <Bar share={section.seconds / site.seconds} />
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => openLimits(site.host, section.section)}
+                    className="mt-1 text-sm font-medium text-accent"
+                  >
+                    {partPolicy ? t("stats.changeLimit") : t("stats.setLimit")}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
           <button
             type="button"
@@ -106,18 +136,27 @@ function SiteRow({
   );
 }
 
-/** Today against each site that has a limit, closest to its limit first; or an invitation to set one. */
+/** Today against each configured site or section, closest to its limit first. */
 function LimitsGlance() {
   const t = useT();
   const favorites = useFavorites();
   const policies = useUsageControl((s) => s.policies);
+  const sectionPolicies = useUsageControl((s) => s.sectionPolicies);
   const seconds = useUsageControl((s) => s.seconds);
+  const sectionSeconds = useUsageControl((s) => s.sectionSeconds);
   const setTab = useUsageView((s) => s.setTab);
-  const entries = Object.entries(policies)
-    .map(([host, policy]) => {
+  const entries = [
+    ...Object.entries(policies).map(([host, policy]) => {
       const spent = usageSeconds(seconds, host);
-      return { host, policy, spent, status: limitStatus(policy, spent) };
-    })
+      return { host, section: null, policy, spent, status: limitStatus(policy, spent) };
+    }),
+    ...Object.entries(sectionPolicies).flatMap(([host, sections]) =>
+      Object.entries(sections).map(([section, policy]) => {
+        const spent = sectionUsageSeconds(sectionSeconds, host, section);
+        return { host, section, policy, spent, status: limitStatus(policy, spent) };
+      }),
+    ),
+  ]
     .filter((entry) => entry.status.state !== "none")
     .sort((a, b) => b.status.fraction - a.status.fraction);
 
@@ -149,10 +188,13 @@ function LimitsGlance() {
         </button>
       </div>
       <ul className="mt-3 flex flex-col gap-4">
-        {entries.slice(0, 4).map(({ host, policy, spent, status }) => (
-          <li key={host}>
+        {entries.slice(0, 4).map(({ host, section, policy, spent, status }) => (
+          <li key={`${host}:${section ?? "*"}`}>
             <div className="mb-1.5 flex items-baseline justify-between gap-3">
-              <span className="truncate text-sm font-medium">{nameForHost(host, favorites)}</span>
+              <span className="truncate text-sm font-medium">
+                {nameForHost(host, favorites)}
+                {section ? ` · ${sectionLabel(section, t)}` : ""}
+              </span>
               <span className="shrink-0 text-xs text-paper/60 tabular-nums">
                 {t("usage.todayStatus", {
                   value: formatDuration(Math.floor(spent), t),
@@ -178,7 +220,7 @@ function ClearStats({ onCleared }: { onCleared: () => void }) {
     usage
       .clear()
       .then(() => {
-        useUsageControl.setState({ seconds: {}, warning: null });
+        useUsageControl.setState({ seconds: {}, sectionSeconds: {}, warning: null });
         onCleared();
       })
       .catch((error: unknown) => reportError(describeError(error, t)));

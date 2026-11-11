@@ -844,6 +844,12 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 sendState(session)
             }
 
+            override fun doUpdateVisitedHistory(view: WebView, url: String, isReload: Boolean) {
+                val session = sessionOf(view) ?: return
+                session.topUrl = url
+                sendState(session)
+            }
+
             override fun onReceivedError(
                 view: WebView,
                 request: WebResourceRequest,

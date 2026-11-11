@@ -4,7 +4,7 @@ import type { Translate } from "../../i18n/translate";
 import { useT } from "../../i18n/useT";
 import { DownIcon, PlusIcon } from "../../shared/icons";
 import { Group, GroupLabel, field, primaryButton } from "../settings/ui";
-import { formatDuration } from "./format";
+import { formatDuration, sectionLabel } from "./format";
 import {
   hostFor,
   limitSites,
@@ -14,7 +14,14 @@ import {
   type LimitSite,
 } from "./limits";
 import { LimitEditor } from "./LimitEditor";
-import { usageSeconds, useUsageControl, type UsagePolicy } from "./policy";
+import {
+  policyForSection,
+  sectionUsageSeconds,
+  usageSeconds,
+  useUsageControl,
+  type UsagePolicy,
+  type UsageSectionPolicies,
+} from "./policy";
 import { SiteBadge } from "./SiteBadge";
 import { useUsageView } from "./view";
 
@@ -61,15 +68,100 @@ interface LimitRowProps {
   site: LimitSite;
   policy: UsagePolicy | undefined;
   spent: number;
+  sectionPolicies: UsageSectionPolicies;
+  sectionSeconds: Record<string, Record<string, number>>;
+  open: boolean;
+  openSection: string | null;
+  scrollTo: boolean;
+  scrollToSection: string | null;
+  onToggle: () => void;
+  onSectionToggle: (section: string | null) => void;
+}
+
+function SectionLimitRow({
+  host,
+  section,
+  policy,
+  spent,
+  open,
+  scrollTo,
+  onToggle,
+}: {
+  host: string;
+  section: string;
+  policy: UsagePolicy | undefined;
+  spent: number;
   open: boolean;
   scrollTo: boolean;
   onToggle: () => void;
+}) {
+  const t = useT();
+  const row = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollTo) row.current?.scrollIntoView({ block: "start" });
+  }, [scrollTo]);
+
+  return (
+    <div ref={row} className="scroll-mt-4 border-t border-hair">
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={onToggle}
+        className="flex w-full items-center gap-3 px-4 py-3 text-start active:bg-paper/[0.05]"
+      >
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-sm font-medium">{sectionLabel(section, t)}</span>
+          <span className="block text-xs text-paper/55">
+            {formatDuration(spent, t)} · {summaryOf(policy, t)}
+          </span>
+        </span>
+        <StatusChip policy={policy} spent={spent} />
+        <span aria-hidden="true" className={`text-paper/45 ${open ? "rotate-180" : ""}`}>
+          <DownIcon />
+        </span>
+      </button>
+      {open && <LimitEditor host={host} section={section} policy={policy} spentSeconds={spent} />}
+    </div>
+  );
 }
 
-function LimitRow({ site, policy, spent, open, scrollTo, onToggle }: LimitRowProps) {
+function LimitRow({
+  site,
+  policy,
+  spent,
+  sectionPolicies,
+  sectionSeconds,
+  open,
+  openSection,
+  scrollTo,
+  scrollToSection,
+  onToggle,
+  onSectionToggle,
+}: LimitRowProps) {
   const t = useT();
   const row = useRef<HTMLDivElement>(null);
   const name = site.name ?? site.host;
+  const sections = new Set<string>();
+  for (const [host, totals] of Object.entries(sectionSeconds)) {
+    if (site.host === host || site.host.endsWith(`.${host}`) || host.endsWith(`.${site.host}`)) {
+      for (const section of Object.keys(totals)) sections.add(section);
+    }
+  }
+  for (const [host, policies] of Object.entries(sectionPolicies)) {
+    if (site.host === host || site.host.endsWith(`.${host}`) || host.endsWith(`.${site.host}`)) {
+      for (const section of Object.keys(policies)) sections.add(section);
+    }
+  }
+  const sectionIds = [...sections].sort((a, b) =>
+    sectionLabel(a, t).localeCompare(sectionLabel(b, t)),
+  );
+  const configuredSections = sectionIds
+    .filter((section) => policyForSection(sectionPolicies, site.host, section))
+    .map((section) => sectionLabel(section, t));
+  const summary = configuredSections.length
+    ? `${summaryOf(policy, t)} · ${configuredSections.join(", ")}`
+    : summaryOf(policy, t);
 
   useEffect(() => {
     if (scrollTo) row.current?.scrollIntoView({ block: "start" });
@@ -86,14 +178,34 @@ function LimitRow({ site, policy, spent, open, scrollTo, onToggle }: LimitRowPro
         <SiteBadge host={site.host} name={name} />
         <span className="min-w-0 flex-1">
           <span className="block truncate text-base font-medium">{name}</span>
-          <span className="block text-sm leading-snug text-paper/55">{summaryOf(policy, t)}</span>
+          <span className="block text-sm leading-snug text-paper/55">{summary}</span>
         </span>
         <StatusChip policy={policy} spent={spent} />
         <span aria-hidden="true" className={`text-paper/45 ${open ? "rotate-180" : ""}`}>
           <DownIcon />
         </span>
       </button>
-      {open && <LimitEditor host={site.host} policy={policy} spentSeconds={spent} />}
+      {open && (
+        <>
+          <LimitEditor host={site.host} policy={policy} spentSeconds={spent} />
+          {sectionIds.map((section) => {
+            const key = `${site.host}:${section}`;
+            const partPolicy = policyForSection(sectionPolicies, site.host, section);
+            return (
+              <SectionLimitRow
+                key={section}
+                host={site.host}
+                section={section}
+                policy={partPolicy}
+                spent={sectionUsageSeconds(sectionSeconds, site.host, section)}
+                open={openSection === key}
+                scrollTo={scrollToSection === key}
+                onToggle={() => onSectionToggle(openSection === key ? null : key)}
+              />
+            );
+          })}
+        </>
+      )}
     </div>
   );
 }
@@ -167,16 +279,22 @@ function AddSite({ suggestions, onAdd }: AddSiteProps) {
   );
 }
 
-/** Every favorite with its daily limit one tap away, then the other sites that have one. */
+/** Every favorite with its daily site and section limits one tap away. */
 export function LimitsTab() {
   const t = useT();
   const favorites = useApp((s) => s.state?.favorites);
   const history = useApp((s) => s.state?.history) ?? NO_HISTORY;
   const policies = useUsageControl((s) => s.policies);
+  const sectionPolicies = useUsageControl((s) => s.sectionPolicies);
   const seconds = useUsageControl((s) => s.seconds);
+  const sectionSeconds = useUsageControl((s) => s.sectionSeconds);
   const focusHost = useUsageView((s) => s.focusHost);
+  const focusSection = useUsageView((s) => s.focusSection);
+  const focusedSection = focusHost && focusSection ? `${focusHost}:${focusSection}` : null;
   const [open, setOpen] = useState<string | null>(focusHost);
+  const [openSection, setOpenSection] = useState<string | null>(focusedSection);
   const [scrollTo] = useState<string | null>(focusHost);
+  const [scrollToSection] = useState<string | null>(focusedSection);
   const [added, setAdded] = useState<string[]>(focusHost ? [focusHost] : []);
 
   useEffect(() => {
@@ -184,8 +302,8 @@ export function LimitsTab() {
   }, []);
 
   const sites = useMemo(
-    () => limitSites(favorites ?? [], policies, added),
-    [favorites, policies, added],
+    () => limitSites(favorites ?? [], policies, added, sectionPolicies),
+    [favorites, policies, sectionPolicies, added],
   );
   const suggestions = useMemo(() => {
     const taken = new Set([...sites.favorites, ...sites.others].map((site) => site.host));
@@ -198,9 +316,14 @@ export function LimitsTab() {
       site={site}
       policy={policies[site.host]}
       spent={usageSeconds(seconds, site.host)}
+      sectionPolicies={sectionPolicies}
+      sectionSeconds={sectionSeconds}
       open={open === site.host}
+      openSection={openSection}
       scrollTo={scrollTo === site.host}
+      scrollToSection={scrollToSection}
       onToggle={() => setOpen(open === site.host ? null : site.host)}
+      onSectionToggle={setOpenSection}
     />
   );
 

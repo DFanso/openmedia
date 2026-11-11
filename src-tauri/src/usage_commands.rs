@@ -10,7 +10,30 @@ use tauri_plugin_siteview::{SetBlockedRequest, SiteviewExt, validate::parse_sess
 
 use crate::entitlement::Entitlement;
 use crate::error::Result;
-use crate::usage::{Usage, UsagePolicies, UsagePolicy};
+use crate::usage::{Usage, UsagePolicies, UsagePolicy, UsageSectionPolicies};
+
+/// The per-section daily warnings and limits.
+#[tauri::command]
+pub fn get_usage_section_policies(
+    usage: State<'_, Usage>,
+    entitlement: State<'_, Entitlement>,
+) -> Result<UsageSectionPolicies> {
+    entitlement.require_pro()?;
+    usage.section_policies()
+}
+
+/// Saves one section's daily warning and limit; an empty policy removes it.
+#[tauri::command]
+pub fn set_usage_section_policy(
+    usage: State<'_, Usage>,
+    entitlement: State<'_, Entitlement>,
+    host: String,
+    section: String,
+    policy: UsagePolicy,
+) -> Result<UsageSectionPolicies> {
+    entitlement.require_pro()?;
+    usage.set_section_policy(&host, &section, policy)
+}
 
 /// The daily warning and limit of every site the user set one for, keyed by host.
 #[tauri::command]

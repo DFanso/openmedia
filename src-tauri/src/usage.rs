@@ -18,6 +18,8 @@ const MAX_HOSTS_PER_DAY: usize = 200;
 const MAX_SECTIONS_PER_HOST: usize = 60;
 /// How many sites may carry a daily warning or limit.
 pub const MAX_POLICY_HOSTS: usize = 200;
+/// How many per-section daily policies may be saved.
+pub const MAX_SECTION_POLICIES: usize = 1000;
 /// The largest threshold a policy may set: a whole day.
 pub const MAX_POLICY_SECONDS: u32 = 86_400;
 /// One flush never covers more than this; the shell flushes every few seconds.
@@ -41,6 +43,9 @@ struct UsageData {
     /// seconds, but apart from them: clearing the stats never clears the limits.
     #[serde(default)]
     policies: UsagePolicies,
+    /// Per-section warnings and limits, keyed by host and the normalized first path segment.
+    #[serde(default)]
+    section_policies: UsageSectionPolicies,
 }
 
 impl UsageData {
@@ -49,25 +54,26 @@ impl UsageData {
             version: FORMAT_VERSION,
             days: BTreeMap::new(),
             policies: UsagePolicies::new(),
+            section_policies: UsageSectionPolicies::new(),
         }
     }
 }
 
-/// What the user set for one site: when the app warns, and when it closes the site for the day.
-/// Both are seconds of use in one local day; `None` means that step never happens.
+/// What the user set for a site or one of its sections: when the app warns and when it pauses.
+/// Both thresholds are seconds of use in one local day; `None` means that step never happens.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct UsagePolicy {
     /// Seconds after which the app warns; `None` warns never.
     #[serde(default)]
     pub warn_seconds: Option<u32>,
-    /// Seconds after which the app closes the site for the day; `None` never closes it.
+    /// Seconds after which the app pauses the target for the day; `None` never pauses it.
     #[serde(default)]
     pub limit_seconds: Option<u32>,
 }
 
 impl UsagePolicy {
-    /// A policy with neither step: the site has no limit, and setting it removes the policy.
+    /// A policy with neither step: the target has no limit, and setting it removes the policy.
     fn is_unset(&self) -> bool {
         self.warn_seconds.is_none() && self.limit_seconds.is_none()
     }
@@ -75,6 +81,9 @@ impl UsagePolicy {
 
 /// The policy of every site the user set one for, keyed by host.
 pub type UsagePolicies = BTreeMap<String, UsagePolicy>;
+
+/// Per-section policies keyed by host, then normalized first path segment.
+pub type UsageSectionPolicies = BTreeMap<String, BTreeMap<String, UsagePolicy>>;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -125,8 +134,7 @@ impl Usage {
 
     /// Adds `seconds` to a site section for `day`, then drops days older than the retention
     /// window counted back from the newest recorded day. Sites or sections beyond the per-day caps are not recorded.
-    /// A site that has reached its daily limit does not accrue more time: the app closes it, so
-    /// the seconds it would earn are never counted.
+    /// An exhausted site-wide or section rule stops that target from accruing more time.
     pub fn record(&self, day: &str, host: &str, section: &str, seconds: u32) -> Result<()> {
         let today = day_number(day).ok_or(Error::InvalidUsage("the day must be YYYY-MM-DD"))?;
         if !valid_host(host) {
@@ -139,7 +147,7 @@ impl Usage {
             return Err(Error::InvalidUsage("seconds out of range"));
         }
         let mut data = self.lock()?;
-        if reached_limit(&data, day, host) {
+        if reached_limit(&data, day, host, section) {
             return Ok(());
         }
         let hosts = data.days.entry(day.to_owned()).or_default();
@@ -213,6 +221,60 @@ impl Usage {
         Ok(data.policies.clone())
     }
 
+    /// The daily warning and limit for each site section.
+    pub fn section_policies(&self) -> Result<UsageSectionPolicies> {
+        let data = self.lock()?;
+        Ok(data.section_policies.clone())
+    }
+
+    /// Saves one section's daily warning and limit; an unset policy removes that section entry.
+    pub fn set_section_policy(
+        &self,
+        host: &str,
+        section: &str,
+        policy: UsagePolicy,
+    ) -> Result<UsageSectionPolicies> {
+        if !valid_host(host) {
+            return Err(Error::InvalidUsage("invalid host"));
+        }
+        if !valid_section(section) {
+            return Err(Error::InvalidUsage("invalid section"));
+        }
+        check_policy(&policy)?;
+        let mut data = self.lock()?;
+        let previous = data.section_policies.clone();
+        let exists = data
+            .section_policies
+            .get(host)
+            .is_some_and(|sections| sections.contains_key(section));
+        if policy.is_unset() {
+            if let Some(sections) = data.section_policies.get_mut(host) {
+                sections.remove(section);
+                if sections.is_empty() {
+                    data.section_policies.remove(host);
+                }
+            }
+        } else {
+            let count = data
+                .section_policies
+                .values()
+                .map(BTreeMap::len)
+                .sum::<usize>();
+            if !exists && count >= MAX_SECTION_POLICIES {
+                return Err(Error::InvalidUsage("too many sections carry a limit"));
+            }
+            data.section_policies
+                .entry(host.to_owned())
+                .or_default()
+                .insert(section.to_owned(), policy);
+        }
+        if let Err(error) = self.save(&data) {
+            data.section_policies = previous;
+            return Err(error);
+        }
+        Ok(data.section_policies.clone())
+    }
+
     /// Sites an earlier build stored under a public suffix (`github.io`, `com.br`) because it
     /// did not know the suffix list. Their seconds belong to no site and are dropped; a limit
     /// moves to each favorite under that suffix, which is how the user reached the site.
@@ -238,6 +300,29 @@ impl Usage {
             for host in favorite_hosts.iter().filter(|host| host.ends_with(&under)) {
                 if let Some(site) = registrable_domain(host) {
                     data.policies.entry(site).or_insert_with(|| policy.clone());
+                }
+            }
+            changed = true;
+        }
+        let stale_sections: Vec<String> = data
+            .section_policies
+            .keys()
+            .filter(|site| is_public_suffix(site))
+            .cloned()
+            .collect();
+        for suffix in stale_sections {
+            let Some(policies) = data.section_policies.remove(&suffix) else {
+                continue;
+            };
+            let under = format!(".{suffix}");
+            for host in favorite_hosts.iter().filter(|host| host.ends_with(&under)) {
+                if let Some(site) = registrable_domain(host) {
+                    let target = data.section_policies.entry(site).or_default();
+                    for (section, policy) in &policies {
+                        target
+                            .entry(section.clone())
+                            .or_insert_with(|| policy.clone());
+                    }
                 }
             }
             changed = true;
@@ -289,20 +374,33 @@ fn check_policy(policy: &UsagePolicy) -> Result<()> {
     Ok(())
 }
 
-/// True when the site has already used up its daily limit on `day`.
-fn reached_limit(data: &UsageData, day: &str, host: &str) -> bool {
-    let Some(policy) = policy_for_host(&data.policies, host) else {
+/// True when the site's or the current section's daily limit is exhausted.
+fn reached_limit(data: &UsageData, day: &str, host: &str, section: &str) -> bool {
+    let Some(hosts) = data.days.get(day) else {
         return false;
     };
-    let Some(limit) = policy.limit_seconds else {
+    if let Some(limit) =
+        policy_for_host(&data.policies, host).and_then(|policy| policy.limit_seconds)
+    {
+        let spent = hosts
+            .iter()
+            .filter(|(site, _)| same_site(host, site))
+            .flat_map(|(_, sections)| sections.values())
+            .sum::<u64>();
+        if spent >= u64::from(limit) {
+            return true;
+        }
+    }
+    let Some(limit) = policy_for_section(&data.section_policies, host, section)
+        .and_then(|policy| policy.limit_seconds)
+    else {
         return false;
     };
-    let spent = data
-        .days
-        .get(day)
-        .and_then(|hosts| hosts.get(host))
-        .map(|sections| sections.values().sum::<u64>())
-        .unwrap_or(0);
+    let spent = hosts
+        .iter()
+        .filter(|(site, _)| same_site(host, site))
+        .filter_map(|(_, sections)| sections.get(section))
+        .sum::<u64>();
     spent >= u64::from(limit)
 }
 
@@ -314,6 +412,23 @@ fn policy_for_host(policies: &UsagePolicies, host: &str) -> Option<UsagePolicy> 
         .iter()
         .filter(|(site, _)| same_site(host, site))
         .map(|(_, policy)| policy)
+        .cloned()
+        .reduce(|best, policy| UsagePolicy {
+            warn_seconds: strictest(best.warn_seconds, policy.warn_seconds),
+            limit_seconds: strictest(best.limit_seconds, policy.limit_seconds),
+        })
+}
+
+/// The strictest policy for `section` among the host and its parent/subdomains.
+fn policy_for_section(
+    policies: &UsageSectionPolicies,
+    host: &str,
+    section: &str,
+) -> Option<UsagePolicy> {
+    policies
+        .iter()
+        .filter(|(site, _)| same_site(host, site))
+        .filter_map(|(_, sections)| sections.get(section))
         .cloned()
         .reduce(|best, policy| UsagePolicy {
             warn_seconds: strictest(best.warn_seconds, policy.warn_seconds),
@@ -388,6 +503,7 @@ fn valid_section(section: &str) -> bool {
     }
     section.strip_prefix('/').is_some_and(|segment| {
         (1..=MAX_SECTION_CHARS).contains(&segment.len())
+            && !segment.bytes().all(|byte| byte.is_ascii_digit())
             && segment
                 .bytes()
                 .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'_' || b == b'-')
@@ -642,7 +758,7 @@ mod tests {
         let text = fs::read_to_string(dir.path().join("usage.json")).unwrap();
         assert_eq!(
             text,
-            r#"{"version":1,"days":{"2026-11-08":{"youtube.com":{"/watch":7}}},"policies":{}}"#
+            r#"{"version":1,"days":{"2026-11-08":{"youtube.com":{"/watch":7}}},"policies":{},"section_policies":{}}"#
         );
     }
 
@@ -677,6 +793,47 @@ mod tests {
             reload(&dir).policies().unwrap().get("reddit.com"),
             Some(&policy(None, Some(600)))
         );
+    }
+
+    #[test]
+    fn section_policies_persist_and_can_be_removed() {
+        let (dir, usage) = usage();
+        let configured = policy(Some(3600), Some(7200));
+        usage
+            .set_section_policy("instagram.com", "/reels", configured.clone())
+            .unwrap();
+        assert_eq!(
+            usage.section_policies().unwrap()["instagram.com"]["/reels"],
+            configured
+        );
+        assert_eq!(
+            reload(&dir).section_policies().unwrap()["instagram.com"]["/reels"],
+            configured
+        );
+
+        let policies = usage
+            .set_section_policy("instagram.com", "/reels", policy(None, None))
+            .unwrap();
+        assert!(policies.is_empty());
+        assert!(reload(&dir).section_policies().unwrap().is_empty());
+    }
+
+    #[test]
+    fn caps_the_number_of_section_policies() {
+        let (_dir, usage) = usage();
+        {
+            let mut data = usage.lock().unwrap();
+            for i in 0..MAX_SECTION_POLICIES {
+                data.section_policies
+                    .entry(format!("h{i}.com"))
+                    .or_default()
+                    .insert("/reels".to_owned(), policy(None, Some(60)));
+            }
+        }
+        assert!(matches!(
+            usage.set_section_policy("one-too-many.com", "/reels", policy(None, Some(60))),
+            Err(Error::InvalidUsage(_))
+        ));
     }
 
     #[test]
@@ -720,6 +877,16 @@ mod tests {
                 "{host}"
             );
         }
+        for section in ["", "reels", "/UPPER", "/123", "/a/b"] {
+            assert!(
+                matches!(
+                    usage.set_section_policy("youtube.com", section, policy(Some(60), Some(120))),
+                    Err(Error::InvalidUsage(_))
+                ),
+                "{section}"
+            );
+        }
+        assert!(usage.section_policies().unwrap().is_empty());
         assert!(usage.policies().unwrap().is_empty());
     }
 
@@ -732,12 +899,19 @@ mod tests {
         usage
             .set_policy("youtube.com", policy(Some(300), Some(3600)))
             .unwrap();
+        usage
+            .set_section_policy("youtube.com", "/shorts", policy(None, Some(1800)))
+            .unwrap();
         usage.clear().unwrap();
         let reloaded = reload(&dir);
         assert_eq!(reloaded.report("2026-11-08", 30).unwrap().total_seconds, 0);
         assert_eq!(
             reloaded.policies().unwrap().get("youtube.com"),
             Some(&policy(Some(300), Some(3600)))
+        );
+        assert_eq!(
+            reloaded.section_policies().unwrap()["youtube.com"]["/shorts"],
+            policy(None, Some(1800))
         );
     }
 
@@ -759,6 +933,46 @@ mod tests {
             .record("2026-11-09", "youtube.com", "/watch", 60)
             .unwrap();
         assert_eq!(usage.report("2026-11-09", 1).unwrap().sites[0].seconds, 60);
+    }
+
+    #[test]
+    fn a_section_at_its_limit_stops_only_that_section() {
+        let (_dir, usage) = usage();
+        usage
+            .set_section_policy("instagram.com", "/reels", policy(Some(3600), Some(7200)))
+            .unwrap();
+        usage
+            .record("2026-11-08", "instagram.com", "/reels", 3600)
+            .unwrap();
+        usage
+            .record("2026-11-08", "instagram.com", "/reels", 3600)
+            .unwrap();
+        usage
+            .record("2026-11-08", "instagram.com", "/reels", 60)
+            .unwrap();
+        usage
+            .record("2026-11-08", "instagram.com", "/messages", 60)
+            .unwrap();
+
+        let report = usage.report("2026-11-08", 1).unwrap();
+        assert_eq!(report.total_seconds, 7260);
+        let sections = &report.sites[0].sections;
+        assert_eq!(
+            sections
+                .iter()
+                .find(|section| section.section == "/reels")
+                .unwrap()
+                .seconds,
+            7200
+        );
+        assert_eq!(
+            sections
+                .iter()
+                .find(|section| section.section == "/messages")
+                .unwrap()
+                .seconds,
+            60
+        );
     }
 
     #[test]
@@ -792,7 +1006,7 @@ mod tests {
         .unwrap();
         let usage = Usage::load(path).unwrap();
         assert_eq!(usage.report("2026-11-08", 1).unwrap().total_seconds, 5);
-        assert!(usage.policies().unwrap().is_empty());
+        assert!(usage.section_policies().unwrap().is_empty());
     }
 
     #[test]
@@ -822,6 +1036,9 @@ mod tests {
             .set_policy("youtube.com", policy(None, Some(900)))
             .unwrap();
         let favorites = vec!["alice.github.io".to_owned(), "www.example.org".to_owned()];
+        usage
+            .set_section_policy("github.io", "/reels", policy(Some(60), Some(120)))
+            .unwrap();
 
         usage.retire_public_suffix_sites(&favorites).unwrap();
 
@@ -836,6 +1053,18 @@ mod tests {
                 ["alice.github.io", "youtube.com"]
             );
             assert_eq!(policies["alice.github.io"], policy(Some(300), Some(600)));
+            let section_policies = usage.section_policies().unwrap();
+            assert_eq!(
+                section_policies
+                    .keys()
+                    .map(String::as_str)
+                    .collect::<Vec<_>>(),
+                ["alice.github.io"]
+            );
+            assert_eq!(
+                section_policies["alice.github.io"]["/reels"],
+                policy(Some(60), Some(120))
+            );
         }
     }
 

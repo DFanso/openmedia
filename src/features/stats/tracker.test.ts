@@ -30,7 +30,7 @@ import { useApp } from "../../app/store";
 import type { Session } from "../web/sessions";
 import { settleUsageWrites, startUsageTracking } from "./tracker";
 import { localDay } from "./format";
-import { usagePolicies, useUsageControl } from "./policy";
+import { usagePolicies, usageSectionPolicies, useUsageControl } from "./policy";
 import { useEntitlementStore } from "../paywall/store";
 
 const policies = {
@@ -64,6 +64,7 @@ beforeEach(() => {
   vi.setSystemTime(new Date(2026, 10, 8, 12, 0, 0));
   ledger.clear();
   vi.spyOn(usagePolicies, "get").mockResolvedValue(policies);
+  vi.spyOn(usageSectionPolicies, "get").mockResolvedValue({});
   documentTarget = new EventTarget();
   windowTarget = new EventTarget();
   Object.defineProperty(documentTarget, "visibilityState", { get: () => visibility });
@@ -85,7 +86,9 @@ beforeEach(() => {
   useUsageControl.setState({
     day: localDay(new Date()),
     policies: {},
+    sectionPolicies: {},
     seconds: {},
+    sectionSeconds: {},
     ready: false,
     warning: null,
   });
@@ -140,6 +143,33 @@ describe("usage tracking", () => {
     expect(useUsageControl.getState().seconds).toMatchObject({ "example.com": 3, "other.test": 2 });
     expect(ledger.get(localDay(new Date()))?.get("other.test")?.get("/")).toBe(2);
     expect(ledger.get(localDay(new Date()))?.get("example.com")?.get("/")).toBe(3);
+  });
+
+  it("stops counting only the section that reached its limit", async () => {
+    vi.spyOn(usagePolicies, "get").mockResolvedValue({});
+    vi.spyOn(usageSectionPolicies, "get").mockResolvedValue({
+      "example.com": { "/reels": { warnSeconds: 2, limitSeconds: 3 } },
+    });
+    useApp.setState({
+      sessions: [
+        session("reels", "https://example.com/reels", "example.com"),
+        session("messages", "https://example.com/messages", "example.com"),
+      ],
+      activeId: "reels",
+    });
+    await start();
+    await tick(4);
+    expect(useUsageControl.getState().sectionSeconds["example.com"]["/reels"]).toBe(3);
+
+    useApp.setState({ activeId: "messages" });
+    await tick(2);
+    await settleUsageWrites();
+    expect(useUsageControl.getState().sectionSeconds["example.com"]).toEqual({
+      "/reels": 3,
+      "/messages": 2,
+    });
+    expect(ledger.get(localDay(new Date()))?.get("example.com")?.get("/reels")).toBe(3);
+    expect(ledger.get(localDay(new Date()))?.get("example.com")?.get("/messages")).toBe(2);
   });
 
   it("splits elapsed foreground time across local midnight", async () => {

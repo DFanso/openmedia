@@ -3,7 +3,7 @@ import { appError, useApp, selectPage, type AppStore } from "../../app/store";
 import { usage } from "../../shared/ipc";
 import { advance, createAccumulator, drain, type UsageEntry } from "./accumulator";
 import { localDay } from "./format";
-import { isUsageBlocked, usagePolicies, useUsageControl } from "./policy";
+import { isUsageBlocked, usagePolicies, usageSectionPolicies, useUsageControl } from "./policy";
 import { usageTargetOf, type UsageTarget } from "./section";
 
 const TICK_MS = 1_000;
@@ -21,7 +21,7 @@ export function currentTarget(store: AppStore, visible: boolean): UsageTarget | 
   if (!visible || store.sheet !== "none" || store.onboardingOpen) return null;
   const page = selectPage(store);
   const target = page?.url ? usageTargetOf(page.url, page.scope) : null;
-  return target && !isUsageBlocked(target.host) ? target : null;
+  return target && !isUsageBlocked(target) ? target : null;
 }
 
 export function startUsageTracking(): () => void {
@@ -44,15 +44,23 @@ export function startUsageTracking(): () => void {
     const requestedDay = day;
     try {
       await writes;
-      const [policies, report] = await Promise.all([
+      const [policies, sectionPolicies, report] = await Promise.all([
         usagePolicies.get(),
+        usageSectionPolicies.get(),
         usage.report(requestedDay, 1),
       ]);
       if (stopped || requestedDay !== day || !isPro()) return;
       useUsageControl.setState({
         day,
         policies,
+        sectionPolicies,
         seconds: Object.fromEntries(report.sites.map((site) => [site.host, site.seconds])),
+        sectionSeconds: Object.fromEntries(
+          report.sites.map((site) => [
+            site.host,
+            Object.fromEntries(site.sections.map(({ section, seconds }) => [section, seconds])),
+          ]),
+        ),
         ready: true,
       });
     } catch (error) {
@@ -80,10 +88,18 @@ export function startUsageTracking(): () => void {
     acc = rest;
     if (entries.length === 0) return;
     pending.push(...entries);
-    const seconds = { ...useUsageControl.getState().seconds };
-    for (const entry of entries) seconds[entry.host] = (seconds[entry.host] ?? 0) + entry.seconds;
-    useUsageControl.setState({ seconds });
-    // Once the limit is reached, the next interval must never accrue time on that site.
+    const control = useUsageControl.getState();
+    const seconds = { ...control.seconds };
+    const sectionSeconds = { ...control.sectionSeconds };
+    for (const entry of entries) {
+      seconds[entry.host] = (seconds[entry.host] ?? 0) + entry.seconds;
+      sectionSeconds[entry.host] = {
+        ...sectionSeconds[entry.host],
+        [entry.section]: (sectionSeconds[entry.host]?.[entry.section] ?? 0) + entry.seconds,
+      };
+    }
+    useUsageControl.setState({ seconds, sectionSeconds });
+    // Re-evaluate after adding time so an exhausted site or section stops counting immediately.
     acc = { ...acc, target: target() };
   };
 
@@ -102,7 +118,13 @@ export function startUsageTracking(): () => void {
       flush();
       day = nextDay;
       acc = createAccumulator(now);
-      useUsageControl.setState({ day, seconds: {}, warning: null, ready: false });
+      useUsageControl.setState({
+        day,
+        seconds: {},
+        sectionSeconds: {},
+        warning: null,
+        ready: false,
+      });
     }
     collect(now);
     if (flushAlways || pending.reduce((sum, entry) => sum + entry.seconds, 0) >= FLUSH_SECONDS)
@@ -115,14 +137,26 @@ export function startUsageTracking(): () => void {
   const timer = window.setInterval(() => step(false), TICK_MS);
   const unsubscribe = useApp.subscribe(onLeave);
   const unsubscribePolicies = useUsageControl.subscribe((next, previous) => {
-    if (next.ready !== previous.ready || next.policies !== previous.policies) step(true);
+    if (
+      next.ready !== previous.ready ||
+      next.policies !== previous.policies ||
+      next.sectionPolicies !== previous.sectionPolicies
+    )
+      step(true);
   });
   const unsubscribeEntitlement = useEntitlementStore.subscribe((next, previous) => {
     if (next.status === previous.status) return;
     if (next.status === "pro") {
       void load();
     } else {
-      useUsageControl.setState({ policies: {}, seconds: {}, warning: null, ready: false });
+      useUsageControl.setState({
+        policies: {},
+        sectionPolicies: {},
+        seconds: {},
+        sectionSeconds: {},
+        warning: null,
+        ready: false,
+      });
     }
   });
   flushPending = onLeave;

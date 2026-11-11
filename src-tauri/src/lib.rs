@@ -88,6 +88,8 @@ pub fn run() {
             commands::clear_usage,
             usage_commands::get_usage_policies,
             usage_commands::set_usage_policy,
+            usage_commands::get_usage_section_policies,
+            usage_commands::set_usage_section_policy,
             usage_commands::set_usage_blocked,
             incognito::unlock_incognito,
             incognito::biometry_kind,

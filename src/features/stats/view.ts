@@ -9,6 +9,8 @@ interface UsageView {
   tab: UsageTab;
   /** A site the Limits tab should open and scroll to once, then forget. */
   focusHost: string | null;
+  /** A section the Limits tab should open under `focusHost`, once. */
+  focusSection: string | null;
   setTab: (tab: UsageTab) => void;
   clearFocus: () => void;
 }
@@ -16,13 +18,17 @@ interface UsageView {
 export const useUsageView = create<UsageView>((set) => ({
   tab: "activity",
   focusHost: null,
+  focusSection: null,
   setTab: (tab) => set({ tab }),
-  clearFocus: () => set({ focusHost: null }),
+  clearFocus: () => set({ focusHost: null, focusSection: null }),
 }));
 
-/** Opens Usage on the Limits tab, with `host` (when given) expanded and in view. */
-export function openLimits(host?: string): void {
-  const key = host ? policyKeyFor(useUsageControl.getState().policies, host) : null;
-  useUsageView.setState({ tab: "limits", focusHost: key });
+/** Opens Usage on Limits with the requested site or site section expanded and in view. */
+export function openLimits(host?: string, section?: string): void {
+  const key =
+    host && section === undefined
+      ? policyKeyFor(useUsageControl.getState().policies, host)
+      : (host ?? null);
+  useUsageView.setState({ tab: "limits", focusHost: key, focusSection: section ?? null });
   useApp.getState().openSheet("stats");
 }

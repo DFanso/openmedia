@@ -1,6 +1,6 @@
 import { siteOf } from "../../shared/site";
 import { normalizeWebUrl } from "../../shared/url";
-import type { UsagePolicies, UsagePolicy } from "./policy";
+import type { UsageSectionPolicies, UsagePolicies, UsagePolicy } from "./policy";
 
 /** The values a duration slider snaps to: fine steps where they matter, coarse ones up to a day. */
 export const LIMIT_STOPS = [
@@ -133,11 +133,12 @@ export interface LimitSite {
   name: string | null;
 }
 
-/** Favorites first, in their own order; then every other site that has a limit or was just added. */
+/** Favorites first, then sites with a site limit, section limit, or a pending edit. */
 export function limitSites(
   favorites: readonly { name: string; url: string }[],
   policies: UsagePolicies,
   added: readonly string[],
+  sectionPolicies: UsageSectionPolicies = {},
 ): { favorites: LimitSite[]; others: LimitSite[] } {
   const seen = new Set<string>();
   const favoriteSites: LimitSite[] = [];
@@ -148,7 +149,7 @@ export function limitSites(
     favoriteSites.push({ host, name: favorite.name });
   }
   const others: LimitSite[] = [];
-  for (const host of [...Object.keys(policies), ...added]) {
+  for (const host of [...Object.keys(policies), ...Object.keys(sectionPolicies), ...added]) {
     if (seen.has(host)) continue;
     seen.add(host);
     others.push({ host, name: null });

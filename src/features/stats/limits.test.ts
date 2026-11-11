@@ -148,6 +148,17 @@ describe("limit sites", () => {
     });
   });
 
+  it("lists a host that has only a section policy", () => {
+    expect(
+      limitSites([], {}, [], {
+        "instagram.com": { "/reels": { warnSeconds: 3600, limitSeconds: 7200 } },
+      }),
+    ).toEqual({
+      favorites: [],
+      others: [{ host: "instagram.com", name: null }],
+    });
+  });
+
   it("finds the saved limit that governs a subdomain, and falls back to the host", () => {
     const policies = { "example.com": { warnSeconds: null, limitSeconds: 60 } };
     expect(policyKeyFor(policies, "m.example.com")).toBe("example.com");
