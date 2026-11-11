@@ -24,7 +24,7 @@ const context = (overrides: Partial<RouteContext> = {}): RouteContext => ({
 
 describe("routeInput", () => {
   it("is empty for blank text in every mode", () => {
-    for (const mode of ["auto", "link", "search", "chat", "hub"] as const) {
+    for (const mode of ["auto", "link", "search", "chat"] as const) {
       expect(routeInput("   ", context({ mode }))).toEqual({ kind: "empty" });
     }
   });
@@ -135,19 +135,30 @@ describe("routeInput", () => {
       }
     });
   });
-  describe("hub", () => {
-    it("routes a hub request without a page", () => {
-      expect(routeInput("messages across sites", context({ mode: "hub", pageUrl: null }))).toEqual({
+  describe("hub requests from chat", () => {
+    it("routes a site-combination request without a page", () => {
+      expect(
+        routeInput("combine websites for messages", context({ mode: "chat", pageUrl: null })),
+      ).toEqual({
         kind: "hub",
-        request: "messages across sites",
+        request: "combine websites for messages",
+      });
+    });
+
+    it("routes a direct-message recipe prompt without a page", () => {
+      const request =
+        "new recipe, with only direct messages of whatsapp, facebook, instagram, linkedin";
+      expect(routeInput(request, context({ mode: "chat", pageUrl: null }))).toEqual({
+        kind: "hub",
+        request,
       });
     });
 
     it("paywalls free users and requires a provider", () => {
-      expect(routeInput("make a hub", context({ mode: "hub", pro: false }))).toEqual({
+      expect(routeInput("make a hub", context({ mode: "chat", pro: false }))).toEqual({
         kind: "paywall",
       });
-      expect(routeInput("make a hub", context({ mode: "hub", ai: null, pageUrl: null }))).toEqual({
+      expect(routeInput("make a hub", context({ mode: "chat", ai: null, pageUrl: null }))).toEqual({
         kind: "blocked",
         reason: "noProvider",
       });

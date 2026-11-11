@@ -282,7 +282,7 @@ export const el: Messages = {
   "recipes.options": "Επιλογές {name}",
   "recipes.addFavorite": "Προσθήκη {name} στα αγαπημένα",
   "recipes.removeFavorite": "Αφαίρεση {name} από τα αγαπημένα",
-  "recipes.hub": "Πειραματικό",
+  "recipes.hub": "Hub",
   "recipes.hubPages": "Σελίδες",
   "recipes.openHubPage": "Άνοιγμα {label}",
   "recipes.hubNote":
@@ -342,6 +342,7 @@ export const el: Messages = {
   "market.tag.community": "Κοινότητα",
   "market.tag.mobile": "Κινητό",
   "market.tag.desktop": "Υπολογιστής",
+  "market.tag.hub": "Πειραματικό",
   "market.filters": "Φιλτράρισμα ανά ετικέτα",
   "market.noMatch": "Τίποτα δεν ταιριάζει με αυτά τα φίλτρα.",
   "market.search": "Αναζήτηση συνταγών",

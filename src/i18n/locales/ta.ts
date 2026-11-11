@@ -282,7 +282,7 @@ export const ta: Messages = {
   "recipes.options": "{name} விருப்பங்கள்",
   "recipes.addFavorite": "{name} ஐப் பிடித்துக்கொள்ளவிடைகளில் சேர்",
   "recipes.removeFavorite": "{name} ஐப் பிடித்துக்கொள்ளவிடைகளிலிருந்து அகற்று",
-  "recipes.hub": "சோதனைக்குரிய",
+  "recipes.hub": "ஹப்",
   "recipes.hubPages": "பக்கங்கள்",
   "recipes.openHubPage": "{label} திற",
   "recipes.hubNote":
@@ -344,6 +344,7 @@ export const ta: Messages = {
   "market.tag.community": "சமூகம்",
   "market.tag.mobile": "மொபைல்",
   "market.tag.desktop": "டெஸ்க்டாப்",
+  "market.tag.hub": "சோதனைக்குரிய",
   "market.filters": "குறிச்சொல்லால் வடிகட்டு",
   "market.noMatch": "இந்த வடிகட்டிகளுக்குப் பொருந்துவது எதுவும் இல்லை.",
   "market.search": "ரெசிபிகளைத் தேடு",

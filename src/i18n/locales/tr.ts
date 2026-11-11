@@ -277,7 +277,7 @@ export const tr: Messages = {
   "recipes.options": "{name} seçenekleri",
   "recipes.addFavorite": "{name} öğesini favorilere ekle",
   "recipes.removeFavorite": "{name} öğesini favorilerden çıkar",
-  "recipes.hub": "Deneysel",
+  "recipes.hub": "Hub",
   "recipes.hubPages": "Sayfalar",
   "recipes.openHubPage": "{label} sayfasını aç",
   "recipes.hubNote":
@@ -336,6 +336,7 @@ export const tr: Messages = {
   "market.tag.community": "Topluluk",
   "market.tag.mobile": "Mobil",
   "market.tag.desktop": "Masaüstü",
+  "market.tag.hub": "Deneysel",
   "market.filters": "Etikete göre filtrele",
   "market.noMatch": "Bu filtrelerle eşleşen bir şey yok.",
   "market.search": "Tarif ara",

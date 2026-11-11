@@ -278,7 +278,7 @@ export const ur: Messages = {
   "recipes.options": "{name} کے اختیارات",
   "recipes.addFavorite": "{name} کو پسندیدہ میں شامل کریں",
   "recipes.removeFavorite": "{name} کو پسندیدہ سے ہٹائیں",
-  "recipes.hub": "تجرباتی",
+  "recipes.hub": "ہاب",
   "recipes.hubPages": "صفحات",
   "recipes.openHubPage": "{label} کھولیں",
   "recipes.hubNote":
@@ -337,6 +337,7 @@ export const ur: Messages = {
   "market.tag.community": "کمیونٹی",
   "market.tag.mobile": "موبائل",
   "market.tag.desktop": "ڈیسک ٹاپ",
+  "market.tag.hub": "تجرباتی",
   "market.filters": "ٹیگ کے مطابق فلٹر کریں",
   "market.noMatch": "ان فلٹرز سے کچھ میل نہیں کھاتا۔",
   "market.search": "ریسپیز تلاش کریں",

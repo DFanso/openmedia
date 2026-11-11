@@ -277,7 +277,7 @@ export const en = {
   "recipes.options": "{name} options",
   "recipes.addFavorite": "Add {name} to favorites",
   "recipes.removeFavorite": "Remove {name} from favorites",
-  "recipes.hub": "Experimental",
+  "recipes.hub": "Hub",
   "recipes.hubPages": "Pages",
   "recipes.openHubPage": "Open {label}",
   "recipes.hubNote":
@@ -334,6 +334,7 @@ export const en = {
   "market.tag.community": "Community",
   "market.tag.mobile": "Mobile",
   "market.tag.desktop": "Desktop",
+  "market.tag.hub": "Experimental",
   "market.filters": "Filter by tag",
   "market.noMatch": "Nothing matches these filters.",
   "market.search": "Search recipes",

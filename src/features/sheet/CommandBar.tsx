@@ -133,6 +133,9 @@ export function CommandBar() {
       case "request":
         setNotice(null);
         setBlocked(false);
+        setHubProposal(null);
+        setHubError(null);
+        setHubSaved(null);
         void submitRequest(route.request);
         return;
       case "hub":
@@ -230,9 +233,7 @@ export function CommandBar() {
                 inputMode={mode === "link" ? "url" : "search"}
                 maxLength={MAX_REQUEST_LENGTH}
                 enterKeyHint="go"
-                placeholder={t(
-                  mode === "hub" ? "commandBar.placeholder.chat" : `commandBar.placeholder.${mode}`,
-                )}
+                placeholder={t(`commandBar.placeholder.${mode}`)}
                 value={text}
                 onChange={(event) => {
                   editRequest(event.target.value);
@@ -241,11 +242,7 @@ export function CommandBar() {
                 }}
                 className="min-w-0 flex-1 bg-transparent px-2 py-2 text-base text-paper outline-none placeholder:text-paper/40"
               />
-              <button
-                type="submit"
-                disabled={mode === "hub" && hubBusy}
-                className="grid size-11 place-items-center rounded-full bg-accent text-on-accent"
-              >
+              <button type="submit" disabled={hubBusy}>
                 <ArrowIcon />
               </button>
             </form>
@@ -256,8 +253,8 @@ export function CommandBar() {
               className="mt-2 flex gap-1 px-1"
             >
               {INPUT_MODES.map((option) => {
-                // Chat and Hub use the assistant; without Pro both open the plans.
-                const locked = (option === "chat" || option === "hub") && !isPro;
+                // Chat uses the assistant; without Pro it opens the plans.
+                const locked = option === "chat" && !isPro;
                 return (
                   <button
                     key={option}
@@ -276,13 +273,13 @@ export function CommandBar() {
                       mode === option ? "bg-accent text-on-accent" : "text-paper/70 bg-paper/[0.06]"
                     } ${locked ? "opacity-45" : ""}`}
                   >
-                    {t(option === "hub" ? "recipes.hub" : `commandBar.mode.${option}`)}
+                    {t(`commandBar.mode.${option}`)}
                     {locked && <ProIcon size={12} />}
                   </button>
                 );
               })}
             </div>
-            {mode === "hub" && (
+            {mode === "chat" && (hubBusy || hubProposal || hubSaved || hubError) && (
               <section className="mt-3 rounded-2xl border border-hair bg-paper/[0.03] p-3">
                 {hubBusy && (
                   <p role="status" className="text-sm text-paper/70">

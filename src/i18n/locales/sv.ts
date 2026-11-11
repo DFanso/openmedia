@@ -277,7 +277,7 @@ export const sv: Messages = {
   "recipes.options": "Alternativ för {name}",
   "recipes.addFavorite": "Lägg till {name} i favoriter",
   "recipes.removeFavorite": "Ta bort {name} från favoriter",
-  "recipes.hub": "Experimentell",
+  "recipes.hub": "Hubb",
   "recipes.hubPages": "Sidor",
   "recipes.openHubPage": "Öppna {label}",
   "recipes.hubNote":
@@ -337,6 +337,7 @@ export const sv: Messages = {
   "market.tag.community": "Community",
   "market.tag.mobile": "Mobil",
   "market.tag.desktop": "Dator",
+  "market.tag.hub": "Experimentell",
   "market.filters": "Filtrera efter tagg",
   "market.noMatch": "Inget matchar de här filtren.",
   "market.search": "Sök recept",

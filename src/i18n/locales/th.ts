@@ -263,7 +263,7 @@ export const th: Messages = {
   "recipes.options": "ตัวเลือกของ {name}",
   "recipes.addFavorite": "เพิ่ม {name} ในรายการโปรด",
   "recipes.removeFavorite": "นำ {name} ออกจากรายการโปรด",
-  "recipes.hub": "ทดลอง",
+  "recipes.hub": "ฮับ",
   "recipes.hubPages": "หน้า",
   "recipes.openHubPage": "เปิด {label}",
   "recipes.hubNote":
@@ -319,6 +319,7 @@ export const th: Messages = {
   "market.tag.community": "ชุมชน",
   "market.tag.mobile": "มือถือ",
   "market.tag.desktop": "เดสก์ท็อป",
+  "market.tag.hub": "ทดลอง",
   "market.filters": "กรองตามแท็ก",
   "market.noMatch": "ไม่มีรายการที่ตรงกับตัวกรองเหล่านี้",
   "market.search": "ค้นหาสูตร",

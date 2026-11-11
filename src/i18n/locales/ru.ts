@@ -279,7 +279,7 @@ export const ru: Messages = {
   "recipes.options": "Настройки {name}",
   "recipes.addFavorite": "Добавить {name} в избранное",
   "recipes.removeFavorite": "Убрать {name} из избранного",
-  "recipes.hub": "Экспериментальный",
+  "recipes.hub": "Хаб",
   "recipes.hubPages": "Страницы",
   "recipes.openHubPage": "Открыть {label}",
   "recipes.hubNote":
@@ -338,6 +338,7 @@ export const ru: Messages = {
   "market.tag.community": "Сообщество",
   "market.tag.mobile": "Мобильные",
   "market.tag.desktop": "Компьютер",
+  "market.tag.hub": "Экспериментальный",
   "market.filters": "Фильтр по тегу",
   "market.noMatch": "Ничего не подходит под эти фильтры.",
   "market.search": "Поиск рецептов",

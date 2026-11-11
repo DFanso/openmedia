@@ -283,7 +283,7 @@ export const fr: Messages = {
   "recipes.options": "Options de {name}",
   "recipes.addFavorite": "Ajouter {name} aux favoris",
   "recipes.removeFavorite": "Retirer {name} des favoris",
-  "recipes.hub": "Expérimental",
+  "recipes.hub": "Hub",
   "recipes.hubPages": "Pages",
   "recipes.openHubPage": "Ouvrir {label}",
   "recipes.hubNote":
@@ -343,6 +343,7 @@ export const fr: Messages = {
   "market.tag.community": "Communauté",
   "market.tag.mobile": "Mobile",
   "market.tag.desktop": "Ordinateur",
+  "market.tag.hub": "Expérimental",
   "market.filters": "Filtrer par étiquette",
   "market.noMatch": "Rien ne correspond à ces filtres.",
   "market.search": "Rechercher des recettes",

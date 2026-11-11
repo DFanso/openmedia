@@ -271,7 +271,7 @@ export const id: Messages = {
   "recipes.options": "Opsi {name}",
   "recipes.addFavorite": "Tambahkan {name} ke favorit",
   "recipes.removeFavorite": "Hapus {name} dari favorit",
-  "recipes.hub": "Eksperimental",
+  "recipes.hub": "Hub",
   "recipes.hubPages": "Halaman",
   "recipes.openHubPage": "Buka {label}",
   "recipes.hubNote":
@@ -332,6 +332,7 @@ export const id: Messages = {
   "market.tag.community": "Komunitas",
   "market.tag.mobile": "Seluler",
   "market.tag.desktop": "Desktop",
+  "market.tag.hub": "Eksperimental",
   "market.filters": "Filter menurut tag",
   "market.noMatch": "Tidak ada yang cocok dengan filter ini.",
   "market.search": "Cari resep",

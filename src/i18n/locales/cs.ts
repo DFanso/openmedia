@@ -278,7 +278,7 @@ export const cs: Messages = {
   "recipes.options": "Možnosti pro {name}",
   "recipes.addFavorite": "Přidat {name} do oblíbených",
   "recipes.removeFavorite": "Odebrat {name} z oblíbených",
-  "recipes.hub": "Experimentální",
+  "recipes.hub": "Hub",
   "recipes.hubPages": "Stránky",
   "recipes.openHubPage": "Otevřít {label}",
   "recipes.hubNote":
@@ -335,6 +335,7 @@ export const cs: Messages = {
   "market.tag.community": "Komunitní",
   "market.tag.mobile": "Mobilní",
   "market.tag.desktop": "Počítač",
+  "market.tag.hub": "Experimentální",
   "market.filters": "Filtrovat podle štítku",
   "market.noMatch": "Těmto filtrům nic neodpovídá.",
   "market.search": "Hledat recepty",

@@ -279,7 +279,7 @@ export const uk: Messages = {
   "recipes.options": "Налаштування {name}",
   "recipes.addFavorite": "Додати {name} до обраного",
   "recipes.removeFavorite": "Прибрати {name} з обраного",
-  "recipes.hub": "Експериментальний",
+  "recipes.hub": "Хаб",
   "recipes.hubPages": "Сторінки",
   "recipes.openHubPage": "Відкрити {label}",
   "recipes.hubNote":
@@ -339,6 +339,7 @@ export const uk: Messages = {
   "market.tag.community": "Спільноти",
   "market.tag.mobile": "Мобільні",
   "market.tag.desktop": "Комп’ютер",
+  "market.tag.hub": "Експериментальний",
   "market.filters": "Фільтр за тегами",
   "market.noMatch": "Нічого не відповідає цим фільтрам.",
   "market.search": "Пошук рецептів",
