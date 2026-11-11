@@ -1,8 +1,8 @@
 import { quickAccess } from "../../shared/favorites";
 import type { SiteViewState } from "../../shared/ipc";
 
-/** Where a session came from: tapped from favorites, typed or picked from history, or restored. */
-export type SessionSource = "favorite" | "typed" | "restored";
+/** Where a session came from: favorites, a hub tab, typed input, or restored app state. */
+export type SessionSource = "favorite" | "hub" | "typed" | "restored";
 
 export interface Session {
   id: string;
@@ -70,19 +70,46 @@ export function scopeCovers(scope: string, url: string): boolean {
   return host !== null && (host === scope || host.endsWith(`.${scope}`));
 }
 
-/**
- * The live session a favorite should switch to instead of opening again: one on the favorite's
- * site, preferring sessions that came from a favorite and then the most recently used. A session
- * whose domain is not known yet matches only the exact address it was opened with.
- */
+/** The live session on the requested site, preferring favorites then recent use. */
+function findSessionOnSite(
+  sessions: Session[],
+  url: string,
+  role: "site" | "favorite" | "hub",
+): Session | undefined {
+  let found: Session | undefined;
+  for (const session of sessions) {
+    if (
+      (role === "favorite" && session.source === "hub") ||
+      (role === "hub" && session.source !== "hub") ||
+      !(session.scope ? scopeCovers(session.scope, url) : session.openedUrl === url)
+    ) {
+      continue;
+    }
+    if (
+      !found ||
+      (session.source === "favorite" && found.source !== "favorite") ||
+      ((session.source === "favorite") === (found.source === "favorite") &&
+        session.lastUsed > found.lastUsed)
+    ) {
+      found = session;
+    }
+  }
+  return found;
+}
+
+/** A live session a favorite can reuse; hub tabs stay separate even when they share its domain. */
 export function findFavoriteSession(sessions: Session[], favoriteUrl: string): Session | undefined {
-  return sessions
-    .filter((s) => (s.scope ? scopeCovers(s.scope, favoriteUrl) : s.openedUrl === favoriteUrl))
-    .sort(
-      (a, b) =>
-        Number(b.source === "favorite") - Number(a.source === "favorite") ||
-        b.lastUsed - a.lastUsed,
-    )[0];
+  return findSessionOnSite(sessions, favoriteUrl, "favorite");
+}
+
+/** A live session on the favorite's site, including one opened from a hub, for badge/retention. */
+export function findSiteSession(sessions: Session[], url: string): Session | undefined {
+  return findSessionOnSite(sessions, url, "site");
+}
+
+/** A live session for a hub tab, never an ordinary favorite on the same site. */
+export function findHubSession(sessions: Session[], tabUrl: string): Session | undefined {
+  return findSessionOnSite(sessions, tabUrl, "hub");
 }
 
 /**
@@ -125,7 +152,7 @@ export function sessionsToClose(
 
   const retained = new Set<string>();
   for (const { url } of quickAccess(favorites)) {
-    const session = findFavoriteSession(sessions, url);
+    const session = findSiteSession(sessions, url);
     if (session) retained.add(session.id);
   }
   const unprotected = hidden.filter((s) => !retained.has(s.id));

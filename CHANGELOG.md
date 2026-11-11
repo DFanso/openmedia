@@ -7,6 +7,14 @@ All notable changes to OpenMedia are documented here.
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
 ## 2026-11-11
+### fix(favorites): keep hub tabs separate from site favorites
+
+**Area:** `fix(favorites)`
+
+**Change:** Opening a site favorite no longer reuses a Messages Hub tab session for that site.
+
+**Verified:** Focused session and unread-watch tests; 32 passed.
+
 ### fix(siteview): keep clicked links in the embedded browser
 
 **Area:** `fix(siteview)`

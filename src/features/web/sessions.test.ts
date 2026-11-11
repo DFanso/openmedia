@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   IDLE_LIMIT_MS,
-  MAX_SESSIONS,
   applyState,
+  MAX_SESSIONS,
   findFavoriteSession,
+  findHubSession,
+  findSiteSession,
   findTypedSession,
   newSession,
   scopeCovers,
@@ -54,6 +56,23 @@ describe("findFavoriteSession", () => {
   it("does not match another site", () => {
     const other = session("a", "favorite", { scope: "reddit.com" });
     expect(findFavoriteSession([other], "https://m.youtube.com/")).toBeUndefined();
+  });
+  it("keeps a hub tab separate from the site's favorite while still tracking the live site", () => {
+    const hubTab = session("hub", "hub", {
+      openedUrl: "https://www.facebook.com/messages/",
+      scope: "facebook.com",
+      lastUsed: NOW,
+    });
+    const favorite = session("facebook", "favorite", {
+      openedUrl: "https://www.facebook.com/",
+      scope: "facebook.com",
+      lastUsed: NOW - 1,
+    });
+
+    expect(findFavoriteSession([hubTab], "https://www.facebook.com/")).toBeUndefined();
+    expect(findFavoriteSession([hubTab, favorite], "https://www.facebook.com/")).toBe(favorite);
+    expect(findHubSession([favorite, hubTab], "https://www.facebook.com/")).toBe(hubTab);
+    expect(findSiteSession([hubTab], "https://www.facebook.com/")).toBe(hubTab);
   });
 });
 

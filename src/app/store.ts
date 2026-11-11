@@ -15,6 +15,7 @@ import { incognito as incognitoIpc } from "../features/incognito/ipc";
 import {
   applyState,
   findFavoriteSession,
+  findHubSession,
   findTypedSession,
   newSession,
   startSource,
@@ -343,14 +344,19 @@ export const useApp = create<AppStore>((set, get) => {
   };
 
   /**
-   * A page the user picked from a list: the live session on that site is reused when there is
-   * one, otherwise a new session opens. The page is a site of its own, so it keeps its own
-   * session and its own cookies.
+   * A page picked from a site favorite reuses its own live session, never a hub tab on that site.
    */
   const openPickedPage = (url: string) => {
     const live = findFavoriteSession(get().sessions, url);
     if (live) switchTo(live.id);
     else startSession(url, "favorite");
+  };
+
+  /** A hub tab reuses its own live session, otherwise opens a new hub session. */
+  const openHubPage = (url: string) => {
+    const live = findHubSession(get().sessions, url);
+    if (live) switchTo(live.id);
+    else startSession(url, "hub");
   };
 
   /** Incognito chats live only in memory: switching modes drops them and loads the saved ones again. */
@@ -513,7 +519,7 @@ export const useApp = create<AppStore>((set, get) => {
 
     openFavorite: (url) => openPickedPage(url),
 
-    openHubTab: (url) => openPickedPage(url),
+    openHubTab: (url) => openHubPage(url),
 
     openHistory: (url) => {
       const live = findTypedSession(get().sessions, url);

@@ -1,7 +1,7 @@
 import { quickAccess } from "../../shared/favorites";
 import type { Favorite } from "../../shared/ipc";
 import { unreadCount } from "../../shared/unread";
-import { findFavoriteSession, type Session } from "./sessions";
+import { findSiteSession, type Session } from "./sessions";
 
 /** A page can rewrite its own title at will, so one session may raise a notification this often. */
 export const NOTIFY_MIN_GAP_MS = 30_000;
@@ -49,7 +49,7 @@ export function quickFavoriteOf(
   sessionId: string,
 ): Favorite | undefined {
   return quickAccess(favorites).find(
-    (favorite) => findFavoriteSession(sessions, favorite.url)?.id === sessionId,
+    (favorite) => findSiteSession(sessions, favorite.url)?.id === sessionId,
   );
 }
 
@@ -63,7 +63,7 @@ export function unreadByFavorite(
   activeId: string | null,
 ): number[] {
   return quickAccess(favorites).map((favorite) => {
-    const session = findFavoriteSession(sessions, favorite.url);
+    const session = findSiteSession(sessions, favorite.url);
     return session && session.id !== activeId ? unreadCount(session.title) : 0;
   });
 }
