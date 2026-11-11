@@ -8,6 +8,15 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### fix(ai): keep keys, previews and incognito state where they belong
+
+**Area:** `fix(ai)`
+
+**Problem:** `ai_save_provider` could repoint a provider at a new host while keeping its stored key, so any script in the shell could send the key elsewhere; `ai_send` used the currently active provider rather than the one the preview named; unsent drafts in `contenteditable` boxes were included in snapshots; the open assistant turn survived leaving incognito; the command-bar star wrote to the normal favorites while incognito; the shell webview was allowed to emit events, so it could forge `billing:snapshot` and become Pro.
+
+**Change:** changing a provider's base URL or kind deletes its key; `ai_send` resolves the provider from the prepared job and refuses if it changed; `snapshot.js` skips editable content; mode switches cancel the assistant; the star uses the active favorites set; the main capability lists the `core:*` defaults it needs and only `core:event:allow-listen`/`allow-unlisten`.
+
+**Verified:** `cargo test`, `clippy -D warnings`, `ts:check`, Vitest (new incognito/assistant test). **Not verified:** on a device; the snapshot change has no DOM test. **Not fixed here:** pinning an in-flight AI job to the session it started in (A1-01), deriving the recipe scope from native navigation (A1-03), cancelling an in-flight `ai_send` (A1-06).
 ### fix(recipes): bound match patterns, refuse suffix-wide and page-wide recipes, stop writing nulls
 
 **Area:** `fix(recipes)`
