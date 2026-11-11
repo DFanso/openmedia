@@ -39,6 +39,15 @@ describe("tabIndexFor", () => {
     expect(tabIndexFor(TABS, "https://www.reddit.com/r/rust/comments/1")).toBe(0);
   });
 
+  it("leaves the rest of a site alone when the page points into one area of it", () => {
+    const inbox: HubTab[] = [
+      { label: "Instagram", url: "https://www.instagram.com/direct/inbox/" },
+    ];
+    expect(tabIndexFor(inbox, "https://www.instagram.com/")).toBe(-1);
+    expect(tabIndexFor(inbox, "https://www.instagram.com/explore/")).toBe(-1);
+    expect(tabIndexFor(inbox, "https://www.instagram.com/direct/t/123/")).toBe(0);
+  });
+
   it("finds no page for another site or a broken address", () => {
     expect(tabIndexFor(TABS, "https://example.com/")).toBe(-1);
     expect(tabIndexFor(TABS, "nonsense")).toBe(-1);

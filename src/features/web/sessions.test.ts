@@ -55,6 +55,17 @@ describe("findFavoriteSession", () => {
     const other = session("a", "favorite", { scope: "reddit.com" });
     expect(findFavoriteSession([other], "https://m.youtube.com/")).toBeUndefined();
   });
+
+  it("keeps a hub page and a favorite on the same site apart", () => {
+    const inbox = session("inbox", "hub", { scope: "instagram.com" });
+    const feed = session("feed", "favorite", { scope: "instagram.com" });
+    expect(findFavoriteSession([inbox], "https://www.instagram.com/")).toBeUndefined();
+    expect(findFavoriteSession([inbox, feed], "https://www.instagram.com/")).toBe(feed);
+    expect(findFavoriteSession([inbox, feed], "https://www.instagram.com/direct/", true)).toBe(
+      inbox,
+    );
+    expect(findFavoriteSession([feed], "https://www.instagram.com/direct/", true)).toBeUndefined();
+  });
 });
 
 describe("findTypedSession", () => {
