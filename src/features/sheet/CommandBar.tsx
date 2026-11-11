@@ -1,9 +1,9 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { selectPage, useApp } from "../../app/store";
+import { selectPage, selectQuickFavorites, useApp } from "../../app/store";
 import { describeError } from "../../i18n/errors";
 import { useT } from "../../i18n/useT";
 import { displayHost, isFavoriteSite, toggleSiteFavorite } from "../../shared/favorites";
-import { siteView, type Favorite } from "../../shared/ipc";
+import { siteView } from "../../shared/ipc";
 import {
   ArrowIcon,
   BackIcon,
@@ -20,7 +20,6 @@ import { INPUT_MODES, MAX_REQUEST_LENGTH, routeInput, type InputMode } from "../
 import { useEntitlementStore } from "../paywall/store";
 import { DEFAULT_SEARCH_ENGINE } from "../../shared/searchEngines";
 
-const NO_FAVORITES: Favorite[] = [];
 
 /** Opens from the top so the keyboard never covers it. Addresses open directly; other text is a request for the assistant. */
 export function CommandBar() {
@@ -31,8 +30,11 @@ export function CommandBar() {
   const openSearch = useApp((s) => s.openSearch);
   const isPro = useEntitlementStore((s) => s.status === "pro");
   const searchEngine = useApp((s) => s.state?.searchEngine ?? DEFAULT_SEARCH_ENGINE);
-  const favorites = useApp((s) => s.state?.favorites) ?? NO_FAVORITES;
-  const saveFavorites = useApp((s) => s.saveFavorites);
+  const incognito = useApp((s) => s.incognito.active);
+  const favorites = useApp(selectQuickFavorites);
+  const saveNormalFavorites = useApp((s) => s.saveFavorites);
+  const saveIncognitoFavorites = useApp((s) => s.saveIncognitoFavorites);
+  const saveFavorites = incognito ? saveIncognitoFavorites : saveNormalFavorites;
   const aiState = useApp((s) => s.aiState);
   const assistant = useApp((s) => s.assistant);
   const loadAi = useApp((s) => s.loadAi);

@@ -491,7 +491,14 @@ pub fn ai_save_provider(
     provider: ProviderInput,
 ) -> Result<ProviderView> {
     entitlement.require_pro()?;
-    view(&secrets, library.upsert_provider(provider)?)
+    let before = provider.id.and_then(|id| library.provider(id).ok());
+    let saved = library.upsert_provider(provider)?;
+    // A stored key belongs to the endpoint it was entered for: pointing the provider elsewhere
+    // would send that key to a different host, so it has to be entered again.
+    if before.is_some_and(|before| before.base_url != saved.base_url || before.kind != saved.kind) {
+        secrets.0.delete(saved.id)?;
+    }
+    view(&secrets, saved)
 }
 
 #[tauri::command]
@@ -649,7 +656,15 @@ pub async fn ai_send(
     on_activity: Channel<Activity>,
 ) -> Result<Proposal> {
     entitlement.require_pro()?;
-    let (config, key) = active_provider(&library, &secrets)?;
+    // Send to the provider the preview named, not whichever one is active now.
+    let reviewed = agent.get(id)?.provider;
+    let config = library.provider(reviewed.id)?;
+    if config != reviewed {
+        return Err(Error::Connection(
+            "The provider changed since this request was prepared. Ask again.".to_owned(),
+        ));
+    }
+    let key = secrets.0.get(config.id)?.ok_or(Error::NoKey)?;
     agent::send(
         &agent,
         &LivePage(&app),
