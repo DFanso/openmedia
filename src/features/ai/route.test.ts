@@ -74,11 +74,11 @@ describe("routeInput", () => {
     it("searches everything, including text that looks like a request or an address", () => {
       expect(routeInput("hide stories", context({ mode: "search", pro: false }))).toEqual({
         kind: "search",
-        url: searchUrl("hide stories"),
+        url: searchUrl("hide stories", "duckDuckGo"),
       });
       expect(routeInput("reddit.com", context({ mode: "search", pro: false }))).toEqual({
         kind: "search",
-        url: searchUrl("reddit.com"),
+        url: searchUrl("reddit.com", "duckDuckGo"),
       });
     });
 
@@ -94,7 +94,7 @@ describe("routeInput", () => {
     });
 
     it("encodes the query so it cannot add parameters", () => {
-      expect(searchUrl("a&b=c#d")).toBe("https://duckduckgo.com/?q=a%26b%3Dc%23d");
+      expect(searchUrl("a&b=c#d")).toBe("https://www.google.com/search?q=a%26b%3Dc%23d");
       expect(searchUrl("a&b=c#d", "brave")).toBe("https://search.brave.com/search?q=a%26b%3Dc%23d");
     });
   });

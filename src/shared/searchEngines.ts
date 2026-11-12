@@ -1,6 +1,6 @@
 import type { SearchEngine } from "./ipc";
 
-export const DEFAULT_SEARCH_ENGINE: SearchEngine = "duckDuckGo";
+export const DEFAULT_SEARCH_ENGINE: SearchEngine = "google";
 
 /** The engines the command bar can search with. `url` is the address the encoded query is appended to. */
 export const SEARCH_ENGINES: readonly { id: SearchEngine; name: string; url: string }[] = [
@@ -15,6 +15,9 @@ export const SEARCH_ENGINES: readonly { id: SearchEngine; name: string; url: str
 
 /** The web search for `query` on `engine`. The query is encoded, so it cannot add parameters. */
 export function searchUrl(query: string, engine: SearchEngine = DEFAULT_SEARCH_ENGINE): string {
-  const entry = SEARCH_ENGINES.find((candidate) => candidate.id === engine) ?? SEARCH_ENGINES[0];
+  const entry =
+    SEARCH_ENGINES.find((candidate) => candidate.id === engine) ??
+    SEARCH_ENGINES.find((candidate) => candidate.id === DEFAULT_SEARCH_ENGINE) ??
+    SEARCH_ENGINES[0];
   return `${entry.url}${encodeURIComponent(query.trim())}`;
 }
