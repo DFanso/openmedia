@@ -527,4 +527,7 @@ export const tr: Messages = {
     "Abonelikler, dönem bitmeden en az 24 saat önce cihazınızın mağaza ayarlarından iptal etmedikçe otomatik olarak yenilenir. Her plan mağazanın yerel fiyatını ve varsa ücretsiz deneme süresini gösterir.",
   "paywall.privacy": "Gizlilik politikası",
   "paywall.terms": "Kullanım koşulları",
+  "favorites.backgroundMedia": "Arka planda oynatmaya devam et",
+  "favorites.backgroundMediaNote":
+    "Kapalı: başka bir siteye geçtiğinizde veya uygulamadan çıktığınızda ses ve video duraklar. Açık: bu site oynatmaya devam eder.",
 };

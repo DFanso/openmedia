@@ -530,4 +530,7 @@ export const pt: Messages = {
     "As subscrições renovam-se automaticamente até as cancelares nas definições da loja do teu dispositivo pelo menos 24 horas antes do fim do período. Cada plano mostra o preço local da loja e o período experimental, se existir.",
   "paywall.privacy": "Política de privacidade",
   "paywall.terms": "Termos de utilização",
+  "favorites.backgroundMedia": "Continuar tocando em segundo plano",
+  "favorites.backgroundMediaNote":
+    "Desativado: áudio e vídeo pausam ao trocar de site ou sair do app. Ativado: este site continua tocando.",
 };

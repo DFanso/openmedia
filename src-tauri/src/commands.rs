@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Manager, State, ipc::Channel};
 use tauri_plugin_siteview::{
     ColorScheme, ContentRuleList, EvaluateRequest, FetchFaviconRequest, OpenRequest, Rect,
-    SessionRequest, SetColorSchemeRequest, SetContentRuleListsRequest,
+    SessionRequest, SetBackgroundMediaRequest, SetColorSchemeRequest, SetContentRuleListsRequest,
     SetDocumentStartScriptRequest, SetRectRequest, SiteviewExt,
     validate::{parse_session_id, parse_web_url},
 };
@@ -177,7 +177,9 @@ pub fn open_external(app: AppHandle, url: String) -> Result<()> {
     use tauri_plugin_opener::OpenerExt;
     let url = parse_web_url(&url)?;
     if url.scheme() != "https" {
-        return Err(Error::Connection("only https addresses open outside the app".into()));
+        return Err(Error::Connection(
+            "only https addresses open outside the app".into(),
+        ));
     }
     app.opener()
         .open_url(url.as_str(), None::<&str>)
@@ -436,6 +438,26 @@ pub fn bottom_margin_for(
         library.bottom_margin()?,
         &url,
     ))
+}
+
+/// Lets a site's media keep playing while its page is hidden or the app is in the background, or
+/// pauses it again. Every site pauses by default. `site` is a registrable domain.
+#[tauri::command]
+pub fn set_site_background_media(
+    app: AppHandle,
+    library: State<'_, Library>,
+    site: String,
+    enabled: bool,
+) -> Result<()> {
+    let sites = library.set_background_media(&site, enabled)?;
+    push_background_media(&app, sites)
+}
+
+/// Tells the site views which sites may play in the background; the rest pause when hidden.
+pub(crate) fn push_background_media(app: &AppHandle, sites: Vec<String>) -> Result<()> {
+    app.siteview()
+        .set_background_media(SetBackgroundMediaRequest { sites })?;
+    Ok(())
 }
 
 /// Shows or hides the floating back button. The shell draws it; nothing native changes.

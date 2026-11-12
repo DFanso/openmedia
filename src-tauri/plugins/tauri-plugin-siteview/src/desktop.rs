@@ -79,6 +79,11 @@ impl<R: Runtime> Siteview<R> {
         Err(Error::DesktopUnsupported("site views"))
     }
 
+    /// Windows and Linux have no site views, so there is no media to pause.
+    pub fn set_background_media(&self, _request: SetBackgroundMediaRequest) -> Result<()> {
+        Ok(())
+    }
+
     pub fn authenticate(&self, _request: AuthenticateRequest) -> Result<bool> {
         Err(Error::DesktopUnsupported("site views"))
     }

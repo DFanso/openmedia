@@ -42,7 +42,9 @@ pub fn run() {
             let data_dir = app.path().app_data_dir()?;
             let library = library::Library::load(data_dir.join("library.json"))?;
             let ad_block_enabled = library.ad_block_enabled()?;
+            let background_media = library.background_media_sites()?;
             app.manage(library);
+            commands::push_background_media(app.handle(), background_media)?;
             app.manage(incognito::Incognito::default());
             app.manage(recipes::Recipes::load(data_dir.join("recipes"))?);
             app.manage(catalog::Catalog::new(
@@ -134,6 +136,7 @@ pub fn run() {
             commands::set_bottom_margin,
             commands::set_site_bottom_margin,
             commands::bottom_margin_for,
+            commands::set_site_background_media,
             commands::set_back_button,
             commands::ai_state,
             commands::ai_save_provider,

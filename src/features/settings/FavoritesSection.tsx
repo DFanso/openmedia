@@ -10,6 +10,7 @@ import {
 import { DownIcon, ForwardIcon, ProIcon, PlusIcon, StarIcon, UpIcon } from "../../shared/icons";
 import type { Favorite, FavoriteInput, SiteSettings } from "../../shared/ipc";
 import { SiteTile } from "../../shared/SiteTile";
+import { siteOf } from "../../shared/site";
 import { normalizeWebUrl } from "../../shared/url";
 import { useEntitlementStore } from "../paywall/store";
 import { describeAddress } from "../history/address";
@@ -120,6 +121,7 @@ export function FavoritesEditor({
         onRemove={() => remove(index)}
         onOpenRecipe={recipe ? () => openRecipe(recipe.recipeId) : undefined}
         marginRecipe={recipeSheet === "recipes" ? recipe : undefined}
+        playsInBackground={recipeSheet === "recipes"}
       />
     );
   };
@@ -276,6 +278,8 @@ interface RowProps {
   onOpenRecipe?: () => void;
   /** The recipe whose bottom margin the editor shows; absent for incognito and recipe-less favorites. */
   marginRecipe?: SiteSettings;
+  /** Offers the background playback switch; off for incognito, which must not write its sites to the library. */
+  playsInBackground?: boolean;
 }
 
 function FavoriteRow({
@@ -290,6 +294,7 @@ function FavoriteRow({
   onRemove,
   onOpenRecipe,
   marginRecipe,
+  playsInBackground,
 }: RowProps) {
   const { host } = describeAddress(favorite.url);
   const arrow = "grid size-10 place-items-center text-paper/65 disabled:opacity-20";
@@ -348,6 +353,7 @@ function FavoriteRow({
           onRemove={onRemove}
           onOpenRecipe={onOpenRecipe}
           marginRecipe={marginRecipe}
+          playsInBackground={playsInBackground}
         />
       )}
     </div>
@@ -363,6 +369,7 @@ interface EditorProps {
   onRemove?: () => void;
   onOpenRecipe?: () => void;
   marginRecipe?: SiteSettings;
+  playsInBackground?: boolean;
 }
 
 function FavoriteEditor({
@@ -374,6 +381,7 @@ function FavoriteEditor({
   onRemove,
   onOpenRecipe,
   marginRecipe,
+  playsInBackground,
 }: EditorProps) {
   const [name, setName] = useState(initial.name);
   const [url, setUrl] = useState(initial.url);
@@ -421,6 +429,7 @@ function FavoriteEditor({
           <Switch label={t("favorites.notify")} checked={notify} onChange={setNotify} />
         </div>
       )}
+      {playsInBackground && <BackgroundMedia url={url} />}
       {(problem ?? hint) && (
         <p className={`text-sm ${problem ? "text-accent" : "text-paper/55"}`}>{problem ?? hint}</p>
       )}
@@ -477,6 +486,27 @@ function FavoriteMargin({ site }: { site: SiteSettings }) {
           {t("recipes.useSharedMargin")}
         </button>
       )}
+    </div>
+  );
+}
+
+/** Whether the site's audio and video keep playing once its page is hidden or the app is left. It saves at once, not with Save. */
+function BackgroundMedia({ url }: { url: string }) {
+  const site = siteOf(url);
+  const enabled = useApp((s) =>
+    site ? (s.state?.backgroundMediaSites.includes(site) ?? false) : false,
+  );
+  const setSiteBackgroundMedia = useApp((s) => s.setSiteBackgroundMedia);
+  const t = useT();
+  if (!site) return null;
+  return (
+    <div className="-mx-4">
+      <Switch
+        label={t("favorites.backgroundMedia")}
+        description={t("favorites.backgroundMediaNote")}
+        checked={enabled}
+        onChange={(next) => void setSiteBackgroundMedia(site, next)}
+      />
     </div>
   );
 }

@@ -17,7 +17,7 @@ mod notify;
 mod shell;
 
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     path::{Path, PathBuf},
     process::Command,
     sync::{
@@ -67,6 +67,10 @@ const EVALUATE_TIMEOUT: Duration = Duration::from_secs(5);
 const SAFARI_USER_AGENT: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Safari/605.1.15";
 /// How many closed sessions are remembered; the oldest are forgotten first.
 const MAX_REMEMBERED_BLOCKED: usize = 32;
+/// Pauses what is playing in a page that went out of sight and remembers which elements it
+/// paused, so showing the page again resumes exactly those and nothing the visitor had paused.
+const PAUSE_MEDIA_SCRIPT: &str = "(function(){var held=window.__openmediaPaused=window.__openmediaPaused||[];document.querySelectorAll('video,audio').forEach(function(m){if(!m.paused&&!m.ended){held.push(m);m.pause()}})})()";
+const RESUME_MEDIA_SCRIPT: &str = "(function(){var held=window.__openmediaPaused||[];window.__openmediaPaused=[];held.forEach(function(m){try{var p=m.play();if(p&&p.catch)p.catch(function(){})}catch(e){}})})()";
 const STOP_MEDIA_SCRIPT: &str =
     "document.querySelectorAll('video,audio').forEach(function(m){m.pause()});window.stop();";
 
@@ -100,6 +104,31 @@ struct State<R: Runtime> {
     document_start_script: String,
     rule_lists: Vec<ContentRuleList>,
     blocked: Vec<String>,
+    /// The sites whose media keeps playing while their page is hidden.
+    background_media: Vec<String>,
+    /// Sessions whose media was paused because their page went out of sight.
+    media_paused: HashSet<String>,
+}
+
+/// What a page's media needs when its visibility changes.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum MediaStep {
+    Pause,
+    Resume,
+}
+
+/// A closed session is left to the usage block, which already stops its media. Otherwise a hidden
+/// page pauses unless its site may play in the background, and a shown page resumes what was
+/// paused; a page paused and then allowed to play on resumes too.
+fn media_step(shown: bool, blocked: bool, keeps_playing: bool, paused: bool) -> Option<MediaStep> {
+    if blocked {
+        return None;
+    }
+    match (shown || keeps_playing, paused) {
+        (false, false) => Some(MediaStep::Pause),
+        (true, true) => Some(MediaStep::Resume),
+        _ => None,
+    }
 }
 
 /// Everything a new web view needs.
@@ -138,6 +167,8 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
             document_start_script: String::new(),
             rule_lists: Vec::new(),
             blocked: Vec::new(),
+            background_media: Vec::new(),
+            media_paused: HashSet::new(),
         }),
         labels: AtomicU64::new(0),
         focused: Mutex::new(None),
@@ -377,8 +408,8 @@ impl<R: Runtime> Inner<R> {
     /// Puts every view where it belongs: the active one visible unless the shell covers it or the
     /// session is closed for the day, the rest hidden.
     fn sync_views(&self) {
-        let (rect, overlay, views) = {
-            let state = self.state();
+        let (rect, overlay, views, media) = {
+            let mut state = self.state();
             let rect = state.rect.and_then(layout::usable);
             let overlay = rect.is_some_and(|rect| layout::overlay_open(&rect, &state.regions));
             let views: Vec<(Webview<R>, bool)> = state
@@ -390,8 +421,15 @@ impl<R: Runtime> Inner<R> {
                     (session.webview.clone(), shown)
                 })
                 .collect();
-            (rect, overlay, views)
+            let media = Self::media_steps(&mut state);
+            (rect, overlay, views, media)
         };
+        for (webview, step) in media {
+            let _ = webview.eval(match step {
+                MediaStep::Pause => PAUSE_MEDIA_SCRIPT,
+                MediaStep::Resume => RESUME_MEDIA_SCRIPT,
+            });
+        }
         // Asked of the main thread, so never while the state lock is held.
         let bounds = rect.and_then(|rect| self.page_bounds(Some(rect)).ok());
         for (webview, shown) in &views {
@@ -413,6 +451,32 @@ impl<R: Runtime> Inner<R> {
             _ => MAIN_WINDOW.to_owned(),
         };
         self.focus(&focus);
+    }
+
+    /// The pause or resume each session needs for where it now stands, recorded as done. Run the
+    /// scripts after the state lock is released.
+    fn media_steps(state: &mut State<R>) -> Vec<(Webview<R>, MediaStep)> {
+        let mut steps = Vec::new();
+        for (id, session) in &state.sessions {
+            let shown = state.active.as_deref() == Some(id.as_str());
+            let blocked = state.blocked.contains(id);
+            let scope = session
+                .scope
+                .lock()
+                .unwrap_or_else(PoisonError::into_inner)
+                .clone();
+            let keeps_playing = state.background_media.contains(&scope);
+            let paused = state.media_paused.contains(id);
+            let Some(step) = media_step(shown, blocked, keeps_playing, paused) else {
+                continue;
+            };
+            match step {
+                MediaStep::Pause => state.media_paused.insert(id.clone()),
+                MediaStep::Resume => state.media_paused.remove(id),
+            };
+            steps.push((session.webview.clone(), step));
+        }
+        steps
     }
 
     /// Gives the keyboard to the page showing, or to the shell while an overlay is open: the page
@@ -636,6 +700,7 @@ impl<R: Runtime> Siteview<R> {
             if state.active.as_deref() == Some(request.session.as_str()) {
                 state.active = None;
             }
+            state.media_paused.remove(&request.session);
             state.sessions.remove(&request.session)
         };
         if let Some(session) = removed {
@@ -791,6 +856,14 @@ impl<R: Runtime> Siteview<R> {
         Ok(())
     }
 
+    /// Names the sites whose media may keep playing while hidden. Rust-only: there is no command
+    /// for it, so no webview can call it.
+    pub fn set_background_media(&self, request: SetBackgroundMediaRequest) -> Result<()> {
+        self.inner.state().background_media = request.sites;
+        self.inner.sync_views();
+        Ok(())
+    }
+
     /// Touch ID, Apple Watch or the account password, as the system offers. Rust-only: there is
     /// no command for it, so no webview can raise or answer the prompt. Waits for the person.
     pub fn authenticate(&self, request: AuthenticateRequest) -> Result<bool> {
@@ -824,6 +897,31 @@ impl<R: Runtime> Siteview<R> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_hidden_page_pauses_unless_its_site_plays_on_and_a_shown_one_resumes() {
+        assert_eq!(
+            media_step(false, false, false, false),
+            Some(MediaStep::Pause)
+        );
+        assert_eq!(media_step(false, false, false, true), None);
+        assert_eq!(media_step(false, false, true, false), None);
+        assert_eq!(
+            media_step(true, false, false, true),
+            Some(MediaStep::Resume)
+        );
+        assert_eq!(media_step(true, false, false, false), None);
+        assert_eq!(
+            media_step(false, false, true, true),
+            Some(MediaStep::Resume)
+        );
+    }
+
+    #[test]
+    fn a_closed_session_is_left_to_the_usage_block() {
+        assert_eq!(media_step(false, true, false, false), None);
+        assert_eq!(media_step(true, true, false, true), None);
+    }
 
     #[test]
     fn only_web_pages_may_load() {

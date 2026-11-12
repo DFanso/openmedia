@@ -519,4 +519,7 @@ export const en = {
     "Subscriptions renew automatically until you cancel them in your device's store settings at least 24 hours before the period ends. Each plan shows the store's local price and any free trial.",
   "paywall.privacy": "Privacy Policy",
   "paywall.terms": "Terms of Use",
+  "favorites.backgroundMedia": "Keep playing in the background",
+  "favorites.backgroundMediaNote":
+    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 } as const;

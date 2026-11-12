@@ -87,6 +87,11 @@ class SetBlockedArgs {
 }
 
 @InvokeArg
+class SetBackgroundMediaArgs {
+    var sites: List<String> = emptyList()
+}
+
+@InvokeArg
 class AuthenticateArgs {
     var reason: String = ""
 }

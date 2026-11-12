@@ -524,4 +524,7 @@ export const id: Messages = {
     "Langganan diperpanjang otomatis sampai kamu membatalkannya di pengaturan toko perangkat minimal 24 jam sebelum periode berakhir. Setiap paket menampilkan harga lokal toko dan uji coba gratis bila ada.",
   "paywall.privacy": "Kebijakan privasi",
   "paywall.terms": "Ketentuan layanan",
+  "favorites.backgroundMedia": "Tetap putar di latar belakang",
+  "favorites.backgroundMediaNote":
+    "Mati: audio dan video berhenti sejenak saat Anda pindah ke situs lain atau meninggalkan aplikasi. Hidup: situs ini terus diputar.",
 };

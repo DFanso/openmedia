@@ -36,6 +36,8 @@ export interface AppState {
   adBlock: boolean;
   /** Pixels kept clear under every page that has no margin of its own. */
   bottomMargin: number;
+  /** The sites (registrable domains) whose media keeps playing while hidden or in the background. */
+  backgroundMediaSites: string[];
   backButton: boolean;
   aiPreview: boolean;
   /** The language the user picked, as a BCP 47 tag; null follows the device's language. */
@@ -202,6 +204,9 @@ export const library = {
    */
   setSiteOption: (recipeId: string, optionId: string, enabled: boolean, incognito: boolean) =>
     command("set_site_option", { recipeId, optionId, enabled, incognito }),
+  /** Lets a site's media keep playing while hidden or in the background; every site pauses by default. */
+  setSiteBackgroundMedia: (site: string, enabled: boolean) =>
+    command("set_site_background_media", { site, enabled }),
   setBottomMargin: (pixels: number) => command("set_bottom_margin", { pixels }),
   setSiteBottomMargin: (recipeId: string, pixels: number | null) =>
     command("set_site_bottom_margin", { recipeId, pixels }),

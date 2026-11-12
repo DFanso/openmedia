@@ -524,4 +524,7 @@ export const cs: Messages = {
     "Odběry se automaticky obnovují, dokud je neukončíte v nastavení obchodu zařízení alespoň 24 hodin před koncem období. Každý plán zobrazuje místní cenu obchodu a případnou zkušební dobu zdarma.",
   "paywall.privacy": "Zásady ochrany soukromí",
   "paywall.terms": "Podmínky použití",
+  "favorites.backgroundMedia": "Přehrávat na pozadí",
+  "favorites.backgroundMediaNote":
+    "Vypnuto: zvuk a video se pozastaví, když přepnete na jiný web nebo opustíte aplikaci. Zapnuto: tento web hraje dál.",
 };

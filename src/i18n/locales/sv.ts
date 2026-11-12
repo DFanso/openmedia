@@ -526,4 +526,7 @@ export const sv: Messages = {
     "Prenumerationer förnyas automatiskt tills du avslutar dem i butiksinställningarna på din enhet, minst 24 timmar innan perioden går ut. Varje plan visar butikens lokala pris och eventuell gratisperiod.",
   "paywall.privacy": "Integritetspolicy",
   "paywall.terms": "Användarvillkor",
+  "favorites.backgroundMedia": "Fortsätt spela i bakgrunden",
+  "favorites.backgroundMediaNote":
+    "Av: ljud och video pausas när du byter webbplats eller lämnar appen. På: den här webbplatsen fortsätter spela.",
 };

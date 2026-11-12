@@ -88,6 +88,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         var loading: Boolean = false,
         var needsReload: Boolean = false,
         var blocked: Boolean = false,
+        /** True while the page's media is paused because the page went out of sight. */
+        var mediaPaused: Boolean = false,
         var shield: View? = null,
         var recipe: String? = null,
         var scriptHandler: ScriptHandler? = null,
@@ -143,6 +145,12 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         java.util.Collections.synchronizedMap(LinkedHashMap())
     @Volatile private var loadedRulePaths: List<String>? = null
     private var activeId: String? = null
+
+    /** The sites (registrable domains) whose media keeps playing while hidden or in the background. */
+    private var backgroundMediaSites: Set<String> = emptySet()
+
+    /** False from the activity's pause to its resume. */
+    private var appForeground = true
     private var events: Channel? = null
     private var interactiveRegions = emptyList<RectF>()
     private var colorScheme = "system"
@@ -523,6 +531,43 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     }
 
     /**
+     * Names the sites whose media may keep playing while hidden or in the background. Rust-only:
+     * the plugin registers no command for it, so neither the shell nor a site view can reach it.
+     */
+    @Command
+    fun setBackgroundMedia(invoke: Invoke) {
+        val args = invoke.parseArgs(SetBackgroundMediaArgs::class.java)
+        backgroundMediaSites = args.sites.toSet()
+        refreshMedia()
+        invoke.resolve()
+    }
+
+    /**
+     * Pauses the media of every page that is out of sight, unless its site may play on, and resumes
+     * what was paused when the page is shown again. A closed page is left to [applyBlocked].
+     */
+    private fun refreshMedia() {
+        for (session in sessions.values) {
+            if (session.blocked) continue
+            val shown = appForeground && session.id == activeId
+            val pause = !shown && session.scope !in backgroundMediaSites
+            if (pause == session.mediaPaused) continue
+            session.mediaPaused = pause
+            session.view.evaluateJavascript(if (pause) PAUSE_MEDIA_SCRIPT else RESUME_MEDIA_SCRIPT, null)
+        }
+    }
+
+    override fun onPause() {
+        appForeground = false
+        refreshMedia()
+    }
+
+    override fun onResume() {
+        appForeground = true
+        refreshMedia()
+    }
+
+    /**
      * Asks the device owner to prove they are present: a biometric or the device credential.
      * Resolves `authenticated: false` when the person cancels, and rejects only when the check
      * cannot run at all.
@@ -678,6 +723,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         session.frame.visibility = View.VISIBLE
         session.shield?.visibility = View.VISIBLE
         activeId = session.id
+        refreshMedia()
         if (session.needsReload && !session.blocked) {
             session.needsReload = false
             if (session.view.url == null) {
@@ -751,6 +797,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
             session.frame.isEnabled = true
             if (session.view.url == null) session.needsReload = true
             if (session.id == activeId && session.needsReload) show(session)
+            refreshMedia()
         }
     }
 
@@ -1388,6 +1435,16 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
 
     companion object {
         private const val BRIDGE_OBJECT = "openmedia"
+
+        /** Pauses what plays and remembers which elements it paused, so only those resume. */
+        private const val PAUSE_MEDIA_SCRIPT =
+            "(function(){var held=window.__openmediaPaused=window.__openmediaPaused||[];" +
+                "document.querySelectorAll('video,audio').forEach(function(m){" +
+                "if(!m.paused&&!m.ended){held.push(m);m.pause()}})})()"
+        private const val RESUME_MEDIA_SCRIPT =
+            "(function(){var held=window.__openmediaPaused||[];window.__openmediaPaused=[];" +
+                "held.forEach(function(m){try{var p=m.play();if(p&&p.catch)p.catch(function(){})}" +
+                "catch(e){}})})()"
         private const val PAINT_OBJECT = "openmediaPaint"
         private const val OPENER_OBJECT = "openmediaOpener"
         private const val NOTIFICATION_CHANNEL = "openmedia-siteview"

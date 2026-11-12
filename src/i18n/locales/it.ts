@@ -531,4 +531,7 @@ export const it: Messages = {
     "Gli abbonamenti si rinnovano automaticamente finché non li annulli nelle impostazioni dello store del dispositivo almeno 24 ore prima della fine del periodo. Ogni piano mostra il prezzo locale dello store e l'eventuale prova gratuita.",
   "paywall.privacy": "Informativa sulla privacy",
   "paywall.terms": "Termini di servizio",
+  "favorites.backgroundMedia": "Continua la riproduzione in background",
+  "favorites.backgroundMediaNote":
+    "Disattivato: audio e video vanno in pausa quando passi a un altro sito o lasci l'app. Attivato: questo sito continua a riprodurre.",
 };
