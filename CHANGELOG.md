@@ -33,6 +33,13 @@ All notable changes to OpenMedia are documented here.
 **Verified:** `cargo test --workspace` (366 + 31 passed), the Android plugin compiles (`compileDebugKotlin`), the Swift plugin type-checks, `yarn ts:check`, `yarn lint`, `yarn test`. **Not verified:** any run on a device, simulator or emulator; media in iframes; Mac window close.
 
 **Issue:** #151
+### feat(tabs): a Tabs screen with open sites, quick access, history and per-site performance
+
+**Area:** `feat(tabs)`
+
+**Change:** The fan has a Tabs button directly above History (Usage and Incognito move up one place). It opens a page listing every open site, the quick-access favorites and the newest history. Open sites can be switched to without a reload, closed one by one, or closed all at once except the visible one; closing never removes a favorite or a history entry, and the last open site stays. Each open site shows time to first paint, last load time, foreground time today and time since last use. The measurements live in memory (`Session.paintMs`, `loadMs`) and today's time comes from `usage.json`; nothing new is stored or sent. Per-site memory use is not shown because the web views do not expose it. New strings are English in every language until translated.
+
+**Issue:** #149
 
 ### feat(app): a splash screen that waits for the first site
 

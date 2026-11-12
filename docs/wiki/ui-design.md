@@ -9,8 +9,8 @@ The web is the product. The screen is one full-bleed page, from under the status
 | Gesture | Result |
 |---------|--------|
 | Tap the button | Command bar slides in from the top. Addresses open directly; requests use the active AI provider with a redacted payload preview before sending |
-| Hold the button (about 380 ms) | The favorites fan out with Incognito, Usage, History and Settings in the edge column, top to bottom: Incognito directly above Usage, Usage directly above History, Settings last |
-| Hold, slide onto an item, lift | Opens that favorite, Usage, History or Settings, or toggles Incognito |
+| Hold the button (about 380 ms) | The favorites fan out with Incognito, Usage, Tabs, History and Settings in the edge column, top to bottom: Incognito directly above Usage, Usage directly above Tabs, Tabs directly above History, Settings last |
+| Hold, slide onto an item, lift | Opens that favorite, Usage, Tabs, History or Settings, or toggles Incognito |
 | Hold, lift, then tap an item | Same, in two steps |
 | Drag the button | Moves it; on release it snaps to the nearer left or right edge and remembers its place |
 | Pull the page down from the top | Native pull-to-refresh: `UIRefreshControl` on iOS, `SwipeRefreshLayout` around each page view on Android; only where the page's own scroll view is at the top |
@@ -110,9 +110,15 @@ request in flight.
 - **While it works.** The bar keeps the steps visible as they come in, so the wait shows what is
   happening. The dock over the page shows the same card while the bar is closed.
 
+## Tabs
+
+The Tabs button sits directly above History in the fan and opens a full-screen page (`features/tabs/TabsSheet.tsx`) with three sections: **Open sites** (every live session, the visible one first, then by last use), **Quick access** (the quick-access favorites, each marked open or not) and the newest addresses of **History** (the History page has the rest). Tapping an open site switches to it without a reload. Each open site has a close button, and "Close the other sites" ends every hidden one; the last open site is never closed, so the app always has a page. Closing only ends the live session: favorites and history are never touched (`closeSession`, `closeOtherSessions` in the store).
+
+Each open site shows measurements kept in memory only, never saved or sent: time to first paint (opening to the first drawn content), the duration of its last load (sampled from state events, so approximate, coarser on macOS where state is polled every 400 ms), foreground time today on its site (from `usage.json`, the same figures as Usage) and how long ago it was used. Memory use per site is not shown: the platform web views do not expose it.
+
 ## History
 
-The History button sits above Settings and below Usage. It lists up to 100 addresses, newest first, with cached/bundled site icons and an independent favorite star: addresses the user typed, and sites reached from a search (the first page a session loads after leaving a search engine's results; `leftSearchForSite`). The search itself is never listed, and neither is moving around inside the site afterwards. Repeated addresses move to the top. Tapping an entry follows the session rules below.
+The History button sits above Settings and below Tabs. It lists up to 100 addresses, newest first, with cached/bundled site icons and an independent favorite star: addresses the user typed, and sites reached from a search (the first page a session loads after leaving a search engine's results; `leftSearchForSite`). The search itself is never listed, and neither is moving around inside the site afterwards. Repeated addresses move to the top. Tapping an entry follows the session rules below.
 
 ## Onboarding
 

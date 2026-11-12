@@ -26,12 +26,13 @@ export const EDGE_MARGIN = 10;
 export const FAVORITE_SIZE = 52;
 export const SETTINGS_SIZE = 44;
 export const HISTORY_SIZE = 44;
+export const TABS_SIZE = 44;
 export const STATS_SIZE = 44;
 export const INCOGNITO_SIZE = 44;
 /** Centre-to-centre distance between neighbouring buttons in the settings column. */
 const COLUMN_OFFSET = 52;
 /** From the settings button up to the incognito button at the top of the column. */
-const COLUMN_REACH = 3 * COLUMN_OFFSET;
+const COLUMN_REACH = 4 * COLUMN_OFFSET;
 
 const MIN_FAN_RADIUS = 108;
 const MAX_ARC_DEGREES = 120;
@@ -89,6 +90,7 @@ export interface FanLayout {
   favorites: Point[];
   settings: Point;
   history: Point;
+  tabs: Point;
   stats: Point;
   incognito: Point;
 }
@@ -98,6 +100,7 @@ export type FanTarget =
   | { kind: "incognito" }
   | { kind: "stats" }
   | { kind: "history" }
+  | { kind: "tabs" }
   | { kind: "settings" };
 
 interface FanItem {
@@ -144,8 +147,8 @@ function isValid(items: FanItem[], origin: Point, viewport: Size, insets: Insets
 /**
  * Favorites sit on an arc opening away from the edge, listed top to bottom. Settings is tucked
  * on the edge column above or below the button, farther out than the arc, so it never reads as
- * a favorite. History sits directly above it in the same column, usage directly above that and
- * incognito at the top. Below the button the whole column is pushed out far enough that its top
+ * a favorite. History sits directly above it in the same column, tabs directly above that, then
+ * usage, and incognito at the top. Below the button the whole column is pushed out far enough that its top
  * item clears the button. When the button is near the top or bottom the arc rotates, the column
  * may flip sides, and finally the arc compacts (smaller steps, larger radius) until everything
  * fits.
@@ -179,14 +182,16 @@ export function fanLayout(
       ),
       settings,
       history: { x: settings.x, y: settings.y - COLUMN_OFFSET },
-      stats: { x: settings.x, y: settings.y - 2 * COLUMN_OFFSET },
-      incognito: { x: settings.x, y: settings.y - 3 * COLUMN_OFFSET },
+      tabs: { x: settings.x, y: settings.y - 2 * COLUMN_OFFSET },
+      stats: { x: settings.x, y: settings.y - 3 * COLUMN_OFFSET },
+      incognito: { x: settings.x, y: settings.y - 4 * COLUMN_OFFSET },
     };
   };
   const items = (layout: FanLayout): FanItem[] => [
     ...layout.favorites.map((center) => ({ center, size: FAVORITE_SIZE })),
     { center: layout.settings, size: SETTINGS_SIZE },
     { center: layout.history, size: HISTORY_SIZE },
+    { center: layout.tabs, size: TABS_SIZE },
     { center: layout.stats, size: STATS_SIZE },
     { center: layout.incognito, size: INCOGNITO_SIZE },
   ];
@@ -212,6 +217,7 @@ export function fanTargetAt(point: Point, layout: FanLayout): FanTarget | null {
   if (index >= 0) return { kind: "favorite", index };
   if (near(layout.incognito, INCOGNITO_SIZE)) return { kind: "incognito" };
   if (near(layout.stats, STATS_SIZE)) return { kind: "stats" };
+  if (near(layout.tabs, TABS_SIZE)) return { kind: "tabs" };
   if (near(layout.history, HISTORY_SIZE)) return { kind: "history" };
   return near(layout.settings, SETTINGS_SIZE) ? { kind: "settings" } : null;
 }

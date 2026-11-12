@@ -7,6 +7,7 @@ import {
   INCOGNITO_SIZE,
   SETTINGS_SIZE,
   STATS_SIZE,
+  TABS_SIZE,
   fabCenter,
   fanLayout,
   fanTargetAt,
@@ -66,6 +67,7 @@ describe("fanLayout", () => {
             ...layout.favorites.map((center) => ({ center, size: FAVORITE_SIZE })),
             { center: layout.settings, size: SETTINGS_SIZE },
             { center: layout.history, size: HISTORY_SIZE },
+            { center: layout.tabs, size: TABS_SIZE },
             { center: layout.stats, size: STATS_SIZE },
             { center: layout.incognito, size: INCOGNITO_SIZE },
           ];
@@ -135,14 +137,27 @@ describe("fanLayout", () => {
     }
   });
 
-  it("stacks stats directly above history in the same column", () => {
+  it("stacks tabs directly above history in the same column", () => {
     for (const edge of edges) {
       for (const y of heights) {
         for (const count of [0, 6]) {
           const origin = fabCenter(edge, y, phone, insets);
           const layout = fanLayout(origin, edge, phone, insets, count);
-          expect(layout.stats.x).toBe(layout.history.x);
-          expect(layout.stats.y).toBeLessThan(layout.history.y);
+          expect(layout.tabs.x).toBe(layout.history.x);
+          expect(layout.tabs.y).toBeLessThan(layout.history.y);
+        }
+      }
+    }
+  });
+
+  it("stacks stats directly above tabs in the same column", () => {
+    for (const edge of edges) {
+      for (const y of heights) {
+        for (const count of [0, 6]) {
+          const origin = fabCenter(edge, y, phone, insets);
+          const layout = fanLayout(origin, edge, phone, insets, count);
+          expect(layout.stats.x).toBe(layout.tabs.x);
+          expect(layout.stats.y).toBeLessThan(layout.tabs.y);
         }
       }
     }
@@ -170,6 +185,7 @@ describe("fanTargetAt", () => {
     expect(fanTargetAt(layout.favorites[2], layout)).toEqual({ kind: "favorite", index: 2 });
     expect(fanTargetAt(layout.settings, layout)).toEqual({ kind: "settings" });
     expect(fanTargetAt(layout.history, layout)).toEqual({ kind: "history" });
+    expect(fanTargetAt(layout.tabs, layout)).toEqual({ kind: "tabs" });
     expect(fanTargetAt(layout.stats, layout)).toEqual({ kind: "stats" });
     expect(fanTargetAt(layout.incognito, layout)).toEqual({ kind: "incognito" });
   });
