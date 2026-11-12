@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-12
 
+### feat(app): a splash screen that waits for the first site
+
+**Area:** `feat(app)`
+
+**Change:** The startup splash is rebuilt. The logo stays exactly where the native launch screen puts it (centred, 52% of the width, at most 240 px, so the handover from the launch screen changes nothing), with a soft halo behind it, the host of the site being opened and a hairline accent track that follows the launch: the web view booting, the shell up, the first site drawn. The splash no longer leaves when the first page merely starts loading: it stays until the site the app opened at launch has painted, because a page that commits early still shows an empty view until it draws. It lifts when there is no site to wait for, when the start page could not be opened, or after 12 s.
+
+**Verified:** `yarn ts:check`, ESLint, Prettier, frontend tests, and the built first paint measured in a browser (logo centred at 52% of the width, status line and track in place, dark and light). **Not verified:** on-device iOS/Android cold start.
+
 ### fix(siteview): a sign-in window stays in the app, so the token reaches the page
 
 **Area:** `fix(siteview)`

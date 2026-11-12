@@ -8,7 +8,14 @@ import { startUsageTracking } from "../features/stats/tracker";
 import { UsageGuard } from "../features/stats/UsageGuard";
 import { WebLayer } from "../features/web/WebLayer";
 import { useApplyTheme } from "../shared/theme";
-import { hideSplash, hideSplashWhen, pageShowing } from "./splash";
+import {
+  hideSplash,
+  hideSplashWhen,
+  setSplashHost,
+  setSplashStage,
+  splashDone,
+  type StartupProgress,
+} from "./splash";
 import { selectLocale, selectPage, selectSettingsOpen, useApp } from "./store";
 import { useHitRegions } from "./useHitRegions";
 import { useAndroidBack } from "../features/back/useAndroidBack";
@@ -49,9 +56,17 @@ const IncognitoRecipesScreen = lazy(() =>
 );
 const Onboarding = lazy(() => loadOnboarding().then((module) => ({ default: module.Onboarding })));
 
-function firstPageShowing(): boolean {
+/**
+ * What the splash is waiting for: the shell is up, and the site the app opened at launch is
+ * really on screen. The site has to have painted, not merely started loading.
+ */
+function splashProgress(): StartupProgress {
   const store = useApp.getState();
-  return store.error !== null || pageShowing(selectPage(store));
+  return {
+    shellReady: true,
+    page: selectPage(store),
+    failed: store.error !== null,
+  };
 }
 
 export function App() {
@@ -95,7 +110,11 @@ export function App() {
 
   useEffect(() => {
     void load()
-      .then(() => hideSplashWhen(firstPageShowing, useApp.subscribe), hideSplash)
+      .then(() => {
+        setSplashStage("shell");
+        setSplashHost(selectPage(useApp.getState())?.openedUrl ?? null);
+        return hideSplashWhen(() => splashDone(splashProgress()), useApp.subscribe);
+      }, hideSplash)
       .then(() => {
         void updates.confirm().catch(() => undefined);
         loadSecondary();

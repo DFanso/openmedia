@@ -37,7 +37,15 @@ When a hidden quick-access session's count rises, the shell asks the plugin for 
 
 iOS Settings still has the master switch. No push: see [Platform Support](./platform-support.md).
 
-**Opening a site:** a small accent spinner sits in the page area until the active session first paints or finishes loading. It uses the existing native page state, stays out of the touch router, and stops on errors; switching to a ready session shows no loader. Reduced-motion mode keeps the ring still. The startup splash still covers the first load.
+**Opening a site:** a small accent spinner sits in the page area until the active session first paints or finishes loading. It uses the existing native page state, stays out of the touch router, and stops on errors; switching to a ready session shows no loader. Reduced-motion mode keeps the ring still. The startup splash still covers the first load (see [The startup splash](#the-startup-splash)).
+
+## The startup splash
+
+The launch screen is native (iOS: `LaunchScreen.storyboard`, the logo at 52% of the width, at most 240 px, on the app's ink or paper). The splash in the shell continues it exactly: the same colour, the same logo in the same place, so nothing changes when the web view takes over. Around the logo sit a soft halo, the host of the site being opened and a hairline accent track that follows the launch: the web view booting, the shell up, the first site drawn.
+
+The splash lifts only when that first site has **painted** — a page that commits early still shows an empty view until it draws, and that frame is what the splash exists to hide — or when there is no site to wait for, or when the start page could not be opened, or after 12 s. Fade-out is 320 ms. Reduced motion keeps the halo still and the track's steps instant.
+
+The splash is drawn by `index.html` itself, with the logo and the stylesheet inlined by the Vite plugin `inlineFirstPaint`, so it is on screen with the first HTML instead of after two more requests.
 
 ## Settings
 
