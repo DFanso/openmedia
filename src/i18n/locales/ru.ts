@@ -873,6 +873,12 @@ export const ru: Messages = {
   "tabs.number": "Вкладка {value}",
   "tabs.arrangeNote":
     "Номера — это горячие клавиши вкладок. Чтобы изменить порядок, удерживайте сайт и перетащите его или используйте стрелки.",
+  "tabs.recentlyClosed": "Недавно закрытые",
+  "tabs.closedEmpty":
+    "Сайты, которые вы закрыли или которые приложение закрыло для экономии памяти, видны здесь до выхода из приложения.",
+  "tabs.closedAgo": "закрыт {value}",
+  "tabs.reopen": "Снова открыть {name}",
+  "tabs.reopenShort": "Открыть снова",
   "tabs.quickAccess": "Быстрый доступ",
   "tabs.history": "История",
   "tabs.allHistory": "Вся история ({count})",

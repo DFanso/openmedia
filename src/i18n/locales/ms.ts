@@ -873,6 +873,12 @@ export const ms: Messages = {
   "tabs.number": "Tab {value}",
   "tabs.arrangeNote":
     "Nombor ialah pintasan tab. Tekan lama dan seret laman, atau gunakan anak panah, untuk menukar susunan.",
+  "tabs.recentlyClosed": "Baru ditutup",
+  "tabs.closedEmpty":
+    "Laman yang anda tutup, atau yang ditutup oleh apl untuk menjimatkan memori, disenaraikan di sini sehingga apl ditutup.",
+  "tabs.closedAgo": "ditutup {value}",
+  "tabs.reopen": "Buka semula {name}",
+  "tabs.reopenShort": "Buka semula",
   "tabs.quickAccess": "Akses pantas",
   "tabs.history": "Sejarah",
   "tabs.allHistory": "Semua sejarah ({count})",

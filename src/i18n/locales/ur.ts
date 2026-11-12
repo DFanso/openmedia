@@ -862,6 +862,12 @@ export const ur: Messages = {
   "tabs.number": "ٹیب {value}",
   "tabs.arrangeNote":
     "نمبر ٹیب کے شارٹ کٹ ہیں۔ ترتیب بدلنے کے لیے کسی سائٹ کو دبائے رکھ کر گھسیٹیں، یا تیر استعمال کریں۔",
+  "tabs.recentlyClosed": "حال ہی میں بند",
+  "tabs.closedEmpty":
+    "جو سائٹس آپ بند کرتے ہیں، یا جنہیں ایپ میموری بچانے کے لیے بند کرتی ہے، ایپ بند ہونے تک یہاں نظر آتی ہیں۔",
+  "tabs.closedAgo": "بند ہوئی {value}",
+  "tabs.reopen": "{name} دوبارہ کھولیں",
+  "tabs.reopenShort": "دوبارہ کھولیں",
   "tabs.quickAccess": "فوری رسائی",
   "tabs.history": "ہسٹری",
   "tabs.allHistory": "پوری ہسٹری ({count})",

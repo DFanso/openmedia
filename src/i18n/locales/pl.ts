@@ -872,6 +872,12 @@ export const pl: Messages = {
   "tabs.number": "Karta {value}",
   "tabs.arrangeNote":
     "Numery to skróty kart. Przytrzymaj witrynę i przeciągnij lub użyj strzałek, aby zmienić kolejność.",
+  "tabs.recentlyClosed": "Ostatnio zamknięte",
+  "tabs.closedEmpty":
+    "Strony, które zamkniesz lub które aplikacja zamknie, by oszczędzić pamięć, są tu do zamknięcia aplikacji.",
+  "tabs.closedAgo": "zamknięto {value}",
+  "tabs.reopen": "Otwórz ponownie {name}",
+  "tabs.reopenShort": "Otwórz ponownie",
   "tabs.quickAccess": "Szybki dostęp",
   "tabs.history": "Historia",
   "tabs.allHistory": "Cała historia ({count})",

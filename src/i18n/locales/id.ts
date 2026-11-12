@@ -869,6 +869,12 @@ export const id: Messages = {
   "tabs.number": "Tab {value}",
   "tabs.arrangeNote":
     "Angka adalah pintasan tab. Tahan lalu seret situs, atau pakai tanda panah, untuk mengubah urutan.",
+  "tabs.recentlyClosed": "Baru ditutup",
+  "tabs.closedEmpty":
+    "Situs yang Anda tutup, atau yang ditutup aplikasi untuk menghemat memori, tercantum di sini sampai aplikasi ditutup.",
+  "tabs.closedAgo": "ditutup {value}",
+  "tabs.reopen": "Buka lagi {name}",
+  "tabs.reopenShort": "Buka lagi",
   "tabs.quickAccess": "Akses cepat",
   "tabs.history": "Riwayat",
   "tabs.allHistory": "Semua riwayat ({count})",

@@ -7,6 +7,7 @@ vi.mock("@tauri-apps/api/event", () => ({ listen: vi.fn() }));
 import { selectQuickFavorites, useApp } from "./store";
 import type { AppState, Favorite } from "../shared/ipc";
 import { useEntitlementStore } from "../features/paywall/store";
+import { newSession } from "../features/web/sessions";
 
 const favorite = (name: string, url: string): Favorite => ({ id: name, name, url, notify: true });
 const normal = [favorite("Reddit", "https://www.reddit.com/")];
@@ -29,6 +30,7 @@ beforeEach(() => {
     activeId: null,
     incognito: { active: false, favorites: [], folders: [], busy: false },
     incognitoSites: [],
+    closedTabs: [],
     error: null,
   });
   useEntitlementStore.setState({ status: "pro", configured: true, snapshot: null });
@@ -76,6 +78,33 @@ describe("incognito mode", () => {
     useApp.setState({ blankTab: false });
     await useApp.getState().exitIncognito();
     expect(useApp.getState().blankTab).toBe(true);
+  });
+
+  it("forgets the recently closed sites when the mode changes, both ways", async () => {
+    invoke.mockImplementation(async (name: string) => (name === "enter_incognito" ? secret : null));
+    useApp.setState({
+      sessions: [
+        newSession("n", "typed", "https://normal.example/", 1),
+        newSession("m", "typed", "https://more.example/", 1),
+      ],
+      activeId: "m",
+    });
+    useApp.getState().closeSession("n");
+    expect(useApp.getState().closedTabs).toHaveLength(1);
+    await useApp.getState().enterIncognito();
+    expect(useApp.getState().closedTabs).toEqual([]);
+
+    useApp.setState({
+      sessions: [
+        newSession("i", "typed", "https://secret.example/", 1),
+        newSession("m", "typed", "https://more.example/", 1),
+      ],
+      activeId: "m",
+    });
+    useApp.getState().closeSession("i");
+    expect(useApp.getState().closedTabs.map((tab) => tab.url)).toEqual(["https://secret.example/"]);
+    await useApp.getState().exitIncognito();
+    expect(useApp.getState().closedTabs).toEqual([]);
   });
 
   it("drops an open assistant turn when the mode changes, so it cannot be seen in the other mode", async () => {

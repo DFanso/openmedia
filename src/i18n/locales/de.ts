@@ -888,6 +888,12 @@ export const de: Messages = {
   "tabs.number": "Tab {value}",
   "tabs.arrangeNote":
     "Die Nummern sind die Tab-Kürzel. Halte eine Seite gedrückt und ziehe sie, oder nutze die Pfeile, um die Reihenfolge zu ändern.",
+  "tabs.recentlyClosed": "Kürzlich geschlossen",
+  "tabs.closedEmpty":
+    "Seiten, die du schließt oder die die App schließt, um Speicher zu sparen, stehen hier, bis die App beendet wird.",
+  "tabs.closedAgo": "geschlossen {value}",
+  "tabs.reopen": "{name} wieder öffnen",
+  "tabs.reopenShort": "Wieder öffnen",
   "tabs.quickAccess": "Schnellzugriff",
   "tabs.history": "Verlauf",
   "tabs.allHistory": "Gesamter Verlauf ({count})",

@@ -890,6 +890,12 @@ export const ta: Messages = {
   "tabs.number": "தாவல் {value}",
   "tabs.arrangeNote":
     "எண்கள் தாவல் குறுக்குவழிகள். வரிசையை மாற்ற தளத்தை அழுத்திப் பிடித்து இழுக்கவும், அல்லது அம்புகளைப் பயன்படுத்தவும்.",
+  "tabs.recentlyClosed": "சமீபத்தில் மூடியவை",
+  "tabs.closedEmpty":
+    "நீங்கள் மூடும் தளங்கள், அல்லது நினைவகத்தைச் சேமிக்க ஆப் மூடும் தளங்கள், ஆப் மூடப்படும் வரை இங்கே இருக்கும்.",
+  "tabs.closedAgo": "மூடப்பட்டது {value}",
+  "tabs.reopen": "{name} மீண்டும் திற",
+  "tabs.reopenShort": "மீண்டும் திற",
   "tabs.quickAccess": "விரைவு அணுகல்",
   "tabs.history": "வரலாறு",
   "tabs.allHistory": "முழு வரலாறு ({count})",

@@ -882,6 +882,12 @@ export const es: Messages = {
   "tabs.number": "Pestaña {value}",
   "tabs.arrangeNote":
     "Los números son los atajos de pestañas. Mantén pulsado un sitio y arrástralo, o usa las flechas, para cambiar el orden.",
+  "tabs.recentlyClosed": "Cerrados recientemente",
+  "tabs.closedEmpty":
+    "Los sitios que cierras, o que la app cierra para ahorrar memoria, aparecen aquí hasta que se cierra la app.",
+  "tabs.closedAgo": "cerrado {value}",
+  "tabs.reopen": "Volver a abrir {name}",
+  "tabs.reopenShort": "Volver a abrir",
   "tabs.quickAccess": "Acceso rápido",
   "tabs.history": "Historial",
   "tabs.allHistory": "Todo el historial ({count})",

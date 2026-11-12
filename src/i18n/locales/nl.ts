@@ -877,6 +877,12 @@ export const nl: Messages = {
   "tabs.number": "Tabblad {value}",
   "tabs.arrangeNote":
     "De nummers zijn de sneltoetsen voor tabbladen. Houd een site ingedrukt en sleep, of gebruik de pijlen, om de volgorde te wijzigen.",
+  "tabs.recentlyClosed": "Onlangs gesloten",
+  "tabs.closedEmpty":
+    "Sites die je sluit, of die de app sluit om geheugen te sparen, staan hier tot de app stopt.",
+  "tabs.closedAgo": "gesloten {value}",
+  "tabs.reopen": "{name} opnieuw openen",
+  "tabs.reopenShort": "Opnieuw openen",
   "tabs.quickAccess": "Snelle toegang",
   "tabs.history": "Geschiedenis",
   "tabs.allHistory": "Alle geschiedenis ({count})",

@@ -853,6 +853,12 @@ export const ko: Messages = {
   "tabs.number": "탭 {value}",
   "tabs.arrangeNote":
     "번호는 탭 단축키입니다. 사이트를 길게 눌러 끌거나 화살표를 사용해 순서를 바꾸세요.",
+  "tabs.recentlyClosed": "최근에 닫은 사이트",
+  "tabs.closedEmpty":
+    "직접 닫았거나 메모리를 아끼려고 앱이 닫은 사이트가 앱을 종료할 때까지 여기에 표시됩니다.",
+  "tabs.closedAgo": "{value} 닫음",
+  "tabs.reopen": "{name} 다시 열기",
+  "tabs.reopenShort": "다시 열기",
   "tabs.quickAccess": "빠른 접근",
   "tabs.history": "기록",
   "tabs.allHistory": "전체 기록({count})",

@@ -829,6 +829,12 @@ export const th: Messages = {
   "tabs.number": "แท็บ {value}",
   "tabs.arrangeNote":
     "ตัวเลขคือคีย์ลัดของแท็บ กดค้างที่เว็บไซต์แล้วลาก หรือใช้ปุ่มลูกศรเพื่อเปลี่ยนลำดับ",
+  "tabs.recentlyClosed": "ปิดล่าสุด",
+  "tabs.closedEmpty":
+    "เว็บไซต์ที่คุณปิด หรือที่แอปปิดเพื่อประหยัดหน่วยความจำ จะแสดงที่นี่จนกว่าแอปจะปิด",
+  "tabs.closedAgo": "ปิดเมื่อ {value}",
+  "tabs.reopen": "เปิด {name} อีกครั้ง",
+  "tabs.reopenShort": "เปิดอีกครั้ง",
   "tabs.quickAccess": "ทางลัด",
   "tabs.history": "ประวัติ",
   "tabs.allHistory": "ประวัติทั้งหมด ({count})",

@@ -873,6 +873,12 @@ export const uk: Messages = {
   "tabs.number": "Вкладка {value}",
   "tabs.arrangeNote":
     "Номери — це гарячі клавіші вкладок. Щоб змінити порядок, утримуйте сайт і перетягніть його або скористайтеся стрілками.",
+  "tabs.recentlyClosed": "Нещодавно закриті",
+  "tabs.closedEmpty":
+    "Сайти, які ви закрили або які застосунок закрив, щоб заощадити пам'ять, видно тут до виходу із застосунку.",
+  "tabs.closedAgo": "закрито {value}",
+  "tabs.reopen": "Знову відкрити {name}",
+  "tabs.reopenShort": "Відкрити знову",
   "tabs.quickAccess": "Швидкий доступ",
   "tabs.history": "Історія",
   "tabs.allHistory": "Уся історія ({count})",

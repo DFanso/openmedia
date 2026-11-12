@@ -875,6 +875,12 @@ export const pt: Messages = {
   "tabs.number": "Aba {value}",
   "tabs.arrangeNote":
     "Os números são os atalhos das abas. Mantenha um site pressionado e arraste, ou use as setas, para mudar a ordem.",
+  "tabs.recentlyClosed": "Fechados recentemente",
+  "tabs.closedEmpty":
+    "Os sites que você fecha, ou que o app fecha para poupar memória, ficam aqui até o app ser fechado.",
+  "tabs.closedAgo": "fechado {value}",
+  "tabs.reopen": "Reabrir {name}",
+  "tabs.reopenShort": "Reabrir",
   "tabs.quickAccess": "Acesso rápido",
   "tabs.history": "Histórico",
   "tabs.allHistory": "Todo o histórico ({count})",

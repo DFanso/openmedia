@@ -834,6 +834,12 @@ export const ar: Messages = {
   "tabs.number": "علامة التبويب {value}",
   "tabs.arrangeNote":
     "الأرقام هي اختصارات علامات التبويب. اضغط مطولًا على موقع واسحبه، أو استخدم الأسهم، لتغيير الترتيب.",
+  "tabs.recentlyClosed": "المغلقة مؤخرًا",
+  "tabs.closedEmpty":
+    "المواقع التي تغلقها، أو التي يغلقها التطبيق لتوفير الذاكرة، تظهر هنا حتى يُغلق التطبيق.",
+  "tabs.closedAgo": "أُغلق {value}",
+  "tabs.reopen": "إعادة فتح {name}",
+  "tabs.reopenShort": "إعادة الفتح",
   "tabs.quickAccess": "الوصول السريع",
   "tabs.history": "السجل",
   "tabs.allHistory": "كل السجل ({count})",
