@@ -300,7 +300,7 @@ export const ro: Messages = {
   "recipes.openHubPage": "Deschide {label}",
   "recipes.hubNote":
     "Un hub deschide mai multe site-uri deodată. Fiecare pagină este un site propriu, cu cookie-urile proprii.",
-  "recipes.bottomMargin": "Margine inferioară",
+  "favorites.bottomMargin": "Margine inferioară",
   "recipes.sharedMargin":
     "Folosește marginea comună. Mută glisorul pentru a da acestui site una proprie.",
   "recipes.ownMargin": "Acest site are propria margine.",

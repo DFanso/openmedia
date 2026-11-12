@@ -303,7 +303,7 @@ export const pt: Messages = {
   "recipes.openHubPage": "Abrir {label}",
   "recipes.hubNote":
     "Um hub abre vários sites ao mesmo tempo. Cada página é um site próprio, com os seus próprios cookies.",
-  "recipes.bottomMargin": "Margem inferior",
+  "favorites.bottomMargin": "Margem inferior",
   "recipes.sharedMargin":
     "Usa a margem compartilhada. Mova o controle deslizante para dar a este site sua própria margem.",
   "recipes.ownMargin": "Este site tem sua própria margem.",

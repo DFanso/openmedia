@@ -288,7 +288,7 @@ export const ar: Messages = {
   "recipes.openHubPage": "فتح {label}",
   "recipes.hubNote":
     "يفتح المركز عدة مواقع في وقت واحد. كل صفحة موقع خاص بها بملفات تعريف الارتباط الخاصة به.",
-  "recipes.bottomMargin": "الهامش السفلي",
+  "favorites.bottomMargin": "الهامش السفلي",
   "recipes.sharedMargin": "يستخدم الهامش المشترك. حرّك المؤشر ليمنح هذا الموقع هامشًا خاصًا به.",
   "recipes.ownMargin": "لهذا الموقع هامش خاص به.",
   "recipes.siteMarginLabel": "الهامش السفلي لـ {name}",

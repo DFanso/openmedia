@@ -164,7 +164,7 @@ What the validator allows: one CSS selector (comma lists fine) per rule; at most
 
 ## Bottom margin
 
-Some sites draw fixed bars at the very bottom that sit under the screen edge or under the floating button. Settings → Bottom margin shrinks the native site view from the bottom (0–200 px, shared), and a site card can override it. It is a native layout setting, not CSS, so it works the same on every page and needs no selector. See [UI Design](./ui-design.md#settings).
+Some sites draw fixed bars at the very bottom that sit under the screen edge or under the floating button. Settings → Bottom margin shrinks the native site view from the bottom (0–200 px, shared), and an expanded favorite in Settings → Favorites can override it. It is a native layout setting, not CSS, so it works the same on every page and needs no selector. See [UI Design](./ui-design.md#settings).
 
 ## Discord (`discord.default`)
 

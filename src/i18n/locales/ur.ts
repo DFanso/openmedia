@@ -299,7 +299,7 @@ export const ur: Messages = {
   "recipes.openHubPage": "{label} کھولیں",
   "recipes.hubNote":
     "ہب ایک وقت میں کئی سائٹس کھولتا ہے۔ ہر صفحہ اپنی سائٹ ہے، اپنے کوکیز کے ساتھ۔",
-  "recipes.bottomMargin": "نیچے کا مارجن",
+  "favorites.bottomMargin": "نیچے کا مارجن",
   "recipes.sharedMargin":
     "مشترکہ مارجن استعمال ہوتا ہے۔ سلائیڈر کو ہلائیں تاکہ اس سائٹ کا اپنا مارجن ہو۔",
   "recipes.ownMargin": "اس سائٹ کا اپنا مارجن ہے۔",

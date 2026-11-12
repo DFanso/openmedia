@@ -15,6 +15,13 @@ All notable changes to OpenMedia are documented here.
 **Change:** On iOS the splash's logo painted about 48 pt above the launch screen's logo and dropped back a moment later. The shell's web view lays out its first frame 96 px shorter than the screen (the safe areas are taken off) and grows to full height about 40 ms after, and the splash centred its logo in that short viewport. The splash is now sized and centred with the large viewport (`100lvh`, which is the screen's height from the first frame), so the logo stays where the launch screen put it.
 
 **Verified:** on the iPhone 17 Pro Max simulator (iOS 26.5), a debug build logged the shell's viewport at the splash's first frame (`innerHeight` 860, then 956; `100lvh` 956 throughout), and a cold-launch video tracked the logo from the launch screen to the splash: before, it was drawn higher for the first frames and then moved; after, its position is the same on every frame. **Not verified:** a physical device, Android and a release build.
+### feat(settings): the per-site bottom margin moves from the recipe card to the expanded favorite
+
+**Area:** `feat(settings)`
+
+**Change:** A site's own bottom margin is now set in Settings > Favorites, in the expanded favorite whose site has a recipe, and the Recipes card no longer shows it. Saved margins keep working: they are still stored per recipe id. The slider saves on release, not with Save. Incognito favorites and favorites with no recipe have no margin control. The shared margin stays in Accessibility. Only the English settings note was reworded; the other languages still say "a recipe".
+
+**Issue:** #150
 
 ### feat(app): a splash screen that waits for the first site
 

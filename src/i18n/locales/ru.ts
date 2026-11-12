@@ -301,7 +301,7 @@ export const ru: Messages = {
   "recipes.openHubPage": "Открыть {label}",
   "recipes.hubNote":
     "Хаб открывает несколько сайтов сразу. Каждая страница — отдельный сайт со своими cookie.",
-  "recipes.bottomMargin": "Нижнее поле",
+  "favorites.bottomMargin": "Нижнее поле",
   "recipes.sharedMargin": "Использует общее поле. Сдвиньте ползунок, чтобы дать этому сайту своё.",
   "recipes.ownMargin": "У этого сайта своё нижнее поле.",
   "recipes.siteMarginLabel": "Нижнее поле для {name}",

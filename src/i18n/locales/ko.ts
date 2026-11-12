@@ -292,7 +292,7 @@ export const ko: Messages = {
   "recipes.openHubPage": "{label} 열기",
   "recipes.hubNote":
     "허브는 여러 사이트를 한 번에 엽니다. 각 페이지는 별도의 사이트이며 자체 쿠키를 사용합니다.",
-  "recipes.bottomMargin": "하단 여백",
+  "favorites.bottomMargin": "하단 여백",
   "recipes.sharedMargin":
     "공통 여백을 사용합니다. 슬라이더를 옮기면 이 사이트만 별도의 여백을 갖게 됩니다.",
   "recipes.ownMargin": "이 사이트에는 자체 여백이 있습니다.",

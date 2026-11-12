@@ -295,7 +295,7 @@ export const ms: Messages = {
   "recipes.openHubPage": "Buka {label}",
   "recipes.hubNote":
     "Hab membuka beberapa laman sekali gus. Setiap halaman ialah laman sendiri, dengan cookie sendiri.",
-  "recipes.bottomMargin": "Margin bawah",
+  "favorites.bottomMargin": "Margin bawah",
   "recipes.sharedMargin":
     "Guna margin bersama. Leret peluncur untuk memberi laman ini margin sendiri.",
   "recipes.ownMargin": "Laman ini mempunyai margin sendiri.",

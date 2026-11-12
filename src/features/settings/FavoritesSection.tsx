@@ -13,6 +13,7 @@ import { SiteTile } from "../../shared/SiteTile";
 import { normalizeWebUrl } from "../../shared/url";
 import { useEntitlementStore } from "../paywall/store";
 import { describeAddress } from "../history/address";
+import { MarginSlider } from "./MarginSlider";
 import { MAX_FAVORITE_NAME } from "./presets";
 import { Switch } from "./Switch";
 import { Group, GroupLabel, Section, field, primaryButton, quietButton } from "./ui";
@@ -118,6 +119,7 @@ export function FavoritesEditor({
         onCommit={(entry) => commit(index, entry)}
         onRemove={() => remove(index)}
         onOpenRecipe={recipe ? () => openRecipe(recipe.recipeId) : undefined}
+        marginRecipe={recipeSheet === "recipes" ? recipe : undefined}
       />
     );
   };
@@ -272,6 +274,8 @@ interface RowProps {
   onRemove: () => void;
   /** Present when the favorite's site has an installed recipe. */
   onOpenRecipe?: () => void;
+  /** The recipe whose bottom margin the editor shows; absent for incognito and recipe-less favorites. */
+  marginRecipe?: SiteSettings;
 }
 
 function FavoriteRow({
@@ -285,6 +289,7 @@ function FavoriteRow({
   onCommit,
   onRemove,
   onOpenRecipe,
+  marginRecipe,
 }: RowProps) {
   const { host } = describeAddress(favorite.url);
   const arrow = "grid size-10 place-items-center text-paper/65 disabled:opacity-20";
@@ -342,6 +347,7 @@ function FavoriteRow({
           onCancel={onEdit}
           onRemove={onRemove}
           onOpenRecipe={onOpenRecipe}
+          marginRecipe={marginRecipe}
         />
       )}
     </div>
@@ -356,6 +362,7 @@ interface EditorProps {
   onCancel: () => void;
   onRemove?: () => void;
   onOpenRecipe?: () => void;
+  marginRecipe?: SiteSettings;
 }
 
 function FavoriteEditor({
@@ -366,6 +373,7 @@ function FavoriteEditor({
   onCancel,
   onRemove,
   onOpenRecipe,
+  marginRecipe,
 }: EditorProps) {
   const [name, setName] = useState(initial.name);
   const [url, setUrl] = useState(initial.url);
@@ -416,6 +424,7 @@ function FavoriteEditor({
       {(problem ?? hint) && (
         <p className={`text-sm ${problem ? "text-accent" : "text-paper/55"}`}>{problem ?? hint}</p>
       )}
+      {marginRecipe && <FavoriteMargin site={marginRecipe} />}
       {onOpenRecipe && (
         <button type="button" onClick={onOpenRecipe} className={`self-start ${quietButton}`}>
           {t("favorites.openRecipe")}
@@ -438,6 +447,36 @@ function FavoriteEditor({
           </button>
         )}
       </div>
+    </div>
+  );
+}
+
+/** The site's own bottom margin. It saves on release, like the slider always did, not with Save. */
+function FavoriteMargin({ site }: { site: SiteSettings }) {
+  const setSiteBottomMargin = useApp((s) => s.setSiteBottomMargin);
+  const sharedMargin = useApp((s) => s.state?.bottomMargin ?? 0);
+  const t = useT();
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="text-sm font-medium">{t("favorites.bottomMargin")}</div>
+      <p className="text-sm leading-snug text-paper/55">
+        {site.bottomMargin === null ? t("recipes.sharedMargin") : t("recipes.ownMargin")}
+      </p>
+      <MarginSlider
+        label={t("recipes.siteMarginLabel", { name: site.name })}
+        value={site.bottomMargin ?? sharedMargin}
+        onCommit={(pixels) => void setSiteBottomMargin(site.recipeId, pixels)}
+      />
+      {site.bottomMargin !== null && (
+        <button
+          type="button"
+          onClick={() => void setSiteBottomMargin(site.recipeId, null)}
+          className={`self-start ${quietButton}`}
+        >
+          {t("recipes.useSharedMargin")}
+        </button>
+      )}
     </div>
   );
 }

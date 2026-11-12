@@ -291,7 +291,7 @@ export const bn: Messages = {
   "recipes.openHubPage": "{label} খুলুন",
   "recipes.hubNote":
     "একটি হাব একসাথে কয়েকটি সাইট খোলে। প্রতিটি পৃষ্ঠা নিজস্ব সাইট, নিজস্ব কুকি সহ।",
-  "recipes.bottomMargin": "নিচের মার্জিন",
+  "favorites.bottomMargin": "নিচের মার্জিন",
   "recipes.sharedMargin":
     "সাধারণ মার্জিন ব্যবহার করে। এই সাইটের নিজস্ব মার্জিন দিতে স্লাইডারটি সরান।",
   "recipes.ownMargin": "এই সাইটের নিজস্ব মার্জিন আছে।",

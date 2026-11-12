@@ -199,7 +199,7 @@ export const en = {
   "settings.themeDark": "Dark",
   "settings.browsing": "Browsing",
   "settings.browsingNote":
-    "Ad blocking uses lists built into the app; if a site stops working, turn it off and the page reloads. The back button sits opposite the main button, for sites with none of their own. A recipe can set its own bottom margin.",
+    "Ad blocking uses lists built into the app; if a site stops working, turn it off and the page reloads. The back button sits opposite the main button, for sites with none of their own. A favorite can set its own bottom margin.",
   "settings.adBlock": "Block ads and trackers",
   "settings.backButton": "Floating back button",
   "settings.backButtonNote":
@@ -299,7 +299,7 @@ export const en = {
   "recipes.openHubPage": "Open {label}",
   "recipes.hubNote":
     "A hub opens several sites at once. Each page is a site of its own, with its own cookies.",
-  "recipes.bottomMargin": "Bottom margin",
+  "favorites.bottomMargin": "Bottom margin",
   "recipes.sharedMargin": "Uses the shared margin. Move the slider to give this site its own.",
   "recipes.ownMargin": "This site has its own margin.",
   "recipes.siteMarginLabel": "{name} bottom margin",

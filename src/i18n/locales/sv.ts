@@ -299,7 +299,7 @@ export const sv: Messages = {
   "recipes.openHubPage": "Öppna {label}",
   "recipes.hubNote":
     "En hubb öppnar flera webbplatser samtidigt. Varje sida är en egen webbplats med egna cookies.",
-  "recipes.bottomMargin": "Nedre marginal",
+  "favorites.bottomMargin": "Nedre marginal",
   "recipes.sharedMargin":
     "Använder den delade marginalen. Flytta reglaget för att ge den här webbplatsen en egen.",
   "recipes.ownMargin": "Den här webbplatsen har en egen marginal.",

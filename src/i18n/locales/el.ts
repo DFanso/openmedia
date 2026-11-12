@@ -304,7 +304,7 @@ export const el: Messages = {
   "recipes.openHubPage": "Άνοιγμα {label}",
   "recipes.hubNote":
     "Ένα hub ανοίγει πολλά site ταυτόχρονα. Κάθε σελίδα είναι δικό της site, με δικά της cookies.",
-  "recipes.bottomMargin": "Κάτω περιθώριο",
+  "favorites.bottomMargin": "Κάτω περιθώριο",
   "recipes.sharedMargin":
     "Χρησιμοποιεί το κοινό περιθώριο. Σύρετε τον ρυθμιστή για να δώσετε σε αυτό τον ιστότοπο δικό του.",
   "recipes.ownMargin": "Αυτός ο ιστότοπος έχει δικό του κάτω περιθώριο.",

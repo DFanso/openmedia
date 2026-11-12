@@ -297,7 +297,7 @@ export const nl: Messages = {
   "recipes.openHubPage": "{label} openen",
   "recipes.hubNote":
     "Een hub opent meerdere sites tegelijk. Elke pagina is een eigen site, met eigen cookies.",
-  "recipes.bottomMargin": "Ondermarge",
+  "favorites.bottomMargin": "Ondermarge",
   "recipes.sharedMargin":
     "Gebruikt de gedeelde marge. Beweeg de schuifregelaar om deze site een eigen marge te geven.",
   "recipes.ownMargin": "Deze site heeft een eigen marge.",

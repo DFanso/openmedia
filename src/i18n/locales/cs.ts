@@ -299,7 +299,7 @@ export const cs: Messages = {
   "recipes.openHubPage": "Otevřít {label}",
   "recipes.hubNote":
     "Hub otevře několik webů najednou. Každá stránka je vlastní web s vlastními cookies.",
-  "recipes.bottomMargin": "Spodní okraj",
+  "favorites.bottomMargin": "Spodní okraj",
   "recipes.sharedMargin": "Používá sdílený okraj. Posunutím jezdce dáte tomuto webu vlastní.",
   "recipes.ownMargin": "Tento web má vlastní okraj.",
   "recipes.siteMarginLabel": "Spodní okraj webu {name}",

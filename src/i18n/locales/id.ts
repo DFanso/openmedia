@@ -293,7 +293,7 @@ export const id: Messages = {
   "recipes.openHubPage": "Buka {label}",
   "recipes.hubNote":
     "Hub membuka beberapa situs sekaligus. Setiap halaman adalah situsnya sendiri, dengan cookie sendiri.",
-  "recipes.bottomMargin": "Margin bawah",
+  "favorites.bottomMargin": "Margin bawah",
   "recipes.sharedMargin":
     "Memakai margin bersama. Geser slider untuk memberi situs ini margin sendiri.",
   "recipes.ownMargin": "Situs ini punya margin sendiri.",

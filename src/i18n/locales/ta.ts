@@ -304,7 +304,7 @@ export const ta: Messages = {
   "recipes.openHubPage": "{label} திற",
   "recipes.hubNote":
     "ஒரு ஹப் ஒரே நேரத்தில் பல தளங்களைத் திறக்கிறது. ஒவ்வொரு பக்கமும் தனி தளம், தனது குக்கீகளுடன்.",
-  "recipes.bottomMargin": "கீழ் விளிச்சை",
+  "favorites.bottomMargin": "கீழ் விளிச்சை",
   "recipes.sharedMargin":
     "பகிர்ந்த கீழ் விளிச்சையைப் பயன்படுத்துகிறது. இந்தத் தளத்திற்குத் தனி விளிச்சை கொடுக்கச் ச்ளைடரை நகர்த்தவும்.",
   "recipes.ownMargin": "இந்தத் தளத்திற்கு தனி விளிச்சை உள்ளது.",
