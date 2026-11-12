@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-12
 
+### feat(usage): a daily limit for the parts of a site
+
+**Area:** `feat(usage)`
+
+**Change:** A site can now carry a daily limit for one of its parts — Reels inside Instagram, Shorts inside YouTube — next to the limit for the site itself. The Limits tab lists the parts of a site under its row with the time spent on each today and the same slider editor; the "Limits today" card counts site and part limits together, and the Activity tab's section breakdown links to a part's limit. A part that is over its limit stops the clock: its time is no longer counted and the app says so over the page, while the rest of the site keeps counting and stays open. Part limits live in `usage.json` next to the site limits, per host and per first path segment; `get_usage_limits`, `set_usage_limit` and `set_usage_section_limit` replace `get_usage_policies` and `set_usage_policy`.
+
+**Verified:** `yarn ts:check`, ESLint, Prettier, 402 frontend tests, `cargo test --workspace` (364 tests) and clippy. **Not verified:** on a device.
+
 ### fix(hubs): a hub's quick-access favorite opens the hub
 
 **Area:** `fix(hubs)`

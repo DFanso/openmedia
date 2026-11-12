@@ -95,7 +95,7 @@ Each opened site is a session (a separate native web view) scoped to its current
 
 History (the addresses the user typed) is stored in `library.json` on the device, like favorites, and holds no page content. "Clear history" removes it and the remembered last page.
 
-Usage stats (seconds per site and first path segment, per local day, 30 days) and daily policies are stored locally in `usage.json`. Shell-only app commands `record_usage`, `get_usage`, `clear_usage`, `get_usage_policies` and `set_usage_policy` validate dates, hosts, sections, seconds and policy bounds (1–86400 seconds, warning below limit, at most 200 policies). Clearing stats preserves policy settings. No full address, query, title or page content is stored or sent.
+Usage stats (seconds per site and first path segment, per local day, 30 days) and daily policies are stored locally in `usage.json`. Shell-only app commands `record_usage`, `get_usage`, `clear_usage`, `get_usage_limits`, `set_usage_limit` and `set_usage_section_limit` validate dates, hosts, sections, seconds and policy bounds (1–86400 seconds, warning below limit, at most 200 policies per host and 60 parts per host). A policy may be set for a whole site or for one part of it (a first path segment), and both are stored under the host they belong to. Clearing stats preserves policy settings. No full address, query, title or page content is stored or sent.
 
 Assistant chats (the user's own requests, the steps of each request and its outcome) are stored
 locally in `chats.json`. The shell-only app commands `chat_list`, `chat_save`, `chat_delete` and
