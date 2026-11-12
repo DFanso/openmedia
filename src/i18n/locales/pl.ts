@@ -133,6 +133,20 @@ export const pl: Messages = {
   "usage.remindAtHint": "Sygnał, gdy jest jeszcze czas na dokończenie.",
   "usage.sliderLimit": "Dzienny limit dla {host}",
   "usage.sliderReminder": "Przypomnienie dla {host}",
+  "usage.partsTitle": "Części tej witryny",
+  "usage.partSetLimit": "Ustaw limit dla tej części",
+  "usage.partChangeLimit": "Zmień limit tej części",
+  "usage.partLimitLabel": "Limit dzienny dla {part} w {host}",
+  "usage.partReminderLabel": "Przypomnienie dla {part} w {host}",
+  "usage.partStopAfter": "Przestań liczyć po",
+  "usage.partPresetsHint":
+    "Wybierz dzienny limit. Dostaniesz przypomnienie wcześniej, a po jego osiągnięciu czas tutaj przestanie być liczony.",
+  "usage.partStopAfterHint":
+    "Czas w tej części przestaje być liczony do północy. Reszta witryny pozostaje otwarta.",
+  "usage.partTimeCheck": "Kontrola czasu: {part} w {host}",
+  "usage.partLimitReached":
+    "{part} w {host} przekroczył dzienny limit. Czas tutaj nie jest już liczony.",
+  "usage.partStatusReached": "Limit osiągnięty. Czas tutaj nie jest już liczony.",
   "usage.saveHint":
     "Zmiany zapisują się po puszczeniu suwaka. Czas jest liczony, gdy witryna jest na ekranie, i resetuje się o północy.",
 

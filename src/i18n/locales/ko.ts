@@ -130,6 +130,20 @@ export const ko: Messages = {
   "usage.remindAtHint": "마무리할 시간이 남아 있을 때 미리 알려 드립니다.",
   "usage.sliderLimit": "{host}의 일일 한도",
   "usage.sliderReminder": "{host}의 알림",
+  "usage.partsTitle": "이 사이트의 섹션",
+  "usage.partSetLimit": "이 섹션의 한도 설정",
+  "usage.partChangeLimit": "이 섹션의 한도 변경",
+  "usage.partLimitLabel": "{host}의 {part} 일일 한도",
+  "usage.partReminderLabel": "{host}의 {part} 알림",
+  "usage.partStopAfter": "이 시간이 지나면 집계 중지",
+  "usage.partPresetsHint":
+    "일일 한도를 고르세요. 전에 알림이 오고, 한도에 도달하면 이곳의 시간은 집계되지 않습니다.",
+  "usage.partStopAfterHint":
+    "이 섹션의 시간은 자정까지 집계되지 않습니다. 사이트의 나머지 부분은 계속 열려 있습니다.",
+  "usage.partTimeCheck": "시간 확인: {host}의 {part}",
+  "usage.partLimitReached":
+    "{host}의 {part}가 일일 한도를 넘었습니다. 이곳의 시간은 더 이상 집계되지 않습니다.",
+  "usage.partStatusReached": "한도에 도달했습니다. 이곳의 시간은 더 이상 집계되지 않습니다.",
   "usage.saveHint":
     "손을 떼면 변경 사항이 저장됩니다. 시간은 사이트가 화면에 표시되는 동안 집계되며 자정에 초기화됩니다.",
 

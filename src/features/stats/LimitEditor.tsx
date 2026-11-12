@@ -3,7 +3,7 @@ import { describeError } from "../../i18n/errors";
 import { useT } from "../../i18n/useT";
 import { Switch } from "../settings/Switch";
 import { DurationSlider } from "./DurationSlider";
-import { formatDuration } from "./format";
+import { formatDuration, sectionLabel } from "./format";
 import {
   DEFAULT_LIMIT_MINUTES,
   LIMIT_PRESETS,
@@ -17,7 +17,7 @@ import {
   withPreset,
   type Thresholds,
 } from "./limits";
-import { usagePolicies, type UsagePolicy } from "./policy";
+import { usageLimits, type UsagePolicy } from "./policy";
 import { MeterCaption, UsageMeter } from "./UsageMeter";
 
 function Chips({
@@ -53,15 +53,18 @@ function Chips({
 
 interface LimitEditorProps {
   host: string;
+  /** The part of the site the limit is for; `null` for the site itself. */
+  section: string | null;
   policy: UsagePolicy | undefined;
   spentSeconds: number;
 }
 
 /**
- * Sets one site's daily reminder and limit with sliders. Nothing needs typing and nothing needs a
- * Save button: a drag follows the thumb on screen and is saved when the finger lifts.
+ * Sets one site's daily reminder and limit with sliders, or the same for one part of a site.
+ * Nothing needs typing and nothing needs a Save button: a drag follows the thumb on screen and is
+ * saved when the finger lifts.
  */
-export function LimitEditor({ host, policy, spentSeconds }: LimitEditorProps) {
+export function LimitEditor({ host, section, policy, spentSeconds }: LimitEditorProps) {
   const t = useT();
   const [draft, setDraft] = useState<Thresholds | null>(null);
   const [error, setError] = useState("");
@@ -70,6 +73,7 @@ export function LimitEditor({ host, policy, spentSeconds }: LimitEditorProps) {
   const shown = draft ?? committed;
   const stops = stopsFor(committed.warn, committed.limit);
   const active = shown.warn !== null || shown.limit !== null;
+  const part = section === null ? null : sectionLabel(section, t);
 
   const save = async (next: Thresholds) => {
     if (next.warn === committed.warn && next.limit === committed.limit) {
@@ -80,7 +84,8 @@ export function LimitEditor({ host, policy, spentSeconds }: LimitEditorProps) {
     setError("");
     setDraft(next);
     try {
-      await usagePolicies.set(host, policyOf(next));
+      if (section === null) await usageLimits.setSite(host, policyOf(next));
+      else await usageLimits.setSection(host, section, policyOf(next));
     } catch (cause) {
       setError(describeError(cause, t));
     } finally {
@@ -126,15 +131,19 @@ export function LimitEditor({ host, policy, spentSeconds }: LimitEditorProps) {
         <div className="divide-y divide-hair border-t border-hair">
           <div>
             <Switch
-              label={t("usage.pauseAfter")}
-              description={t("usage.pauseAfterHint")}
+              label={part === null ? t("usage.pauseAfter") : t("usage.partStopAfter")}
+              description={part === null ? t("usage.pauseAfterHint") : t("usage.partStopAfterHint")}
               checked={shown.limit !== null}
               onChange={toggleLimit}
             />
             {shown.limit !== null && (
               <div className="flex flex-col gap-2 px-4 pb-4">
                 <DurationSlider
-                  label={t("usage.sliderLimit", { host })}
+                  label={
+                    part === null
+                      ? t("usage.sliderLimit", { host })
+                      : t("usage.partLimitLabel", { part, host })
+                  }
                   stops={stops}
                   value={shown.limit}
                   onScrub={(minutes) => setDraft(moved("limit", minutes))}
@@ -158,7 +167,11 @@ export function LimitEditor({ host, policy, spentSeconds }: LimitEditorProps) {
             {shown.warn !== null && (
               <div className="px-4 pb-4">
                 <DurationSlider
-                  label={t("usage.sliderReminder", { host })}
+                  label={
+                    part === null
+                      ? t("usage.sliderReminder", { host })
+                      : t("usage.partReminderLabel", { part, host })
+                  }
                   stops={warnStops(stops)}
                   value={shown.warn}
                   onScrub={(minutes) => setDraft(moved("warn", minutes))}
@@ -170,7 +183,9 @@ export function LimitEditor({ host, policy, spentSeconds }: LimitEditorProps) {
         </div>
       ) : (
         <div className="border-t border-hair px-4 py-4">
-          <p className="mb-3 text-sm leading-snug text-paper/60">{t("usage.presetsHint")}</p>
+          <p className="mb-3 text-sm leading-snug text-paper/60">
+            {part === null ? t("usage.presetsHint") : t("usage.partPresetsHint")}
+          </p>
           <Chips
             values={LIMIT_PRESETS}
             current={null}

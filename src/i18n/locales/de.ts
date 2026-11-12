@@ -126,6 +126,20 @@ export const de: Messages = {
   "usage.remindAtHint": "Ein Hinweis, solange noch Zeit zum Abschließen bleibt.",
   "usage.sliderLimit": "Tageslimit für {host}",
   "usage.sliderReminder": "Erinnerung für {host}",
+  "usage.partsTitle": "Teile dieser Website",
+  "usage.partSetLimit": "Limit für diesen Teil festlegen",
+  "usage.partChangeLimit": "Limit für diesen Teil ändern",
+  "usage.partLimitLabel": "Tageslimit für {part} auf {host}",
+  "usage.partReminderLabel": "Erinnerung für {part} auf {host}",
+  "usage.partStopAfter": "Zählen stoppen nach",
+  "usage.partPresetsHint":
+    "Wählen Sie ein Tageslimit. Sie werden vorher erinnert, und sobald es erreicht ist, wird die Zeit hier nicht mehr gezählt.",
+  "usage.partStopAfterHint":
+    "Die Zeit in diesem Teil wird bis Mitternacht nicht mehr gezählt. Der Rest der Website bleibt offen.",
+  "usage.partTimeCheck": "Zeitkontrolle: {part} auf {host}",
+  "usage.partLimitReached":
+    "{part} auf {host} hat das Tageslimit überschritten. Die Zeit hier wird nicht mehr gezählt.",
+  "usage.partStatusReached": "Limit erreicht. Die Zeit hier wird nicht mehr gezählt.",
   "usage.saveHint":
     "Änderungen werden beim Loslassen gespeichert. Die Zeit läuft, solange die Website auf dem Bildschirm ist, und wird um Mitternacht zurückgesetzt.",
 

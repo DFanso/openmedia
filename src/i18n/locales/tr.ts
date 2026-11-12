@@ -132,6 +132,20 @@ export const tr: Messages = {
   "usage.remindAtHint": "İşi bitirmek için hâlâ zaman varken bir uyarı.",
   "usage.sliderLimit": "{host} için günlük sınır",
   "usage.sliderReminder": "{host} için hatırlatma",
+  "usage.partsTitle": "Bu sitenin bölümleri",
+  "usage.partSetLimit": "Bu bölüm için bir sınır belirle",
+  "usage.partChangeLimit": "Bu bölümün sınırını değiştir",
+  "usage.partLimitLabel": "{host} üzerindeki {part} için günlük sınır",
+  "usage.partReminderLabel": "{host} üzerindeki {part} için hatırlatma",
+  "usage.partStopAfter": "Şu süreden sonra saymayı bırak",
+  "usage.partPresetsHint":
+    "Günlük bir sınır seçin. Öncesinde bir hatırlatma alırsınız ve sınıra ulaşıldığında buradaki süre artık sayılmaz.",
+  "usage.partStopAfterHint":
+    "Bu bölümdeki süre gece yarısına kadar sayılmaz. Sitenin geri kalanı açık kalır.",
+  "usage.partTimeCheck": "Süre kontrolü: {host} üzerindeki {part}",
+  "usage.partLimitReached":
+    "{host} üzerindeki {part} günlük sınırını aştı. Buradaki süre artık sayılmıyor.",
+  "usage.partStatusReached": "Sınıra ulaşıldı. Buradaki süre artık sayılmıyor.",
   "usage.saveHint":
     "Parmağınızı çektiğinizde değişiklikler kaydedilir. Süre, site ekrandayken sayılır ve gece yarısı sıfırlanır.",
 

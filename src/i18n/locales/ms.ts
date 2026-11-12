@@ -128,6 +128,20 @@ export const ms: Messages = {
   "usage.remindAtHint": "Pemberitahuan awal ketika masih ada masa untuk menyudahkan.",
   "usage.sliderLimit": "Had harian untuk {host}",
   "usage.sliderReminder": "Peringatan untuk {host}",
+  "usage.partsTitle": "Bahagian laman ini",
+  "usage.partSetLimit": "Tetapkan had untuk bahagian ini",
+  "usage.partChangeLimit": "Tukar had bahagian ini",
+  "usage.partLimitLabel": "Had harian untuk {part} pada {host}",
+  "usage.partReminderLabel": "Peringatan untuk {part} pada {host}",
+  "usage.partStopAfter": "Berhenti mengira selepas",
+  "usage.partPresetsHint":
+    "Pilih had harian. Anda akan menerima peringatan lebih awal, dan selepas had dicapai, masa di sini tidak lagi dikira.",
+  "usage.partStopAfterHint":
+    "Masa dalam bahagian ini tidak lagi dikira sehingga tengah malam. Bahagian lain laman kekal terbuka.",
+  "usage.partTimeCheck": "Semakan masa: {part} pada {host}",
+  "usage.partLimitReached":
+    "{part} pada {host} telah melebihi had hariannya. Masa di sini tidak lagi dikira.",
+  "usage.partStatusReached": "Had dicapai. Masa di sini tidak lagi dikira.",
   "usage.saveHint":
     "Perubahan disimpan apabila anda melepaskan. Masa dikira semasa laman berada di skrin dan ditetapkan semula pada tengah malam.",
 

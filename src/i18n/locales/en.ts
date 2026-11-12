@@ -134,6 +134,20 @@ export const en = {
   "usage.remindAtHint": "A heads-up while there is still time to wrap up.",
   "usage.sliderLimit": "Daily limit for {host}",
   "usage.sliderReminder": "Reminder for {host}",
+  "usage.partsTitle": "Parts of this site",
+  "usage.partSetLimit": "Set a limit for this part",
+  "usage.partChangeLimit": "Change this part's limit",
+  "usage.partLimitLabel": "Daily limit for {part} on {host}",
+  "usage.partReminderLabel": "Reminder for {part} on {host}",
+  "usage.partStopAfter": "Stop counting after",
+  "usage.partStopAfterHint":
+    "Time in this part stops counting until midnight. The rest of the site stays open.",
+  "usage.partPresetsHint":
+    "Pick a daily limit. You get a reminder before it, and the time here stops counting once it is reached.",
+  "usage.partTimeCheck": "Time check: {part} on {host}",
+  "usage.partLimitReached":
+    "{part} on {host} is over its daily limit. Time here is no longer counted.",
+  "usage.partStatusReached": "Limit reached. Time here is no longer counted.",
   "usage.saveHint":
     "Changes save when you let go. Time counts while the site is on screen and resets at midnight.",
 

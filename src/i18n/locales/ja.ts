@@ -131,6 +131,20 @@ export const ja: Messages = {
   "usage.remindAtHint": "まだ切り上げられるうちにお知らせします。",
   "usage.sliderLimit": "{host}の1日の上限",
   "usage.sliderReminder": "{host}のリマインダー",
+  "usage.partsTitle": "このサイトの各部分",
+  "usage.partSetLimit": "この部分の制限を設定",
+  "usage.partChangeLimit": "この部分の制限を変更",
+  "usage.partLimitLabel": "{host} の {part} の1日の制限",
+  "usage.partReminderLabel": "{host} の {part} のお知らせ",
+  "usage.partStopAfter": "この時間で集計を停止",
+  "usage.partPresetsHint":
+    "1日の上限を選んでください。事前にリマインダが届き、上限に達するとここでの時間は集計されなくなります。",
+  "usage.partStopAfterHint":
+    "この部分の時間は夜中まで集計されません。サイトの他の部分は開いたままです。",
+  "usage.partTimeCheck": "時間チェック: {host} の {part}",
+  "usage.partLimitReached":
+    "{host} の {part} は1日の制限を超えました。ここでの時間は集計されません。",
+  "usage.partStatusReached": "制限に達しました。ここでの時間は集計されません。",
   "usage.saveHint":
     "指を離すと変更が保存されます。時間はサイトが画面に表示されている間だけカウントされ、午前0時にリセットされます。",
 

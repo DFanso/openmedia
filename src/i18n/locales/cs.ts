@@ -133,6 +133,19 @@ export const cs: Messages = {
   "usage.remindAtHint": "Upozornění, dokud ještě zbývá čas na dokončení.",
   "usage.sliderLimit": "Denní limit pro {host}",
   "usage.sliderReminder": "Připomenutí pro {host}",
+  "usage.partsTitle": "Části tohoto webu",
+  "usage.partSetLimit": "Nastavit limit pro tuto část",
+  "usage.partChangeLimit": "Změnit limit této části",
+  "usage.partLimitLabel": "Denní limit pro {part} na {host}",
+  "usage.partReminderLabel": "Připomenutí pro {part} na {host}",
+  "usage.partStopAfter": "Přestat počítat po",
+  "usage.partPresetsHint":
+    "Vyberte denní limit. Dostanete upozornění před ním a po jeho dosažení se zde čas přestane počítat.",
+  "usage.partStopAfterHint":
+    "Čas v této části se do půlnoci nepočítá. Zbytek webu zůstává otevřený.",
+  "usage.partTimeCheck": "Kontrola času: {part} na {host}",
+  "usage.partLimitReached": "{part} na {host} překročil denní limit. Čas zde se už nepočítá.",
+  "usage.partStatusReached": "Limit dosažen. Čas zde se už nepočítá.",
   "usage.saveHint":
     "Změny se uloží po uvolnění. Čas se počítá, dokud je web na obrazovce, a o půlnoci se vynuluje.",
 

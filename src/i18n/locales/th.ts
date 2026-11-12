@@ -125,6 +125,19 @@ export const th: Messages = {
   "usage.remindAtHint": "แจ้งล่วงหน้าขณะที่ยังมีเวลาสรุปให้เสร็จ",
   "usage.sliderLimit": "ขีดจำกัดรายวันสำหรับ {host}",
   "usage.sliderReminder": "การเตือนสำหรับ {host}",
+  "usage.partsTitle": "ส่วนต่าง ๆ ของเว็บไซต์นี้",
+  "usage.partSetLimit": "ตั้งขีดจำกัดสำหรับส่วนนี้",
+  "usage.partChangeLimit": "เปลี่ยนขีดจำกัดของส่วนนี้",
+  "usage.partLimitLabel": "ขีดจำกัดรายวันของ {part} บน {host}",
+  "usage.partReminderLabel": "การแจ้งเตือนสำหรับ {part} บน {host}",
+  "usage.partStopAfter": "หยุดนับหลังจาก",
+  "usage.partPresetsHint":
+    "เลือกขีดจำกัดรายวัน คุณจะได้รับการแจ้งเตือนก่อน และเมื่อถึงขีดจำกัด เวลาที่นี่จะไม่ถูกนับอีกต่อไป",
+  "usage.partStopAfterHint":
+    "เวลาในส่วนนี้จะไม่ถูกนับอีกต่อไปจนถึงเที่ยงคืน ส่วนอื่นของเว็บไซต์ยังเปิดอยู่",
+  "usage.partTimeCheck": "ตรวจเวลา: {part} บน {host}",
+  "usage.partLimitReached": "{part} บน {host} เกินขีดจำกัดรายวันแล้ว เวลาที่นี่ไม่ถูกนับอีกต่อไป",
+  "usage.partStatusReached": "ถึงขีดจำกัดแล้ว เวลาที่นี่ไม่ถูกนับอีกต่อไป",
   "usage.saveHint":
     "บันทึกการเปลี่ยนแปลงเมื่อคุณปล่อยนิ้ว เวลาจะนับขณะที่เว็บไซต์แสดงอยู่บนหน้าจอ และรีเซ็ตตอนเที่ยงคืน",
 

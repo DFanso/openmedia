@@ -133,6 +133,20 @@ export const ru: Messages = {
   "usage.remindAtHint": "Предупреждение, пока ещё есть время закончить.",
   "usage.sliderLimit": "Дневной лимит для {host}",
   "usage.sliderReminder": "Напоминание для {host}",
+  "usage.partsTitle": "Разделы этого сайта",
+  "usage.partSetLimit": "Задать лимит для этого раздела",
+  "usage.partChangeLimit": "Изменить лимит этого раздела",
+  "usage.partLimitLabel": "Дневной лимит для {part} на {host}",
+  "usage.partReminderLabel": "Напоминание для {part} на {host}",
+  "usage.partStopAfter": "Прекратить считать через",
+  "usage.partPresetsHint":
+    "Выберите дневной лимит. Вы получите напоминание заранее, а когда лимит достигнут, время здесь перестанет засчитываться.",
+  "usage.partStopAfterHint":
+    "Время в этом разделе не засчитывается до полуночи. Остальная часть сайта остаётся открытой.",
+  "usage.partTimeCheck": "Проверка времени: {part} на {host}",
+  "usage.partLimitReached":
+    "{part} на {host} превысил дневной лимит. Время здесь больше не засчитывается.",
+  "usage.partStatusReached": "Лимит достигнут. Время здесь больше не засчитывается.",
   "usage.saveHint":
     "Изменения сохраняются, когда вы отпускаете ползунок. Время идёт, пока сайт открыт на экране, и сбрасывается в полночь.",
 
