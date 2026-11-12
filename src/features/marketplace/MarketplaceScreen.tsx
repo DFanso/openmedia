@@ -15,12 +15,12 @@ import {
   setIconCache,
 } from "../../shared/siteIcons";
 import { Screen } from "../../shared/Screen";
+import { Spinner } from "../../shared/Spinner";
 import { GuideLink } from "../guides/GuideLink";
 import { useEntitlementStore } from "../paywall/store";
 import { Switch } from "../settings/Switch";
 import {
   Group,
-  Spinner,
   primaryButton,
   field,
   primaryBlockButton,
@@ -210,7 +210,7 @@ function ListView({
           </button>
         </div>
       )}
-      {!error && listing === null && <Spinner label={t("market.loading")} />}
+      {!error && listing === null && <Spinner className="px-1" label={t("market.loading")} />}
       {listing && listing.withdrawn.length > 0 && (
         <p className="px-1 text-sm text-paper/70">
           {t("market.withdrawn", { names: listing.withdrawn.join(", ") })}
@@ -532,7 +532,7 @@ function DetailView({ item, onChanged, onRated, onManageBlocked }: DetailViewPro
         </div>
       )}
       {error && <p className="px-1 text-sm text-paper/70">{error}</p>}
-      {preview === null && !error && <Spinner label={t("market.loading")} />}
+      {preview === null && !error && <Spinner className="px-1" label={t("market.loading")} />}
       {preview && <RecipeReview preview={preview} />}
       <div>
         <p className="px-1 pb-2 text-[13px] font-medium text-paper/60">{t("market.report")}</p>

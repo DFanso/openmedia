@@ -1,4 +1,5 @@
 import { useT } from "../../i18n/useT";
+import { Spinner } from "../../shared/Spinner";
 import type { Translate } from "../../i18n/translate";
 import type { ActivityStep } from "./ipc";
 
@@ -27,9 +28,7 @@ export function stepLabel(step: ActivityStep, provider: string, t: Translate): s
 
 function StepMark({ status }: { status: ActivityStep["status"] }) {
   if (status === "running") {
-    return (
-      <span className="size-3.5 shrink-0 animate-spin rounded-full border-2 border-paper/25 border-t-accent motion-reduce:animate-none" />
-    );
+    return <Spinner size={14} />;
   }
   return (
     <span
