@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-12
 
+### fix(hubs): a hub's quick-access favorite opens the hub
+
+**Area:** `fix(hubs)`
+
+**Change:** A favorite that stands for a hub (its homepage, the first page) now opens as a hub session, so the quick action for Messages Hub shows the whole bar (WhatsApp, Facebook, Instagram, LinkedIn) instead of a lone WhatsApp page. A single-site recipe with the same homepage still wins.
+
+**Verified:** `yarn ts:check`, ESLint and frontend tests. **Not verified:** on a device. **Known:** a hub favorite's session is not protected from idle eviction and raises no unread notifications, as those follow plain favorite sessions.
+
 ### fix(hubs): a hub page belongs to the hub it was opened from
 
 **Area:** `fix(hubs)`
