@@ -527,6 +527,6 @@ export const ms: Messages = {
   "paywall.privacy": "Dasar privasi",
   "paywall.terms": "Terma penggunaan",
   "favorites.backgroundMedia": "Teruskan main di latar belakang",
-  "favorites.backgroundMediaNote": "Mati: audio dan video dijeda apabila anda bertukar ke laman lain atau meninggalkan aplikasi. Hidup: laman ini terus bermain.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "Mati: audio dan video dijeda apabila anda bertukar ke laman lain atau meninggalkan aplikasi. Hidup: laman ini terus bermain.",
 };

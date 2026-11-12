@@ -519,6 +519,6 @@ export const ko: Messages = {
   "paywall.privacy": "개인정보 처리방침",
   "paywall.terms": "이용약관",
   "favorites.backgroundMedia": "백그라운드에서 계속 재생",
-  "favorites.backgroundMediaNote": "끔: 다른 사이트로 전환하거나 앱을 나가면 오디오와 비디오가 일시 정지됩니다. 켬: 이 사이트는 계속 재생됩니다.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "끔: 다른 사이트로 전환하거나 앱을 나가면 오디오와 비디오가 일시 정지됩니다. 켬: 이 사이트는 계속 재생됩니다.",
 };

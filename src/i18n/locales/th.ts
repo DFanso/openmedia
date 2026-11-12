@@ -503,6 +503,6 @@ export const th: Messages = {
   "paywall.privacy": "นโยบายความเป็นส่วนตัว",
   "paywall.terms": "ข้อกำหนดการใช้งาน",
   "favorites.backgroundMedia": "เล่นต่อในเบื้องหลัง",
-  "favorites.backgroundMediaNote": "ปิด: เสียงและวิดีโอจะหยุดชั่วคราวเมื่อสลับไปไซต์อื่นหรือออกจากแอป เปิด: ไซต์นี้เล่นต่อไป",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "ปิด: เสียงและวิดีโอจะหยุดชั่วคราวเมื่อสลับไปไซต์อื่นหรือออกจากแอป เปิด: ไซต์นี้เล่นต่อไป",
 };

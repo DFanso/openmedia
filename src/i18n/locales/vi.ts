@@ -522,6 +522,6 @@ export const vi: Messages = {
   "paywall.privacy": "Chính sách quyền riêng tư",
   "paywall.terms": "Điều khoản sử dụng",
   "favorites.backgroundMedia": "Tiếp tục phát ở chế độ nền",
-  "favorites.backgroundMediaNote": "Tắt: âm thanh và video tạm dừng khi bạn chuyển sang trang khác hoặc rời ứng dụng. Bật: trang này tiếp tục phát.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "Tắt: âm thanh và video tạm dừng khi bạn chuyển sang trang khác hoặc rời ứng dụng. Bật: trang này tiếp tục phát.",
 };

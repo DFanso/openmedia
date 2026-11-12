@@ -525,6 +525,6 @@ export const id: Messages = {
   "paywall.privacy": "Kebijakan privasi",
   "paywall.terms": "Ketentuan layanan",
   "favorites.backgroundMedia": "Tetap putar di latar belakang",
-  "favorites.backgroundMediaNote": "Mati: audio dan video berhenti sejenak saat Anda pindah ke situs lain atau meninggalkan aplikasi. Hidup: situs ini terus diputar.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "Mati: audio dan video berhenti sejenak saat Anda pindah ke situs lain atau meninggalkan aplikasi. Hidup: situs ini terus diputar.",
 };

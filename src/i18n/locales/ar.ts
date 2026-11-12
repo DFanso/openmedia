@@ -507,6 +507,6 @@ export const ar: Messages = {
   "paywall.privacy": "سياسة الخصوصية",
   "paywall.terms": "شروط الاستخدام",
   "favorites.backgroundMedia": "متابعة التشغيل في الخلفية",
-  "favorites.backgroundMediaNote": "متوقف: يتوقف الصوت والفيديو مؤقتًا عند الانتقال إلى موقع آخر أو مغادرة التطبيق. مفعّل: يواصل هذا الموقع التشغيل.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "متوقف: يتوقف الصوت والفيديو مؤقتًا عند الانتقال إلى موقع آخر أو مغادرة التطبيق. مفعّل: يواصل هذا الموقع التشغيل.",
 };

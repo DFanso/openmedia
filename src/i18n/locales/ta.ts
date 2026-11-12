@@ -537,6 +537,6 @@ export const ta: Messages = {
   "paywall.privacy": "தனியுரிமைக் கொள்கை",
   "paywall.terms": "பயன்பாட்டு விதிமுறைகள்",
   "favorites.backgroundMedia": "பின்னணியில் தொடர்ந்து இயக்கு",
-  "favorites.backgroundMediaNote": "முடக்கம்: வேறு தளத்துக்கு மாறினால் அல்லது செயலியை விட்டால் ஆடியோவும் வீடியோவும் இடைநிறுத்தப்படும். இயக்கம்: இந்த தளம் தொடர்ந்து இயங்கும்.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "முடக்கம்: வேறு தளத்துக்கு மாறினால் அல்லது செயலியை விட்டால் ஆடியோவும் வீடியோவும் இடைநிறுத்தப்படும். இயக்கம்: இந்த தளம் தொடர்ந்து இயங்கும்.",
 };

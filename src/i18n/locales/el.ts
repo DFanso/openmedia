@@ -538,6 +538,6 @@ export const el: Messages = {
   "paywall.privacy": "Απορρήτου",
   "paywall.terms": "Όροι χρήσης",
   "favorites.backgroundMedia": "Συνέχιση αναπαραγωγής στο παρασκήνιο",
-  "favorites.backgroundMediaNote": "Ανενεργό: ο ήχος και το βίντεο σταματούν όταν αλλάζετε ιστότοπο ή αφήνετε την εφαρμογή. Ενεργό: ο ιστότοπος συνεχίζει να παίζει.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "Ανενεργό: ο ήχος και το βίντεο σταματούν όταν αλλάζετε ιστότοπο ή αφήνετε την εφαρμογή. Ενεργό: ο ιστότοπος συνεχίζει να παίζει.",
 };

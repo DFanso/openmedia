@@ -525,6 +525,6 @@ export const cs: Messages = {
   "paywall.privacy": "Zásady ochrany soukromí",
   "paywall.terms": "Podmínky použití",
   "favorites.backgroundMedia": "Přehrávat na pozadí",
-  "favorites.backgroundMediaNote": "Vypnuto: zvuk a video se pozastaví, když přepnete na jiný web nebo opustíte aplikaci. Zapnuto: tento web hraje dál.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "Vypnuto: zvuk a video se pozastaví, když přepnete na jiný web nebo opustíte aplikaci. Zapnuto: tento web hraje dál.",
 };

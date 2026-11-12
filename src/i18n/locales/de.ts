@@ -535,6 +535,6 @@ export const de: Messages = {
   "paywall.privacy": "Datenschutz",
   "paywall.terms": "Nutzungsbedingungen",
   "favorites.backgroundMedia": "Im Hintergrund weiterspielen",
-  "favorites.backgroundMediaNote": "Aus: Audio und Video pausieren, wenn du zu einer anderen Seite wechselst oder die App verlässt. An: Diese Seite spielt weiter.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "Aus: Audio und Video pausieren, wenn du zu einer anderen Seite wechselst oder die App verlässt. An: Diese Seite spielt weiter.",
 };

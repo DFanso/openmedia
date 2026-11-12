@@ -489,6 +489,6 @@ export const zhHans: Messages = {
   "paywall.privacy": "隐私政策",
   "paywall.terms": "使用条款",
   "favorites.backgroundMedia": "在后台继续播放",
-  "favorites.backgroundMediaNote": "关闭：切换到其他网站或离开应用时，音频和视频会暂停。开启：此网站继续播放。",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "关闭：切换到其他网站或离开应用时，音频和视频会暂停。开启：此网站继续播放。",
 };

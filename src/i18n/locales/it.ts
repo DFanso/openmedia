@@ -532,6 +532,6 @@ export const it: Messages = {
   "paywall.privacy": "Informativa sulla privacy",
   "paywall.terms": "Termini di servizio",
   "favorites.backgroundMedia": "Continua la riproduzione in background",
-  "favorites.backgroundMediaNote": "Disattivato: audio e video vanno in pausa quando passi a un altro sito o lasci l'app. Attivato: questo sito continua a riprodurre.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "Disattivato: audio e video vanno in pausa quando passi a un altro sito o lasci l'app. Attivato: questo sito continua a riprodurre.",
 };

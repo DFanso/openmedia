@@ -522,6 +522,6 @@ export const si: Messages = {
   "paywall.privacy": "රහස්‍යතා ප්‍රතිපතිතාව",
   "paywall.terms": "භාවිත කොන්දිස",
   "favorites.backgroundMedia": "පසුබිමේ දිගටම වාදනය කරන්න",
-  "favorites.backgroundMediaNote": "ක්‍රියාවිරහිත: වෙනත් අඩවියකට මාරු වූ විට හෝ යෙදුමෙන් ඉවත් වූ විට ශ්‍රව්‍ය සහ වීඩියෝ විරාමයට පත් වේ. ක්‍රියාත්මක: මෙම අඩවිය දිගටම වාදනය වේ.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "ක්‍රියාවිරහිත: වෙනත් අඩවියකට මාරු වූ විට හෝ යෙදුමෙන් ඉවත් වූ විට ශ්‍රව්‍ය සහ වීඩියෝ විරාමයට පත් වේ. ක්‍රියාත්මක: මෙම අඩවිය දිගටම වාදනය වේ.",
 };

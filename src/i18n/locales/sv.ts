@@ -527,6 +527,6 @@ export const sv: Messages = {
   "paywall.privacy": "Integritetspolicy",
   "paywall.terms": "Användarvillkor",
   "favorites.backgroundMedia": "Fortsätt spela i bakgrunden",
-  "favorites.backgroundMediaNote": "Av: ljud och video pausas när du byter webbplats eller lämnar appen. På: den här webbplatsen fortsätter spela.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "Av: ljud och video pausas när du byter webbplats eller lämnar appen. På: den här webbplatsen fortsätter spela.",
 };

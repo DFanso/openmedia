@@ -531,6 +531,6 @@ export const nl: Messages = {
   "paywall.privacy": "Privacybeleid",
   "paywall.terms": "Gebruiksvoorwaarden",
   "favorites.backgroundMedia": "Op de achtergrond blijven afspelen",
-  "favorites.backgroundMediaNote": "Uit: audio en video pauzeren als je naar een andere site gaat of de app verlaat. Aan: deze site blijft afspelen.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "Uit: audio en video pauzeren als je naar een andere site gaat of de app verlaat. Aan: deze site blijft afspelen.",
 };

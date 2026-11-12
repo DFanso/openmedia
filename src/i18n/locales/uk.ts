@@ -531,6 +531,6 @@ export const uk: Messages = {
   "paywall.privacy": "Політика конфіденційності",
   "paywall.terms": "Умови використання",
   "favorites.backgroundMedia": "Продовжувати відтворення у фоні",
-  "favorites.backgroundMediaNote": "Вимк.: звук і відео ставляться на паузу, коли ви переходите на інший сайт або виходите з застосунку. Ввімк.: цей сайт продовжує відтворення.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "Вимк.: звук і відео ставляться на паузу, коли ви переходите на інший сайт або виходите з застосунку. Ввімк.: цей сайт продовжує відтворення.",
 };

@@ -525,6 +525,6 @@ export const pl: Messages = {
   "paywall.privacy": "Polityka prywatności",
   "paywall.terms": "Warunki korzystania",
   "favorites.backgroundMedia": "Odtwarzaj w tle",
-  "favorites.backgroundMediaNote": "Wyłączone: dźwięk i wideo wstrzymują się po przejściu do innej witryny lub wyjściu z aplikacji. Włączone: ta witryna gra dalej.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "Wyłączone: dźwięk i wideo wstrzymują się po przejściu do innej witryny lub wyjściu z aplikacji. Włączone: ta witryna gra dalej.",
 };

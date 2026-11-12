@@ -528,6 +528,6 @@ export const tr: Messages = {
   "paywall.privacy": "Gizlilik politikası",
   "paywall.terms": "Kullanım koşulları",
   "favorites.backgroundMedia": "Arka planda oynatmaya devam et",
-  "favorites.backgroundMediaNote": "Kapalı: başka bir siteye geçtiğinizde veya uygulamadan çıktığınızda ses ve video duraklar. Açık: bu site oynatmaya devam eder.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "Kapalı: başka bir siteye geçtiğinizde veya uygulamadan çıktığınızda ses ve video duraklar. Açık: bu site oynatmaya devam eder.",
 };

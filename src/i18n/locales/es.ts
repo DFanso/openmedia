@@ -532,6 +532,6 @@ export const es: Messages = {
   "paywall.privacy": "Política de privacidad",
   "paywall.terms": "Términos de uso",
   "favorites.backgroundMedia": "Seguir reproduciendo en segundo plano",
-  "favorites.backgroundMediaNote": "Desactivado: el audio y el vídeo se pausan al cambiar de sitio o salir de la app. Activado: este sitio sigue reproduciéndose.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "Desactivado: el audio y el vídeo se pausan al cambiar de sitio o salir de la app. Activado: este sitio sigue reproduciéndose.",
 };

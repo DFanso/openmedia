@@ -518,6 +518,6 @@ export const hi: Messages = {
   "paywall.privacy": "गोपनीयता नीति",
   "paywall.terms": "सेवा की शर्तें",
   "favorites.backgroundMedia": "बैकग्राउंड में चलते रहें",
-  "favorites.backgroundMediaNote": "बंद: दूसरी साइट पर जाने या ऐप छोड़ने पर ऑडियो और वीडियो रुक जाते हैं। चालू: यह साइट चलती रहती है।",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "बंद: दूसरी साइट पर जाने या ऐप छोड़ने पर ऑडियो और वीडियो रुक जाते हैं। चालू: यह साइट चलती रहती है।",
 };

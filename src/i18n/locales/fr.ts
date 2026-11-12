@@ -539,6 +539,6 @@ export const fr: Messages = {
   "paywall.privacy": "Politique de confidentialité",
   "paywall.terms": "Conditions d'utilisation",
   "favorites.backgroundMedia": "Continuer la lecture en arrière-plan",
-  "favorites.backgroundMediaNote": "Désactivé : l'audio et la vidéo se mettent en pause quand vous changez de site ou quittez l'app. Activé : ce site continue de jouer.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "Désactivé : l'audio et la vidéo se mettent en pause quand vous changez de site ou quittez l'app. Activé : ce site continue de jouer.",
 };

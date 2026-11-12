@@ -516,6 +516,6 @@ export const bn: Messages = {
   "paywall.privacy": "গোপনীয়তা নীতি",
   "paywall.terms": "পরিষেবার শর্তাবলি",
   "favorites.backgroundMedia": "ব্যাকগ্রাউন্ডে চালানো চালিয়ে যান",
-  "favorites.backgroundMediaNote": "বন্ধ: অন্য সাইটে গেলে বা অ্যাপ ছাড়লে অডিও ও ভিডিও থেমে যায়। চালু: এই সাইট চলতে থাকে।",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "বন্ধ: অন্য সাইটে গেলে বা অ্যাপ ছাড়লে অডিও ও ভিডিও থেমে যায়। চালু: এই সাইট চলতে থাকে।",
 };

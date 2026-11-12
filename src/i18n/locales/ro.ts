@@ -530,6 +530,6 @@ export const ro: Messages = {
   "paywall.privacy": "Politica de confidențialitate",
   "paywall.terms": "Termeni de utilizare",
   "favorites.backgroundMedia": "Continuă redarea în fundal",
-  "favorites.backgroundMediaNote": "Dezactivat: sunetul și videoclipul se opresc când treci la alt site sau părăsești aplicația. Activat: acest site continuă să redea.",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "Dezactivat: sunetul și videoclipul se opresc când treci la alt site sau părăsești aplicația. Activat: acest site continuă să redea.",
 };

@@ -525,6 +525,6 @@ export const ur: Messages = {
   "paywall.privacy": "رازداری کی پالیسی",
   "paywall.terms": "استعمال کی شرائط",
   "favorites.backgroundMedia": "پس منظر میں چلانا جاری رکھیں",
-  "favorites.backgroundMediaNote": "بند: دوسری سائٹ پر جانے یا ایپ چھوڑنے پر آڈیو اور ویڈیو رک جاتے ہیں۔ آن: یہ سائٹ چلتی رہتی ہے۔",
-    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.backgroundMediaNote":
+    "بند: دوسری سائٹ پر جانے یا ایپ چھوڑنے پر آڈیو اور ویڈیو رک جاتے ہیں۔ آن: یہ سائٹ چلتی رہتی ہے۔",
 };
