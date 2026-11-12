@@ -21,23 +21,23 @@
         position: fixed;
         inset: 0;
         z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         background: #070b14;
         transition:
-          opacity 0.25s ease,
-          transform 0.25s ease;
+          opacity 320ms ease,
+          transform 320ms ease;
       }
-      #splash .glow {
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(circle at 50% 45%, #0d1a36 0%, transparent 65%);
+      #splash[data-hidden] {
         opacity: 0;
-        animation: splash-glow 0.5s ease-out forwards;
+        transform: scale(1.03);
+        pointer-events: none;
       }
+      /* The logo sits exactly where the launch screen puts it: centred, 52% of the width and at
+         most 240 px. Everything else is placed around it, never under it. */
       #splash .mark {
-        position: relative;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
         width: min(52vmin, 240px);
         height: min(52vmin, 240px);
         display: flex;
@@ -49,35 +49,81 @@
         width: 100%;
         height: 100%;
       }
-      #splash .ring {
+      /* The halo behind the logo: the one thing that moves while the app starts. */
+      #splash .mark::before {
+        content: "";
         position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        border: 2px solid #06aff8;
+        inset: -28%;
+        background: radial-gradient(circle, rgb(6 175 248 / 0.2) 0%, transparent 68%);
         opacity: 0;
-        animation: splash-ring 2s ease-out 0.3s infinite;
+        animation:
+          splash-halo 900ms ease-out forwards,
+          splash-breathe 7s ease-in-out 900ms infinite;
       }
-      #splash .ring:nth-child(2) {
-        animation-delay: 1s;
-      }
-      #splash[data-hidden] {
+      /* The site being opened, in the system monospace: a status line, not a headline. */
+      #splash .host {
+        position: absolute;
+        left: 50%;
+        top: calc(50% + min(26vmin, 120px) + 28px);
+        transform: translateX(-50%);
+        max-width: 80vw;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font:
+          500 12px/1 ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          Consolas,
+          monospace;
+        letter-spacing: 0.06em;
+        color: rgb(238 243 250 / 0.45);
         opacity: 0;
-        transform: scale(1.08);
-        pointer-events: none;
+        transition: opacity 400ms ease;
       }
-      @keyframes splash-glow {
+      #splash[data-host] .host {
+        opacity: 1;
+      }
+      /* How far the launch has come: the web view booting, the shell up, the first site drawn. */
+      #splash .track {
+        position: absolute;
+        left: 50%;
+        top: calc(50% + min(26vmin, 120px) + 56px);
+        transform: translateX(-50%);
+        width: min(44vmin, 180px);
+        height: 2px;
+        border-radius: 2px;
+        background: rgb(190 220 255 / 0.16);
+        overflow: hidden;
+      }
+      #splash .fill {
+        display: block;
+        height: 100%;
+        width: 12%;
+        border-radius: 2px;
+        background: #06aff8;
+        box-shadow: 0 0 12px rgb(6 175 248 / 0.5);
+        transition: width 800ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      #splash[data-stage="shell"] .fill {
+        width: 48%;
+      }
+      #splash[data-stage="done"] .fill {
+        width: 100%;
+        transition: none;
+      }
+      @keyframes splash-halo {
         to {
           opacity: 1;
         }
       }
-      @keyframes splash-ring {
-        from {
-          opacity: 0.55;
-          transform: scale(0.7);
+      @keyframes splash-breathe {
+        0%,
+        100% {
+          opacity: 1;
         }
-        to {
-          opacity: 0;
-          transform: scale(1.7);
+        50% {
+          opacity: 0.55;
         }
       }
       @media (prefers-color-scheme: light) {
@@ -88,25 +134,34 @@
         #splash {
           background: #f4f7fc;
         }
-        #splash .glow {
-          background: radial-gradient(circle at 50% 45%, #ffffff 0%, transparent 65%);
+        #splash .mark::before {
+          background: radial-gradient(circle, rgb(6 175 248 / 0.14) 0%, transparent 68%);
+        }
+        #splash .host {
+          color: rgb(11 18 32 / 0.45);
+        }
+        #splash .track {
+          background: rgb(11 18 32 / 0.12);
         }
       }
       @media (prefers-reduced-motion: reduce) {
-        #splash .ring {
-          display: none;
+        #splash .mark::before {
+          animation: splash-halo 900ms ease-out forwards;
+        }
+        #splash .fill {
+          transition: none;
         }
       }
     </style>
   </head>
 
   <body>
-    <div id="splash">
-      <div class="glow"></div>
+    <div id="splash" data-stage="boot">
       <div class="mark">
-        <span class="ring"></span><span class="ring"></span>
         <!--logo-mark-->
       </div>
+      <p class="host"></p>
+      <div class="track"><span class="fill"></span></div>
     </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
