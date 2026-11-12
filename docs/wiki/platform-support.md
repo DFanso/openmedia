@@ -43,6 +43,7 @@ Runs on the iPhone 17 Pro Max simulator (iOS 26.5). The first used a throwaway s
 | Real app: add a site, open it, native title and URL reach the shell as `siteview:state` events | Yes |
 | Real app: page-initiated navigation enables Back; Back returns to the first page | Yes |
 | Real app: `navigate("javascript:alert(1)")` | Rejected in Rust: "only http and https urls can be opened" |
+| Android forwards `doUpdateVisitedHistory` callbacks to shell URL state for SPA routes | Implemented; whether a WebView reports every `pushState` is unverified on Android |
 | Real app: page message reaches the shell as `siteview:bridge` with origin `http://localhost`; the page sees no `__TAURI_INTERNALS__` or `ipc` handler | Yes |
 | Real app: a real HTTPS site loads in the native view | Yes: the Reddit mobile site loaded (logged out) when the app restored its last page. An earlier `example.com` attempt failed; the host's own `curl` also failed at that moment, so it was likely a transient network problem, not an app fault |
 | Site view below a transparent shell: native hit test sends touches inside reported regions to the shell and everything else to the page | Yes, from a native log: the button's centre went to the shell and the screen centre to the page; with the fan, command bar or an error banner open, the corresponding regions went to the shell |

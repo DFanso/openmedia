@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-12
 
+### fix(siteview): Android reports single-page-app route changes to the shell
+
+**Area:** `fix(siteview)`
+
+**Change:** The Android site view forwards `doUpdateVisitedHistory` to the shell's URL state, so a route change a site makes with `pushState` updates the address (hub bar, unread and limits follow the current page). The section-limit feature this PR first carried was dropped in favor of the per-part limits already on `main` (#143).
+
+**Verified:** Not built or run on Android; whether a WebView reports every `pushState` is unverified.
+
 ### feat(usage): a daily limit for the parts of a site
 
 **Area:** `feat(usage)`
