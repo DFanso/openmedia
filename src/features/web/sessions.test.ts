@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { SiteSettings } from "../../shared/ipc";
+import type { SiteSettings, SiteViewState } from "../../shared/ipc";
 import {
   IDLE_LIMIT_MS,
   MAX_SESSIONS,
@@ -303,5 +303,37 @@ describe("a hub's quick-access favorite", () => {
     expect(
       sessionsToClose([idle, session("v", "typed")], "v", NOW, "routine", favorites, sites),
     ).toEqual([]);
+  });
+});
+
+describe("applyState measurements", () => {
+  const state = (overrides: Partial<SiteViewState>): SiteViewState => ({
+    session: "a",
+    url: "https://a.example/",
+    title: null,
+    loading: true,
+    canGoBack: false,
+    canGoForward: false,
+    painted: false,
+    scope: "a.example",
+    ...overrides,
+  });
+
+  it("records first paint once, from when the session opened", () => {
+    const opened = newSession("a", "typed", "https://a.example/", 1000);
+    const painted = applyState(opened, state({ painted: true }), 1900);
+    expect(painted.paintMs).toBe(900);
+    expect(applyState(painted, state({ painted: true }), 5000).paintMs).toBe(900);
+  });
+
+  it("times each load from its start to its finish", () => {
+    const opened = newSession("a", "typed", "https://a.example/", 1000);
+    const done = applyState(opened, state({ loading: false, painted: true }), 3500);
+    expect(done.loadMs).toBe(2500);
+    expect(done.loadStartedAt).toBeNull();
+    const again = applyState(done, state({ loading: true, painted: true }), 4000);
+    expect(again.loadStartedAt).toBe(4000);
+    expect(again.loadMs).toBe(2500);
+    expect(applyState(again, state({ loading: false, painted: true }), 4400).loadMs).toBe(400);
   });
 });

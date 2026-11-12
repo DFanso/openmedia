@@ -12,6 +12,7 @@ import {
   INCOGNITO_SIZE,
   SETTINGS_SIZE,
   STATS_SIZE,
+  TABS_SIZE,
   fabCenter,
   fanLayout,
   fanTargetAt,
@@ -28,7 +29,14 @@ import {
 } from "./gesture";
 import { loadPosition, savePosition, type FabPosition } from "./position";
 import { BiometricIcon } from "../incognito/BiometricIcon";
-import { HistoryIcon, IncognitoIcon, ProIcon, SlidersIcon, StatsIcon } from "../../shared/icons";
+import {
+  HistoryIcon,
+  IncognitoIcon,
+  ProIcon,
+  SlidersIcon,
+  StatsIcon,
+  TabsIcon,
+} from "../../shared/icons";
 import { useBackHandler } from "../back/useBackHandler";
 import logoMark from "../../assets/logo-mark.svg";
 import { useEntitlementStore } from "../paywall/store";
@@ -104,6 +112,7 @@ export function Fab() {
   const select = (target: FanTarget) => {
     if (target.kind === "settings") openSheet("settings");
     else if (target.kind === "history") openSheet("history");
+    else if (target.kind === "tabs") openSheet("tabs");
     else if (target.kind === "stats") openSheet("stats");
     else if (target.kind === "incognito")
       void (incognito.active ? exitIncognito() : enterIncognito());
@@ -192,7 +201,7 @@ export function Fab() {
     "--dx": `${center.x - target.x}px`,
     "--dy": `${center.y - target.y}px`,
     "--i": index,
-    "--n": list.length + 4,
+    "--n": list.length + 5,
   });
 
   const hidden = sheet !== "none" || onboardingOpen;
@@ -288,6 +297,28 @@ export function Fab() {
       <button
         type="button"
         data-open={fanOpen}
+        aria-label={t("fab.tabs")}
+        tabIndex={fanOpen ? 0 : -1}
+        onClick={() => {
+          select({ kind: "tabs" });
+          dispatch({ type: "dismiss" });
+        }}
+        style={{
+          ...fanStyle(layout.tabs, list.length + 2),
+          width: TABS_SIZE,
+          height: TABS_SIZE,
+          margin: -TABS_SIZE / 2,
+        }}
+        className={`fan-item fab-glass fixed z-20 grid place-items-center rounded-full ${
+          hover?.kind === "tabs" ? "border-accent! text-accent" : "text-white"
+        }`}
+      >
+        <TabsIcon />
+      </button>
+
+      <button
+        type="button"
+        data-open={fanOpen}
         aria-label={t("fab.usage")}
         tabIndex={fanOpen ? 0 : -1}
         onClick={() => {
@@ -295,7 +326,7 @@ export function Fab() {
           dispatch({ type: "dismiss" });
         }}
         style={{
-          ...fanStyle(layout.stats, list.length + 2),
+          ...fanStyle(layout.stats, list.length + 3),
           width: STATS_SIZE,
           height: STATS_SIZE,
           margin: -STATS_SIZE / 2,
@@ -326,7 +357,7 @@ export function Fab() {
           dispatch({ type: "dismiss" });
         }}
         style={{
-          ...fanStyle(layout.incognito, list.length + 3),
+          ...fanStyle(layout.incognito, list.length + 4),
           width: INCOGNITO_SIZE,
           height: INCOGNITO_SIZE,
           margin: -INCOGNITO_SIZE / 2,

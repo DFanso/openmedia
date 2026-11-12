@@ -37,6 +37,7 @@ import {
   type SiteViewState,
   type Theme,
 } from "../shared/ipc";
+import { hiddenTabIds, tabAfterClose } from "../features/tabs/tabs";
 import { useEntitlementStore } from "../features/paywall/store";
 import { isProRequired } from "../features/paywall/ipc";
 import { detectLocale, resolveLocale, type Locale } from "../i18n/locales";
@@ -55,6 +56,7 @@ export type Sheet =
   | "none"
   | "assistant"
   | "history"
+  | "tabs"
   | "stats"
   | "settings"
   | "recipes"
@@ -151,6 +153,10 @@ export interface AppStore {
   openHistory: (url: string) => void;
   /** Shows a live session by id, for example the one a notification was tapped for. */
   openSession: (id: string) => void;
+  /** Ends one live session. Favorites and history are untouched; the last open site stays. */
+  closeSession: (id: string) => void;
+  /** Ends every live session but the visible one. */
+  closeOtherSessions: () => void;
   setSessionState: (state: SiteViewState) => void;
   /** A native `open` failed: forget the session and go back to the one that was showing. */
   sessionOpenFailed: (id: string) => void;
@@ -543,6 +549,29 @@ export const useApp = create<AppStore>((set, get) => {
 
     openSession: (id) => {
       if (get().sessions.some((session) => session.id === id)) switchTo(id);
+    },
+
+    closeSession: (id) => {
+      const { sessions, activeId } = get();
+      if (sessions.length <= 1 || !sessions.some((session) => session.id === id)) return;
+      const next = id === activeId ? tabAfterClose(sessions, id) : activeId;
+      void siteView.close(id).catch(() => {});
+      set((current) => ({
+        sessions: current.sessions.filter((session) => session.id !== id),
+        activeId: next,
+        action:
+          next !== null && next !== activeId
+            ? { nonce: ++nonce, type: "activate", id: next }
+            : current.action,
+      }));
+    },
+
+    closeOtherSessions: () => {
+      const { sessions, activeId } = get();
+      const doomed = hiddenTabIds(sessions, activeId);
+      if (doomed.length === 0) return;
+      doomed.forEach((id) => void siteView.close(id).catch(() => {}));
+      get().forgetSessions(doomed);
     },
 
     setSessionState: (page) =>

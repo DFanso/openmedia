@@ -4,6 +4,7 @@ import { BackButton } from "../features/back/BackButton";
 import { Fab } from "../features/fab/Fab";
 import { CommandBar } from "../features/sheet/CommandBar";
 import { HistorySheet } from "../features/history/HistorySheet";
+import { TabsSheet } from "../features/tabs/TabsSheet";
 import { startUsageTracking } from "../features/stats/tracker";
 import { UsageGuard } from "../features/stats/UsageGuard";
 import { WebLayer } from "../features/web/WebLayer";
@@ -132,6 +133,7 @@ export function App() {
       <CommandBar />
       <AssistantDock />
       <HistorySheet />
+      <TabsSheet />
       <Suspense fallback={null}>
         {(idle || settingsOpen) && <SettingsScreen />}
         {(idle || sheet === "recipes") && <RecipesScreen />}

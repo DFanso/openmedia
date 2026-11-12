@@ -88,6 +88,13 @@ export const HistoryIcon = () => (
   </Icon>
 );
 
+export const TabsIcon = () => (
+  <Icon>
+    <rect x="3.5" y="8" width="13" height="11" rx="2.2" />
+    <path d="M7.5 8V6.2A2.2 2.2 0 0 1 9.7 4h8.1A2.2 2.2 0 0 1 20 6.2v7.1a2.2 2.2 0 0 1-2.2 2.2H16.5" />
+  </Icon>
+);
+
 export const StarIcon = ({ filled = false }: { filled?: boolean }) => (
   <Icon>
     <path

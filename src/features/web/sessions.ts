@@ -23,6 +23,14 @@ export interface Session {
   painted: boolean;
   /** When the session was last visible or opened, in ms. */
   lastUsed: number;
+  /** When the session was opened, in ms. */
+  openedAt: number;
+  /** Milliseconds from opening to the first drawn content; null until it has painted. */
+  paintMs: number | null;
+  /** When the load now in flight began, in ms; null while no load is running. */
+  loadStartedAt: number | null;
+  /** How long the last finished load took, in ms. Sampled from state events, so it is approximate. */
+  loadMs: number | null;
 }
 
 /** Usual total session budget; expands only for quick-access pages plus the visible page. */
@@ -50,12 +58,28 @@ export function newSession(
     canGoForward: false,
     painted: false,
     lastUsed: now,
+    openedAt: now,
+    paintMs: null,
+    loadStartedAt: now,
+    loadMs: null,
   };
 }
 
-export function applyState(session: Session, state: SiteViewState): Session {
+/** The measurements a state event adds: first paint once, and the duration of each load. */
+function measure(session: Session, state: SiteViewState, now: number) {
+  const paintMs =
+    session.paintMs === null && state.painted ? now - session.openedAt : session.paintMs;
+  if (state.loading && !session.loading)
+    return { paintMs, loadStartedAt: now, loadMs: session.loadMs };
+  if (!state.loading && session.loading && session.loadStartedAt !== null)
+    return { paintMs, loadStartedAt: null, loadMs: now - session.loadStartedAt };
+  return { paintMs, loadStartedAt: session.loadStartedAt, loadMs: session.loadMs };
+}
+
+export function applyState(session: Session, state: SiteViewState, now = Date.now()): Session {
   return {
     ...session,
+    ...measure(session, state, now),
     scope: state.scope,
     url: state.url,
     title: state.title,

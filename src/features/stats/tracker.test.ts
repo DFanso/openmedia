@@ -50,6 +50,10 @@ const session = (id: string, url: string, scope: string): Session => ({
   canGoForward: false,
   painted: true,
   lastUsed: Date.now(),
+  openedAt: 0,
+  paintMs: null,
+  loadStartedAt: null,
+  loadMs: null,
 });
 const flushMicrotasks = async () => {
   await vi.advanceTimersByTimeAsync(0);
