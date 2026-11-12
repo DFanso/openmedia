@@ -31,6 +31,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -456,8 +457,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     fun setColorScheme(invoke: Invoke) {
         val args = invoke.parseArgs(SetColorSchemeArgs::class.java)
         colorScheme = args.scheme
-        for (session in sessions.values) applyScheme(session)
-        backdrop?.setBackgroundColor(backdropColor())
+        applyColorScheme()
         invoke.resolve()
     }
 
@@ -1401,30 +1401,44 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         sendMemoryWarning()
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {}
+    /** With the "system" scheme the app follows the device, which can change while it runs. */
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        if (colorScheme == "system") applyColorScheme()
+    }
 
     // MARK: Helpers
 
+    private fun isDark(): Boolean = when (colorScheme) {
+        "dark" -> true
+        "light" -> false
+        else -> (activity.resources.configuration.uiMode and
+            Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+    }
+
+    private fun applyColorScheme() {
+        for (session in sessions.values) applyScheme(session)
+        backdrop?.setBackgroundColor(backdropColor())
+        applyStatusBarIcons()
+    }
+
     private fun applyScheme(session: Session) {
-        val dark = when (colorScheme) {
-            "dark" -> true
-            "light" -> false
-            else -> (activity.resources.configuration.uiMode and
-                Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-        }
         runCatching {
-            WebSettingsCompat.setAlgorithmicDarkeningAllowed(session.view.settings, dark)
+            WebSettingsCompat.setAlgorithmicDarkeningAllowed(session.view.settings, isDark())
         }
     }
 
-    private fun backdropColor(): Int {
-        val dark = when (colorScheme) {
-            "dark" -> true
-            "light" -> false
-            else -> (activity.resources.configuration.uiMode and
-                Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-        }
-        return if (dark) Color.parseColor("#070B14") else Color.parseColor("#F4F7FC")
+    private fun backdropColor(): Int =
+        if (isDark()) Color.parseColor("#070B14") else Color.parseColor("#F4F7FC")
+
+    /**
+     * The shell paints the strip under the status bar in the app's own ink or paper. The system
+     * picks the icon colour from the device's theme, not the app's, so an app set to Dark on a
+     * light device would get dark icons on a dark strip.
+     */
+    private fun applyStatusBarIcons() {
+        val window = activity.window
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars =
+            !isDark()
     }
 
     /** Shows the outside page in the system's browser; it shares nothing with the profile. */
