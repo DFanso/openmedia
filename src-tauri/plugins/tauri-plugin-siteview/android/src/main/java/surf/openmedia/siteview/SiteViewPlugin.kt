@@ -168,6 +168,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     private var signInWindow: WebView? = null
     /** The session whose page opened the sign-in window. */
     private var signInOwner: String? = null
+    /** The session whose page is loading the address the sign-in window handed back. */
+    private var handoffSession: String? = null
     private val worker = Executors.newSingleThreadExecutor()
     private var safeArea: Pair<Int, Int>? = null
     private var safeAreaScript: ScriptHandler? = null
@@ -901,7 +903,9 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                     DomainScope.Verdict.ALLOW -> false
                     DomainScope.Verdict.CANCEL -> true
                     DomainScope.Verdict.POPUP -> {
-                        presentPopup(url)
+                        // A redirect the page made on its own (a sign-in that runs after the tap)
+                        // has to stay in the app: the system browser shares no cookies with it.
+                        if (!openRedirectWindow(session, url)) presentPopup(url)
                         true
                     }
                 }
@@ -930,6 +934,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 val session = sessionOf(view) ?: return
                 session.loading = false
                 session.settled = true
+                finishHandoff(session)
                 session.userNavigationPending = false
                 session.frame.isRefreshing = false
                 reveal(session)
@@ -950,6 +955,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 if (!request.isForMainFrame) return
                 val session = sessionOf(view) ?: return
                 session.settled = true
+                finishHandoff(session)
                 session.userNavigationPending = false
                 session.frame.isRefreshing = false
                 sendError(error.description?.toString() ?: "the page could not be loaded")
@@ -1121,12 +1127,47 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     }
 
     /**
+     * An address the page navigated to on its own, outside the session's domain: usually a
+     * sign-in redirect. It opens in a window of its own in the session's profile, so the cookies
+     * it sets are the page's cookies; when the sign-in returns to the site, the page's own view
+     * loads that address and the window closes.
+     */
+    private fun openRedirectWindow(session: Session, url: Uri): Boolean {
+        if (url.scheme?.lowercase() !in setOf("http", "https")) return false
+        val layer = pageLayer ?: return false
+        closeSignInWindow()
+        val popup = WebView(activity)
+        try {
+            WebViewCompat.setProfile(popup, session.profile)
+        } catch (error: Exception) {
+            popup.destroy()
+            return false
+        }
+        configureSignInWindow(popup, session, returnsToSession = true)
+        layer.addView(
+            popup,
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            ),
+        )
+        signInWindow = popup
+        signInOwner = session.id
+        popup.loadUrl(url.toString())
+        return true
+    }
+
+    /**
      * The sign-in window's own rules: it follows its redirects, because the identity provider
      * and the site it returns to are different domains. The first address decides where the
      * window belongs: a page of the session's own site belongs in the session, everything else
      * is a sign-in window and stays.
      */
-    private fun configureSignInWindow(popup: WebView, session: Session) {
+    private fun configureSignInWindow(
+        popup: WebView,
+        session: Session,
+        returnsToSession: Boolean = false,
+    ) {
         popup.settings.javaScriptEnabled = true
         popup.settings.domStorageEnabled = true
         popup.settings.javaScriptCanOpenWindowsAutomatically = true
@@ -1145,6 +1186,13 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 if (scheme != "http" && scheme != "https") return scheme != "about"
                 if (!request.isForMainFrame) return false
                 val host = url.host ?: return true
+                if (returnsToSession) {
+                    if (!DomainScope.contains(session.scope, host)) return false
+                    // The identity provider sent the user back to the site: that page belongs in
+                    // the session's own view, which shares this window's cookies.
+                    handBack(session, url.toString(), popup)
+                    return true
+                }
                 if (!firstAddress) return false
                 firstAddress = false
                 if (DomainScope.contains(session.scope, host)) {
@@ -1162,6 +1210,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 url: String,
                 favicon: android.graphics.Bitmap?,
             ) {
+                if (returnsToSession) return
                 // Without document-start scripts the opener comes late, which the page's own
                 // scripts may have missed.
                 if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
@@ -1174,12 +1223,38 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 session.view.post { session.view.loadUrl(url) }
                 popup.post { closeSignInWindow(popup) }
             }
+
+            override fun onPageFinished(view: WebView, url: String) {
+                if (!returnsToSession || !url.startsWith("http")) return
+                // A return that arrived as a form post cannot be replayed in the session's view;
+                // the window finished it (its cookies are the page's), so the session's view
+                // loads where it ended up.
+                val host = Uri.parse(url).host ?: return
+                if (!DomainScope.contains(session.scope, host)) return
+                handBack(session, url, popup)
+            }
         }
         popup.webChromeClient = object : WebChromeClient() {
             override fun onCloseWindow(window: WebView) {
                 if (window === signInWindow) closeSignInWindow()
             }
         }
+    }
+
+    /**
+     * The sign-in window stays over the page until the page has loaded the address it was handed,
+     * so the user sees the sign-in, not a blank page, while the site comes up.
+     */
+    private fun handBack(session: Session, url: String, popup: WebView) {
+        handoffSession = session.id
+        session.view.post { session.view.loadUrl(url) }
+        popup.postDelayed({
+            if (handoffSession == session.id) closeSignInWindow(popup)
+        }, 8000)
+    }
+
+    private fun finishHandoff(session: Session) {
+        if (handoffSession == session.id) closeSignInWindow()
     }
 
     /**
@@ -1220,6 +1295,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         if (window != null && window !== view) return
         signInWindow = null
         signInOwner = null
+        handoffSession = null
         pageLayer?.removeView(view)
         view.stopLoading()
         view.destroy()
