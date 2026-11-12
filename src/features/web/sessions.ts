@@ -1,5 +1,6 @@
 import { quickAccess } from "../../shared/favorites";
-import type { SiteViewState } from "../../shared/ipc";
+import { hubForFavorite } from "../../shared/hubs";
+import type { SiteSettings, SiteViewState } from "../../shared/ipc";
 
 /** Where a session came from: tapped from favorites, typed or picked from history, restored, or opened as a hub page. */
 export type SessionSource = "favorite" | "typed" | "restored" | "hub";
@@ -102,6 +103,22 @@ export function findFavoriteSession(
 }
 
 /**
+ * The live session of a quick-access favorite. A favorite that stands for a hub (see
+ * `hubForFavorite`) belongs to that hub's session, so it is retained and badged like any other.
+ */
+export function sessionForFavorite(
+  sessions: Session[],
+  favoriteUrl: string,
+  sites: readonly SiteSettings[],
+): Session | undefined {
+  return findFavoriteSession(
+    sessions,
+    favoriteUrl,
+    hubForFavorite(sites, favoriteUrl)?.recipeId ?? null,
+  );
+}
+
+/**
  * The page the app opens with. One on a favorite's site counts as a favorite session, so the
  * session cap spares it like any other favorite.
  */
@@ -135,13 +152,14 @@ export function sessionsToClose(
   now: number,
   pressure: Pressure,
   favorites: readonly { url: string }[],
+  sites: readonly SiteSettings[] = [],
 ): string[] {
   const hidden = sessions.filter((s) => s.id !== activeId);
   if (pressure === "memory") return hidden.map((s) => s.id);
 
   const retained = new Set<string>();
   for (const { url } of quickAccess(favorites)) {
-    const session = findFavoriteSession(sessions, url);
+    const session = sessionForFavorite(sessions, url, sites);
     if (session) retained.add(session.id);
   }
   const unprotected = hidden.filter((s) => !retained.has(s.id));

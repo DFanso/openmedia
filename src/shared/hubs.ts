@@ -61,3 +61,21 @@ export function activeHub(
     active: url ? tabIndexFor(tabs, url) : -1,
   };
 }
+
+/**
+ * The hub a favorite stands for: a hub's favorite is its homepage (its first page), so it must
+ * open as that hub, with the other pages in the bar, not as a plain page of that one site. A
+ * single-site recipe that owns the same homepage wins, since then the favorite is that site.
+ */
+export function hubForFavorite(
+  sites: readonly SiteSettings[],
+  favoriteUrl: string,
+): SiteSettings | undefined {
+  const site = siteOf(favoriteUrl);
+  if (!site) return undefined;
+  const owners = sites.filter(
+    (entry) => entry.homepage !== null && siteOf(entry.homepage) === site,
+  );
+  if (owners.some((entry) => !entry.hub)) return undefined;
+  return owners.find((entry) => entry.hub && entry.hub.tabs.length > 0);
+}

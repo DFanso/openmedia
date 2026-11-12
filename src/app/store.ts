@@ -10,6 +10,7 @@ import {
 import { earlierOf } from "../features/ai/chat";
 import { selectActiveChat, useChat } from "../features/ai/chatStore";
 import { assistant as assistantIpc, type PreparedRequest } from "../features/ai/ipc";
+import { hubForFavorite } from "../shared/hubs";
 import { siteOf } from "../shared/site";
 import { incognito as incognitoIpc } from "../features/incognito/ipc";
 import {
@@ -527,7 +528,7 @@ export const useApp = create<AppStore>((set, get) => {
 
     openSearch: (url) => startSession(url, "typed"),
 
-    openFavorite: (url) => openPickedPage(url),
+    openFavorite: (url) => openPickedPage(url, hubForFavorite(get().sites, url)?.recipeId ?? null),
 
     openHubTab: (url, hubId) => openPickedPage(url, hubId),
 
@@ -579,6 +580,7 @@ export const useApp = create<AppStore>((set, get) => {
         Date.now(),
         pressure,
         selectUsableQuickFavorites(get()),
+        get().sites,
       );
       if (doomed.length === 0) return;
       doomed.forEach((id) => void siteView.close(id).catch(() => {}));

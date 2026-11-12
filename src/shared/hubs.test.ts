@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { activeHub, tabHost, tabIndexFor } from "./hubs";
+import { activeHub, hubForFavorite, tabHost, tabIndexFor } from "./hubs";
 import type { HubTab, SiteSettings } from "./ipc";
 
 const TABS: HubTab[] = [
@@ -85,5 +85,34 @@ describe("activeHub", () => {
       site("second", "Second", { tabs: TABS }),
     ];
     expect(activeHub(twice, "second", "https://m.youtube.com/")?.recipeId).toBe("second");
+  });
+});
+
+describe("hubForFavorite", () => {
+  const withHome = (
+    recipeId: string,
+    homepage: string,
+    hub: SiteSettings["hub"],
+  ): SiteSettings => ({
+    ...site(recipeId, recipeId, hub),
+    homepage,
+  });
+  const messages = withHome("messages", "https://web.whatsapp.com/", {
+    tabs: [{ label: "WhatsApp", url: "https://web.whatsapp.com/" }],
+  });
+
+  it("opens a hub's homepage favorite as that hub", () => {
+    expect(hubForFavorite([messages], "https://web.whatsapp.com/")?.recipeId).toBe("messages");
+  });
+
+  it("leaves a favorite of an ordinary recipe or an unknown site alone", () => {
+    const instagram = withHome("instagram", "https://www.instagram.com/", null);
+    expect(hubForFavorite([messages, instagram], "https://www.instagram.com/")).toBeUndefined();
+    expect(hubForFavorite([messages], "https://example.com/")).toBeUndefined();
+  });
+
+  it("lets a single-site recipe that owns the homepage win over a hub", () => {
+    const whatsapp = withHome("whatsapp", "https://web.whatsapp.com/", null);
+    expect(hubForFavorite([messages, whatsapp], "https://web.whatsapp.com/")).toBeUndefined();
   });
 });
