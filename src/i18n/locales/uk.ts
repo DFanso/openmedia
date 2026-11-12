@@ -434,6 +434,11 @@ export const uk: Messages = {
   "settings.languageLabel": "Мова застосунку",
   "settings.languageSystem": "Системна мова",
   "settings.searchEngine": "Пошукова система",
+  "settings.startPage": "Стартова сторінка",
+  "settings.startPageLast": "Остання відкрита сторінка",
+  "settings.startPageSearch": "Головна сторінка {engine}",
+  "settings.startPageNote":
+    "Що застосунок відкриває під час запуску. Зміна діятиме з наступного запуску.",
 
   "favorites.title": "Обране",
   "favorites.note":

@@ -428,6 +428,10 @@ export const hi: Messages = {
   "settings.languageLabel": "ऐप की भाषा",
   "settings.languageSystem": "सिस्टम की भाषा",
   "settings.searchEngine": "सर्च इंजन",
+  "settings.startPage": "शुरुआती पेज",
+  "settings.startPageLast": "आख़िरी पेज जिस पर मैं था",
+  "settings.startPageSearch": "{engine} का होम पेज",
+  "settings.startPageNote": "ऐप शुरू होने पर क्या खोलता है। बदलाव अगली बार ऐप खोलने पर लागू होगा।",
 
   "favorites.title": "पसंदीदा",
   "favorites.note":

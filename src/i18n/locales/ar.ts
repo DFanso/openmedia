@@ -414,6 +414,10 @@ export const ar: Messages = {
   "settings.languageLabel": "لغة التطبيق",
   "settings.languageSystem": "لغة النظام",
   "settings.searchEngine": "محرك البحث",
+  "settings.startPage": "صفحة البدء",
+  "settings.startPageLast": "آخر صفحة كنت عليها",
+  "settings.startPageSearch": "الصفحة الرئيسية لـ {engine}",
+  "settings.startPageNote": "ما يفتحه التطبيق عند تشغيله. يسري التغيير من التشغيل التالي.",
 
   "favorites.title": "المفضلة",
   "favorites.note":

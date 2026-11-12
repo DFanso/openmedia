@@ -434,6 +434,11 @@ export const nl: Messages = {
   "settings.languageLabel": "App-taal",
   "settings.languageSystem": "Systeemtaal",
   "settings.searchEngine": "Zoekmachine",
+  "settings.startPage": "Startpagina",
+  "settings.startPageLast": "De laatste pagina waar ik was",
+  "settings.startPageSearch": "Startpagina van {engine}",
+  "settings.startPageNote":
+    "Wat de app opent bij het starten. De wijziging geldt vanaf de volgende start.",
 
   "favorites.title": "Favorieten",
   "favorites.note":

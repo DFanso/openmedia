@@ -432,6 +432,11 @@ export const tr: Messages = {
   "settings.languageLabel": "Uygulama dili",
   "settings.languageSystem": "Sistem dili",
   "settings.searchEngine": "Arama motoru",
+  "settings.startPage": "Başlangıç sayfası",
+  "settings.startPageLast": "En son bulunduğum sayfa",
+  "settings.startPageSearch": "{engine} ana sayfası",
+  "settings.startPageNote":
+    "Uygulamanın açılırken gösterdiği sayfa. Değişiklik bir sonraki açılışta geçerli olur.",
 
   "favorites.title": "Favoriler",
   "favorites.note":

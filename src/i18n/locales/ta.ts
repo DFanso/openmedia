@@ -442,6 +442,11 @@ export const ta: Messages = {
   "settings.languageLabel": "செயலி மொழி",
   "settings.languageSystem": "அமைப்பு மொழி",
   "settings.searchEngine": "தேடுபொறி",
+  "settings.startPage": "தொடக்கப் பக்கம்",
+  "settings.startPageLast": "நான் கடைசியாக இருந்த பக்கம்",
+  "settings.startPageSearch": "{engine} முகப்புப் பக்கம்",
+  "settings.startPageNote":
+    "ஆப் தொடங்கும்போது திறப்பது. மாற்றம் அடுத்த முறை தொடங்கும்போது நடைமுறைக்கு வரும்.",
 
   "favorites.title": "பிடித்துக்கொள்ளவிடைகள்",
   "favorites.note":

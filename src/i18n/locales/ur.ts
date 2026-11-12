@@ -429,6 +429,11 @@ export const ur: Messages = {
   "settings.languageLabel": "ایپ کی زبان",
   "settings.languageSystem": "سسٹم کی زبان",
   "settings.searchEngine": "سرچ انجن",
+  "settings.startPage": "شروع کا صفحہ",
+  "settings.startPageLast": "آخری صفحہ جس پر میں تھا",
+  "settings.startPageSearch": "{engine} کا ہوم پیج",
+  "settings.startPageNote":
+    "ایپ شروع ہونے پر کیا کھولتی ہے۔ تبدیلی اگلی بار ایپ کھولنے سے لاگو ہوگی۔",
 
   "favorites.title": "پسندیدہ",
   "favorites.note":

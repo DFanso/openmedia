@@ -425,6 +425,10 @@ export const si: Messages = {
   "settings.languageLabel": "ඇප් භාෂාව",
   "settings.languageSystem": "පද්ධතියේ භාෂාව",
   "settings.searchEngine": "සෙවුම් යන්ත්‍රය",
+  "settings.startPage": "ආරම්භක පිටුව",
+  "settings.startPageLast": "මා අවසානයට සිටි පිටුව",
+  "settings.startPageSearch": "{engine} මුල් පිටුව",
+  "settings.startPageNote": "යෙදුම ආරම්භ වන විට විවෘත කරන දේ. වෙනස ඊළඟ ආරම්භයේ සිට ක්‍රියාත්මක වේ.",
 
   "favorites.title": "ආදරණීය",
   "favorites.note":

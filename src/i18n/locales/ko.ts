@@ -423,6 +423,11 @@ export const ko: Messages = {
   "settings.languageLabel": "앱 언어",
   "settings.languageSystem": "시스템 언어",
   "settings.searchEngine": "검색 엔진",
+  "settings.startPage": "시작 페이지",
+  "settings.startPageLast": "마지막으로 보던 페이지",
+  "settings.startPageSearch": "{engine} 홈페이지",
+  "settings.startPageNote":
+    "앱을 시작할 때 여는 페이지입니다. 변경 사항은 다음 실행부터 적용됩니다.",
 
   "favorites.title": "즐겨찾기",
   "favorites.note":

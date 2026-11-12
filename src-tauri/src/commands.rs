@@ -36,7 +36,9 @@ use crate::entitlement::Entitlement;
 use crate::error::{Error, Result};
 use crate::find_in_page;
 use crate::incognito::Incognito;
-use crate::library::{Favorite, FavoriteInput, Folder, Library, Mode, SearchEngine, Theme};
+use crate::library::{
+    Favorite, FavoriteInput, Folder, Library, Mode, SearchEngine, StartPage, Theme,
+};
 use crate::recipes::{
     OptionValue, Recipe, Recipes,
     bundled::{self, SearchHit},
@@ -211,6 +213,12 @@ pub fn set_locale(library: State<'_, Library>, locale: Option<String>) -> Result
 #[tauri::command]
 pub fn set_search_engine(library: State<'_, Library>, engine: SearchEngine) -> Result<()> {
     library.set_search_engine(engine)
+}
+
+/// Remembers what the app opens at launch: the last page, or the search engine's home page.
+#[tauri::command]
+pub fn set_start_page(library: State<'_, Library>, start_page: StartPage) -> Result<()> {
+    library.set_start_page(start_page)
 }
 
 /// Reads the local favicon cache without making a network request.
