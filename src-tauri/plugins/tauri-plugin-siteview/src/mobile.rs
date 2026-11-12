@@ -182,6 +182,15 @@ impl<R: Runtime> Siteview<R> {
         )
     }
 
+    /// Names the sites whose media may keep playing while hidden or in the background. Rust-only:
+    /// the plugin registers no command for it, so neither the shell nor a site view can reach it.
+    pub fn set_background_media(&self, request: SetBackgroundMediaRequest) -> Result<()> {
+        self.run(
+            "setBackgroundMedia",
+            serde_json::json!({ "sites": request.sites }),
+        )
+    }
+
     /// Asks the device owner for Face ID, Touch ID or the device passcode and says whether they
     /// passed. Rust-only: the plugin registers no command for it, so neither the shell nor a site
     /// view can raise or answer the prompt.

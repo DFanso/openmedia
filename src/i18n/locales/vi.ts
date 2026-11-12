@@ -521,4 +521,7 @@ export const vi: Messages = {
     "Gói đăng ký tự động gia hạn cho đến khi bạn hủy trong cài đặt cửa hàng trên thiết bị, ít nhất 24 giờ trước khi kỳ hạn kết thúc. Mỗi gói hiển thị giá địa phương của cửa hàng và thời gian dùng thử miễn phí nếu có.",
   "paywall.privacy": "Chính sách quyền riêng tư",
   "paywall.terms": "Điều khoản sử dụng",
+  "favorites.backgroundMedia": "Keep playing in the background",
+  "favorites.backgroundMediaNote":
+    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

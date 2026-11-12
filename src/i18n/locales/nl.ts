@@ -530,4 +530,7 @@ export const nl: Messages = {
     "Abonnementen worden automatisch verlengd tot je ze minstens 24 uur voor het einde van de periode in de winkelinstellingen van je apparaat opzegt. Elk plan toont de lokale winkelprijs en een gratis proefperiode indien die er is.",
   "paywall.privacy": "Privacybeleid",
   "paywall.terms": "Gebruiksvoorwaarden",
+  "favorites.backgroundMedia": "Keep playing in the background",
+  "favorites.backgroundMediaNote":
+    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

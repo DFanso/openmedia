@@ -121,10 +121,7 @@ export function PaywallSheet() {
           <p className="text-xs leading-relaxed text-paper/50">{t("paywall.disclosure")}</p>
           {legalConfigured && (
             <div className="flex justify-center gap-5 text-sm text-paper/65">
-              <button
-                type="button"
-                onClick={() => openLegal(PRIVACY_POLICY_URL)}
-              >
+              <button type="button" onClick={() => openLegal(PRIVACY_POLICY_URL)}>
                 {t("paywall.privacy")}
               </button>
               <button type="button" onClick={() => openLegal(TERMS_URL)}>

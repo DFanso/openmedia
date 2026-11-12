@@ -515,4 +515,7 @@ export const bn: Messages = {
     "সাবস্ক্রিপশন স্বয়ংক্রিয়ভাবে নবায়ন হয় যতক্ষণ না আপনি পর্যায় শেষ হওয়ার অন্তত ২৪ ঘণ্টা আগে আপনার ডিভাইসের স্টোর সেটিংসে তা বাতিল করেন। প্রতিটি প্ল্যানে স্টোরের স্থানীয় মূল্য ও ফ্রি ট্রায়াল দেখানো হয়।",
   "paywall.privacy": "গোপনীয়তা নীতি",
   "paywall.terms": "পরিষেবার শর্তাবলি",
+  "favorites.backgroundMedia": "Keep playing in the background",
+  "favorites.backgroundMediaNote":
+    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

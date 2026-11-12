@@ -506,4 +506,7 @@ export const ar: Messages = {
     "تتجدد الاشتراكات تلقائيًا حتى تلغيها في إعدادات متجر جهازك قبل 24 ساعة على الأقل من نهاية الفترة. تعرض كل خطة السعر المحلي للمتجر وأي فترة تجريبية.",
   "paywall.privacy": "سياسة الخصوصية",
   "paywall.terms": "شروط الاستخدام",
+  "favorites.backgroundMedia": "Keep playing in the background",
+  "favorites.backgroundMediaNote":
+    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

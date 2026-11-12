@@ -524,4 +524,7 @@ export const ur: Messages = {
     "اسبسکرپشنز خودکار طور پر تازہ ہوتے رہتے ہیں جب تک آپ انہیں مدت ختم ہونے سے کم از کم 24 گھنٹے پہلے اپنی ڈیوائس کی اسٹور سیٹنگز میں منسوخ نہ کر دیں۔ ہر منصوبہ اسٹور کا مقامی قیمت اور مفت تجربہ (اگر ہو) دکھاتا ہے۔",
   "paywall.privacy": "رازداری کی پالیسی",
   "paywall.terms": "استعمال کی شرائط",
+  "favorites.backgroundMedia": "Keep playing in the background",
+  "favorites.backgroundMediaNote":
+    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

@@ -490,4 +490,7 @@ export const zhHant: Messages = {
     "訂閱會自動續訂，除非你在週期結束前至少 24 小時在裝置的商店設定中取消。每個方案都會顯示商店的當地價格和免費試用（如有）。",
   "paywall.privacy": "隱私權政策",
   "paywall.terms": "使用條款",
+  "favorites.backgroundMedia": "Keep playing in the background",
+  "favorites.backgroundMediaNote":
+    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

@@ -521,4 +521,7 @@ export const si: Messages = {
     "ඔබ ඔබගේ උපකරණයේ ගනිමින් සැකසුම් තුළ ඒකක කාලය අවසන් වීමට අවම වශයෙන් පැය 24ක් පෙර අවලංගු කරන තුරු දිගටම ස්ථාපනය වේ. සෑම සැලසුමකම ගනිමින්ගේ දේශීය මිල සහ නොමිලේ උපකරණ කාලය ඇති බව පෙන්වයි.",
   "paywall.privacy": "රහස්‍යතා ප්‍රතිපතිතාව",
   "paywall.terms": "භාවිත කොන්දිස",
+  "favorites.backgroundMedia": "Keep playing in the background",
+  "favorites.backgroundMediaNote":
+    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

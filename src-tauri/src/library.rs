@@ -1,5 +1,5 @@
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, BTreeSet},
     fs,
     io::Write,
     path::{Path, PathBuf},
@@ -130,6 +130,8 @@ pub struct AppState {
     pub ad_block: bool,
     /// Pixels kept clear under every page, unless the site has its own.
     pub bottom_margin: u32,
+    /// The sites whose media keeps playing in the background.
+    pub background_media_sites: Vec<String>,
     pub back_button: bool,
     /// Show the exact AI payload and ask before sending it.
     pub ai_preview: bool,
@@ -170,6 +172,10 @@ struct LibraryData {
     /// Per-site bottom margins by recipe id; a site without an entry uses `bottom_margin`.
     #[serde(default)]
     site_bottom_margins: BTreeMap<String, u32>,
+    /// The sites (registrable domains) whose media keeps playing while their page is hidden or the
+    /// app is in the background. Every other site's media is paused then.
+    #[serde(default)]
+    background_media_sites: BTreeSet<String>,
     /// Off by default; the shell can show a floating back button over the page.
     #[serde(default)]
     back_button: bool,
@@ -247,6 +253,7 @@ impl Library {
             theme: data.theme,
             ad_block: data.ad_block,
             bottom_margin: data.bottom_margin,
+            background_media_sites: data.background_media_sites.iter().cloned().collect(),
             back_button: data.back_button,
             ai_preview: data.ai_preview,
             locale: data.locale.clone(),
@@ -410,6 +417,28 @@ impl Library {
         self.save(&data)
     }
 
+    pub fn background_media_sites(&self) -> Result<Vec<String>> {
+        Ok(self
+            .lock()?
+            .background_media_sites
+            .iter()
+            .cloned()
+            .collect())
+    }
+
+    /// Lets a site's media keep playing while hidden, or pauses it again. Returns the whole list.
+    pub fn set_background_media(&self, site: &str, enabled: bool) -> Result<Vec<String>> {
+        let site = checked_site(site)?;
+        let mut data = self.lock()?;
+        if enabled {
+            data.background_media_sites.insert(site);
+        } else {
+            data.background_media_sites.remove(&site);
+        }
+        self.save(&data)?;
+        Ok(data.background_media_sites.iter().cloned().collect())
+    }
+
     pub fn set_back_button(&self, enabled: bool) -> Result<()> {
         let mut data = self.lock()?;
         data.back_button = enabled;
@@ -560,6 +589,23 @@ fn checked_margin(pixels: u32) -> Result<u32> {
     Ok(pixels)
 }
 
+/// A site as a registrable domain: letters, digits, dots and hyphens only, as the shell sends it.
+fn checked_site(site: &str) -> Result<String> {
+    let site = site.trim().to_ascii_lowercase();
+    let valid = !site.is_empty()
+        && site.len() <= 253
+        && !site.starts_with(['.', '-'])
+        && !site.ends_with(['.', '-'])
+        && site
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '.' || c == '-');
+    if valid {
+        Ok(site)
+    } else {
+        Err(Error::UnknownSite)
+    }
+}
+
 fn enabled() -> bool {
     true
 }
@@ -668,6 +714,7 @@ fn default_data() -> LibraryData {
         site_options: OptionChoices::new(),
         bottom_margin: 0,
         site_bottom_margins: BTreeMap::new(),
+        background_media_sites: BTreeSet::new(),
         back_button: false,
         ai_preview: true,
         icons: BTreeMap::new(),
@@ -1301,6 +1348,44 @@ mod tests {
             Err(Error::InvalidMargin(_))
         ));
         assert_eq!(reload(&dir).bottom_margin().unwrap(), 48);
+    }
+
+    #[test]
+    fn background_media_is_off_by_default_per_site_and_persists() {
+        let (dir, library) = library();
+        assert!(library.state().unwrap().background_media_sites.is_empty());
+        library.set_background_media("Instagram.com", true).unwrap();
+        library.set_background_media("music.example", true).unwrap();
+        assert_eq!(
+            reload(&dir).background_media_sites().unwrap(),
+            vec!["instagram.com".to_string(), "music.example".to_string()]
+        );
+        let left = library
+            .set_background_media("instagram.com", false)
+            .unwrap();
+        assert_eq!(left, vec!["music.example".to_string()]);
+    }
+
+    #[test]
+    fn background_media_refuses_a_site_that_is_not_a_domain() {
+        let (_dir, library) = library();
+        for bad in [
+            "",
+            " ",
+            "a b.example",
+            "https://a.example/",
+            "-a.example",
+            "a.example.",
+        ] {
+            assert!(
+                matches!(
+                    library.set_background_media(bad, true),
+                    Err(Error::UnknownSite)
+                ),
+                "{bad:?}"
+            );
+        }
+        assert!(library.background_media_sites().unwrap().is_empty());
     }
 
     #[test]

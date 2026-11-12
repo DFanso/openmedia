@@ -488,4 +488,7 @@ export const zhHans: Messages = {
     "订阅会自动续订，除非你在周期结束前至少 24 小时在设备的商店设置中取消。每个套餐都显示商店的当地价格和免费试用（如有）。",
   "paywall.privacy": "隐私政策",
   "paywall.terms": "使用条款",
+  "favorites.backgroundMedia": "Keep playing in the background",
+  "favorites.backgroundMediaNote":
+    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

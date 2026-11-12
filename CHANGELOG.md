@@ -22,6 +22,17 @@ All notable changes to OpenMedia are documented here.
 **Change:** A site's own bottom margin is now set in Settings > Favorites, in the expanded favorite whose site has a recipe, and the Recipes card no longer shows it. Saved margins keep working: they are still stored per recipe id. The slider saves on release, not with Save. Incognito favorites and favorites with no recipe have no margin control. The shared margin stays in Accessibility. Only the English settings note was reworded; the other languages still say "a recipe".
 
 **Issue:** #150
+### feat(media): a site's audio and video pause when it is hidden or the app is left, unless the favorite keeps them playing
+
+**Area:** `feat(media)`
+
+**Problem:** Reels and other media kept playing after the user switched to another site or left the app, and nothing could stop it short of closing the page.
+
+**Change:** A hidden page, or any page while the app is in the background, now has its media paused and resumed on return. A favorite's editor has a new switch, "Keep playing in the background" (off by default), for sites that should keep playing, such as music. It is one switch for audio and video: the platforms do not let the app tell them apart reliably. The list is saved in `library.json` (`backgroundMediaSites`, registrable domains) and passed to the site views through a Rust-only plugin method, `set_background_media`, so no page can reach it. Not offered for incognito favorites. iOS suspends playback natively; Android and macOS pause the main frame's `video` and `audio` elements with a script and resume only those.
+
+**Verified:** `cargo test --workspace` (366 + 31 passed), the Android plugin compiles (`compileDebugKotlin`), the Swift plugin type-checks, `yarn ts:check`, `yarn lint`, `yarn test`. **Not verified:** any run on a device, simulator or emulator; media in iframes; Mac window close.
+
+**Issue:** #151
 
 ### feat(app): a splash screen that waits for the first site
 

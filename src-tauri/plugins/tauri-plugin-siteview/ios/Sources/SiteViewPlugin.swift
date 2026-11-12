@@ -131,6 +131,10 @@ class SetBlockedArgs: Decodable {
   let blocked: Bool
 }
 
+class SetBackgroundMediaArgs: Decodable {
+  let sites: [String]
+}
+
 class AuthenticateArgs: Decodable {
   let reason: String
 }
@@ -221,6 +225,8 @@ private final class Session {
   /// True while the app has closed this site. The block lives in the native layer: the page
   /// cannot lift it, and switching to another session does not clear it.
   var blocked = false
+  /// True while the page's media is suspended because the page went out of sight.
+  var mediaSuspended = false
   /// The native shield over a closed page. It covers the page and takes every touch.
   var shield: UIView?
   var observations: [NSKeyValueObservation] = []
@@ -288,6 +294,10 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   /// Sessions the app has closed, oldest first. A closed session stays closed until the app opens
   /// it again, so it cannot be reopened and walked past the limit.
   private var blockedSessions: [String] = []
+  /// The sites (registrable domains) whose media keeps playing while hidden or in the background.
+  private var backgroundMediaSites: Set<String> = []
+  /// False from the app entering the background to it coming back.
+  private var appForeground = true
 
   override func load(webview: WKWebView) {
     shell = webview
@@ -301,6 +311,18 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     NotificationCenter.default.addObserver(
       forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: .main
     ) { [weak self] _ in self?.send(MemoryWarningEvent()) }
+    NotificationCenter.default.addObserver(
+      forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main
+    ) { [weak self] _ in
+      self?.appForeground = false
+      self?.refreshMedia()
+    }
+    NotificationCenter.default.addObserver(
+      forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main
+    ) { [weak self] _ in
+      self?.appForeground = true
+      self?.refreshMedia()
+    }
     UNUserNotificationCenter.current().delegate = self
     DispatchQueue.main.async { self.attachShell() }
   }
@@ -549,6 +571,30 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
         session.view.evaluateJavaScript(live)
       }
       invoke.resolve()
+    }
+  }
+
+  /// Names the sites whose media may keep playing while hidden or in the background. Rust-only:
+  /// the plugin registers no command for it, so neither the shell nor a site view can reach it.
+  @objc public func setBackgroundMedia(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(SetBackgroundMediaArgs.self)
+    DispatchQueue.main.async {
+      self.backgroundMediaSites = Set(args.sites)
+      self.refreshMedia()
+      invoke.resolve()
+    }
+  }
+
+  /// Suspends the media of every page that is out of sight, unless its site may play on, and
+  /// resumes what was suspended when the page is shown again. A closed page is left to
+  /// `applyBlocked`.
+  private func refreshMedia() {
+    for session in sessions.values where !session.blocked {
+      let shown = appForeground && session.id == activeId
+      let suspend = !shown && !backgroundMediaSites.contains(session.scope)
+      if suspend == session.mediaSuspended { continue }
+      session.mediaSuspended = suspend
+      session.view.setAllMediaPlaybackSuspended(suspend)
     }
   }
 
@@ -857,6 +903,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       session.blocked = false
       removeShield(from: session)
       session.view.setAllMediaPlaybackSuspended(false)
+      session.mediaSuspended = false
+      refreshMedia()
       if session.view.url == nil { session.needsReload = true }
       if session.id == activeId && session.needsReload { show(session) }
     }
@@ -936,6 +984,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     activeId = session.id
     if let host = shell?.superview { session.view.frame = pageFrame(in: host) }
     router?.siteView = session.view
+    refreshMedia()
     if session.needsReload && !session.blocked {
       session.needsReload = false
       if session.view.url == nil {

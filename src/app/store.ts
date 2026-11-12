@@ -176,6 +176,8 @@ export interface AppStore {
   setBottomMargin: (pixels: number) => Promise<void>;
   /** `null` returns the site to the shared margin. */
   setSiteBottomMargin: (recipeId: string, pixels: number | null) => Promise<void>;
+  /** Whether a site's media keeps playing while hidden or in the background. */
+  setSiteBackgroundMedia: (site: string, enabled: boolean) => Promise<void>;
   setBackButton: (enabled: boolean) => Promise<void>;
   setFabEdge: (edge: Edge) => void;
   /** Shows the exact payload before it is sent; on by default. */
@@ -749,6 +751,25 @@ export const useApp = create<AppStore>((set, get) => {
         await library.setSiteBottomMargin(recipeId, pixels);
       } catch (error) {
         set({ sites: before, error: appError(error) });
+      }
+    },
+    setSiteBackgroundMedia: async (site, enabled) => {
+      const previous = get().state?.backgroundMediaSites;
+      if (!previous) return;
+      const without = previous.filter((entry) => entry !== site);
+      set((current) => ({
+        state: current.state && {
+          ...current.state,
+          backgroundMediaSites: enabled ? [...without, site] : without,
+        },
+      }));
+      try {
+        await library.setSiteBackgroundMedia(site, enabled);
+      } catch (error) {
+        set((current) => ({
+          state: current.state && { ...current.state, backgroundMediaSites: previous },
+          error: appError(error),
+        }));
       }
     },
     setFabEdge: (fabEdge) => set({ fabEdge }),

@@ -172,6 +172,15 @@ pub struct SetBlockedRequest {
     pub blocked: bool,
 }
 
+/// The sites whose pages may keep playing media while they are hidden behind another page or the
+/// app is in the background, as registrable domains. Any other page has its media paused then and
+/// resumed when it is shown again. Rust-only: it is deliberately not a Tauri command and has no
+/// permission, so no webview can call it.
+#[derive(Debug, Clone, Default, Deserialize)]
+pub struct SetBackgroundMediaRequest {
+    pub sites: Vec<String>,
+}
+
 /// A script for the active page. Rust-only: not a Tauri command, never reachable from a webview.
 #[derive(Debug, Clone, Deserialize)]
 pub struct EvaluateRequest {

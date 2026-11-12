@@ -530,4 +530,7 @@ export const uk: Messages = {
     "Підписки продовжуються автоматично, доки ви не скасуєте їх у налаштуваннях магазину на пристрої щонайменше за 24 години до кінця періоду. Кожен тариф показує місцеву ціну магазину та пробний період, якщо він є.",
   "paywall.privacy": "Політика конфіденційності",
   "paywall.terms": "Умови використання",
+  "favorites.backgroundMedia": "Keep playing in the background",
+  "favorites.backgroundMediaNote":
+    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

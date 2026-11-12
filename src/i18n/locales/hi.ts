@@ -517,4 +517,7 @@ export const hi: Messages = {
     "सदस्यताएँ स्वतः नवीनीकृत होती हैं, जब तक आप उनके अवधि समाप्त होने से कम से कम 24 घंटे पहले अपने डिवाइस के स्टोर सेटिंग्स में उन्हें रद्द नहीं करते। हर प्लान में स्टोर का स्थानीय मूल्य और मुफ़्त परीक्षण (यदि हो) दिखता है।",
   "paywall.privacy": "गोपनीयता नीति",
   "paywall.terms": "सेवा की शर्तें",
+  "favorites.backgroundMedia": "Keep playing in the background",
+  "favorites.backgroundMediaNote":
+    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

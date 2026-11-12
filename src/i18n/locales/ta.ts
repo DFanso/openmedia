@@ -536,4 +536,7 @@ export const ta: Messages = {
     "காலகட்டம் முடிவதற்கு குறைந்தது 24 மணி நேரத்திற்கு முன் உங்கள் சாதனத்தின் கடை அமைப்புகளில் அவற்றை ரத்து செய்யும் வரை சந்தாகங்கள் தானியாகப் புதுப்பிக்கப்படும். ஒவ்வொரு திட்டமும் கடையின் உள்ளூர் விலையையும் இலவச மாதிரியையும் காட்டுகிறது.",
   "paywall.privacy": "தனியுரிமைக் கொள்கை",
   "paywall.terms": "பயன்பாட்டு விதிமுறைகள்",
+  "favorites.backgroundMedia": "Keep playing in the background",
+  "favorites.backgroundMediaNote":
+    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

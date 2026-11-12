@@ -537,4 +537,7 @@ export const el: Messages = {
     "Οι συνδρομές ανανεώνονται αυτόματα μέχρι να τις ακυρώσετε στις ρυθμίσεις του καταστήματος της συσκευής σας τουλάχιστον 24 ώρες πριν από το τέλος της περιόδου. Κάθε πλάνο δείχνει την τοπική τιμή του καταστήματος και τυχόν δωρεάν δοκιμή.",
   "paywall.privacy": "Απορρήτου",
   "paywall.terms": "Όροι χρήσης",
+  "favorites.backgroundMedia": "Keep playing in the background",
+  "favorites.backgroundMediaNote":
+    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

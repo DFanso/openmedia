@@ -518,4 +518,7 @@ export const ko: Messages = {
     "구독은 기간 종료 24시간 이상 전에 기기의 스토어 설정에서 취소하지 않는 한 자동으로 갱신됩니다. 각 요금제에는 스토어의 현지 가격과 무료 체험(있는 경우)이 표시됩니다.",
   "paywall.privacy": "개인정보 처리방침",
   "paywall.terms": "이용약관",
+  "favorites.backgroundMedia": "Keep playing in the background",
+  "favorites.backgroundMediaNote":
+    "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };
