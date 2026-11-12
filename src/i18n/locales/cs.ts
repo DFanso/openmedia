@@ -554,7 +554,7 @@ export const cs: Messages = {
   "tabs.open": "Otevřené weby",
   "tabs.openEmpty": "Žádný web není otevřený.",
   "tabs.closeOthers": "Zavřít ostatní weby",
-  "tabs.closeNote": "Zavřením webu se ukončí jen jeho otevřená stránka. Oblíbené a historie zůstanou.",
+  "tabs.closeNote":
     "Zavřením webu se ukončí jen jeho otevřená stránka. Oblíbené a historie zůstanou.",
   "tabs.closeOne": "Zavřít {name}",
   "tabs.quickAccess": "Rychlý přístup",

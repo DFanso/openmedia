@@ -559,7 +559,7 @@ export const ro: Messages = {
   "tabs.open": "Site-uri deschise",
   "tabs.openEmpty": "Niciun site nu este deschis.",
   "tabs.closeOthers": "Închide celelalte site-uri",
-  "tabs.closeNote": "Închiderea unui site încheie doar pagina lui deschisă. Favoritele și istoricul rămân.",
+  "tabs.closeNote":
     "Închiderea unui site încheie doar pagina lui deschisă. Favoritele și istoricul rămân.",
   "tabs.closeOne": "Închide {name}",
   "tabs.quickAccess": "Acces rapid",

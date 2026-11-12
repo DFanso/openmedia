@@ -556,7 +556,7 @@ export const ms: Messages = {
   "tabs.open": "Laman terbuka",
   "tabs.openEmpty": "Tiada laman yang terbuka.",
   "tabs.closeOthers": "Tutup laman lain",
-  "tabs.closeNote": "Menutup laman hanya menamatkan halamannya yang terbuka. Kegemaran dan sejarah anda kekal.",
+  "tabs.closeNote":
     "Menutup laman hanya menamatkan halamannya yang terbuka. Kegemaran dan sejarah anda kekal.",
   "tabs.closeOne": "Tutup {name}",
   "tabs.quickAccess": "Akses pantas",

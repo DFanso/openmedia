@@ -551,7 +551,7 @@ export const vi: Messages = {
   "tabs.open": "Trang đang mở",
   "tabs.openEmpty": "Không có trang nào đang mở.",
   "tabs.closeOthers": "Đóng các trang khác",
-  "tabs.closeNote": "Đóng một trang chỉ kết thúc trang đang mở của nó. Mục yêu thích và lịch sử vẫn còn.",
+  "tabs.closeNote":
     "Đóng một trang chỉ kết thúc trang đang mở của nó. Mục yêu thích và lịch sử vẫn còn.",
   "tabs.closeOne": "Đóng {name}",
   "tabs.quickAccess": "Truy cập nhanh",

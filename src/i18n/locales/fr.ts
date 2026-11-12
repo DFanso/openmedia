@@ -568,7 +568,7 @@ export const fr: Messages = {
   "tabs.open": "Sites ouverts",
   "tabs.openEmpty": "Aucun site n'est ouvert.",
   "tabs.closeOthers": "Fermer les autres sites",
-  "tabs.closeNote": "Fermer un site ne ferme que sa page ouverte. Vos favoris et votre historique restent.",
+  "tabs.closeNote":
     "Fermer un site ne ferme que sa page ouverte. Vos favoris et votre historique restent.",
   "tabs.closeOne": "Fermer {name}",
   "tabs.quickAccess": "Accès rapide",

@@ -554,7 +554,7 @@ export const pl: Messages = {
   "tabs.open": "Otwarte witryny",
   "tabs.openEmpty": "Żadna witryna nie jest otwarta.",
   "tabs.closeOthers": "Zamknij pozostałe witryny",
-  "tabs.closeNote": "Zamknięcie witryny kończy tylko jej otwartą stronę. Ulubione i historia zostają.",
+  "tabs.closeNote":
     "Zamknięcie witryny kończy tylko jej otwartą stronę. Ulubione i historia zostają.",
   "tabs.closeOne": "Zamknij {name}",
   "tabs.quickAccess": "Szybki dostęp",

@@ -560,7 +560,7 @@ export const pt: Messages = {
   "tabs.open": "Sites abertos",
   "tabs.openEmpty": "Nenhum site está aberto.",
   "tabs.closeOthers": "Fechar os outros sites",
-  "tabs.closeNote": "Fechar um site só encerra a página aberta. Seus favoritos e o histórico continuam.",
+  "tabs.closeNote":
     "Fechar um site só encerra a página aberta. Seus favoritos e o histórico continuam.",
   "tabs.closeOne": "Fechar {name}",
   "tabs.quickAccess": "Acesso rápido",

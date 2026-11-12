@@ -553,7 +553,7 @@ export const ja: Messages = {
   "tabs.open": "開いているサイト",
   "tabs.openEmpty": "開いているサイトはありません。",
   "tabs.closeOthers": "ほかのサイトを閉じる",
-  "tabs.closeNote": "サイトを閉じると、開いているページだけが終了します。お気に入りと履歴は残ります。",
+  "tabs.closeNote":
     "サイトを閉じると、開いているページだけが終了します。お気に入りと履歴は残ります。",
   "tabs.closeOne": "{name}を閉じる",
   "tabs.quickAccess": "クイックアクセス",

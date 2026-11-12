@@ -556,7 +556,7 @@ export const sv: Messages = {
   "tabs.open": "Öppna webbplatser",
   "tabs.openEmpty": "Ingen webbplats är öppen.",
   "tabs.closeOthers": "Stäng de andra webbplatserna",
-  "tabs.closeNote": "Att stänga en webbplats avslutar bara dess öppna sida. Dina favoriter och din historik finns kvar.",
+  "tabs.closeNote":
     "Att stänga en webbplats avslutar bara dess öppna sida. Dina favoriter och din historik finns kvar.",
   "tabs.closeOne": "Stäng {name}",
   "tabs.quickAccess": "Snabbåtkomst",

@@ -544,7 +544,7 @@ export const nl: Messages = {
   "tabs.open": "Open sites",
   "tabs.openEmpty": "Er is geen site open.",
   "tabs.closeOthers": "De andere sites sluiten",
-  "tabs.closeNote": "Een site sluiten beëindigt alleen de geopende pagina. Je favorieten en geschiedenis blijven.",
+  "tabs.closeNote":
     "Een site sluiten beëindigt alleen de geopende pagina. Je favorieten en geschiedenis blijven.",
   "tabs.closeOne": "{name} sluiten",
   "tabs.quickAccess": "Snelle toegang",

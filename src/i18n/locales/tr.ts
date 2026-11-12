@@ -557,7 +557,7 @@ export const tr: Messages = {
   "tabs.open": "Açık siteler",
   "tabs.openEmpty": "Açık site yok.",
   "tabs.closeOthers": "Diğer siteleri kapat",
-  "tabs.closeNote": "Bir siteyi kapatmak yalnızca açık sayfasını sonlandırır. Favorileriniz ve geçmişiniz kalır.",
+  "tabs.closeNote":
     "Bir siteyi kapatmak yalnızca açık sayfasını sonlandırır. Favorileriniz ve geçmişiniz kalır.",
   "tabs.closeOne": "{name} sitesini kapat",
   "tabs.quickAccess": "Hızlı erişim",
