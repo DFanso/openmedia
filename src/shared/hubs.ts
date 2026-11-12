@@ -40,16 +40,24 @@ export function tabIndexFor(tabs: readonly HubTab[], url: string): number {
 }
 
 /**
- * The hub the page belongs to, or null when it belongs to none. The first installed hub with a
- * page on the page's own site wins, so a hub never fights another one for the same page.
+ * The hub a hub session was opened from, with the page the session is on. The hub comes from the
+ * session, never from the address: a plain Instagram page is not a page of the Messages Hub just
+ * because the hub also has an Instagram tab. `active` is -1 while the session is outside every
+ * page of the hub (a redirect to a login page, say), and the hub bar stays.
  */
-export function activeHub(sites: readonly SiteSettings[], url: string | null): ActiveHub | null {
-  if (!url) return null;
-  for (const site of sites) {
-    const tabs = site.hub?.tabs;
-    if (!tabs || tabs.length === 0) continue;
-    const active = tabIndexFor(tabs, url);
-    if (active >= 0) return { recipeId: site.recipeId, name: site.name, tabs, active };
-  }
-  return null;
+export function activeHub(
+  sites: readonly SiteSettings[],
+  hubId: string | null,
+  url: string | null,
+): ActiveHub | null {
+  if (!hubId) return null;
+  const site = sites.find((candidate) => candidate.recipeId === hubId);
+  const tabs = site?.hub?.tabs;
+  if (!site || !tabs || tabs.length === 0) return null;
+  return {
+    recipeId: site.recipeId,
+    name: site.name,
+    tabs,
+    active: url ? tabIndexFor(tabs, url) : -1,
+  };
 }

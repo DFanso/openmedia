@@ -7,6 +7,8 @@ export type SessionSource = "favorite" | "typed" | "restored" | "hub";
 export interface Session {
   id: string;
   source: SessionSource;
+  /** The hub recipe a hub session was opened from; null for every other session. */
+  hubId: string | null;
   /** The address the session was opened with. */
   openedUrl: string;
   /** The registrable domain the native side pinned the session to; unknown until it loads. */
@@ -27,10 +29,17 @@ export const MAX_SESSIONS = 5;
 /** Unprotected hidden pages idle longer than this are closed. */
 export const IDLE_LIMIT_MS = 20 * 60_000;
 
-export function newSession(id: string, source: SessionSource, url: string, now: number): Session {
+export function newSession(
+  id: string,
+  source: SessionSource,
+  url: string,
+  now: number,
+  hubId: string | null = null,
+): Session {
   return {
     id,
     source,
+    hubId,
     openedUrl: url,
     scope: null,
     url: null,
@@ -75,15 +84,15 @@ export function scopeCovers(scope: string, url: string): boolean {
  * site, preferring sessions that came from a favorite and then the most recently used. A session
  * whose domain is not known yet matches only the exact address it was opened with. Hub pages
  * are sessions of their own: a favorite never switches to one (Instagram must not open the
- * Messages Hub's inbox), and a hub page (`hub`) switches only to another hub session.
+ * Messages Hub's inbox), and a page of a hub (`hubId`) switches only to a session of that same hub.
  */
 export function findFavoriteSession(
   sessions: Session[],
   favoriteUrl: string,
-  hub = false,
+  hubId: string | null = null,
 ): Session | undefined {
   return sessions
-    .filter((s) => (s.source === "hub") === hub)
+    .filter((s) => s.hubId === hubId)
     .filter((s) => (s.scope ? scopeCovers(s.scope, favoriteUrl) : s.openedUrl === favoriteUrl))
     .sort(
       (a, b) =>

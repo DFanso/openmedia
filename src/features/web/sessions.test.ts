@@ -57,14 +57,24 @@ describe("findFavoriteSession", () => {
   });
 
   it("keeps a hub page and a favorite on the same site apart", () => {
-    const inbox = session("inbox", "hub", { scope: "instagram.com" });
+    const inbox = session("inbox", "hub", { scope: "instagram.com", hubId: "messages" });
     const feed = session("feed", "favorite", { scope: "instagram.com" });
     expect(findFavoriteSession([inbox], "https://www.instagram.com/")).toBeUndefined();
     expect(findFavoriteSession([inbox, feed], "https://www.instagram.com/")).toBe(feed);
-    expect(findFavoriteSession([inbox, feed], "https://www.instagram.com/direct/", true)).toBe(
-      inbox,
+    expect(
+      findFavoriteSession([inbox, feed], "https://www.instagram.com/direct/", "messages"),
+    ).toBe(inbox);
+    expect(
+      findFavoriteSession([feed], "https://www.instagram.com/direct/", "messages"),
+    ).toBeUndefined();
+  });
+
+  it("keeps the pages of two hubs on the same site apart", () => {
+    const first = session("a", "hub", { scope: "instagram.com", hubId: "first" });
+    const second = session("b", "hub", { scope: "instagram.com", hubId: "second" });
+    expect(findFavoriteSession([first, second], "https://www.instagram.com/", "second")).toBe(
+      second,
     );
-    expect(findFavoriteSession([feed], "https://www.instagram.com/direct/", true)).toBeUndefined();
   });
 });
 

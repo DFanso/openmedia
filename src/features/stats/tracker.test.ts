@@ -40,6 +40,7 @@ const policies = {
 const session = (id: string, url: string, scope: string): Session => ({
   id,
   source: "typed",
+  hubId: null,
   openedUrl: url,
   scope,
   url,

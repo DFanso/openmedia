@@ -180,7 +180,9 @@ function SiteOptions({ site }: { site: SiteSettings }) {
   return (
     <div className="flex flex-col gap-5 border-t border-hair px-3 py-4">
       <ImportedNotice site={site} />
-      {site.hub && site.hub.tabs.length > 0 && <HubPages hub={site.hub} onOpen={openHubTab} />}
+      {site.hub && site.hub.tabs.length > 0 && (
+        <HubPages hub={site.hub} onOpen={(url) => openHubTab(url, site.recipeId)} />
+      )}
       <OptionGroups
         site={site}
         onToggle={(optionId, enabled) => void setSiteOption(site.recipeId, optionId, enabled)}
@@ -251,7 +253,9 @@ function IncognitoSiteOptions({ site }: { site: SiteSettings }) {
   return (
     <div className="flex flex-col gap-5 border-t border-hair px-3 py-4">
       <ImportedNotice site={site} incognito />
-      {site.hub && site.hub.tabs.length > 0 && <HubPages hub={site.hub} onOpen={openHubTab} />}
+      {site.hub && site.hub.tabs.length > 0 && (
+        <HubPages hub={site.hub} onOpen={(url) => openHubTab(url, site.recipeId)} />
+      )}
       <OptionGroups
         site={site}
         onToggle={(optionId, enabled) =>
