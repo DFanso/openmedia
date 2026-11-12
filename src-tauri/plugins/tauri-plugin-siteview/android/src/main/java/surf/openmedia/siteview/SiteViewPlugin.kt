@@ -14,10 +14,12 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.net.Uri
 import android.os.Build
+import android.os.Message
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -75,6 +77,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         /** Holds the page view and gives it pull-to-refresh; this is what the page layer lays out. */
         val frame: SwipeRefreshLayout,
         val initialUrl: String,
+        /** The profile the page lives in; a sign-in window shares it, so the cookies are the same. */
+        val profile: String,
         @Volatile var topUrl: String = initialUrl,
         var scope: String,
         var settled: Boolean = false,
@@ -145,6 +149,10 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     private val blockedSessions = ArrayList<String>()
     private val rules = BlockingRules()
     private var touchTarget: View? = null
+    /** The window a page opened with `window.open`: a sign-in window. It sits above the page. */
+    private var signInWindow: WebView? = null
+    /** The session whose page opened the sign-in window. */
+    private var signInOwner: String? = null
     private val worker = Executors.newSingleThreadExecutor()
     private var safeArea: Pair<Int, Int>? = null
     private var safeAreaScript: ScriptHandler? = null
@@ -260,6 +268,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
             view = view,
             frame = frame,
             initialUrl = url.toString(),
+            profile = args.profile,
             scope = DomainScope.registrableDomain(url.host),
         )
         sessions[session.id] = session
@@ -356,6 +365,11 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     @Command
     fun goBack(invoke: Invoke) {
         onActiveSession(invoke) {
+            // Back leaves the sign-in window first: the page under it keeps its place.
+            if (signInWindow != null) {
+                closeSignInWindow()
+                return@onActiveSession
+            }
             if (it.view.canGoBack()) {
                 prepareHistoryNavigation(it, -1)
                 it.view.goBack()
@@ -654,6 +668,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
 
     /** Makes `session` the one visible page. The others stay alive underneath, hidden. */
     private fun show(session: Session) {
+        // A sign-in window belongs to the page that opened it; another page takes the screen.
+        if (signInOwner != null && signInOwner != session.id) closeSignInWindow()
         for (other in sessions.values) {
             if (other === session) continue
             other.frame.visibility = View.GONE
@@ -674,6 +690,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     }
 
     private fun dispose(session: Session) {
+        if (signInOwner == session.id) closeSignInWindow()
         removeShield(session)
         session.scriptHandler?.remove()
         session.paintHandler?.remove()
@@ -777,9 +794,28 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         view.settings.domStorageEnabled = true
         view.settings.mediaPlaybackRequiresUserGesture = false
         view.settings.javaScriptCanOpenWindowsAutomatically = true
+        // A window the page opens is ours to make; without this the page's `window.open` would
+        // navigate the page itself.
+        view.settings.setSupportMultipleWindows(true)
         view.setBackgroundColor(Color.TRANSPARENT)
         view.overScrollMode = View.OVER_SCROLL_NEVER
         view.isClickable = true
+        view.webChromeClient = object : WebChromeClient() {
+            override fun onCreateWindow(
+                view: WebView,
+                isDialog: Boolean,
+                isUserGesture: Boolean,
+                resultMsg: Message,
+            ): Boolean {
+                val session = sessionOf(view) ?: return false
+                if (session.blocked) return false
+                return openSignInWindow(session, resultMsg)
+            }
+
+            override fun onCloseWindow(window: WebView) {
+                if (window === signInWindow) closeSignInWindow()
+            }
+        }
         view.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(
                 view: WebView,
@@ -987,6 +1023,145 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         if (!recipe.isNullOrEmpty()) session.view.evaluateJavascript(recipe, null)
     }
 
+    // MARK: Sign-in window
+
+    /**
+     * The window a page opened with `window.open`: a sign-in window (Google, Apple). It has to
+     * live inside the app and share the page's profile, or the sign-in cannot hand its token
+     * back to the page that opened it.
+     */
+    private fun openSignInWindow(session: Session, resultMsg: Message): Boolean {
+        val layer = pageLayer ?: return false
+        val transport = resultMsg.obj as? WebView.WebViewTransport ?: return false
+        closeSignInWindow()
+        val popup = WebView(activity)
+        try {
+            WebViewCompat.setProfile(popup, session.profile)
+        } catch (error: Exception) {
+            popup.destroy()
+            return false
+        }
+        configureSignInWindow(popup, session)
+        installSignInBridge(popup, session)
+        layer.addView(
+            popup,
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            ),
+        )
+        signInWindow = popup
+        signInOwner = session.id
+        transport.webView = popup
+        resultMsg.sendToTarget()
+        return true
+    }
+
+    /**
+     * The sign-in window's own rules: it follows its redirects, because the identity provider
+     * and the site it returns to are different domains. The first address decides where the
+     * window belongs: a page of the session's own site belongs in the session, everything else
+     * is a sign-in window and stays.
+     */
+    private fun configureSignInWindow(popup: WebView, session: Session) {
+        popup.settings.javaScriptEnabled = true
+        popup.settings.domStorageEnabled = true
+        popup.settings.javaScriptCanOpenWindowsAutomatically = true
+        popup.settings.setSupportMultipleWindows(true)
+        popup.setBackgroundColor(Color.TRANSPARENT)
+        popup.overScrollMode = View.OVER_SCROLL_NEVER
+        popup.isClickable = true
+        var firstAddress = true
+        popup.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(
+                view: WebView,
+                request: WebResourceRequest,
+            ): Boolean {
+                val url = request.url
+                val scheme = url.scheme?.lowercase()
+                if (scheme != "http" && scheme != "https") return scheme != "about"
+                if (!request.isForMainFrame) return false
+                val host = url.host ?: return true
+                if (!firstAddress) return false
+                firstAddress = false
+                if (DomainScope.contains(session.scope, host)) {
+                    // The window opened a page of the session's own site: that page belongs in
+                    // the session, not in a window of its own.
+                    session.view.post { session.view.loadUrl(url.toString()) }
+                    popup.post { closeSignInWindow(popup) }
+                    return true
+                }
+                return false
+            }
+
+            override fun onPageStarted(
+                view: WebView,
+                url: String,
+                favicon: android.graphics.Bitmap?,
+            ) {
+                // Without document-start scripts the opener comes late, which the page's own
+                // scripts may have missed.
+                if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+                    popup.evaluateJavascript(OPENER_SCRIPT, null)
+                }
+                if (!url.startsWith("http") || !firstAddress) return
+                firstAddress = false
+                val host = Uri.parse(url).host ?: return
+                if (!DomainScope.contains(session.scope, host)) return
+                session.view.post { session.view.loadUrl(url) }
+                popup.post { closeSignInWindow(popup) }
+            }
+        }
+        popup.webChromeClient = object : WebChromeClient() {
+            override fun onCloseWindow(window: WebView) {
+                if (window === signInWindow) closeSignInWindow()
+            }
+        }
+    }
+
+    /**
+     * The sign-in window's way to talk to the page that opened it. Android's WebView gives a
+     * window no `window.opener`, so the window gets one that carries the message over this
+     * channel and the app hands it to the page as a message event.
+     */
+    private fun installSignInBridge(popup: WebView, session: Session) {
+        WebViewCompat.addWebMessageListener(
+            popup,
+            OPENER_OBJECT,
+            setOf("*"),
+        ) { _, message: WebMessageCompat, sourceOrigin: Uri, isMainFrame: Boolean, _ ->
+            if (!isMainFrame) return@addWebMessageListener
+            val body = message.data ?: return@addWebMessageListener
+            forwardToOpener(session, body, "${sourceOrigin.scheme}://${sourceOrigin.host}")
+        }
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+            WebViewCompat.addDocumentStartJavaScript(popup, OPENER_SCRIPT, setOf("*"))
+        }
+    }
+
+    /** Hands a message from the sign-in window to the page that opened it. */
+    private fun forwardToOpener(session: Session, body: String, origin: String) {
+        val payload = try {
+            JSONObject(body)
+        } catch (error: Exception) {
+            return
+        }
+        if (payload.optString("kind") != "message") return
+        val script = openerMessageScript(payload.opt("message"), origin) ?: return
+        session.view.evaluateJavascript(script, null)
+    }
+
+    /** Takes the sign-in window down and gives the touches back to the page. */
+    private fun closeSignInWindow(window: WebView? = null) {
+        val view = signInWindow ?: return
+        if (window != null && window !== view) return
+        signInWindow = null
+        signInOwner = null
+        pageLayer?.removeView(view)
+        view.stopLoading()
+        view.destroy()
+    }
+
     // MARK: Painting
 
     /** Shows the page once it has something to show; until then the backdrop is visible. */
@@ -1034,7 +1209,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
             touchTarget = null
             val session = activeSession() ?: return false
             if (interactiveRegions.any { it.contains(event.x, event.y) }) return false
-            val target = session.shield ?: session.frame
+            val target = signInWindow ?: session.shield ?: session.frame
             if (target.visibility != View.VISIBLE) return false
             touchTarget = target
         }
@@ -1214,6 +1389,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     companion object {
         private const val BRIDGE_OBJECT = "openmedia"
         private const val PAINT_OBJECT = "openmediaPaint"
+        private const val OPENER_OBJECT = "openmediaOpener"
         private const val NOTIFICATION_CHANNEL = "openmedia-siteview"
         private const val NOTIFICATION_SESSION = "openmedia.session"
         private const val POST_NOTIFICATIONS = "android.permission.POST_NOTIFICATIONS"
@@ -1253,5 +1429,56 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
   }
 })();
 """
+
+        /**
+         * Android's WebView gives a window no `window.opener`, so a sign-in window cannot report
+         * back to the page that opened it. This gives it one: the message goes to the app, which
+         * hands it to the page as a message event, the way a real opener would. A window that
+         * already has an opener keeps it.
+         */
+        private val OPENER_SCRIPT = """
+(function () {
+  if (window.opener) return;
+  var send = function (payload) {
+    try { window.$OPENER_OBJECT.postMessage(JSON.stringify(payload)); } catch (error) {}
+  };
+  var proxy = {
+    postMessage: function (message, origin) {
+      send({ kind: "message", message: message, origin: origin || "" });
+    },
+    closed: false,
+    focus: function () {},
+    close: function () { send({ kind: "close" }); },
+  };
+  var define = function (target) {
+    Object.defineProperty(target, "opener", {
+      configurable: true,
+      get: function () { return proxy; },
+    });
+  };
+  try {
+    define(window);
+  } catch (error) {
+    try { define(Object.getPrototypeOf(window)); } catch (fallbackError) {}
+  }
+})();
+"""
     }
+}
+
+/**
+ * The script that hands a message from the sign-in window to the page that opened it, the way a
+ * real opener's `postMessage` would. The message and the origin are the page's own words, so
+ * both are written as JSON text: nothing the page says can end the script early.
+ */
+internal fun openerMessageScript(message: Any?, origin: String): String? {
+    val data = when (message) {
+        is JSONObject -> message.toString()
+        is JSONArray -> message.toString()
+        is String -> JSONObject.quote(message)
+        is Boolean -> message.toString()
+        is Int, is Long, is Double, is Float -> message.toString()
+        else -> return null
+    }
+    return "window.dispatchEvent(new MessageEvent('message',{data:$data,origin:${JSONObject.quote(origin)}}))"
 }

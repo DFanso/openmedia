@@ -8,6 +8,18 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-12
 
+### fix(siteview): a sign-in window stays in the app, so the token reaches the page
+
+**Area:** `fix(siteview)`
+
+**Change:** A window a page opens with `window.open` (Google or Apple sign-in) now opens inside the app instead of the system browser. The window runs in the session's own profile, so the cookies the sign-in sets are the page's cookies, and it keeps the opener's link, so the token reaches the page that asked for it. On iOS it is a `WKWebView` built from the configuration WebKit hands over, which carries the opener's data store and `window.opener`; on Android it is a `WebView` in the same profile, and because Android's WebView gives a window no opener, the plugin gives it one that carries the message to the opening page over a write-only bridge. The window closes when the page closes it, when Back is pressed, when its session closes and when another session is shown. Automatic cross-domain navigation still opens in the system browser, unchanged.
+
+**Why:** a sign-in that ran in the system browser shared no cookies with the app, so the page stayed logged out and the browser showed a blank page once the login finished. The in-app sign-in window had been built for iOS and was lost when the live-sessions merge landed on 2026-11-07.
+
+**Verified:** the iOS app was built and run on the iPhone 17 Pro Max simulator (iOS 26.5) against a local fixture: the window opened inside the app (its request carried the app's user agent), it read the cookie the page had set (the profile's store is shared), its message reached the page through `window.opener`, and the window closed when the page closed it. The same check passes on macOS, where the popup window already existed, and on Android (a debug build on an emulator): the window opened inside the app, read the page's cookie, carried its message to the page over the bridge, and closed when the page closed it. The Android plugin's unit tests pass, including new ones for the message the window carries. **Not verified:** on a physical Android device, and a real Google or Apple sign-in.
+
+**PR:** n/a
+
 ### chore(release): version 1.0.2
 
 **Area:** `chore(release)`
