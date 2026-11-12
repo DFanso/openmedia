@@ -45,6 +45,8 @@ The launch screen is native (iOS: `LaunchScreen.storyboard`, the logo at 52% of 
 
 The splash lifts only when that first site has **painted** — a page that commits early still shows an empty view until it draws, and that frame is what the splash exists to hide — or when there is no site to wait for, or when the start page could not be opened, or after 12 s. Fade-out is 320 ms. Reduced motion keeps the halo still and the track's steps instant.
 
+The splash is sized and centred with `100lvh`, not the layout viewport: on iOS the shell's web view lays out its first frame 96 px shorter than the screen (the safe areas are taken off) and grows about 40 ms later, so a logo centred in that viewport painted above the launch screen's logo and then moved. `lvh` is the screen's height from the first frame.
+
 The splash is drawn by `index.html` itself, with the logo and the stylesheet inlined by the Vite plugin `inlineFirstPaint`, so it is on screen with the first HTML instead of after two more requests.
 
 ## Settings
