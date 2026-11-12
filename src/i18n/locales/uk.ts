@@ -301,7 +301,7 @@ export const uk: Messages = {
   "recipes.openHubPage": "Відкрити {label}",
   "recipes.hubNote":
     "Хаб відкриває кілька сайтів одразу. Кожна сторінка — окремий сайт із власними cookie.",
-  "recipes.bottomMargin": "Нижнє поле",
+  "favorites.bottomMargin": "Нижнє поле",
   "recipes.sharedMargin":
     "Використовує спільне поле. Посуньте повзунок, щоб дати цьому сайту власне.",
   "recipes.ownMargin": "Цей сайт має власне нижнє поле.",

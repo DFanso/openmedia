@@ -277,7 +277,7 @@ export const zhHant: Messages = {
   "recipes.hubPages": "頁面",
   "recipes.openHubPage": "開啟 {label}",
   "recipes.hubNote": "聚合頁會同時開啟多個網站。每個頁面都是獨立的網站，有自己的 Cookie。",
-  "recipes.bottomMargin": "底部邊距",
+  "favorites.bottomMargin": "底部邊距",
   "recipes.sharedMargin": "使用共用的邊距。拖動滑桿可讓這個網站有自己的邊距。",
   "recipes.ownMargin": "這個網站有自己的邊距。",
   "recipes.siteMarginLabel": "{name} 的底部邊距",

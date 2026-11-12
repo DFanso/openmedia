@@ -296,7 +296,7 @@ export const vi: Messages = {
   "recipes.openHubPage": "Mở {label}",
   "recipes.hubNote":
     "Một hub mở nhiều trang web cùng lúc. Mỗi trang là một trang web riêng, với cookie riêng.",
-  "recipes.bottomMargin": "Lề dưới",
+  "favorites.bottomMargin": "Lề dưới",
   "recipes.sharedMargin": "Dùng lề dưới chung. Kéo thanh trượt để đặt lề riêng cho trang này.",
   "recipes.ownMargin": "Trang này có lề dưới riêng.",
   "recipes.siteMarginLabel": "Lề dưới của {name}",

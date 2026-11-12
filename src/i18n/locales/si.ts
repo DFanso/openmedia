@@ -292,7 +292,7 @@ export const si: Messages = {
   "recipes.openHubPage": "{label} විවෘත කරන්න",
   "recipes.hubNote":
     "හබ් එකවර බහ සටහන් විවෘත කරයි. හැම පිටුවක්ම එකම සටහනක් පරිදි එයි, එහි පුනර්ය කුකීස් සමඟ.",
-  "recipes.bottomMargin": "පහළ දුරස්ථය",
+  "favorites.bottomMargin": "පහළ දුරස්ථය",
   "recipes.sharedMargin":
     "මූලික දුරස්ථය භාවිතයෙන්. මෙම අඩවියට එකම දුරස්ථයක් ලබා දීමට ස්ලයිඩරය ගමන් කරන්න.",
   "recipes.ownMargin": "මෙම අඩවියට එකම දුරස්ථයක් ඇත.",

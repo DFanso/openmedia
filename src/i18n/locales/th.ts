@@ -284,7 +284,7 @@ export const th: Messages = {
   "recipes.openHubPage": "เปิด {label}",
   "recipes.hubNote":
     "ฮับเปิดหลายเว็บไซต์พร้อมกัน แต่ละหน้าเป็นเว็บไซต์ของตัวเอง พร้อมคุกกี้ของตัวเอง",
-  "recipes.bottomMargin": "ขอบล่าง",
+  "favorites.bottomMargin": "ขอบล่าง",
   "recipes.sharedMargin": "ใช้ขอบล่างร่วมกัน เลื่อนแถบเพื่อกำหนดขอบของเว็บไซต์นี้เอง",
   "recipes.ownMargin": "เว็บไซต์นี้มีขอบล่างของตัวเอง",
   "recipes.siteMarginLabel": "ขอบล่างของ {name}",

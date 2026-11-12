@@ -290,7 +290,7 @@ export const hi: Messages = {
   "recipes.hubPages": "पेज",
   "recipes.openHubPage": "{label} खोलें",
   "recipes.hubNote": "हब एक साथ कई साइट खोलता है। हर पेज अपनी अलग साइट है, अपने कुकीज़ के साथ।",
-  "recipes.bottomMargin": "निचली मार्जिन",
+  "favorites.bottomMargin": "निचली मार्जिन",
   "recipes.sharedMargin":
     "साझा निचली मार्जिन का उपयोग हो रहा है। इस साइट को अलग मार्जिन देने के लिए स्लाइडर हिलाएँ।",
   "recipes.ownMargin": "इस साइट की अपनी निचली मार्जिन है।",

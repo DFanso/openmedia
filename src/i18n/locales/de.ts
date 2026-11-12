@@ -296,7 +296,7 @@ export const de: Messages = {
   "recipes.openHubPage": "{label} öffnen",
   "recipes.hubNote":
     "Ein Hub öffnet mehrere Websites auf einmal. Jede Seite ist eine eigene Website mit eigenen Cookies.",
-  "recipes.bottomMargin": "Unterer Rand",
+  "favorites.bottomMargin": "Unterer Rand",
   "recipes.sharedMargin":
     "Verwendet den gemeinsamen Rand. Verschiebe den Regler, um dieser Website einen eigenen zu geben.",
   "recipes.ownMargin": "Diese Website hat einen eigenen unteren Rand.",

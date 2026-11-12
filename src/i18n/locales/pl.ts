@@ -298,7 +298,7 @@ export const pl: Messages = {
   "recipes.openHubPage": "Otwórz {label}",
   "recipes.hubNote":
     "Hub otwiera kilka stron naraz. Każda strona to osobna witryna, z własnymi plikami cookie.",
-  "recipes.bottomMargin": "Dolny margines",
+  "favorites.bottomMargin": "Dolny margines",
   "recipes.sharedMargin": "Używa wspólnego marginesu. Przesuń suwak, aby ta witryna miała własny.",
   "recipes.ownMargin": "Ta witryna ma własny margines.",
   "recipes.siteMarginLabel": "Dolny margines: {name}",

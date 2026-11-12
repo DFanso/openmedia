@@ -11,7 +11,6 @@ import { SiteTile } from "../../shared/SiteTile";
 import { Screen } from "../../shared/Screen";
 import { GuideLink } from "../guides/GuideLink";
 import { useMarketplaceAvailable } from "../marketplace/Links";
-import { MarginSlider } from "./MarginSlider";
 import { Switch } from "./Switch";
 import { ImportedNotice } from "../marketplace/Links";
 import { Group, GroupLabel, quietButton } from "./ui";
@@ -172,10 +171,7 @@ export function SiteCard({ site, incognito = false }: { site: SiteSettings; inco
 
 function SiteOptions({ site }: { site: SiteSettings }) {
   const setSiteOption = useApp((s) => s.setSiteOption);
-  const setSiteBottomMargin = useApp((s) => s.setSiteBottomMargin);
-  const sharedMargin = useApp((s) => s.state?.bottomMargin ?? 0);
   const openHubTab = useApp((s) => s.openHubTab);
-  const t = useT();
 
   return (
     <div className="flex flex-col gap-5 border-t border-hair px-3 py-4">
@@ -187,30 +183,6 @@ function SiteOptions({ site }: { site: SiteSettings }) {
         site={site}
         onToggle={(optionId, enabled) => void setSiteOption(site.recipeId, optionId, enabled)}
       />
-      <div>
-        <GroupLabel>{t("recipes.bottomMargin")}</GroupLabel>
-        <Group>
-          <div className="flex flex-col gap-3 px-4 py-3.5">
-            <p className="text-sm leading-snug text-paper/55">
-              {site.bottomMargin === null ? t("recipes.sharedMargin") : t("recipes.ownMargin")}
-            </p>
-            <MarginSlider
-              label={t("recipes.siteMarginLabel", { name: site.name })}
-              value={site.bottomMargin ?? sharedMargin}
-              onCommit={(pixels) => void setSiteBottomMargin(site.recipeId, pixels)}
-            />
-            {site.bottomMargin !== null && (
-              <button
-                type="button"
-                onClick={() => void setSiteBottomMargin(site.recipeId, null)}
-                className={`self-start ${quietButton}`}
-              >
-                {t("recipes.useSharedMargin")}
-              </button>
-            )}
-          </div>
-        </Group>
-      </div>
     </div>
   );
 }

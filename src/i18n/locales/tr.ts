@@ -299,7 +299,7 @@ export const tr: Messages = {
   "recipes.openHubPage": "{label} sayfasını aç",
   "recipes.hubNote":
     "Bir hub aynı anda birkaç siteyi açar. Her sayfa kendi site'ıdır ve kendi çerezleri vardır.",
-  "recipes.bottomMargin": "Alt kenar boşluğu",
+  "favorites.bottomMargin": "Alt kenar boşluğu",
   "recipes.sharedMargin":
     "Paylaşılan boşluğu kullanır. Bu siteye kendi boşluğunu vermek için kaydırıcıyı hareket ettirin.",
   "recipes.ownMargin": "Bu sitenin kendi alt kenar boşluğu var.",

@@ -295,7 +295,7 @@ export const ja: Messages = {
   "recipes.openHubPage": "{label}を開く",
   "recipes.hubNote":
     "ハブは複数のサイトを一度に開きます。各ページはそれぞれ独立したサイトで、Cookieも別々です。",
-  "recipes.bottomMargin": "下余白",
+  "favorites.bottomMargin": "下余白",
   "recipes.sharedMargin":
     "共通の下余白を使います。スライダーを動かすと、このサイト専用の値になります。",
   "recipes.ownMargin": "このサイトには独自の下余白があります。",
