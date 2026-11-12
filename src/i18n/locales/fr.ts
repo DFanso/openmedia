@@ -538,7 +538,7 @@ export const fr: Messages = {
     "Les abonnements se renouvellent automatiquement jusqu'à leur annulation dans les réglages du magasin de votre appareil, au moins 24 heures avant la fin de la période. Chaque offre affiche le prix local du magasin et, le cas échéant, l'essai gratuit.",
   "paywall.privacy": "Politique de confidentialité",
   "paywall.terms": "Conditions d'utilisation",
-  "favorites.backgroundMedia": "Keep playing in the background",
-  "favorites.backgroundMediaNote":
+  "favorites.backgroundMedia": "Continuer la lecture en arrière-plan",
+  "favorites.backgroundMediaNote": "Désactivé : l'audio et la vidéo se mettent en pause quand vous changez de site ou quittez l'app. Activé : ce site continue de jouer.",
     "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

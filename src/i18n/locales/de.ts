@@ -534,7 +534,7 @@ export const de: Messages = {
     "Abonnements verlängern sich automatisch, bis du sie mindestens 24 Stunden vor Ende des Zeitraums in den Store-Einstellungen deines Geräts kündigst. Jeder Plan zeigt den lokalen Preis des Stores und eine kostenlose Testphase, falls vorhanden.",
   "paywall.privacy": "Datenschutz",
   "paywall.terms": "Nutzungsbedingungen",
-  "favorites.backgroundMedia": "Keep playing in the background",
-  "favorites.backgroundMediaNote":
+  "favorites.backgroundMedia": "Im Hintergrund weiterspielen",
+  "favorites.backgroundMediaNote": "Aus: Audio und Video pausieren, wenn du zu einer anderen Seite wechselst oder die App verlässt. An: Diese Seite spielt weiter.",
     "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

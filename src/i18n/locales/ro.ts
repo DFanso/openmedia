@@ -529,7 +529,7 @@ export const ro: Messages = {
     "Abonamentele se reînnoiesc automat până când le anulezi în setările magazinului de pe dispozitiv cu cel puțin 24 de ore înainte de sfârșitul perioadei. Fiecare plan arată prețul local al magazinului și perioada gratuită, dacă există.",
   "paywall.privacy": "Politica de confidențialitate",
   "paywall.terms": "Termeni de utilizare",
-  "favorites.backgroundMedia": "Keep playing in the background",
-  "favorites.backgroundMediaNote":
+  "favorites.backgroundMedia": "Continuă redarea în fundal",
+  "favorites.backgroundMediaNote": "Dezactivat: sunetul și videoclipul se opresc când treci la alt site sau părăsești aplicația. Activat: acest site continuă să redea.",
     "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

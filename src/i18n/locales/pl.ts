@@ -524,7 +524,7 @@ export const pl: Messages = {
     "Subskrypcje odnawiają się automatycznie, dopóki nie anulujesz ich w ustawieniach sklepu na urządzeniu co najmniej 24 godziny przed końcem okresu. Każdy plan pokazuje lokalną cenę sklepu i ewentualny okres próbny.",
   "paywall.privacy": "Polityka prywatności",
   "paywall.terms": "Warunki korzystania",
-  "favorites.backgroundMedia": "Keep playing in the background",
-  "favorites.backgroundMediaNote":
+  "favorites.backgroundMedia": "Odtwarzaj w tle",
+  "favorites.backgroundMediaNote": "Wyłączone: dźwięk i wideo wstrzymują się po przejściu do innej witryny lub wyjściu z aplikacji. Włączone: ta witryna gra dalej.",
     "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

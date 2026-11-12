@@ -502,7 +502,7 @@ export const th: Messages = {
     "การสมัครจะต่ออายุอัตโนมัติจนกว่าคุณจะยกเลิกในการตั้งค่าร้านค้าของอุปกรณ์อย่างน้อย 24 ชั่วโมงก่อนสิ้นสุดรอบการชำระเงิน แต่ละแพ็กเกจจะแสดงราคาท้องถิ่นของร้านค้าและช่วงทดลองใช้ฟรีถ้ามี",
   "paywall.privacy": "นโยบายความเป็นส่วนตัว",
   "paywall.terms": "ข้อกำหนดการใช้งาน",
-  "favorites.backgroundMedia": "Keep playing in the background",
-  "favorites.backgroundMediaNote":
+  "favorites.backgroundMedia": "เล่นต่อในเบื้องหลัง",
+  "favorites.backgroundMediaNote": "ปิด: เสียงและวิดีโอจะหยุดชั่วคราวเมื่อสลับไปไซต์อื่นหรือออกจากแอป เปิด: ไซต์นี้เล่นต่อไป",
     "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

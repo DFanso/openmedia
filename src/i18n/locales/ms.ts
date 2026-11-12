@@ -526,7 +526,7 @@ export const ms: Messages = {
     "Langganan diperbaharui secara automatik sehingga anda membatalkannya dalam tetapan kedai peranti sekurang-kurangnya 24 jam sebelum tempoh tamat. Setiap pelan memaparkan harga tempatan kedai dan percubaan percuma jika ada.",
   "paywall.privacy": "Dasar privasi",
   "paywall.terms": "Terma penggunaan",
-  "favorites.backgroundMedia": "Keep playing in the background",
-  "favorites.backgroundMediaNote":
+  "favorites.backgroundMedia": "Teruskan main di latar belakang",
+  "favorites.backgroundMediaNote": "Mati: audio dan video dijeda apabila anda bertukar ke laman lain atau meninggalkan aplikasi. Hidup: laman ini terus bermain.",
     "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

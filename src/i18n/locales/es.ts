@@ -531,7 +531,7 @@ export const es: Messages = {
     "Las suscripciones se renuevan automáticamente hasta que las canceles en los ajustes de la tienda de tu dispositivo al menos 24 horas antes de que termine el período. Cada plan muestra el precio local de la tienda y la prueba gratis si la hay.",
   "paywall.privacy": "Política de privacidad",
   "paywall.terms": "Términos de uso",
-  "favorites.backgroundMedia": "Keep playing in the background",
-  "favorites.backgroundMediaNote":
+  "favorites.backgroundMedia": "Seguir reproduciendo en segundo plano",
+  "favorites.backgroundMediaNote": "Desactivado: el audio y el vídeo se pausan al cambiar de sitio o salir de la app. Activado: este sitio sigue reproduciéndose.",
     "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

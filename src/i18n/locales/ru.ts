@@ -528,7 +528,7 @@ export const ru: Messages = {
     "Подписки продлеваются автоматически, пока вы не отмените их в настройках магазина на устройстве не позднее чем за 24 часа до конца периода. Каждый тариф показывает местную цену магазина и пробный период, если он есть.",
   "paywall.privacy": "Политика конфиденциальности",
   "paywall.terms": "Условия использования",
-  "favorites.backgroundMedia": "Keep playing in the background",
-  "favorites.backgroundMediaNote":
+  "favorites.backgroundMedia": "Продолжать воспроизведение в фоне",
+  "favorites.backgroundMediaNote": "Выкл.: звук и видео ставятся на паузу при переходе на другой сайт или выходе из приложения. Вкл.: этот сайт продолжает играть.",
     "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };

@@ -523,7 +523,7 @@ export const ja: Messages = {
     "サブスクリプションは、期間が終わる 24 時間以上前に端末のストア設定で解約しない限り自動更新されます。各プランにはストアの現地価格と無料トライアル（ある場合）が表示されます。",
   "paywall.privacy": "プライバシーポリシー",
   "paywall.terms": "利用規約",
-  "favorites.backgroundMedia": "Keep playing in the background",
-  "favorites.backgroundMediaNote":
+  "favorites.backgroundMedia": "バックグラウンドで再生を続ける",
+  "favorites.backgroundMediaNote": "オフ：別のサイトに切り替えたりアプリを離れたりすると、音声と動画が一時停止します。オン：このサイトは再生を続けます。",
     "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
 };
