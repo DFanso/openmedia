@@ -51,6 +51,15 @@ All notable changes to OpenMedia are documented here.
 **Not verified:** on a device or emulator. This addresses one suspect of #152 only: iOS autoplay policy (audio needs a tap), engine cost on a reel feed and session reloads are still to be reproduced and measured.
 
 **Issue:** #152 (partial)
+### fix(android): readable floating panels and status bar icons
+
+**Area:** `fix(android)`
+
+**Problem:** Two things were wrong on Android. The command bar, assistant dock, back button and error banner are translucent "glass", but Chromium's `backdrop-filter` cannot blur the native page view under the shell, so the page showed through them, sharp (the page's title ghosted across the command bar). And the status bar icons followed the device's theme, not the app's: with the app on Dark and the device on Light, the clock and battery were dark on the shell's dark strip.
+
+**Change:** `<html data-platform="android">` makes `--glass` 98% opaque (`src/index.css`, `src/main.tsx`). The Android plugin sets the status bar icon colour from the resolved app theme in `setColorScheme` and again in `onConfigurationChanged` when the scheme is "system"; the theme check that three functions repeated is one `isDark()`. The wiki records the emulator drawing fault below.
+
+**Verified:** debug build on the Android Emulator (API 37) with HWUI on Vulkan: command bar in Dark and Light, status bar icons with the app on Dark and on System while the device flips between day and night. `yarn ts:check`, ESLint, Prettier and the frontend tests pass. **Not verified:** a physical device. **Not fixed:** with the default OpenGL pipeline the Android Emulator draws stale rectangles over the fan (see Platform Support, "Android emulator drawing"); and about one cold start in six on the emulator ends with "get_state not allowed. Plugin not found" in the error banner, because the log shows the shell's first `event.listen` arriving with the URL `about:blank`; the code path is not touched here.
 
 ### feat(app): a splash screen that waits for the first site
 

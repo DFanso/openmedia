@@ -72,6 +72,17 @@ input {
   font-variant-ligatures: none;
 }
 
+/* The page is a native view under the shell, and Android's backdrop-filter only blurs what the
+   shell itself draws, so a translucent glass panel shows the page through it, sharp. Nearly opaque
+   panels keep the text on them readable. */
+:root[data-platform="android"][data-theme="dark"] {
+  --glass: rgb(9 14 26 / 0.98);
+}
+
+:root[data-platform="android"][data-theme="light"] {
+  --glass: rgb(255 255 255 / 0.98);
+}
+
 .glass {
   background: var(--glass);
   -webkit-backdrop-filter: blur(18px) saturate(1.3);
