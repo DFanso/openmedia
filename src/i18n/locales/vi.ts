@@ -129,6 +129,20 @@ export const vi: Messages = {
   "usage.remindAtHint": "Một lời báo trước khi vẫn còn thời gian để kết thúc.",
   "usage.sliderLimit": "Giới hạn hằng ngày cho {host}",
   "usage.sliderReminder": "Nhắc nhở cho {host}",
+  "usage.partsTitle": "Các phần của trang này",
+  "usage.partSetLimit": "Đặt giới hạn cho phần này",
+  "usage.partChangeLimit": "Đổi giới hạn của phần này",
+  "usage.partLimitLabel": "Giới hạn hằng ngày cho {part} trên {host}",
+  "usage.partReminderLabel": "Nhắc nhở cho {part} trên {host}",
+  "usage.partStopAfter": "Ngừng tính sau",
+  "usage.partPresetsHint":
+    "Chọn một giới hạn hằng ngày. Bạn sẽ được nhắc trước, và khi đã đạt giới hạn, thời gian ở đây không còn được tính.",
+  "usage.partStopAfterHint":
+    "Thời gian trong phần này không còn được tính cho tới nửa đêm. Phần còn lại của trang vẫn mở.",
+  "usage.partTimeCheck": "Kiểm tra thời gian: {part} trên {host}",
+  "usage.partLimitReached":
+    "{part} trên {host} đã vượt giới hạn hằng ngày. Thời gian ở đây không còn được tính.",
+  "usage.partStatusReached": "Đã đạt giới hạn. Thời gian ở đây không còn được tính.",
   "usage.saveHint":
     "Thay đổi được lưu khi bạn thả tay. Thời gian được tính khi trang đang hiển thị trên màn hình và đặt lại vào nửa đêm.",
 

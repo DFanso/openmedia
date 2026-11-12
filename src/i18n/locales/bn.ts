@@ -128,6 +128,19 @@ export const bn: Messages = {
   "usage.remindAtHint": "শেষ করার মতো সময় থাকতেই একটি আগাম সতর্কতা।",
   "usage.sliderLimit": "{host} এর দৈনিক সীমা",
   "usage.sliderReminder": "{host} এর রিমাইন্ডার",
+  "usage.partsTitle": "এই সাইটের অংশ",
+  "usage.partSetLimit": "এই অংশের জন্য সীমা নির্ধারণ করুন",
+  "usage.partChangeLimit": "এই অংশের সীমা পরিবর্তন করুন",
+  "usage.partLimitLabel": "{host}-এ {part}-এর দৈনিক সীমা",
+  "usage.partReminderLabel": "{host}-এ {part}-এর অনুস্মারক",
+  "usage.partStopAfter": "এই সময়ের পর গণনা বন্ধ করুন",
+  "usage.partPresetsHint":
+    "একটি দৈনিক সীমা বেছে নিন। এর আগে আপনি একটি অনুস্মারক পাবেন, এবং সীমায় পৌঁছালে এখানে সময় গণনা বন্ধ হয়ে যাবে।",
+  "usage.partStopAfterHint": "এই অংশে সময় মধ্যরাত পর্যন্ত গণনা হয় না। সাইটের বাকি অংশ খোলা থাকে।",
+  "usage.partTimeCheck": "সময় পরীক্ষা: {host}-এ {part}",
+  "usage.partLimitReached":
+    "{host}-এ {part} তার দৈনিক সীমা অতিক্রম করেছে। এখানে আর সময় গণনা হয় না।",
+  "usage.partStatusReached": "সীমা ছাড়িয়ে গেছে। এখানে আর সময় গণনা হয় না।",
   "usage.saveHint":
     "ছেড়ে দিলে পরিবর্তন সংরক্ষিত হয়। সাইট স্ক্রিনে থাকা অবস্থায় সময় গণনা হয় এবং মধ্যরাতে রিসেট হয়।",
 

@@ -129,6 +129,19 @@ export const ar: Messages = {
   "usage.remindAtHint": "تنبيه مسبق بينما يتوفر وقت كافٍ للإنهاء.",
   "usage.sliderLimit": "الحد اليومي لـ {host}",
   "usage.sliderReminder": "التذكير لـ {host}",
+  "usage.partsTitle": "أقسام هذا الموقع",
+  "usage.partSetLimit": "حدّد حدًا لهذا القسم",
+  "usage.partChangeLimit": "غيّر حد هذا القسم",
+  "usage.partLimitLabel": "الحد اليومي لـ {part} في {host}",
+  "usage.partReminderLabel": "تذكير لـ {part} في {host}",
+  "usage.partStopAfter": "أوقف العد بعد",
+  "usage.partPresetsHint":
+    "اختر حدًا يوميًا. ستحصل على تذكير قبله، وعند بلوغه يتوقف الوقت هنا عن الاحتساب.",
+  "usage.partStopAfterHint":
+    "لا يُحتسب الوقت في هذا القسم حتى منتصف الليل. يبقى بقية الموقع مفتوحًا.",
+  "usage.partTimeCheck": "فحص الوقت: {part} في {host}",
+  "usage.partLimitReached": "تجاوز {part} في {host} حدّه اليومي. لم يعد الوقت هنا يُحتسب.",
+  "usage.partStatusReached": "تم بلوغ الحد. لم يعد الوقت هنا يُحتسب.",
   "usage.saveHint":
     "تُحفظ التغييرات عند رفع إصبعك. يُحسب الوقت أثناء ظهور الموقع على الشاشة ويُعاد ضبطه عند منتصف الليل.",
 

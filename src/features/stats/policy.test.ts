@@ -1,17 +1,30 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { isUsageBlocked, limitReached, policyForHost, useUsageControl } from "./policy";
+import {
+  isUsageBlocked,
+  limitReached,
+  policyForHost,
+  policyForSection,
+  sectionUsageSeconds,
+  useUsageControl,
+} from "./policy";
 
 const policies = {
   "example.com": { warnSeconds: 60, limitSeconds: 120 },
   "other.test": { warnSeconds: null, limitSeconds: 600 },
 };
 
-afterEach(() => useUsageControl.setState({ policies: {}, seconds: {}, ready: false }));
+const sectionPolicies = {
+  "example.com": { "/watch": { warnSeconds: 30, limitSeconds: 90 } },
+};
+
+const empty = { limits: { sites: {}, sections: {} }, seconds: {}, sectionSeconds: {} };
+
+afterEach(() => useUsageControl.setState({ ...empty, ready: false }));
 
 describe("daily site limits", () => {
   it("blocks at the exact boundary, not the warning, and keeps unrelated sites open", () => {
     useUsageControl.setState({
-      policies,
+      limits: { sites: policies, sections: {} },
       seconds: { "example.com": 119, "other.test": 50 },
       ready: true,
     });
@@ -35,9 +48,47 @@ describe("daily site limits", () => {
 
   it("keeps warning-only policies unblocked and lifts limits when today's totals reset", () => {
     expect(limitReached({ warnSeconds: 60, limitSeconds: null }, 90_000)).toBe(false);
-    useUsageControl.setState({ policies, seconds: { "example.com": 120 }, ready: true });
+    useUsageControl.setState({
+      limits: { sites: policies, sections: {} },
+      seconds: { "example.com": 120 },
+      ready: true,
+    });
     expect(isUsageBlocked("example.com")).toBe(true);
     useUsageControl.setState({ day: "2026-11-09", seconds: {} });
     expect(isUsageBlocked("example.com")).toBe(false);
+  });
+});
+
+describe("daily part limits", () => {
+  it("finds the limit of one part and leaves the other parts of the site alone", () => {
+    expect(policyForSection(sectionPolicies, "example.com", "/watch")).toEqual(
+      sectionPolicies["example.com"]["/watch"],
+    );
+    expect(policyForSection(sectionPolicies, "example.com", "/shorts")).toBeUndefined();
+    expect(policyForSection(sectionPolicies, "other.test", "/watch")).toBeUndefined();
+  });
+
+  it("covers the domains around the site, but not a lookalike domain", () => {
+    expect(policyForSection(sectionPolicies, "m.example.com", "/watch")).toEqual(
+      sectionPolicies["example.com"]["/watch"],
+    );
+    expect(policyForSection(sectionPolicies, "notexample.com", "/watch")).toBeUndefined();
+  });
+
+  it("adds up the time of a part across the domains around the site", () => {
+    const sectionSeconds = { "example.com": { "/watch": 30 }, "m.example.com": { "/watch": 20 } };
+    expect(sectionUsageSeconds(sectionSeconds, "example.com", "/watch")).toBe(50);
+    expect(sectionUsageSeconds(sectionSeconds, "example.com", "/shorts")).toBe(0);
+  });
+
+  it("blocks only the part that is over its limit", () => {
+    const sectionSeconds = { "example.com": { "/watch": 90, "/shorts": 60 } };
+    const spent = (section: string) => sectionUsageSeconds(sectionSeconds, "example.com", section);
+    expect(
+      limitReached(policyForSection(sectionPolicies, "example.com", "/watch"), spent("/watch")),
+    ).toBe(true);
+    expect(
+      limitReached(policyForSection(sectionPolicies, "example.com", "/shorts"), spent("/shorts")),
+    ).toBe(false);
   });
 });

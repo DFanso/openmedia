@@ -10,29 +10,44 @@ use tauri_plugin_siteview::{SetBlockedRequest, SiteviewExt, validate::parse_sess
 
 use crate::entitlement::Entitlement;
 use crate::error::Result;
-use crate::usage::{Usage, UsagePolicies, UsagePolicy};
+use crate::usage::{Usage, UsageLimits, UsagePolicy};
 
-/// The daily warning and limit of every site the user set one for, keyed by host.
+/// The daily warning and limit of every site and every part of a site the user set one for.
 #[tauri::command]
-pub fn get_usage_policies(
+pub fn get_usage_limits(
     usage: State<'_, Usage>,
     entitlement: State<'_, Entitlement>,
-) -> Result<UsagePolicies> {
+) -> Result<UsageLimits> {
     entitlement.require_pro()?;
-    usage.policies()
+    usage.limits()
 }
 
-/// Saves the daily warning and limit for one site and returns every policy. A policy with
+/// Saves the daily warning and limit for one site and returns every limit. A policy with
 /// neither step removes the site's policy, which is how a limit is lifted.
 #[tauri::command]
-pub fn set_usage_policy(
+pub fn set_usage_limit(
     usage: State<'_, Usage>,
     entitlement: State<'_, Entitlement>,
     host: String,
     policy: UsagePolicy,
-) -> Result<UsagePolicies> {
+) -> Result<UsageLimits> {
     entitlement.require_pro()?;
-    usage.set_policy(&host, policy)
+    usage.set_limit(&host, policy)
+}
+
+/// Saves the daily warning and limit for one part of a site, such as Reels inside Instagram,
+/// and returns every limit. A policy with neither step removes the part's policy, which is how
+/// a limit is lifted.
+#[tauri::command]
+pub fn set_usage_section_limit(
+    usage: State<'_, Usage>,
+    entitlement: State<'_, Entitlement>,
+    host: String,
+    section: String,
+    policy: UsagePolicy,
+) -> Result<UsageLimits> {
+    entitlement.require_pro()?;
+    usage.set_section_limit(&host, &section, policy)
 }
 
 /// Closes one open site for the day, or opens it again. The block is native: a shield covers

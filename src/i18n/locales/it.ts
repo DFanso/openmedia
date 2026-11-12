@@ -135,6 +135,20 @@ export const it: Messages = {
   "usage.remindAtHint": "Un avviso quando c'è ancora tempo per concludere.",
   "usage.sliderLimit": "Limite giornaliero per {host}",
   "usage.sliderReminder": "Promemoria per {host}",
+  "usage.partsTitle": "Parti di questo sito",
+  "usage.partSetLimit": "Imposta un limite per questa parte",
+  "usage.partChangeLimit": "Cambia il limite di questa parte",
+  "usage.partLimitLabel": "Limite giornaliero per {part} su {host}",
+  "usage.partReminderLabel": "Promemoria per {part} su {host}",
+  "usage.partStopAfter": "Smetti di contare dopo",
+  "usage.partPresetsHint":
+    "Scegli un limite giornaliero. Ricevi un avviso prima, e una volta raggiunto il tempo qui non viene più contato.",
+  "usage.partStopAfterHint":
+    "Il tempo in questa parte non viene più contato fino a mezzanotte. Il resto del sito resta aperto.",
+  "usage.partTimeCheck": "Controllo del tempo: {part} su {host}",
+  "usage.partLimitReached":
+    "{part} su {host} ha superato il limite giornaliero. Qui il tempo non viene più contato.",
+  "usage.partStatusReached": "Limite raggiunto. Qui il tempo non viene più contato.",
   "usage.saveHint":
     "Le modifiche si salvano quando rilasci. Il tempo conta mentre il sito è sullo schermo e si azzera a mezzanotte.",
 

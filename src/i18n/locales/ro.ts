@@ -132,6 +132,20 @@ export const ro: Messages = {
   "usage.remindAtHint": "Un avertisment cât mai ai timp să închei.",
   "usage.sliderLimit": "Limita zilnică pentru {host}",
   "usage.sliderReminder": "Memento pentru {host}",
+  "usage.partsTitle": "Părțile acestui site",
+  "usage.partSetLimit": "Setează o limită pentru această parte",
+  "usage.partChangeLimit": "Schimbă limita acestei părți",
+  "usage.partLimitLabel": "Limită zilnică pentru {part} pe {host}",
+  "usage.partReminderLabel": "Memento pentru {part} pe {host}",
+  "usage.partStopAfter": "Oprește numărarea după",
+  "usage.partPresetsHint":
+    "Alege o limită zilnică. Primești un memento înainte, iar când limita este atinsă, timpul de aici nu mai este numărat.",
+  "usage.partStopAfterHint":
+    "Timpul din această parte nu mai este numărat până la miezul nopții. Restul site-ului rămâne deschis.",
+  "usage.partTimeCheck": "Verificare a timpului: {part} pe {host}",
+  "usage.partLimitReached":
+    "{part} pe {host} a depășit limita zilnică. Timpul de aici nu mai este numărat.",
+  "usage.partStatusReached": "Limită atinsă. Timpul de aici nu mai este numărat.",
   "usage.saveHint":
     "Modificările se salvează când dai drumul. Timpul se contorizează cât site-ul este pe ecran și se resetează la miezul nopții.",
 

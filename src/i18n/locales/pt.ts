@@ -134,6 +134,20 @@ export const pt: Messages = {
   "usage.remindAtHint": "Um aviso enquanto ainda dá tempo de concluir.",
   "usage.sliderLimit": "Limite diário de {host}",
   "usage.sliderReminder": "Lembrete de {host}",
+  "usage.partsTitle": "Partes deste site",
+  "usage.partSetLimit": "Definir um limite para esta parte",
+  "usage.partChangeLimit": "Alterar o limite desta parte",
+  "usage.partLimitLabel": "Limite diário para {part} em {host}",
+  "usage.partReminderLabel": "Lembrete para {part} em {host}",
+  "usage.partStopAfter": "Parar de contar depois de",
+  "usage.partPresetsHint":
+    "Escolha um limite diário. Recebe um lembrete antes e, quando o limite for atingido, o tempo aqui deixa de ser contado.",
+  "usage.partStopAfterHint":
+    "O tempo nesta parte deixa de ser contado até à meia-noite. O resto do site continua aberto.",
+  "usage.partTimeCheck": "Controlo de tempo: {part} em {host}",
+  "usage.partLimitReached":
+    "{part} em {host} ultrapassou o limite diário. O tempo aqui já não é contado.",
+  "usage.partStatusReached": "Limite atingido. O tempo aqui já não é contado.",
   "usage.saveHint":
     "As alterações são salvas ao soltar. O tempo conta enquanto o site está na tela e zera à meia-noite.",
 

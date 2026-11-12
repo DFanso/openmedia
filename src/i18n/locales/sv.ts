@@ -131,6 +131,20 @@ export const sv: Messages = {
   "usage.remindAtHint": "En varning medan det ännu finns tid att avsluta.",
   "usage.sliderLimit": "Daglig gräns för {host}",
   "usage.sliderReminder": "Påminnelse för {host}",
+  "usage.partsTitle": "Delar av den här webbplatsen",
+  "usage.partSetLimit": "Sätt en gräns för den här delen",
+  "usage.partChangeLimit": "Ändra gränsen för den här delen",
+  "usage.partLimitLabel": "Dagsgräns för {part} på {host}",
+  "usage.partReminderLabel": "Påminnelse för {part} på {host}",
+  "usage.partStopAfter": "Sluta räkna efter",
+  "usage.partPresetsHint":
+    "Välj en dagsgräns. Du får en påminnelse innan den, och när den nås räknas tiden här inte längre.",
+  "usage.partStopAfterHint":
+    "Tiden i den här delen räknas inte längre förrän midnatt. Resten av webbplatsen förblir öppen.",
+  "usage.partTimeCheck": "Tidkontroll: {part} på {host}",
+  "usage.partLimitReached":
+    "{part} på {host} har överskridit sin dagsgräns. Tiden här räknas inte längre.",
+  "usage.partStatusReached": "Gränsen nådd. Tiden här räknas inte längre.",
   "usage.saveHint":
     "Ändringar sparas när du släpper. Tiden räknas medan webbplatsen visas på skärmen och nollställs vid midnatt.",
 

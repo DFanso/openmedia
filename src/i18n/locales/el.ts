@@ -135,6 +135,20 @@ export const el: Messages = {
   "usage.remindAtHint": "Μια ειδοποίηση ενώ υπάρχει ακόμα χρόνος για να ολοκληρώσετε.",
   "usage.sliderLimit": "Ημερήσιο όριο για {host}",
   "usage.sliderReminder": "Υπενθύμιση για {host}",
+  "usage.partsTitle": "Μέρη αυτού του ιστότοπου",
+  "usage.partSetLimit": "Ορισμός ορίου για αυτό το μέρος",
+  "usage.partChangeLimit": "Αλλαγή ορίου αυτού του μέρους",
+  "usage.partLimitLabel": "Ημερήσιο όριο για {part} στο {host}",
+  "usage.partReminderLabel": "Υπενθύμιση για {part} στο {host}",
+  "usage.partStopAfter": "Διακοπή μέτρησης μετά",
+  "usage.partPresetsHint":
+    "Επιλέξτε ένα ημερήσιο όριο. Θα λάβετε υπενθύμιση πριν από αυτό, και όταν συμπληρωθεί ο χρόνος εδώ δεν μετράται πλέον.",
+  "usage.partStopAfterHint":
+    "Ο χρόνος σε αυτό το μέρος δεν μετράται πλέον μέχρι τα μεσάνυχτα. Το υπόλοιπο του ιστότοπου παραμένει ανοιχτό.",
+  "usage.partTimeCheck": "Έλεγχος χρόνου: {part} στο {host}",
+  "usage.partLimitReached":
+    "Το {part} στο {host} ξεπέρασε το ημερήσιο όριο. Ο χρόνος εδώ δεν μετράται πλέον.",
+  "usage.partStatusReached": "Όριο συμπληρωμένο. Ο χρόνος εδώ δεν μετράται πλέον.",
   "usage.saveHint":
     "Οι αλλαγές αποθηκεύονται μόλις αφήσετε το ρυθμιστικό. Ο χρόνος μετράει όσο ο ιστότοπος είναι στην οθόνη και μηδενίζεται τα μεσάνυχτα.",
 

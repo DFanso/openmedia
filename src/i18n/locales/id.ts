@@ -127,6 +127,20 @@ export const id: Messages = {
   "usage.remindAtHint": "Pemberitahuan saat masih ada waktu untuk menyelesaikan.",
   "usage.sliderLimit": "Batas harian untuk {host}",
   "usage.sliderReminder": "Pengingat untuk {host}",
+  "usage.partsTitle": "Bagian situs ini",
+  "usage.partSetLimit": "Atur batas untuk bagian ini",
+  "usage.partChangeLimit": "Ubah batas bagian ini",
+  "usage.partLimitLabel": "Batas harian untuk {part} di {host}",
+  "usage.partReminderLabel": "Pengingat untuk {part} di {host}",
+  "usage.partStopAfter": "Berhenti menghitung setelah",
+  "usage.partPresetsHint":
+    "Pilih batas harian. Anda mendapat pengingat sebelumnya, dan setelah batas tercapai, waktu di sini tidak dihitung lagi.",
+  "usage.partStopAfterHint":
+    "Waktu di bagian ini tidak dihitung lagi sampai tengah malam. Sisa situs tetap terbuka.",
+  "usage.partTimeCheck": "Pemeriksaan waktu: {part} di {host}",
+  "usage.partLimitReached":
+    "{part} di {host} melampaui batas hariannya. Waktu di sini tidak dihitung lagi.",
+  "usage.partStatusReached": "Batas tercapai. Waktu di sini tidak dihitung lagi.",
   "usage.saveHint":
     "Perubahan tersimpan saat Anda melepaskan. Waktu dihitung selama situs tampil di layar dan diatur ulang saat tengah malam.",
 

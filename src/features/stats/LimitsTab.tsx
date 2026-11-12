@@ -1,21 +1,26 @@
 import { useEffect, useMemo, useRef, useState, type SubmitEvent } from "react";
 import { useApp } from "../../app/store";
+import { describeError } from "../../i18n/errors";
 import type { Translate } from "../../i18n/translate";
 import { useT } from "../../i18n/useT";
 import { DownIcon, PlusIcon } from "../../shared/icons";
+import { usage } from "../../shared/ipc";
 import { Group, GroupLabel, field, primaryButton } from "../settings/ui";
-import { formatDuration } from "./format";
+import { formatDuration, localDay, sectionLabel } from "./format";
 import {
   hostFor,
   limitSites,
   limitStatus,
+  siteParts,
   suggestHosts,
   thresholdsOf,
   type LimitSite,
 } from "./limits";
 import { LimitEditor } from "./LimitEditor";
-import { usageSeconds, useUsageControl, type UsagePolicy } from "./policy";
+import { sectionUsageSeconds, usageSeconds, useUsageControl, type UsagePolicy } from "./policy";
 import { SiteBadge } from "./SiteBadge";
+import { settleUsageWrites } from "./tracker";
+import { statusText, UsageMeter } from "./UsageMeter";
 import { useUsageView } from "./view";
 
 const NO_HISTORY: string[] = [];
@@ -57,19 +62,76 @@ function StatusChip({ policy, spent }: { policy: UsagePolicy | undefined; spent:
   );
 }
 
+interface PartRowProps {
+  host: string;
+  section: string;
+  policy: UsagePolicy | undefined;
+  spent: number;
+  open: boolean;
+  onToggle: () => void;
+}
+
+/** One part of a site: what it cost today, and the limit the user set for it. */
+function PartRow({ host, section, policy, spent, open, onToggle }: PartRowProps) {
+  const t = useT();
+  const status = limitStatus(policy, spent);
+  return (
+    <li className="border-t border-hair">
+      <div className="px-4 py-3">
+        <div className="flex items-baseline justify-between gap-3">
+          <span className="truncate text-sm font-medium">{sectionLabel(section, t)}</span>
+          <span className="shrink-0 text-sm text-paper/60 tabular-nums">
+            {formatDuration(Math.floor(spent), t)}
+          </span>
+        </div>
+        {status.state !== "none" && (
+          <div className="mt-2">
+            <UsageMeter spentSeconds={spent} policy={policy} compact />
+            <p className="mt-1 text-xs text-paper/55">{statusText(status, t, true)}</p>
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          className="mt-2 text-sm font-medium text-accent"
+        >
+          {policy ? t("usage.partChangeLimit") : t("usage.partSetLimit")}
+        </button>
+      </div>
+      {open && <LimitEditor host={host} section={section} policy={policy} spentSeconds={spent} />}
+    </li>
+  );
+}
+
 interface LimitRowProps {
   site: LimitSite;
   policy: UsagePolicy | undefined;
   spent: number;
+  parts: string[];
   open: boolean;
   scrollTo: boolean;
+  openPart: string | null;
   onToggle: () => void;
+  onTogglePart: (section: string) => void;
 }
 
-function LimitRow({ site, policy, spent, open, scrollTo, onToggle }: LimitRowProps) {
+function LimitRow({
+  site,
+  policy,
+  spent,
+  parts,
+  open,
+  scrollTo,
+  openPart,
+  onToggle,
+  onTogglePart,
+}: LimitRowProps) {
   const t = useT();
   const row = useRef<HTMLDivElement>(null);
   const name = site.name ?? site.host;
+  const limits = useUsageControl((s) => s.limits);
+  const sectionSeconds = useUsageControl((s) => s.sectionSeconds);
 
   useEffect(() => {
     if (scrollTo) row.current?.scrollIntoView({ block: "start" });
@@ -93,7 +155,31 @@ function LimitRow({ site, policy, spent, open, scrollTo, onToggle }: LimitRowPro
           <DownIcon />
         </span>
       </button>
-      {open && <LimitEditor host={site.host} policy={policy} spentSeconds={spent} />}
+      {open && (
+        <>
+          <LimitEditor host={site.host} section={null} policy={policy} spentSeconds={spent} />
+          {parts.length > 0 && (
+            <div className="border-t border-hair">
+              <p className="px-4 pt-3 text-xs font-medium tracking-[0.18em] text-paper/50 uppercase">
+                {t("usage.partsTitle")}
+              </p>
+              <ul>
+                {parts.map((section) => (
+                  <PartRow
+                    key={section}
+                    host={site.host}
+                    section={section}
+                    policy={limits.sections[site.host]?.[section]}
+                    spent={sectionUsageSeconds(sectionSeconds, site.host, section)}
+                    open={openPart === section}
+                    onToggle={() => onTogglePart(section)}
+                  />
+                ))}
+              </ul>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
@@ -172,20 +258,42 @@ export function LimitsTab() {
   const t = useT();
   const favorites = useApp((s) => s.state?.favorites);
   const history = useApp((s) => s.state?.history) ?? NO_HISTORY;
-  const policies = useUsageControl((s) => s.policies);
+  const reportError = useApp((s) => s.reportError);
+  const limits = useUsageControl((s) => s.limits);
   const seconds = useUsageControl((s) => s.seconds);
   const focusHost = useUsageView((s) => s.focusHost);
+  const focusSection = useUsageView((s) => s.focusSection);
   const [open, setOpen] = useState<string | null>(focusHost);
+  const [openPart, setOpenPart] = useState<string | null>(focusSection);
   const [scrollTo] = useState<string | null>(focusHost);
   const [added, setAdded] = useState<string[]>(focusHost ? [focusHost] : []);
+  const [used, setUsed] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
     useUsageView.getState().clearFocus();
   }, []);
 
+  useEffect(() => {
+    let alive = true;
+    settleUsageWrites()
+      .then(() => usage.report(localDay(new Date()), 30))
+      .then((report) => {
+        if (!alive) return;
+        setUsed(
+          Object.fromEntries(
+            report.sites.map((site) => [site.host, site.sections.map((part) => part.section)]),
+          ),
+        );
+      })
+      .catch((error: unknown) => reportError(describeError(error, t)));
+    return () => {
+      alive = false;
+    };
+  }, [reportError, t]);
+
   const sites = useMemo(
-    () => limitSites(favorites ?? [], policies, added),
-    [favorites, policies, added],
+    () => limitSites(favorites ?? [], limits.sites, added),
+    [favorites, limits.sites, added],
   );
   const suggestions = useMemo(() => {
     const taken = new Set([...sites.favorites, ...sites.others].map((site) => site.host));
@@ -196,11 +304,17 @@ export function LimitsTab() {
     <LimitRow
       key={site.host}
       site={site}
-      policy={policies[site.host]}
+      policy={limits.sites[site.host]}
       spent={usageSeconds(seconds, site.host)}
+      parts={siteParts(site.host, used[site.host] ?? [], limits.sections)}
       open={open === site.host}
       scrollTo={scrollTo === site.host}
-      onToggle={() => setOpen(open === site.host ? null : site.host)}
+      openPart={openPart}
+      onToggle={() => {
+        setOpen(open === site.host ? null : site.host);
+        setOpenPart(null);
+      }}
+      onTogglePart={(section) => setOpenPart(openPart === section ? null : section)}
     />
   );
 

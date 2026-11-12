@@ -130,6 +130,18 @@ export const si: Messages = {
   "usage.remindAtHint": "අවසන් කිරීමට තවම කාලය ඇති විට ඉස්සරහට දැනුම්දීමක්.",
   "usage.sliderLimit": "{host} සඳහා දෛනික සීමාව",
   "usage.sliderReminder": "{host} සඳහා මතක්කිරීම",
+  "usage.partsTitle": "මෙම සටහනේ කොටස්",
+  "usage.partSetLimit": "මෙම කොටසට සීමාවක් සාදන්න",
+  "usage.partChangeLimit": "මෙම කොටසේ සීමාව වෙනස් කරන්න",
+  "usage.partLimitLabel": "{host} හි {part} සඳහා දෛනික සීමාව",
+  "usage.partReminderLabel": "{host} හි {part} සඳහා මතක්ස්තුව",
+  "usage.partStopAfter": "මේ කාලයට පසු ගණන් ගැනීම නවත්වන්න",
+  "usage.partPresetsHint":
+    "දෛනික සීමාවක් තෝරන්න. එයට පෙර ඔබට මතක්ස්තුවක් ලැබෙයි, සීමාව පසුකරන ලද විට මෙහි කාලය ගණන් නොගනයි.",
+  "usage.partStopAfterHint": "මෙම කොටසේ කාලය මධ්‍යම රාත්‍රිය දක්වා ගණන් නොගනයි. අඩි කොටස විවෘතයි.",
+  "usage.partTimeCheck": "කාල පරීක්ෂණය: {host} හි {part}",
+  "usage.partLimitReached": "{host} හි {part} දෛනික සීමාව ඉක්මවා ඇත. මෙහි කාලය තවත් ගණන් නොගනයි.",
+  "usage.partStatusReached": "සීමාවට පුරුදු ඇත. මෙහි කාලය තවත් ගණන් නොගනයි.",
   "usage.saveHint":
     "ඔබ අත්හරින විට වෙනස්කම් සුරැකේ. අඩවිය තිරයේ ඇති විට කාලය ගණන් වන අතර මධ්‍යම රාත්‍රියේදී යළි සැකසේ.",
 

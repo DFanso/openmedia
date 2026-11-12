@@ -7,8 +7,8 @@ import { DownIcon } from "../../shared/icons";
 import { usage, type SiteUsage, type UsageReport } from "../../shared/ipc";
 import { quietButton, primaryButton } from "../settings/ui";
 import { formatDuration, localDay, sectionLabel } from "./format";
-import { limitStatus } from "./limits";
-import { policyForHost, usageSeconds, useUsageControl } from "./policy";
+import { limitedThings, limitStatus } from "./limits";
+import { policyForHost, policyForSection, sectionUsageSeconds, useUsageControl } from "./policy";
 import { nameForHost, SiteBadge, useFavorites } from "./SiteBadge";
 import { settleUsageWrites } from "./tracker";
 import { statusText, UsageMeter } from "./UsageMeter";
@@ -43,9 +43,10 @@ function SiteRow({
   showLimit: boolean;
 }) {
   const t = useT();
-  const policies = useUsageControl((s) => s.policies);
+  const limits = useUsageControl((s) => s.limits);
+  const sectionSeconds = useUsageControl((s) => s.sectionSeconds);
   const [open, setOpen] = useState(false);
-  const policy = policyForHost(policies, site.host);
+  const policy = policyForHost(limits.sites, site.host);
   const meter = showLimit && limitStatus(policy, site.seconds).state !== "none";
   return (
     <li className="rounded-2xl border border-hair bg-paper/[0.04]">
@@ -81,17 +82,42 @@ function SiteRow({
       {open && (
         <div className="border-t border-hair px-4 py-3">
           <ul>
-            {site.sections.map((section) => (
-              <li key={section.section} className="py-1.5">
-                <span className="flex items-baseline justify-between gap-3 text-sm">
-                  <span className="truncate text-paper/85">{sectionLabel(section.section, t)}</span>
-                  <span className="shrink-0 text-paper/60 tabular-nums">
-                    {formatDuration(section.seconds, t)}
+            {site.sections.map((section) => {
+              const partPolicy = policyForSection(limits.sections, site.host, section.section);
+              const partSpent = showLimit
+                ? sectionUsageSeconds(sectionSeconds, site.host, section.section)
+                : 0;
+              return (
+                <li key={section.section} className="py-1.5">
+                  <span className="flex items-baseline justify-between gap-3 text-sm">
+                    <span className="truncate text-paper/85">
+                      {sectionLabel(section.section, t)}
+                    </span>
+                    <span className="shrink-0 text-paper/60 tabular-nums">
+                      {formatDuration(section.seconds, t)}
+                    </span>
                   </span>
-                </span>
-                <Bar share={section.seconds / site.seconds} />
-              </li>
-            ))}
+                  <Bar share={section.seconds / site.seconds} />
+                  {showLimit && limitStatus(partPolicy, partSpent).state !== "none" && (
+                    <>
+                      <div className="mt-1.5">
+                        <UsageMeter spentSeconds={partSpent} policy={partPolicy} compact />
+                      </div>
+                      <p className="mt-1 text-xs text-paper/55">
+                        {statusText(limitStatus(partPolicy, partSpent), t, true)}
+                      </p>
+                    </>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => openLimits(site.host, section.section)}
+                    className="mt-1 text-sm font-medium text-accent"
+                  >
+                    {partPolicy ? t("usage.partChangeLimit") : t("usage.partSetLimit")}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
           <button
             type="button"
@@ -106,20 +132,15 @@ function SiteRow({
   );
 }
 
-/** Today against each site that has a limit, closest to its limit first; or an invitation to set one. */
+/** Today against each site and part that has a limit, closest to its limit first; or an invitation to set one. */
 function LimitsGlance() {
   const t = useT();
   const favorites = useFavorites();
-  const policies = useUsageControl((s) => s.policies);
+  const limits = useUsageControl((s) => s.limits);
   const seconds = useUsageControl((s) => s.seconds);
+  const sectionSeconds = useUsageControl((s) => s.sectionSeconds);
   const setTab = useUsageView((s) => s.setTab);
-  const entries = Object.entries(policies)
-    .map(([host, policy]) => {
-      const spent = usageSeconds(seconds, host);
-      return { host, policy, spent, status: limitStatus(policy, spent) };
-    })
-    .filter((entry) => entry.status.state !== "none")
-    .sort((a, b) => b.status.fraction - a.status.fraction);
+  const entries = limitedThings(limits, seconds, sectionSeconds);
 
   if (entries.length === 0) {
     return (
@@ -149,14 +170,17 @@ function LimitsGlance() {
         </button>
       </div>
       <ul className="mt-3 flex flex-col gap-4">
-        {entries.slice(0, 4).map(({ host, policy, spent, status }) => (
-          <li key={host}>
+        {entries.slice(0, 4).map(({ host, section, policy, spent, status }) => (
+          <li key={`${host}${section ?? ""}`}>
             <div className="mb-1.5 flex items-baseline justify-between gap-3">
-              <span className="truncate text-sm font-medium">{nameForHost(host, favorites)}</span>
+              <span className="truncate text-sm font-medium">
+                {nameForHost(host, favorites)}
+                {section === null ? "" : ` · ${sectionLabel(section, t)}`}
+              </span>
               <span className="shrink-0 text-xs text-paper/60 tabular-nums">
                 {t("usage.todayStatus", {
                   value: formatDuration(Math.floor(spent), t),
-                  status: statusText(status, t),
+                  status: statusText(status, t, section !== null),
                 })}
               </span>
             </div>
