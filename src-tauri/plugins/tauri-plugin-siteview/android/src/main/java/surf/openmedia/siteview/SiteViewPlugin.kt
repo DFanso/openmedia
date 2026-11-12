@@ -85,6 +85,12 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         // Redirect allowance must not weaken the cross-domain POST guard while unsettled.
         @Volatile var userNavigationPending: Boolean = false,
         var painted: Boolean = false,
+        /**
+         * True while the touch in progress began inside a page container that is scrolled away from
+         * its top, as in a feed of full-screen videos. The page itself is then still at its top, so
+         * without this a swipe down to the previous item would pull to refresh.
+         */
+        @Volatile var innerScrolled: Boolean = false,
         var loading: Boolean = false,
         var needsReload: Boolean = false,
         var blocked: Boolean = false,
@@ -279,6 +285,9 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
             profile = args.profile,
             scope = DomainScope.registrableDomain(url.host),
         )
+        frame.setOnChildScrollUpCallback { _, child ->
+            session.innerScrolled || (child?.canScrollVertically(-1) ?: false)
+        }
         sessions[session.id] = session
         activeId = session.id
         // The rule lists arrive with every open; without this nothing is blocked until the user
@@ -1025,6 +1034,13 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         ) { _, _: WebMessageCompat, _: Uri, isMainFrame: Boolean, _ ->
             if (isMainFrame) reveal(session)
         }
+        WebViewCompat.addWebMessageListener(
+            session.view,
+            SCROLL_OBJECT,
+            setOf("*"),
+        ) { _, message: WebMessageCompat, _: Uri, isMainFrame: Boolean, _ ->
+            if (isMainFrame) session.innerScrolled = message.data == "1"
+        }
     }
 
     /** True for a JSON object or array, the only shapes the bridge carries. */
@@ -1051,7 +1067,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) return
         session.paintHandler = WebViewCompat.addDocumentStartJavaScript(
             session.view,
-            FIRST_PAINT_SCRIPT,
+            PAGE_REPORTER_SCRIPT,
             setOf("*"),
         )
         if (!recipe.isNullOrEmpty()) {
@@ -1066,7 +1082,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     /** The late path: inject the scripts once the page has started. */
     private fun injectLate(session: Session, recipe: String?) {
         if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) return
-        session.view.evaluateJavascript(FIRST_PAINT_SCRIPT, null)
+        session.view.evaluateJavascript(PAGE_REPORTER_SCRIPT, null)
         if (!recipe.isNullOrEmpty()) session.view.evaluateJavascript(recipe, null)
     }
 
@@ -1446,6 +1462,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 "held.forEach(function(m){try{var p=m.play();if(p&&p.catch)p.catch(function(){})}" +
                 "catch(e){}})})()"
         private const val PAINT_OBJECT = "openmediaPaint"
+        private const val SCROLL_OBJECT = "openmediaScroll"
         private const val OPENER_OBJECT = "openmediaOpener"
         private const val NOTIFICATION_CHANNEL = "openmedia-siteview"
         private const val NOTIFICATION_SESSION = "openmedia.session"
@@ -1486,6 +1503,27 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
   }
 })();
 """
+
+        /**
+         * Tells the app, at the start of every touch, whether the touch began inside a container
+         * that is scrolled away from its top. Feeds of full-screen videos scroll inside such a
+         * container while the page itself stays at its top, which is all the refresh layer can see.
+         */
+        private val TOUCH_SCROLL_SCRIPT = """
+(function () {
+  window.addEventListener('touchstart', function (event) {
+    var node = event.target;
+    var scrolled = false;
+    while (node && node.nodeType === 1) {
+      if (node.scrollTop > 0) { scrolled = true; break; }
+      node = node.parentElement;
+    }
+    try { window.$SCROLL_OBJECT.postMessage(scrolled ? "1" : "0"); } catch (error) {}
+  }, { capture: true, passive: true });
+})();
+"""
+
+        private val PAGE_REPORTER_SCRIPT = FIRST_PAINT_SCRIPT + TOUCH_SCROLL_SCRIPT
 
         /**
          * Android's WebView gives a window no `window.opener`, so a sign-in window cannot report
