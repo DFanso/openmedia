@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-12
 
+### fix(app): the splash logo no longer jumps when it takes over from the launch screen
+
+**Area:** `fix(app)`
+
+**Change:** On iOS the splash's logo painted about 48 pt above the launch screen's logo and dropped back a moment later. The shell's web view lays out its first frame 96 px shorter than the screen (the safe areas are taken off) and grows to full height about 40 ms after, and the splash centred its logo in that short viewport. The splash is now sized and centred with the large viewport (`100lvh`, which is the screen's height from the first frame), so the logo stays where the launch screen put it.
+
+**Verified:** on the iPhone 17 Pro Max simulator (iOS 26.5), a debug build logged the shell's viewport at the splash's first frame (`innerHeight` 860, then 956; `100lvh` 956 throughout), and a cold-launch video tracked the logo from the launch screen to the splash: before, it was drawn higher for the first frames and then moved; after, its position is the same on every frame. **Not verified:** a physical device, Android and a release build.
+
 ### feat(app): a splash screen that waits for the first site
 
 **Area:** `feat(app)`

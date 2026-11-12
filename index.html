@@ -17,9 +17,14 @@
         margin: 0;
         background: #070b14;
       }
+      /* Sized and centred with the large viewport (lvh), not the layout viewport: the web view's
+         first layout is 96 px shorter than the screen (the safe areas are taken off) and grows a
+         moment later, which moved a centred logo up and back down. 100lvh is the screen's height
+         from the first frame, so the logo stays where the launch screen put it. */
       #splash {
         position: fixed;
-        inset: 0;
+        inset: 0 0 auto 0;
+        height: 100lvh;
         z-index: 9999;
         background: #070b14;
         transition:
@@ -36,7 +41,7 @@
       #splash .mark {
         position: absolute;
         left: 50%;
-        top: 50%;
+        top: 50lvh;
         transform: translate(-50%, -50%);
         width: min(52vmin, 240px);
         height: min(52vmin, 240px);
@@ -64,7 +69,7 @@
       #splash .host {
         position: absolute;
         left: 50%;
-        top: calc(50% + min(26vmin, 120px) + 28px);
+        top: calc(50lvh + min(26vmin, 120px) + 28px);
         transform: translateX(-50%);
         max-width: 80vw;
         overflow: hidden;
@@ -88,7 +93,7 @@
       #splash .track {
         position: absolute;
         left: 50%;
-        top: calc(50% + min(26vmin, 120px) + 56px);
+        top: calc(50lvh + min(26vmin, 120px) + 56px);
         transform: translateX(-50%);
         width: min(44vmin, 180px);
         height: 2px;
