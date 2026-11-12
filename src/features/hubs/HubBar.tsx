@@ -13,7 +13,8 @@ export function HubBar() {
   const openHubTab = useApp((s) => s.openHubTab);
   const t = useT();
   const url = page?.url ?? page?.openedUrl ?? null;
-  const hub = useMemo(() => activeHub(sites, url), [sites, url]);
+  const hubId = page?.source === "hub" ? page.hubId : null;
+  const hub = useMemo(() => activeHub(sites, hubId, url), [sites, hubId, url]);
 
   if (!hub) return null;
 
@@ -30,7 +31,7 @@ export function HubBar() {
             key={tab.url}
             type="button"
             aria-current={index === hub.active ? "page" : undefined}
-            onClick={() => openHubTab(tab.url)}
+            onClick={() => openHubTab(tab.url, hub.recipeId)}
             className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-medium ${
               index === hub.active ? "bg-accent text-on-accent" : "bg-paper/[0.06] text-paper/75"
             }`}

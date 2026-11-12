@@ -8,6 +8,15 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-12
 
+### fix(hubs): a hub page belongs to the hub it was opened from
+
+**Area:** `fix(hubs)`
+
+**Change:** A hub session now remembers its hub (`hubId`). The hub bar shows only on a hub session, and its pages and tabs come from that hub, not from matching the address against every installed hub. A single-site page (the Instagram favorite) no longer gets the Messages Hub bar or its navigation just because the hub has a tab on the same site, and two hubs sharing a site stay apart.
+
+**Verified:** `yarn ts:check`, ESLint and 389 frontend tests. **Not verified:** on a device.
+
+
 ### fix(hubs): show the hub bar only on a hub page's own area
 
 **Area:** `fix(hubs)`
