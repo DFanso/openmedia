@@ -255,7 +255,10 @@ final class TouchRouter: UIView {
 ///
 /// A session never leaves its domain: a main-frame navigation outside it is cancelled and shown in
 /// a popup browser (`SFSafariViewController`, which shares nothing with the profile's data store).
-/// Which sessions to keep alive is the shell's decision; this class only opens, shows and closes.
+/// A window the page opens with `window.open` is different: it is a sign-in window (Google,
+/// Apple), and it has to live inside the app, sharing the profile's cookies, or the token it
+/// carries never reaches the page. Which sessions to keep alive is the shell's decision; this
+/// class only opens, shows and closes.
 class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotificationCenterDelegate {
   private var shell: WKWebView?
   private var sessions: [String: Session] = [:]
@@ -263,6 +266,11 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   private var router: TouchRouter?
   private var events: Channel?
   private var popup: SFSafariViewController?
+  /// The window a page opened with `window.open`. It sits above the site view, shares the
+  /// profile's data store and keeps `window.opener`, so the page can be told the sign-in is done.
+  private var signInWindow: WKWebView?
+  /// The session whose page opened the sign-in window.
+  private var signInOwner: String?
   private var colorScheme: UIUserInterfaceStyle = .unspecified
   /// The shell's page rectangle, in shell coordinates; every session's view fills it.
   private var pageRect: CGRect?
@@ -378,6 +386,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       if let shell = self.shell, let host = shell.superview {
         let frame = shell.convert(args.rect.cgRect, to: host)
         self.sessions.values.forEach { $0.view.frame = frame }
+        self.signInWindow?.frame = frame
       }
       invoke.resolve()
     }
@@ -402,7 +411,15 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   }
 
   @objc public func goBack(_ invoke: Invoke) {
-    onActiveSession(invoke) { $0.view.goBack() }
+    onActiveSession(invoke) { [weak self] session in
+      guard let self else { return }
+      // Back leaves the sign-in window first: the page under it keeps its place.
+      if self.signInWindow != nil {
+        self.closeSignInWindow()
+        return
+      }
+      session.view.goBack()
+    }
   }
 
   @objc public func goForward(_ invoke: Invoke) {
@@ -658,6 +675,13 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     decidePolicyFor navigationAction: WKNavigationAction,
     decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
   ) {
+    if webView === signInWindow {
+      // The sign-in window follows its own redirects: the identity provider and the site it
+      // returns to are different domains. Only web addresses load in it.
+      let scheme = navigationAction.request.url?.scheme?.lowercased()
+      decisionHandler(allowedSchemes.contains(scheme ?? "") || scheme == "about" ? .allow : .cancel)
+      return
+    }
     guard let session = session(of: webView) else {
       decisionHandler(.cancel)
       return
@@ -717,6 +741,11 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     send(ErrorEvent(message: error.localizedDescription))
   }
 
+  /// The page closed its sign-in window: the sign-in is done (or gave up). Take the window down.
+  func webViewDidClose(_ webView: WKWebView) {
+    if webView === signInWindow { closeSignInWindow() }
+  }
+
   /// A dead web content process leaves a blank view. The visible page reloads, with the backdrop
   /// showing until it commits; a hidden one is dropped and the shell is told, so it reopens fresh
   /// when the user comes back to it.
@@ -738,14 +767,19 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
-  /// User-clicked `target=_blank` links stay in this view; scripted `window.open` to an outside
-  /// domain uses the popup browser. Never create a second native web view.
+  /// User-clicked `target=_blank` links stay in this view; a window the page opens with
+  /// `window.open` gets a view of its own, inside the app.
   func webView(
     _ webView: WKWebView,
     createWebViewWith configuration: WKWebViewConfiguration,
     for navigationAction: WKNavigationAction,
     windowFeatures: WKWindowFeatures
   ) -> WKWebView? {
+    if webView === signInWindow {
+      // A window opened by the sign-in window stays in it; there is only one level of windows.
+      webView.load(navigationAction.request)
+      return nil
+    }
     guard let session = session(of: webView), let url = navigationAction.request.url else { return nil }
     if session.blocked { return nil }
     let scheme = url.scheme?.lowercased()
@@ -757,10 +791,46 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       isMainFrame: true, userInitiated: userInitiated)
     {
     case .allow: webView.load(navigationAction.request)
-    case .popup: presentPopup(url)
+    case .popup:
+      // A sign-in window has to live inside the app: it shares the profile's cookies and keeps
+      // `window.opener`, so the sign-in can hand its token back to the page.
+      if let window = openSignInWindow(configuration, for: session) { return window }
+      presentPopup(url)
     case .cancel: break
     }
     return nil
+  }
+
+  /// The window a page opened with `window.open`: a sign-in window. WebKit hands over the
+  /// configuration to use, which carries the opener's data store and the link to the opener, so
+  /// the sign-in and the page share one cookie jar and the page can be told the sign-in is done.
+  private func openSignInWindow(
+    _ configuration: WKWebViewConfiguration, for session: Session
+  ) -> WKWebView? {
+    guard let host = shell?.superview else { return nil }
+    closeSignInWindow()
+    let view = WKWebView(frame: session.view.frame, configuration: configuration)
+    view.navigationDelegate = self
+    view.uiDelegate = self
+    view.customUserAgent = safariUserAgent
+    view.overrideUserInterfaceStyle = colorScheme
+    host.insertSubview(view, aboveSubview: session.view)
+    signInWindow = view
+    signInOwner = session.id
+    router?.siteView = view
+    return view
+  }
+
+  /// Takes the sign-in window down and gives the touches back to the page.
+  private func closeSignInWindow() {
+    guard let view = signInWindow else { return }
+    view.stopLoading()
+    view.navigationDelegate = nil
+    view.uiDelegate = nil
+    view.removeFromSuperview()
+    signInWindow = nil
+    signInOwner = nil
+    router?.siteView = activeId.flatMap { sessions[$0]?.view }
   }
 
   // MARK: Helpers
@@ -859,6 +929,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
 
   /// Makes `session` the one visible page. The others stay alive underneath, hidden.
   private func show(_ session: Session) {
+    // A sign-in window belongs to the page that opened it; another page takes the screen.
+    if let owner = signInOwner, owner != session.id { closeSignInWindow() }
     for other in sessions.values where other !== session { other.view.isHidden = true }
     session.view.isHidden = false
     activeId = session.id
@@ -1157,6 +1229,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   }
 
   private func dispose(_ session: Session) {
+    if signInOwner == session.id { closeSignInWindow() }
     session.observations.removeAll()
     removeShield(from: session)
     let view = session.view
