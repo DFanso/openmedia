@@ -16,18 +16,6 @@ export const quietBlockButton = `flex min-h-11 w-full items-center justify-cente
 
 export const primaryBlockButton = `flex min-h-11 w-full items-center justify-center gap-2 ${primaryButton}`;
 
-export function Spinner({ label }: { label: string }) {
-  return (
-    <div role="status" className="flex items-center gap-3 px-1 text-sm text-paper/55">
-      <span
-        aria-hidden="true"
-        className="size-5 animate-spin rounded-full border-2 border-hair border-t-accent"
-      />
-      {label}
-    </div>
-  );
-}
-
 interface SectionProps {
   title: string;
   /** Explains the group below it, in small print. */

@@ -3,6 +3,7 @@ import { library, siteView, type SiteViewState } from "../../shared/ipc";
 import { appError, selectPage, useApp } from "../../app/store";
 import { pageShowing } from "../../app/splash";
 import { useT } from "../../i18n/useT";
+import { Spinner } from "../../shared/Spinner";
 import { usePageMargin } from "./usePageMargin";
 import { readRect, useSiteViewRect } from "./useSiteViewRect";
 import { observeTitle, quickFavoriteOf, type Watch } from "./unreadWatch";
@@ -134,12 +135,8 @@ export function WebLayer() {
         <HubBar />
         <div ref={slot} className="relative min-h-0 flex-1">
           {opening && (
-            <div role="status" className="absolute inset-0 grid place-items-center">
-              <span
-                aria-hidden="true"
-                className="size-7 rounded-full border-2 border-paper/15 border-t-accent motion-safe:animate-spin"
-              />
-              <span className="sr-only">{t("web.loading")}</span>
+            <div className="absolute inset-0 grid place-items-center">
+              <Spinner size={28} label={<span className="sr-only">{t("web.loading")}</span>} />
             </div>
           )}
         </div>

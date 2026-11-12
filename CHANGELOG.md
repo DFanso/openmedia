@@ -16,6 +16,14 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** `yarn ts:check`, ESLint, Prettier, frontend tests, and the built first paint measured in a browser (logo centred at 52% of the width, status line and track in place, dark and light). **Not verified:** on-device iOS/Android cold start.
 
+### fix(ui): one loading spinner
+
+**Area:** `fix(ui)`
+
+**Change:** The marketplace, the page-opening loader and the assistant's running step now share one `Spinner` (`src/shared/Spinner.tsx`), the page-opening ring. All three stop spinning under reduced motion; the marketplace one did not before.
+
+**Verified:** `ts:check`, `lint` and `test` pass. Not checked on a device.
+
 ### fix(siteview): a sign-in window stays in the app, so the token reaches the page
 
 **Area:** `fix(siteview)`
