@@ -44,7 +44,13 @@ pub fn run() {
             let ad_block_enabled = library.ad_block_enabled()?;
             let background_media = library.background_media_sites()?;
             app.manage(library);
-            commands::push_background_media(app.handle(), background_media)?;
+            // Off the setup thread: on iOS the plugin answers from the main thread, which is the
+            // thread running this closure, so asking from here would wait for itself.
+            let handle = app.handle().clone();
+            tauri::async_runtime::spawn_blocking(move || {
+                // The list reaches the site views once; a failure leaves every site pausing.
+                let _ = commands::push_background_media(&handle, background_media);
+            });
             app.manage(incognito::Incognito::default());
             app.manage(recipes::Recipes::load(data_dir.join("recipes"))?);
             app.manage(catalog::Catalog::new(

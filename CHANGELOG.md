@@ -8,6 +8,17 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-12
 
+### fix(media): the app no longer hangs on the splash on iOS
+
+**Area:** `fix(media)`
+
+**Cause:** the background-playback list was sent to the site views from the Tauri setup closure. On iOS the plugin answers on the main thread, which is the thread running that closure, so the call waited for itself and the shell never loaded.
+
+**Change:** the list is sent from a background task instead.
+
+**Verified:** the app starts on the iOS simulator again. Android was not affected.
+
+
 ### fix(app): the splash logo no longer jumps when it takes over from the launch screen
 
 **Area:** `fix(app)`
