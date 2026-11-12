@@ -10,6 +10,7 @@ import {
 import { earlierOf } from "../features/ai/chat";
 import { selectActiveChat, useChat } from "../features/ai/chatStore";
 import { assistant as assistantIpc, type PreparedRequest } from "../features/ai/ipc";
+import { hubForFavorite } from "../shared/hubs";
 import { siteOf } from "../shared/site";
 import { incognito as incognitoIpc } from "../features/incognito/ipc";
 import {
@@ -57,12 +58,19 @@ export type Sheet =
   | "stats"
   | "settings"
   | "recipes"
+  | "incognito-recipes"
   | "marketplace"
   | "share"
   | "paywall";
 
 /** Pages that open on top of Settings. Closing one returns to Settings, which stays mounted beneath it. */
-const SETTINGS_CHILDREN: readonly Sheet[] = ["recipes", "marketplace", "share", "paywall"];
+const SETTINGS_CHILDREN: readonly Sheet[] = [
+  "recipes",
+  "incognito-recipes",
+  "marketplace",
+  "share",
+  "paywall",
+];
 const isSettingsChild = (sheet: Sheet): boolean => SETTINGS_CHILDREN.includes(sheet);
 
 type SheetState = Pick<AppStore, "sheet" | "sheetParent">;
@@ -138,7 +146,7 @@ export interface AppStore {
   /** A favorite: switches to its live session if there is one, otherwise opens a new one. */
   openFavorite: (url: string) => void;
   /** A page of a hub: switches to its live session if there is one, otherwise opens a new one. */
-  openHubTab: (url: string) => void;
+  openHubTab: (url: string, hubId: string) => void;
   /** A history entry: switches to the live session typed with it, otherwise opens a new one. */
   openHistory: (url: string) => void;
   /** Shows a live session by id, for example the one a notification was tapped for. */
@@ -315,12 +323,20 @@ export const useApp = create<AppStore>((set, get) => {
     sessions.map((session) => (session.id === id ? { ...session, lastUsed: now } : session));
 
   /** A new session. `adoptedId` names a page Rust already opened at launch, which is taken over. */
-  const startSession = (url: string, source: SessionSource, adoptedId?: string) => {
+  const startSession = (
+    url: string,
+    source: SessionSource,
+    adoptedId?: string,
+    hubId: string | null = null,
+  ) => {
     const now = Date.now();
     const id = adoptedId ?? crypto.randomUUID();
     const previousId = get().activeId;
     set((current) => ({
-      sessions: [...markUsed(current.sessions, previousId, now), newSession(id, source, url, now)],
+      sessions: [
+        ...markUsed(current.sessions, previousId, now),
+        newSession(id, source, url, now, hubId),
+      ],
       activeId: id,
       sheet: "none",
       action: adoptedId
@@ -345,12 +361,13 @@ export const useApp = create<AppStore>((set, get) => {
   /**
    * A page the user picked from a list: the live session on that site is reused when there is
    * one, otherwise a new session opens. The page is a site of its own, so it keeps its own
-   * session and its own cookies.
+   * session and its own cookies. A hub page and a favorite on the same site stay separate
+   * sessions, so the Instagram favorite is Instagram and the hub's tab is its inbox.
    */
-  const openPickedPage = (url: string) => {
-    const live = findFavoriteSession(get().sessions, url);
+  const openPickedPage = (url: string, hubId: string | null = null) => {
+    const live = findFavoriteSession(get().sessions, url, hubId);
     if (live) switchTo(live.id);
-    else startSession(url, "favorite");
+    else startSession(url, hubId ? "hub" : "favorite", undefined, hubId);
   };
 
   /** Incognito chats live only in memory: switching modes drops them and loads the saved ones again. */
@@ -511,9 +528,9 @@ export const useApp = create<AppStore>((set, get) => {
 
     openSearch: (url) => startSession(url, "typed"),
 
-    openFavorite: (url) => openPickedPage(url),
+    openFavorite: (url) => openPickedPage(url, hubForFavorite(get().sites, url)?.recipeId ?? null),
 
-    openHubTab: (url) => openPickedPage(url),
+    openHubTab: (url, hubId) => openPickedPage(url, hubId),
 
     openHistory: (url) => {
       const live = findTypedSession(get().sessions, url);
@@ -563,6 +580,7 @@ export const useApp = create<AppStore>((set, get) => {
         Date.now(),
         pressure,
         selectUsableQuickFavorites(get()),
+        get().sites,
       );
       if (doomed.length === 0) return;
       doomed.forEach((id) => void siteView.close(id).catch(() => {}));

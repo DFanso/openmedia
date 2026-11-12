@@ -1,6 +1,13 @@
 import { siteOf } from "../../shared/site";
 import { normalizeWebUrl } from "../../shared/url";
-import type { UsageSectionPolicies, UsagePolicies, UsagePolicy } from "./policy";
+import {
+  sectionUsageSeconds,
+  usageSeconds,
+  type SectionPolicies,
+  type UsageLimits,
+  type UsagePolicies,
+  type UsagePolicy,
+} from "./policy";
 
 /** The values a duration slider snaps to: fine steps where they matter, coarse ones up to a day. */
 export const LIMIT_STOPS = [
@@ -133,12 +140,11 @@ export interface LimitSite {
   name: string | null;
 }
 
-/** Favorites first, then sites with a site limit, section limit, or a pending edit. */
+/** Favorites first, in their own order; then every other site that has a limit or was just added. */
 export function limitSites(
   favorites: readonly { name: string; url: string }[],
   policies: UsagePolicies,
   added: readonly string[],
-  sectionPolicies: UsageSectionPolicies = {},
 ): { favorites: LimitSite[]; others: LimitSite[] } {
   const seen = new Set<string>();
   const favoriteSites: LimitSite[] = [];
@@ -149,7 +155,7 @@ export function limitSites(
     favoriteSites.push({ host, name: favorite.name });
   }
   const others: LimitSite[] = [];
-  for (const host of [...Object.keys(policies), ...Object.keys(sectionPolicies), ...added]) {
+  for (const host of [...Object.keys(policies), ...added]) {
     if (seen.has(host)) continue;
     seen.add(host);
     others.push({ host, name: null });
@@ -175,4 +181,47 @@ export function suggestHosts(
     if (suggestions.length === max) break;
   }
   return suggestions;
+}
+
+/** The parts of a site to offer: the ones used recently, plus the ones that carry a limit. */
+export function siteParts(
+  host: string,
+  used: readonly string[],
+  sections: SectionPolicies,
+): string[] {
+  const parts = new Set(used);
+  for (const section of Object.keys(sections[host] ?? {})) parts.add(section);
+  return [...parts];
+}
+
+/** A site or a part of a site that carries a daily limit, and where today stands against it. */
+export interface LimitedThing {
+  host: string;
+  /** The part of the site, when the limit is on one; `null` for the site itself. */
+  section: string | null;
+  policy: UsagePolicy;
+  spent: number;
+  status: LimitStatus;
+}
+
+/** Every site and every part of a site with a limit, closest to its limit first. */
+export function limitedThings(
+  limits: UsageLimits,
+  seconds: Record<string, number>,
+  sectionSeconds: Record<string, Record<string, number>>,
+): LimitedThing[] {
+  const things: LimitedThing[] = [];
+  for (const [host, policy] of Object.entries(limits.sites)) {
+    const spent = usageSeconds(seconds, host);
+    const status = limitStatus(policy, spent);
+    if (status.state !== "none") things.push({ host, section: null, policy, spent, status });
+  }
+  for (const [host, parts] of Object.entries(limits.sections)) {
+    for (const [section, policy] of Object.entries(parts)) {
+      const spent = sectionUsageSeconds(sectionSeconds, host, section);
+      const status = limitStatus(policy, spent);
+      if (status.state !== "none") things.push({ host, section, policy, spent, status });
+    }
+  }
+  return things.sort((a, b) => b.status.fraction - a.status.fraction);
 }

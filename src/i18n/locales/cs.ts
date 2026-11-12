@@ -133,6 +133,19 @@ export const cs: Messages = {
   "usage.remindAtHint": "Upozornění, dokud ještě zbývá čas na dokončení.",
   "usage.sliderLimit": "Denní limit pro {host}",
   "usage.sliderReminder": "Připomenutí pro {host}",
+  "usage.partsTitle": "Části tohoto webu",
+  "usage.partSetLimit": "Nastavit limit pro tuto část",
+  "usage.partChangeLimit": "Změnit limit této části",
+  "usage.partLimitLabel": "Denní limit pro {part} na {host}",
+  "usage.partReminderLabel": "Připomenutí pro {part} na {host}",
+  "usage.partStopAfter": "Přestat počítat po",
+  "usage.partPresetsHint":
+    "Vyberte denní limit. Dostanete upozornění před ním a po jeho dosažení se zde čas přestane počítat.",
+  "usage.partStopAfterHint":
+    "Čas v této části se do půlnoci nepočítá. Zbytek webu zůstává otevřený.",
+  "usage.partTimeCheck": "Kontrola času: {part} na {host}",
+  "usage.partLimitReached": "{part} na {host} překročil denní limit. Čas zde se už nepočítá.",
+  "usage.partStatusReached": "Limit dosažen. Čas zde se už nepočítá.",
   "usage.saveHint":
     "Změny se uloží po uvolnění. Čas se počítá, dokud je web na obrazovce, a o půlnoci se vynuluje.",
 
@@ -195,6 +208,8 @@ export const cs: Messages = {
   "settings.bottomMarginLabel": "Spodní okraj pro všechny weby",
   "settings.accessibility": "Přístupnost",
   "guides.read": "Přečíst průvodce",
+  "guides.makeRecipe": "Vytvořit recept",
+  "guides.customizeSite": "Upravit web",
   "settings.data": "Data a nápověda",
   "settings.dataNote":
     "Historie jsou adresy, které jste vyhledali, uložené jen v tomto zařízení. Její vymazání zapomene také poslední stránku, takže aplikace se spustí na vaší první oblíbené stránce. Otevřené stránky, oblíbené a přihlášení zůstanou.",
@@ -235,7 +250,8 @@ export const cs: Messages = {
     "Zatím tu nic není. Přidejte oblíbenou stránku níže, nebo označte hvězdičkou recept.",
   "favorites.more": "Další oblíbené · {count}",
   "favorites.moreLocked": "Další oblíbené",
-  "favorites.add": "Přidat oblíbenou",
+  "favorites.custom": "Vlastní oblíbená stránka",
+  "favorites.addFromRecipes": "Přidat z receptů",
   "favorites.quickFull":
     "Rychlý přístup je plný, proto se tato stránka přidá do Dalších oblíbených.",
   "favorites.openRecipe": "Otevřít recept",

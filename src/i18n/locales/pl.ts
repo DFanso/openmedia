@@ -133,6 +133,20 @@ export const pl: Messages = {
   "usage.remindAtHint": "Sygnał, gdy jest jeszcze czas na dokończenie.",
   "usage.sliderLimit": "Dzienny limit dla {host}",
   "usage.sliderReminder": "Przypomnienie dla {host}",
+  "usage.partsTitle": "Części tej witryny",
+  "usage.partSetLimit": "Ustaw limit dla tej części",
+  "usage.partChangeLimit": "Zmień limit tej części",
+  "usage.partLimitLabel": "Limit dzienny dla {part} w {host}",
+  "usage.partReminderLabel": "Przypomnienie dla {part} w {host}",
+  "usage.partStopAfter": "Przestań liczyć po",
+  "usage.partPresetsHint":
+    "Wybierz dzienny limit. Dostaniesz przypomnienie wcześniej, a po jego osiągnięciu czas tutaj przestanie być liczony.",
+  "usage.partStopAfterHint":
+    "Czas w tej części przestaje być liczony do północy. Reszta witryny pozostaje otwarta.",
+  "usage.partTimeCheck": "Kontrola czasu: {part} w {host}",
+  "usage.partLimitReached":
+    "{part} w {host} przekroczył dzienny limit. Czas tutaj nie jest już liczony.",
+  "usage.partStatusReached": "Limit osiągnięty. Czas tutaj nie jest już liczony.",
   "usage.saveHint":
     "Zmiany zapisują się po puszczeniu suwaka. Czas jest liczony, gdy witryna jest na ekranie, i resetuje się o północy.",
 
@@ -194,6 +208,8 @@ export const pl: Messages = {
   "settings.bottomMarginLabel": "Dolny margines dla wszystkich witryn",
   "settings.accessibility": "Dostępność",
   "guides.read": "Przeczytaj przewodnik",
+  "guides.makeRecipe": "Utwórz przepis",
+  "guides.customizeSite": "Dostosuj stronę",
   "settings.data": "Dane i pomoc",
   "settings.dataNote":
     "Historia to adresy, które wyszukano, przechowywane tylko na tym urządzeniu. Jej wyczyszczenie usuwa też ostatnią stronę, więc aplikacja uruchomi się na pierwszej ulubionej. Otwarte strony, ulubione i logowania zostają.",
@@ -233,7 +249,8 @@ export const pl: Messages = {
   "favorites.quickEmpty": "Na razie pusto. Dodaj ulubioną poniżej lub oznacz gwiazdką przepis.",
   "favorites.more": "Więcej ulubionych · {count}",
   "favorites.moreLocked": "Więcej ulubionych",
-  "favorites.add": "Dodaj ulubioną",
+  "favorites.custom": "Własny ulubiony",
+  "favorites.addFromRecipes": "Dodaj z przepisów",
   "favorites.quickFull":
     "Szybki dostęp jest pełny, więc ta pozycja trafi do sekcji Więcej ulubionych.",
   "favorites.openRecipe": "Otwórz przepis",

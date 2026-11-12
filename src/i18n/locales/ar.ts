@@ -129,6 +129,19 @@ export const ar: Messages = {
   "usage.remindAtHint": "تنبيه مسبق بينما يتوفر وقت كافٍ للإنهاء.",
   "usage.sliderLimit": "الحد اليومي لـ {host}",
   "usage.sliderReminder": "التذكير لـ {host}",
+  "usage.partsTitle": "أقسام هذا الموقع",
+  "usage.partSetLimit": "حدّد حدًا لهذا القسم",
+  "usage.partChangeLimit": "غيّر حد هذا القسم",
+  "usage.partLimitLabel": "الحد اليومي لـ {part} في {host}",
+  "usage.partReminderLabel": "تذكير لـ {part} في {host}",
+  "usage.partStopAfter": "أوقف العد بعد",
+  "usage.partPresetsHint":
+    "اختر حدًا يوميًا. ستحصل على تذكير قبله، وعند بلوغه يتوقف الوقت هنا عن الاحتساب.",
+  "usage.partStopAfterHint":
+    "لا يُحتسب الوقت في هذا القسم حتى منتصف الليل. يبقى بقية الموقع مفتوحًا.",
+  "usage.partTimeCheck": "فحص الوقت: {part} في {host}",
+  "usage.partLimitReached": "تجاوز {part} في {host} حدّه اليومي. لم يعد الوقت هنا يُحتسب.",
+  "usage.partStatusReached": "تم بلوغ الحد. لم يعد الوقت هنا يُحتسب.",
   "usage.saveHint":
     "تُحفظ التغييرات عند رفع إصبعك. يُحسب الوقت أثناء ظهور الموقع على الشاشة ويُعاد ضبطه عند منتصف الليل.",
 
@@ -188,6 +201,8 @@ export const ar: Messages = {
   "settings.bottomMarginLabel": "الهامش السفلي لكل المواقع",
   "settings.accessibility": "إمكانية الوصول",
   "guides.read": "اقرأ الدليل",
+  "guides.makeRecipe": "أنشئ وصفة",
+  "guides.customizeSite": "خصّص موقعًا",
   "settings.data": "البيانات والمساعدة",
   "settings.dataNote":
     "السجل هو العناوين التي بحثت عنها، ويُحفظ على هذا الجهاز فقط. مسحه ينسى الصفحة الأخيرة أيضًا، فيبدأ التطبيق من أول موقع في مفضلتك. الصفحات المفتوحة والمفضلة وتسجيلات الدخول تبقى.",
@@ -226,7 +241,8 @@ export const ar: Messages = {
   "favorites.quickEmpty": "لا شيء هنا بعد. أضف مفضلة أدناه، أو ضع نجمة على وصفة.",
   "favorites.more": "المزيد من المفضلة · {count}",
   "favorites.moreLocked": "المزيد من المفضلة",
-  "favorites.add": "إضافة مفضلة",
+  "favorites.custom": "مفضلة مخصصة",
+  "favorites.addFromRecipes": "أضف من الوصفات",
   "favorites.quickFull": "الوصول السريع ممتلئ، لذا أضيفت هذه إلى المزيد من المفضلة.",
   "favorites.openRecipe": "فتح الوصفة",
   "favorites.edit": "تعديل {name}",

@@ -135,6 +135,20 @@ export const fr: Messages = {
   "usage.remindAtHint": "Un avertissement tant qu’il reste du temps pour terminer.",
   "usage.sliderLimit": "Limite quotidienne pour {host}",
   "usage.sliderReminder": "Rappel pour {host}",
+  "usage.partsTitle": "Parts de ce site",
+  "usage.partSetLimit": "Définir une limite pour cette partie",
+  "usage.partChangeLimit": "Modifier la limite de cette partie",
+  "usage.partLimitLabel": "Limite quotidienne pour {part} sur {host}",
+  "usage.partReminderLabel": "Rappel pour {part} sur {host}",
+  "usage.partStopAfter": "Arrêter de compter après",
+  "usage.partPresetsHint":
+    "Choisissez une limite quotidienne. Vous recevez un rappel avant, et une fois atteinte, le temps passé ici n'est plus compté.",
+  "usage.partStopAfterHint":
+    "Le temps passé dans cette partie n'est plus compté jusqu'à minuit. Le reste du site reste ouvert.",
+  "usage.partTimeCheck": "Contrôle du temps : {part} sur {host}",
+  "usage.partLimitReached":
+    "{part} sur {host} a dépassé sa limite quotidienne. Le temps passé ici n'est plus compté.",
+  "usage.partStatusReached": "Limite atteinte. Le temps passé ici n'est plus compté.",
   "usage.saveHint":
     "Les modifications sont enregistrées au relâchement. Le temps compte tant que le site est à l’écran et se réinitialise à minuit.",
 
@@ -199,6 +213,8 @@ export const fr: Messages = {
   "settings.bottomMarginLabel": "Marge inférieure pour tous les sites",
   "settings.accessibility": "Accessibilité",
   "guides.read": "Lire le guide",
+  "guides.makeRecipe": "Créer une recette",
+  "guides.customizeSite": "Personnaliser un site",
   "settings.data": "Données et aide",
   "settings.dataNote":
     "L’historique contient les adresses que vous avez recherchées et reste uniquement sur cet appareil. L’effacer oublie aussi la dernière page : l’application démarre donc sur votre premier favori. Les pages ouvertes, les favoris et les connexions sont conservés.",
@@ -240,7 +256,8 @@ export const fr: Messages = {
     "Rien ici pour le moment. Ajoutez un favori ci-dessous ou mettez une recette en favori.",
   "favorites.more": "Autres favoris · {count}",
   "favorites.moreLocked": "Autres favoris",
-  "favorites.add": "Ajouter un favori",
+  "favorites.custom": "Favori personnalisé",
+  "favorites.addFromRecipes": "Ajouter depuis les recettes",
   "favorites.quickFull": "L’accès rapide est plein : ce favori est ajouté aux autres favoris.",
   "favorites.openRecipe": "Ouvrir la recette",
   "favorites.edit": "Modifier {name}",

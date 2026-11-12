@@ -19,8 +19,10 @@ const TEXT: Record<LimitStatus["state"], string> = {
 };
 
 /** One line saying where today stands against the limit. Empty when nothing is set. */
-export function statusText(status: LimitStatus, t: Translate): string {
-  if (status.state === "reached") return t("usage.statusReached");
+export function statusText(status: LimitStatus, t: Translate, part = false): string {
+  if (status.state === "reached") {
+    return part ? t("usage.partStatusReached") : t("usage.statusReached");
+  }
   if (status.untilLimit !== null) {
     return t("usage.statusLeft", { value: formatDuration(status.untilLimit, t) });
   }

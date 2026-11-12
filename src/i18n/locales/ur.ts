@@ -132,6 +132,19 @@ export const ur: Messages = {
   "usage.remindAtHint": "کام سمیٹنے کے لیے وقت باقی ہونے پر پیشگی اطلاع۔",
   "usage.sliderLimit": "{host} کے لیے روزانہ کی حد",
   "usage.sliderReminder": "{host} کے لیے یاد دہانی",
+  "usage.partsTitle": "اس سائٹ کے حصے",
+  "usage.partSetLimit": "اس حصے کے لیے حد مقرر کریں",
+  "usage.partChangeLimit": "اس حصے کی حد تبدیل کریں",
+  "usage.partLimitLabel": "{host} پر {part} کے لیے روزانہ حد",
+  "usage.partReminderLabel": "{host} پر {part} کے لیے یاد دہانی",
+  "usage.partStopAfter": "اس وقت کے بعد گننا بند کریں",
+  "usage.partPresetsHint":
+    "ایک روزانہ حد منتخب کریں۔ آپ کو پہلے یاد دہانی ملے گی، اور حد تک پہنچنے پر یہاں کا وقت گننا بند ہو جائے گا۔",
+  "usage.partStopAfterHint":
+    "اس حصے میں گزرا وقت رات دراز تک گنہا نہیں جاتا۔ سائٹ کا باقی حصہ کھلا رہتا ہے۔",
+  "usage.partTimeCheck": "وقت کی جانچ: {host} پر {part}",
+  "usage.partLimitReached": "{host} پر {part} روزانہ حد سے گزر گیا۔ یہاں کا وقت اب گنہا نہیں جاتا۔",
+  "usage.partStatusReached": "حد تک پہنچ گئی۔ یہاں کا وقت اب گنہا نہیں جاتا۔",
   "usage.saveHint":
     "انگلی ہٹاتے ہی تبدیلیاں محفوظ ہو جاتی ہیں۔ وقت اس دوران گنا جاتا ہے جب سائٹ اسکرین پر ہو، اور آدھی رات کو دوبارہ شروع ہو جاتا ہے۔",
 
@@ -196,6 +209,8 @@ export const ur: Messages = {
   "settings.bottomMarginLabel": "تمام سائٹس کے لیے نیچے کا مارجن",
   "settings.accessibility": "رسائی",
   "guides.read": "گائیڈ پڑھیں",
+  "guides.makeRecipe": "نسخہ بنائیں",
+  "guides.customizeSite": "سائٹ کو حسبِ ضرورت بنائیں",
   "settings.data": "ڈیٹا اور مدد",
   "settings.dataNote":
     "تاریخ وہ پتے ہیں جن کی آپ نے تلاش کی، اور صرف اسی ڈیوائس پر رہتے ہیں۔ انہیں صاف کرنے سے آخری صفحہ بھی بھول جاتا ہے، اس لیے ایپ آپ کی پہلی پسندیدہ سے شروع ہوتی ہے۔ کھلے ہوئے صفحات، پسندیدہ اور لاگ ان قائم رہتے ہیں۔",
@@ -236,7 +251,8 @@ export const ur: Messages = {
   "favorites.quickEmpty": "یہاں ابھی کچھ نہیں۔ نیچے پسندیدہ شامل کریں، یا کسی ریسپی کو ستارہ دیں۔",
   "favorites.more": "مزید پسندیدہ · {count}",
   "favorites.moreLocked": "مزید پسندیدہ",
-  "favorites.add": "پسندیدہ شامل کریں",
+  "favorites.custom": "حسبِ منشا پسندیدہ",
+  "favorites.addFromRecipes": "ترکیبوں سے شامل کریں",
   "favorites.quickFull": "تیز رسائی مکمل ہے، اس لیے یہ مزید پسندیدہ میں شامل کی گئی ہے۔",
   "favorites.openRecipe": "ترکیب کھولیں",
   "favorites.edit": "{name} میں ترمیم کریں",

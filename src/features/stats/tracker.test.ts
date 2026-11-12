@@ -30,7 +30,7 @@ import { useApp } from "../../app/store";
 import type { Session } from "../web/sessions";
 import { settleUsageWrites, startUsageTracking } from "./tracker";
 import { localDay } from "./format";
-import { usagePolicies, usageSectionPolicies, useUsageControl } from "./policy";
+import { usageLimits, useUsageControl } from "./policy";
 import { useEntitlementStore } from "../paywall/store";
 
 const policies = {
@@ -40,6 +40,7 @@ const policies = {
 const session = (id: string, url: string, scope: string): Session => ({
   id,
   source: "typed",
+  hubId: null,
   openedUrl: url,
   scope,
   url,
@@ -63,8 +64,7 @@ beforeEach(() => {
   vi.useFakeTimers();
   vi.setSystemTime(new Date(2026, 10, 8, 12, 0, 0));
   ledger.clear();
-  vi.spyOn(usagePolicies, "get").mockResolvedValue(policies);
-  vi.spyOn(usageSectionPolicies, "get").mockResolvedValue({});
+  vi.spyOn(usageLimits, "get").mockResolvedValue({ sites: policies, sections: {} });
   documentTarget = new EventTarget();
   windowTarget = new EventTarget();
   Object.defineProperty(documentTarget, "visibilityState", { get: () => visibility });
@@ -85,8 +85,7 @@ beforeEach(() => {
   });
   useUsageControl.setState({
     day: localDay(new Date()),
-    policies: {},
-    sectionPolicies: {},
+    limits: { sites: {}, sections: {} },
     seconds: {},
     sectionSeconds: {},
     ready: false,
@@ -119,7 +118,7 @@ describe("usage tracking", () => {
     useEntitlementStore.setState({ status: "free", configured: true, snapshot: null });
     await start();
     await tick(3);
-    expect(usagePolicies.get).not.toHaveBeenCalled();
+    expect(usageLimits.get).not.toHaveBeenCalled();
     expect(report).not.toHaveBeenCalled();
     expect(useUsageControl.getState().ready).toBe(false);
     expect(useApp.getState().sheet).toBe("none");
@@ -145,40 +144,40 @@ describe("usage tracking", () => {
     expect(ledger.get(localDay(new Date()))?.get("example.com")?.get("/")).toBe(3);
   });
 
-  it("stops counting only the section that reached its limit", async () => {
-    vi.spyOn(usagePolicies, "get").mockResolvedValue({});
-    vi.spyOn(usageSectionPolicies, "get").mockResolvedValue({
-      "example.com": { "/reels": { warnSeconds: 2, limitSeconds: 3 } },
+  it("stops counting a part at its limit while the rest of the site keeps counting", async () => {
+    vi.spyOn(usageLimits, "get").mockResolvedValue({
+      sites: {},
+      sections: { "example.com": { "/watch": { warnSeconds: null, limitSeconds: 2 } } },
     });
     useApp.setState({
-      sessions: [
-        session("reels", "https://example.com/reels", "example.com"),
-        session("messages", "https://example.com/messages", "example.com"),
-      ],
-      activeId: "reels",
+      sessions: [session("example", "https://example.com/watch", "example.com")],
+      activeId: "example",
     });
     await start();
     await tick(4);
-    expect(useUsageControl.getState().sectionSeconds["example.com"]["/reels"]).toBe(3);
+    await settleUsageWrites();
+    expect(useUsageControl.getState().sectionSeconds["example.com"]?.["/watch"]).toBe(2);
+    expect(useUsageControl.getState().seconds["example.com"]).toBe(2);
+    expect(ledger.get(localDay(new Date()))?.get("example.com")?.get("/watch")).toBe(2);
 
-    useApp.setState({ activeId: "messages" });
+    useApp.setState({
+      sessions: [session("example", "https://example.com/feed", "example.com")],
+      activeId: "example",
+    });
     await tick(2);
     await settleUsageWrites();
-    expect(useUsageControl.getState().sectionSeconds["example.com"]).toEqual({
-      "/reels": 3,
-      "/messages": 2,
-    });
-    expect(ledger.get(localDay(new Date()))?.get("example.com")?.get("/reels")).toBe(3);
-    expect(ledger.get(localDay(new Date()))?.get("example.com")?.get("/messages")).toBe(2);
+    expect(useUsageControl.getState().sectionSeconds["example.com"]?.["/watch"]).toBe(2);
+    expect(useUsageControl.getState().seconds["example.com"]).toBeGreaterThan(2);
   });
 
   it("splits elapsed foreground time across local midnight", async () => {
     vi.setSystemTime(new Date(2026, 10, 8, 23, 59, 59));
-    vi.spyOn(usagePolicies, "get").mockResolvedValue({});
+    vi.spyOn(usageLimits, "get").mockResolvedValue({ sites: {}, sections: {} });
     useUsageControl.setState({
       day: localDay(new Date()),
-      policies: {},
+      limits: { sites: {}, sections: {} },
       seconds: {},
+      sectionSeconds: {},
       ready: false,
       warning: null,
     });

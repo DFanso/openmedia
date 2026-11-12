@@ -134,6 +134,20 @@ export const en = {
   "usage.remindAtHint": "A heads-up while there is still time to wrap up.",
   "usage.sliderLimit": "Daily limit for {host}",
   "usage.sliderReminder": "Reminder for {host}",
+  "usage.partsTitle": "Parts of this site",
+  "usage.partSetLimit": "Set a limit for this part",
+  "usage.partChangeLimit": "Change this part's limit",
+  "usage.partLimitLabel": "Daily limit for {part} on {host}",
+  "usage.partReminderLabel": "Reminder for {part} on {host}",
+  "usage.partStopAfter": "Stop counting after",
+  "usage.partStopAfterHint":
+    "Time in this part stops counting until midnight. The rest of the site stays open.",
+  "usage.partPresetsHint":
+    "Pick a daily limit. You get a reminder before it, and the time here stops counting once it is reached.",
+  "usage.partTimeCheck": "Time check: {part} on {host}",
+  "usage.partLimitReached":
+    "{part} on {host} is over its daily limit. Time here is no longer counted.",
+  "usage.partStatusReached": "Limit reached. Time here is no longer counted.",
   "usage.saveHint":
     "Changes save when you let go. Time counts while the site is on screen and resets at midnight.",
 
@@ -196,6 +210,8 @@ export const en = {
   "settings.bottomMarginLabel": "Bottom margin for all sites",
   "settings.accessibility": "Accessibility",
   "guides.read": "Read the guide",
+  "guides.makeRecipe": "Create a recipe",
+  "guides.customizeSite": "Customize a site",
   "settings.data": "Data and help",
   "settings.dataNote":
     "History is the addresses you have searched, kept on this device only. Clearing it also forgets the last page, so the app starts on your first favorite. Open pages, favorites and logins stay.",
@@ -235,7 +251,8 @@ export const en = {
   "favorites.quickEmpty": "Nothing here yet. Add a favorite below, or star a recipe.",
   "favorites.more": "More favorites · {count}",
   "favorites.moreLocked": "More favorites",
-  "favorites.add": "Add favorite",
+  "favorites.custom": "Custom favorite",
+  "favorites.addFromRecipes": "Add from recipes",
   "favorites.quickFull": "Quick access is full, so this one is added to More favorites.",
   "favorites.openRecipe": "Open recipe",
   "favorites.edit": "Edit {name}",

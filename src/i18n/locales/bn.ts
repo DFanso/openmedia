@@ -128,6 +128,19 @@ export const bn: Messages = {
   "usage.remindAtHint": "শেষ করার মতো সময় থাকতেই একটি আগাম সতর্কতা।",
   "usage.sliderLimit": "{host} এর দৈনিক সীমা",
   "usage.sliderReminder": "{host} এর রিমাইন্ডার",
+  "usage.partsTitle": "এই সাইটের অংশ",
+  "usage.partSetLimit": "এই অংশের জন্য সীমা নির্ধারণ করুন",
+  "usage.partChangeLimit": "এই অংশের সীমা পরিবর্তন করুন",
+  "usage.partLimitLabel": "{host}-এ {part}-এর দৈনিক সীমা",
+  "usage.partReminderLabel": "{host}-এ {part}-এর অনুস্মারক",
+  "usage.partStopAfter": "এই সময়ের পর গণনা বন্ধ করুন",
+  "usage.partPresetsHint":
+    "একটি দৈনিক সীমা বেছে নিন। এর আগে আপনি একটি অনুস্মারক পাবেন, এবং সীমায় পৌঁছালে এখানে সময় গণনা বন্ধ হয়ে যাবে।",
+  "usage.partStopAfterHint": "এই অংশে সময় মধ্যরাত পর্যন্ত গণনা হয় না। সাইটের বাকি অংশ খোলা থাকে।",
+  "usage.partTimeCheck": "সময় পরীক্ষা: {host}-এ {part}",
+  "usage.partLimitReached":
+    "{host}-এ {part} তার দৈনিক সীমা অতিক্রম করেছে। এখানে আর সময় গণনা হয় না।",
+  "usage.partStatusReached": "সীমা ছাড়িয়ে গেছে। এখানে আর সময় গণনা হয় না।",
   "usage.saveHint":
     "ছেড়ে দিলে পরিবর্তন সংরক্ষিত হয়। সাইট স্ক্রিনে থাকা অবস্থায় সময় গণনা হয় এবং মধ্যরাতে রিসেট হয়।",
 
@@ -189,6 +202,8 @@ export const bn: Messages = {
   "settings.bottomMarginLabel": "সব সাইটের নিচের মার্জিন",
   "settings.accessibility": "অ্যাক্সেসিবিলিটি",
   "guides.read": "গাইড পড়ুন",
+  "guides.makeRecipe": "রেসিপি তৈরি করুন",
+  "guides.customizeSite": "একটি সাইট কাস্টমাইজ করুন",
   "settings.data": "ডেটা ও সহায়তা",
   "settings.dataNote":
     "ইতিহাসে আপনি যে ঠিকানাগুলো অনুসন্ধান করেছেন সেগুলো থাকে, যা শুধু এই ডিভাইসেই সংরক্ষিত থাকে। এটি মুছলে শেষ পেজও মুছে যায়, তাই অ্যাপ আপনার প্রথম পছন্দ থেকে শুরু হয়। খোলা পেজ, পছন্দের তালিকা ও লগইন থেকে যায়।",
@@ -229,7 +244,8 @@ export const bn: Messages = {
     "এখানে এখনও কিছু নেই। নিচে একটি পছন্দ যোগ করুন, অথবা রেসিপিতে তারকা চিহ্ন দিন।",
   "favorites.more": "আরও পছন্দ · {count}",
   "favorites.moreLocked": "আরও পছন্দ",
-  "favorites.add": "পছন্দ যোগ করুন",
+  "favorites.custom": "কাস্টম পছন্দ",
+  "favorites.addFromRecipes": "রেসিপি থেকে যোগ করুন",
   "favorites.quickFull": "দ্রুত অ্যাক্সেস পূর্ণ, তাই এটি আরও পছন্দের তালিকায় যোগ করা হয়েছে।",
   "favorites.openRecipe": "রেসিপি খুলুন",
   "favorites.edit": "{name} সম্পাদনা করুন",

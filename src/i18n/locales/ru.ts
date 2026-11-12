@@ -133,6 +133,20 @@ export const ru: Messages = {
   "usage.remindAtHint": "Предупреждение, пока ещё есть время закончить.",
   "usage.sliderLimit": "Дневной лимит для {host}",
   "usage.sliderReminder": "Напоминание для {host}",
+  "usage.partsTitle": "Разделы этого сайта",
+  "usage.partSetLimit": "Задать лимит для этого раздела",
+  "usage.partChangeLimit": "Изменить лимит этого раздела",
+  "usage.partLimitLabel": "Дневной лимит для {part} на {host}",
+  "usage.partReminderLabel": "Напоминание для {part} на {host}",
+  "usage.partStopAfter": "Прекратить считать через",
+  "usage.partPresetsHint":
+    "Выберите дневной лимит. Вы получите напоминание заранее, а когда лимит достигнут, время здесь перестанет засчитываться.",
+  "usage.partStopAfterHint":
+    "Время в этом разделе не засчитывается до полуночи. Остальная часть сайта остаётся открытой.",
+  "usage.partTimeCheck": "Проверка времени: {part} на {host}",
+  "usage.partLimitReached":
+    "{part} на {host} превысил дневной лимит. Время здесь больше не засчитывается.",
+  "usage.partStatusReached": "Лимит достигнут. Время здесь больше не засчитывается.",
   "usage.saveHint":
     "Изменения сохраняются, когда вы отпускаете ползунок. Время идёт, пока сайт открыт на экране, и сбрасывается в полночь.",
 
@@ -196,6 +210,8 @@ export const ru: Messages = {
   "settings.bottomMarginLabel": "Нижнее поле для всех сайтов",
   "settings.accessibility": "Универсальный доступ",
   "guides.read": "Читать руководство",
+  "guides.makeRecipe": "Создать рецепт",
+  "guides.customizeSite": "Настроить сайт",
   "settings.data": "Данные и помощь",
   "settings.dataNote":
     "История — это адреса, которые вы искали; они хранятся только на этом устройстве. Её очистка также забывает последнюю страницу, поэтому приложение открывает первую страницу из избранного. Открытые страницы, избранное и входы в аккаунты остаются.",
@@ -236,7 +252,8 @@ export const ru: Messages = {
   "favorites.quickEmpty": "Пока пусто. Добавьте избранное ниже или поставьте звезду рецепту.",
   "favorites.more": "Ещё избранное · {count}",
   "favorites.moreLocked": "Ещё избранное",
-  "favorites.add": "Добавить в избранное",
+  "favorites.custom": "Настраиваемое избранное",
+  "favorites.addFromRecipes": "Добавить из рецептов",
   "favorites.quickFull": "Быстрый доступ заполнен, поэтому это добавлено в «Ещё избранное».",
   "favorites.openRecipe": "Открыть рецепт",
   "favorites.edit": "Изменить {name}",

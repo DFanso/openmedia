@@ -1,28 +1,26 @@
 import { useEffect, useMemo, useRef, useState, type SubmitEvent } from "react";
 import { useApp } from "../../app/store";
+import { describeError } from "../../i18n/errors";
 import type { Translate } from "../../i18n/translate";
 import { useT } from "../../i18n/useT";
 import { DownIcon, PlusIcon } from "../../shared/icons";
+import { usage } from "../../shared/ipc";
 import { Group, GroupLabel, field, primaryButton } from "../settings/ui";
-import { formatDuration, sectionLabel } from "./format";
+import { formatDuration, localDay, sectionLabel } from "./format";
 import {
   hostFor,
   limitSites,
   limitStatus,
+  siteParts,
   suggestHosts,
   thresholdsOf,
   type LimitSite,
 } from "./limits";
 import { LimitEditor } from "./LimitEditor";
-import {
-  policyForSection,
-  sectionUsageSeconds,
-  usageSeconds,
-  useUsageControl,
-  type UsagePolicy,
-  type UsageSectionPolicies,
-} from "./policy";
+import { sectionUsageSeconds, usageSeconds, useUsageControl, type UsagePolicy } from "./policy";
 import { SiteBadge } from "./SiteBadge";
+import { settleUsageWrites } from "./tracker";
+import { statusText, UsageMeter } from "./UsageMeter";
 import { useUsageView } from "./view";
 
 const NO_HISTORY: string[] = [];
@@ -64,104 +62,76 @@ function StatusChip({ policy, spent }: { policy: UsagePolicy | undefined; spent:
   );
 }
 
-interface LimitRowProps {
-  site: LimitSite;
-  policy: UsagePolicy | undefined;
-  spent: number;
-  sectionPolicies: UsageSectionPolicies;
-  sectionSeconds: Record<string, Record<string, number>>;
-  open: boolean;
-  openSection: string | null;
-  scrollTo: boolean;
-  scrollToSection: string | null;
-  onToggle: () => void;
-  onSectionToggle: (section: string | null) => void;
-}
-
-function SectionLimitRow({
-  host,
-  section,
-  policy,
-  spent,
-  open,
-  scrollTo,
-  onToggle,
-}: {
+interface PartRowProps {
   host: string;
   section: string;
   policy: UsagePolicy | undefined;
   spent: number;
   open: boolean;
-  scrollTo: boolean;
   onToggle: () => void;
-}) {
+}
+
+/** One part of a site: what it cost today, and the limit the user set for it. */
+function PartRow({ host, section, policy, spent, open, onToggle }: PartRowProps) {
   const t = useT();
-  const row = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (scrollTo) row.current?.scrollIntoView({ block: "start" });
-  }, [scrollTo]);
-
+  const status = limitStatus(policy, spent);
   return (
-    <div ref={row} className="scroll-mt-4 border-t border-hair">
-      <button
-        type="button"
-        aria-expanded={open}
-        onClick={onToggle}
-        className="flex w-full items-center gap-3 px-4 py-3 text-start active:bg-paper/[0.05]"
-      >
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-medium">{sectionLabel(section, t)}</span>
-          <span className="block text-xs text-paper/55">
-            {formatDuration(spent, t)} · {summaryOf(policy, t)}
+    <li className="border-t border-hair">
+      <div className="px-4 py-3">
+        <div className="flex items-baseline justify-between gap-3">
+          <span className="truncate text-sm font-medium">{sectionLabel(section, t)}</span>
+          <span className="shrink-0 text-sm text-paper/60 tabular-nums">
+            {formatDuration(Math.floor(spent), t)}
           </span>
-        </span>
-        <StatusChip policy={policy} spent={spent} />
-        <span aria-hidden="true" className={`text-paper/45 ${open ? "rotate-180" : ""}`}>
-          <DownIcon />
-        </span>
-      </button>
+        </div>
+        {status.state !== "none" && (
+          <div className="mt-2">
+            <UsageMeter spentSeconds={spent} policy={policy} compact />
+            <p className="mt-1 text-xs text-paper/55">{statusText(status, t, true)}</p>
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          className="mt-2 text-sm font-medium text-accent"
+        >
+          {policy ? t("usage.partChangeLimit") : t("usage.partSetLimit")}
+        </button>
+      </div>
       {open && <LimitEditor host={host} section={section} policy={policy} spentSeconds={spent} />}
-    </div>
+    </li>
   );
+}
+
+interface LimitRowProps {
+  site: LimitSite;
+  policy: UsagePolicy | undefined;
+  spent: number;
+  parts: string[];
+  open: boolean;
+  scrollTo: boolean;
+  openPart: string | null;
+  onToggle: () => void;
+  onTogglePart: (section: string) => void;
 }
 
 function LimitRow({
   site,
   policy,
   spent,
-  sectionPolicies,
-  sectionSeconds,
+  parts,
   open,
-  openSection,
   scrollTo,
-  scrollToSection,
+  openPart,
   onToggle,
-  onSectionToggle,
+  onTogglePart,
 }: LimitRowProps) {
   const t = useT();
   const row = useRef<HTMLDivElement>(null);
   const name = site.name ?? site.host;
-  const sections = new Set<string>();
-  for (const [host, totals] of Object.entries(sectionSeconds)) {
-    if (site.host === host || site.host.endsWith(`.${host}`) || host.endsWith(`.${site.host}`)) {
-      for (const section of Object.keys(totals)) sections.add(section);
-    }
-  }
-  for (const [host, policies] of Object.entries(sectionPolicies)) {
-    if (site.host === host || site.host.endsWith(`.${host}`) || host.endsWith(`.${site.host}`)) {
-      for (const section of Object.keys(policies)) sections.add(section);
-    }
-  }
-  const sectionIds = [...sections].sort((a, b) =>
-    sectionLabel(a, t).localeCompare(sectionLabel(b, t)),
-  );
-  const configuredSections = sectionIds
-    .filter((section) => policyForSection(sectionPolicies, site.host, section))
-    .map((section) => sectionLabel(section, t));
-  const summary = configuredSections.length
-    ? `${summaryOf(policy, t)} · ${configuredSections.join(", ")}`
-    : summaryOf(policy, t);
+  const limits = useUsageControl((s) => s.limits);
+  const sectionSeconds = useUsageControl((s) => s.sectionSeconds);
 
   useEffect(() => {
     if (scrollTo) row.current?.scrollIntoView({ block: "start" });
@@ -178,7 +148,7 @@ function LimitRow({
         <SiteBadge host={site.host} name={name} />
         <span className="min-w-0 flex-1">
           <span className="block truncate text-base font-medium">{name}</span>
-          <span className="block text-sm leading-snug text-paper/55">{summary}</span>
+          <span className="block text-sm leading-snug text-paper/55">{summaryOf(policy, t)}</span>
         </span>
         <StatusChip policy={policy} spent={spent} />
         <span aria-hidden="true" className={`text-paper/45 ${open ? "rotate-180" : ""}`}>
@@ -187,23 +157,27 @@ function LimitRow({
       </button>
       {open && (
         <>
-          <LimitEditor host={site.host} policy={policy} spentSeconds={spent} />
-          {sectionIds.map((section) => {
-            const key = `${site.host}:${section}`;
-            const partPolicy = policyForSection(sectionPolicies, site.host, section);
-            return (
-              <SectionLimitRow
-                key={section}
-                host={site.host}
-                section={section}
-                policy={partPolicy}
-                spent={sectionUsageSeconds(sectionSeconds, site.host, section)}
-                open={openSection === key}
-                scrollTo={scrollToSection === key}
-                onToggle={() => onSectionToggle(openSection === key ? null : key)}
-              />
-            );
-          })}
+          <LimitEditor host={site.host} section={null} policy={policy} spentSeconds={spent} />
+          {parts.length > 0 && (
+            <div className="border-t border-hair">
+              <p className="px-4 pt-3 text-xs font-medium tracking-[0.18em] text-paper/50 uppercase">
+                {t("usage.partsTitle")}
+              </p>
+              <ul>
+                {parts.map((section) => (
+                  <PartRow
+                    key={section}
+                    host={site.host}
+                    section={section}
+                    policy={limits.sections[site.host]?.[section]}
+                    spent={sectionUsageSeconds(sectionSeconds, site.host, section)}
+                    open={openPart === section}
+                    onToggle={() => onTogglePart(section)}
+                  />
+                ))}
+              </ul>
+            </div>
+          )}
         </>
       )}
     </div>
@@ -279,31 +253,47 @@ function AddSite({ suggestions, onAdd }: AddSiteProps) {
   );
 }
 
-/** Every favorite with its daily site and section limits one tap away. */
+/** Every favorite with its daily limit one tap away, then the other sites that have one. */
 export function LimitsTab() {
   const t = useT();
   const favorites = useApp((s) => s.state?.favorites);
   const history = useApp((s) => s.state?.history) ?? NO_HISTORY;
-  const policies = useUsageControl((s) => s.policies);
-  const sectionPolicies = useUsageControl((s) => s.sectionPolicies);
+  const reportError = useApp((s) => s.reportError);
+  const limits = useUsageControl((s) => s.limits);
   const seconds = useUsageControl((s) => s.seconds);
-  const sectionSeconds = useUsageControl((s) => s.sectionSeconds);
   const focusHost = useUsageView((s) => s.focusHost);
   const focusSection = useUsageView((s) => s.focusSection);
-  const focusedSection = focusHost && focusSection ? `${focusHost}:${focusSection}` : null;
   const [open, setOpen] = useState<string | null>(focusHost);
-  const [openSection, setOpenSection] = useState<string | null>(focusedSection);
+  const [openPart, setOpenPart] = useState<string | null>(focusSection);
   const [scrollTo] = useState<string | null>(focusHost);
-  const [scrollToSection] = useState<string | null>(focusedSection);
   const [added, setAdded] = useState<string[]>(focusHost ? [focusHost] : []);
+  const [used, setUsed] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
     useUsageView.getState().clearFocus();
   }, []);
 
+  useEffect(() => {
+    let alive = true;
+    settleUsageWrites()
+      .then(() => usage.report(localDay(new Date()), 30))
+      .then((report) => {
+        if (!alive) return;
+        setUsed(
+          Object.fromEntries(
+            report.sites.map((site) => [site.host, site.sections.map((part) => part.section)]),
+          ),
+        );
+      })
+      .catch((error: unknown) => reportError(describeError(error, t)));
+    return () => {
+      alive = false;
+    };
+  }, [reportError, t]);
+
   const sites = useMemo(
-    () => limitSites(favorites ?? [], policies, added, sectionPolicies),
-    [favorites, policies, sectionPolicies, added],
+    () => limitSites(favorites ?? [], limits.sites, added),
+    [favorites, limits.sites, added],
   );
   const suggestions = useMemo(() => {
     const taken = new Set([...sites.favorites, ...sites.others].map((site) => site.host));
@@ -314,16 +304,17 @@ export function LimitsTab() {
     <LimitRow
       key={site.host}
       site={site}
-      policy={policies[site.host]}
+      policy={limits.sites[site.host]}
       spent={usageSeconds(seconds, site.host)}
-      sectionPolicies={sectionPolicies}
-      sectionSeconds={sectionSeconds}
+      parts={siteParts(site.host, used[site.host] ?? [], limits.sections)}
       open={open === site.host}
-      openSection={openSection}
       scrollTo={scrollTo === site.host}
-      scrollToSection={scrollToSection}
-      onToggle={() => setOpen(open === site.host ? null : site.host)}
-      onSectionToggle={setOpenSection}
+      openPart={openPart}
+      onToggle={() => {
+        setOpen(open === site.host ? null : site.host);
+        setOpenPart(null);
+      }}
+      onTogglePart={(section) => setOpenPart(openPart === section ? null : section)}
     />
   );
 

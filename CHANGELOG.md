@@ -6,17 +6,91 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+## 2026-11-12
+
+### fix(siteview): Android reports single-page-app route changes to the shell
+
+**Area:** `fix(siteview)`
+
+**Change:** The Android site view forwards `doUpdateVisitedHistory` to the shell's URL state, so a route change a site makes with `pushState` updates the address (hub bar, unread and limits follow the current page). The section-limit feature this PR first carried was dropped in favor of the per-part limits already on `main` (#143).
+
+**Verified:** Not built or run on Android; whether a WebView reports every `pushState` is unverified.
+
+### feat(usage): a daily limit for the parts of a site
+
+**Area:** `feat(usage)`
+
+**Change:** A site can now carry a daily limit for one of its parts — Reels inside Instagram, Shorts inside YouTube — next to the limit for the site itself. The Limits tab lists the parts of a site under its row with the time spent on each today and the same slider editor; the "Limits today" card counts site and part limits together, and the Activity tab's section breakdown links to a part's limit. A part that is over its limit stops the clock: its time is no longer counted and the app says so over the page, while the rest of the site keeps counting and stays open. Part limits live in `usage.json` next to the site limits, per host and per first path segment; `get_usage_limits`, `set_usage_limit` and `set_usage_section_limit` replace `get_usage_policies` and `set_usage_policy`.
+
+**Verified:** `yarn ts:check`, ESLint, Prettier, 402 frontend tests, `cargo test --workspace` (364 tests) and clippy. **Not verified:** on a device.
+
+### fix(hubs): a hub's quick-access favorite opens the hub
+
+**Area:** `fix(hubs)`
+
+**Change:** A favorite that stands for a hub (its homepage, the first page) now opens as a hub session, so the quick action for Messages Hub shows the whole bar (WhatsApp, Facebook, Instagram, LinkedIn) instead of a lone WhatsApp page. A single-site recipe with the same homepage still wins. The hub favorite's session is also kept from the idle sweep and badged and notified for unread messages like any other quick-access page.
+
+**Verified:** `yarn ts:check`, ESLint and frontend tests. **Not verified:** on a device.
+
+### fix(hubs): a hub page belongs to the hub it was opened from
+
+**Area:** `fix(hubs)`
+
+**Change:** A hub session now remembers its hub (`hubId`). The hub bar shows only on a hub session, and its pages and tabs come from that hub, not from matching the address against every installed hub. A single-site page (the Instagram favorite) no longer gets the Messages Hub bar or its navigation just because the hub has a tab on the same site, and two hubs sharing a site stay apart.
+
+**Verified:** `yarn ts:check`, ESLint and 389 frontend tests. **Not verified:** on a device.
+
+
+### fix(hubs): show the hub bar only on a hub page's own area
+
+**Area:** `fix(hubs)`
+
+**Change:** The Messages Hub bar appeared on every page of Instagram, Facebook, LinkedIn and WhatsApp, so a quick action such as Instagram opened the hub. A hub tab that points into one area of its site (`/direct/inbox/`) now claims only that area; the rest of the site is a plain page. Hub pages also open as sessions of their own, so the Instagram quick action is never answered with the hub's open inbox, and a hub tab never lands on the feed.
+
+**Verified:** `hubs.test.ts`, TypeScript, ESLint. **Not verified:** on a device.
+
+### fix(settings): list hub pages on the incognito recipes page
+
+**Area:** `fix(settings)`
+
+**Change:** A hub card (Messages Hub) on the Incognito recipes page now lists its pages like the normal Recipes page; before, it showed the "Hub" badge and an empty body. The Marketplace "Experimental" tag is unchanged.
+
+**Verified:** `yarn ts:check`, `yarn lint`, Prettier. **Not verified:** on a device or simulator.
+
 ## 2026-11-11
 
-### feat(stats): limit individual site sections
+### fix(settings): ask for the check on the incognito recipes row
 
-**Area:** `feat(stats)`
+**Area:** `fix(settings)`
 
-**Change:** Usage reminders and daily limits can target a whole site or a normalized first path segment, such as `/reels`. Exhausting a section shields only matching sessions; sibling sections and other sites remain usable. Android forwards WebView history updates to shell URL state for SPA routes.
+**Change:** The "Incognito recipes" row in Settings now carries the biometric icon and asks for Face ID, Touch ID or the passcode itself, then opens the page, which lists the recipes as plain cards like the normal Recipes page. The page no longer holds a second collapsible gate inside it, and it closes itself when the app goes to the background.
 
-**Verified:** 33 focused Usage tests and `yarn ts:check`. **Not verified:** Rust usage tests (Cargo hit `ENOSPC` during compilation); Android runtime and SPA history callback behavior.
+**Verified:** `yarn ts:check`, ESLint, Prettier and 385 frontend tests. **Visual check:** on iPhone 17 Pro Max the page lists the recipes as plain cards, with the Pro check bypassed locally because a simulator build cannot unlock Pro. **Not verified:** the Face ID prompt on a device.
 
-**PR:** [#134](https://github.com/skepjandi/openmedia/pull/134)
+### fix(hubs): center hub tabs and route combined-page requests
+
+**Area:** `fix(hubs)`
+
+**Change:** Hub tabs center when they fit and stay horizontally scrollable when they do not. Chat routes combined-page requests through the existing hub builder.
+
+**Verified:** 17 focused routing tests, `yarn ts:check`, and Prettier. **Visual check:** iPhone 17 Pro Max shows all four hub buttons centered.
+
+### feat(settings): open incognito recipes on a dedicated page
+
+**Area:** `feat(settings)`
+
+**Change:** Incognito recipes now open on a biometric-gated page. Normal and incognito favorites offer "Custom favorite" plus "Add from recipes"; recipe stars update the matching favorite set.
+
+**Verified:** 41 focused navigation and localization tests; TypeScript and changed-file formatting; browser-preview navigation and control labels. **Not verified:** native biometric unlock on a device.
+
+### fix(settings): distinguish recipe guide links (#137)
+
+**Area:** `fix(settings)`
+
+**Change:** Give the recipe and site-customization guides distinct, localized labels.
+
+**Verified:** i18n catalog tests (34) and TypeScript check.
+
 ### fix(siteview): keep clicked links in the embedded browser
 
 **Area:** `fix(siteview)`

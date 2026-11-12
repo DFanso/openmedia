@@ -45,7 +45,7 @@ const REQUEST_START =
   /^(hide|remove|block|show|make|change|turn|disable|enable|mute|stop|delete|filter|clean|declutter|get|only|no|don'?t|without|replace|move|dim|collapse|skip|unfollow)\b/i;
 
 const HUB_REQUEST =
-  /\b(?:hub|multi[- ]site|combine)\b|\bnew recipe\b.{0,120}\b(?:messages?|inbox(?:es)?)\b/i;
+  /\b(?:hub|multi[- ]site|combin(?:e|ed|ation|ing))\b|\bnew recipe\b.{0,120}\b(?:messages?|inbox(?:es)?)\b/i;
 
 /** An assistant request. Pro is checked first so a free user is shown the paywall, not setup steps. */
 function assistantRoute(text: string, context: RouteContext): Route {

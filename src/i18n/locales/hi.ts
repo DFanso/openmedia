@@ -128,6 +128,20 @@ export const hi: Messages = {
   "usage.remindAtHint": "समय रहते काम समेटने के लिए एक पूर्व सूचना।",
   "usage.sliderLimit": "{host} की दैनिक सीमा",
   "usage.sliderReminder": "{host} का रिमाइंडर",
+  "usage.partsTitle": "इस साइट के हिस्से",
+  "usage.partSetLimit": "इस हिस्से के लिए सीमा तय करें",
+  "usage.partChangeLimit": "इस हिस्से की सीमा बदलें",
+  "usage.partLimitLabel": "{host} पर {part} की दैनिक सीमा",
+  "usage.partReminderLabel": "{host} पर {part} के लिए अनुस्मारक",
+  "usage.partStopAfter": "इतने समय के बाद गिनना बंद करें",
+  "usage.partPresetsHint":
+    "एक दैनिक सीमा चुनें। इससे पहले आपको याद दिलाया जाएगा, और सीमा पूरी होने पर यहाँ का समय गिनना बंद हो जाएगा।",
+  "usage.partStopAfterHint":
+    "इस हिस्से में बीता समय आधी रात तक गिना नहीं जाता। साइट का बाकी हिस्सा खुला रहता है।",
+  "usage.partTimeCheck": "समय जाँच: {host} पर {part}",
+  "usage.partLimitReached":
+    "{host} पर {part} अपनी दैनिक सीमा से आगे निकल गया है। यहाँ का समय अब नहीं गिना जाता।",
+  "usage.partStatusReached": "सीमा पूरी हो गई। यहाँ का समय अब नहीं गिना जाता।",
   "usage.saveHint":
     "उँगली हटाते ही बदलाव सेव हो जाते हैं। समय तब गिना जाता है जब साइट स्क्रीन पर हो, और आधी रात को रीसेट हो जाता है।",
 
@@ -190,6 +204,8 @@ export const hi: Messages = {
   "settings.bottomMarginLabel": "सभी साइटों के लिए निचली मार्जिन",
   "settings.accessibility": "एक्सेसिबिलिटी",
   "guides.read": "गाइड पढ़ें",
+  "guides.makeRecipe": "रेसिपी बनाएँ",
+  "guides.customizeSite": "साइट को कस्टमाइज़ करें",
   "settings.data": "डेटा और मदद",
   "settings.dataNote":
     "इतिहास वे पते हैं जिन्हें आपने खोजा है, वे सिर्फ़ इसी डिवाइस पर रहते हैं। इन्हें मिटाने पर आख़िरी पृष्ठ भी भूल जाता है, इसलिए ऐप आपकी पहली पसंदीदा से शुरू होता है। खुले पृष्ठ, पसंदीदा और लॉगिन बने रहते हैं।",
@@ -230,7 +246,8 @@ export const hi: Messages = {
     "यहाँ अभी कुछ नहीं है। नीचे कोई पसंदीदा जोड़ें, या रेसिपी को तारांकित करें।",
   "favorites.more": "और पसंदीदा · {count}",
   "favorites.moreLocked": "और पसंदीदा",
-  "favorites.add": "पसंदीदा जोड़ें",
+  "favorites.custom": "कस्टम पसंदीदा",
+  "favorites.addFromRecipes": "रेसिपी से जोड़ें",
   "favorites.quickFull": "त्वरित पहुँच भर चुकी है, इसलिए यह “और पसंदीदा” में जोड़ दी गई है।",
   "favorites.openRecipe": "रेसिपी खोलें",
   "favorites.edit": "{name} संपादित करें",

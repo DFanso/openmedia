@@ -131,6 +131,20 @@ export const sv: Messages = {
   "usage.remindAtHint": "En varning medan det ännu finns tid att avsluta.",
   "usage.sliderLimit": "Daglig gräns för {host}",
   "usage.sliderReminder": "Påminnelse för {host}",
+  "usage.partsTitle": "Delar av den här webbplatsen",
+  "usage.partSetLimit": "Sätt en gräns för den här delen",
+  "usage.partChangeLimit": "Ändra gränsen för den här delen",
+  "usage.partLimitLabel": "Dagsgräns för {part} på {host}",
+  "usage.partReminderLabel": "Påminnelse för {part} på {host}",
+  "usage.partStopAfter": "Sluta räkna efter",
+  "usage.partPresetsHint":
+    "Välj en dagsgräns. Du får en påminnelse innan den, och när den nås räknas tiden här inte längre.",
+  "usage.partStopAfterHint":
+    "Tiden i den här delen räknas inte längre förrän midnatt. Resten av webbplatsen förblir öppen.",
+  "usage.partTimeCheck": "Tidkontroll: {part} på {host}",
+  "usage.partLimitReached":
+    "{part} på {host} har överskridit sin dagsgräns. Tiden här räknas inte längre.",
+  "usage.partStatusReached": "Gränsen nådd. Tiden här räknas inte längre.",
   "usage.saveHint":
     "Ändringar sparas när du släpper. Tiden räknas medan webbplatsen visas på skärmen och nollställs vid midnatt.",
 
@@ -194,6 +208,8 @@ export const sv: Messages = {
   "settings.bottomMarginLabel": "Nedre marginal för alla webbplatser",
   "settings.accessibility": "Tillgänglighet",
   "guides.read": "Läs guiden",
+  "guides.makeRecipe": "Skapa ett recept",
+  "guides.customizeSite": "Anpassa en webbplats",
   "settings.data": "Data och hjälp",
   "settings.dataNote":
     "Historiken består av adresserna du har sökt efter och sparas bara på den här enheten. När du rensar den glöms också den senaste sidan, så appen startar på din första favorit. Öppna sidor, favoriter och inloggningar finns kvar.",
@@ -235,7 +251,8 @@ export const sv: Messages = {
     "Inget här ännu. Lägg till en favorit nedan, eller stjärnmärk ett recept.",
   "favorites.more": "Fler favoriter · {count}",
   "favorites.moreLocked": "Fler favoriter",
-  "favorites.add": "Lägg till favorit",
+  "favorites.custom": "Egen favorit",
+  "favorites.addFromRecipes": "Lägg till från recept",
   "favorites.quickFull": "Snabbåtkomst är full, så den här läggs till under Fler favoriter.",
   "favorites.openRecipe": "Öppna receptet",
   "favorites.edit": "Redigera {name}",

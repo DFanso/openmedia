@@ -10,9 +10,9 @@ import {
   policyForHost,
   policyForSection,
   sectionUsageSeconds,
-  usageLimitForTarget,
   usageSeconds,
   useUsageControl,
+  type UsagePolicy,
 } from "./policy";
 import { usageTargetOf } from "./section";
 import { nameForHost, SiteBadge, useFavorites } from "./SiteBadge";
@@ -26,7 +26,7 @@ function rememberWarning(
   section: string | null,
   threshold: number,
 ): boolean {
-  const key = `${host}:${section ?? "*"}:${threshold}`;
+  const key = `${host}:${section ?? ""}:${threshold}`;
   try {
     const saved: { day: string; keys: string[] } = JSON.parse(
       localStorage.getItem("om.usage.warnings") ?? "null",
@@ -44,30 +44,28 @@ function useNow(intervalMs: number): Date {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), intervalMs);
-    return () => window.clearInterval(timer);
+    return () => window.clearTimeout(timer);
   }, [intervalMs]);
   return now;
 }
 
+interface NoticeProps {
+  host: string;
+  /** The part of the site the notice is about; `null` for the site itself. */
+  section: string | null;
+  spent: number;
+  policy: UsagePolicy | undefined;
+  /** Whether the part is over its limit, so its time stops counting. */
+  reached: boolean;
+}
+
 /** The heads-up shown over the page: how long today, how long is left, and a way to adjust it. */
-function TimeCheck({ host, section }: { host: string; section: string | null }) {
+function TimeCheck({ host, section, spent, policy, reached }: NoticeProps) {
   const t = useT();
   const favorites = useFavorites();
-  const policies = useUsageControl((s) => s.policies);
-  const sectionPolicies = useUsageControl((s) => s.sectionPolicies);
-  const totals = useUsageControl((s) => s.seconds);
-  const sectionTotals = useUsageControl((s) => s.sectionSeconds);
-  const policy =
-    section === null
-      ? policyForHost(policies, host)
-      : policyForSection(sectionPolicies, host, section);
-  const spent =
-    section === null
-      ? usageSeconds(totals, host)
-      : sectionUsageSeconds(sectionTotals, host, section);
   const status = limitStatus(policy, spent);
   const name = nameForHost(host, favorites);
-  const targetName = section === null ? name : `${name} · ${sectionLabel(section, t)}`;
+  const part = section === null ? null : sectionLabel(section, t);
   return (
     <div
       data-hit=""
@@ -78,15 +76,19 @@ function TimeCheck({ host, section }: { host: string; section: string | null }) 
         <SiteBadge host={host} name={name} />
         <div className="min-w-0 flex-1">
           <p className="truncate text-base font-semibold">
-            {t("usage.timeCheck", { host: targetName })}
+            {part === null
+              ? t("usage.timeCheck", { host: name })
+              : t("usage.partTimeCheck", { part, host: name })}
           </p>
           <p className="text-sm text-paper/70 tabular-nums">
-            {status.untilLimit === null
-              ? t("usage.todayValue", { value: formatDuration(Math.floor(spent), t) })
-              : t("usage.pausesIn", {
-                  value: formatDuration(Math.floor(spent), t),
-                  left: formatDuration(status.untilLimit, t),
-                })}
+            {reached
+              ? t("usage.partLimitReached", { part: part ?? name, host: name })
+              : status.untilLimit === null
+                ? t("usage.todayValue", { value: formatDuration(Math.floor(spent), t) })
+                : t("usage.pausesIn", {
+                    value: formatDuration(Math.floor(spent), t),
+                    left: formatDuration(status.untilLimit, t),
+                  })}
           </p>
         </div>
       </div>
@@ -115,22 +117,13 @@ function TimeCheck({ host, section }: { host: string; section: string | null }) 
   );
 }
 
-/** Covers every live session matching an exhausted target and says when it opens again. */
-function LimitReached({
-  host,
-  section,
-  seconds,
-}: {
-  host: string;
-  section: string | null;
-  seconds: number;
-}) {
+/** Covers the paused site's page and says when it opens again. */
+function LimitReached({ host, seconds }: { host: string; seconds: number }) {
   const t = useT();
   const favorites = useFavorites();
   const openSheet = useApp((state) => state.openSheet);
   const now = useNow(30_000);
   const name = nameForHost(host, favorites);
-  const targetName = section === null ? name : `${name} · ${sectionLabel(section, t)}`;
   return (
     <div
       data-hit=""
@@ -147,7 +140,7 @@ function LimitReached({
         <h1 className="mt-4 text-xl font-semibold">{t("usage.limitReached")}</h1>
         <p className="mt-2 break-words text-sm leading-relaxed text-paper/70">
           {t("usage.pausedNotice", {
-            name: targetName,
+            name,
             value: formatDuration(Math.floor(seconds), t),
             left: formatDuration(secondsUntilMidnight(now), t),
           })}
@@ -155,7 +148,7 @@ function LimitReached({
         <div className="mt-5 flex flex-col gap-2">
           <button
             type="button"
-            onClick={() => openLimits(host, section ?? undefined)}
+            onClick={() => openLimits(host)}
             className={`${primaryButton} py-3`}
           >
             {t("usage.adjust")}
@@ -173,42 +166,36 @@ function LimitReached({
   );
 }
 
-/** Whether today's limit has closed the current site or section in front. */
+/** Whether today's limit has closed the page in front, and the figures that decided it. */
 export function useLimitBlock() {
   const control = useUsageControl();
   const page = useApp(selectPage);
   const isPro = useEntitlementStore((state) => state.status === "pro");
-  const target = page ? usageTargetOf(page.url ?? page.openedUrl, page.scope) : null;
-  const limit =
-    control.ready && target
-      ? usageLimitForTarget(
-          control.policies,
-          control.sectionPolicies,
-          control.seconds,
-          control.sectionSeconds,
-          target,
-        )
-      : undefined;
-  return {
-    control,
-    isPro,
-    target,
-    host: target?.host,
-    seconds: limit?.seconds ?? 0,
-    section: limit?.section ?? null,
-    blocked: isPro && control.ready && limit !== undefined,
-  };
+  const host = page ? usageTargetOf(page.url ?? page.openedUrl, page.scope)?.host : undefined;
+  const seconds = host ? usageSeconds(control.seconds, host) : 0;
+  const policy = host ? policyForHost(control.limits.sites, host) : undefined;
+  const blocked = isPro && control.ready && limitReached(policy, seconds);
+  return { control, isPro, host, seconds, policy, blocked };
 }
 
 export function UsageGuard() {
-  const { control, isPro, target, host, seconds, section, blocked } = useLimitBlock();
+  const { control, isPro, host, seconds, policy, blocked } = useLimitBlock();
   const sessions = useApp((state) => state.sessions);
   const sheet = useApp((state) => state.sheet);
   const onboarding = useApp((state) => state.onboardingOpen);
   const reportError = useApp((state) => state.reportError);
+  const page = useApp(selectPage);
   const requested = useRef(new Map<string, boolean>());
   const queues = useRef(new Map<string, Promise<unknown>>());
   const warned = useRef(new Set<string>());
+
+  const target = page?.url ? usageTargetOf(page.url ?? page.openedUrl, page.scope) : null;
+  const partPolicy = target
+    ? policyForSection(control.limits.sections, target.host, target.section)
+    : undefined;
+  const partSpent = target
+    ? sectionUsageSeconds(control.sectionSeconds, target.host, target.section)
+    : 0;
 
   useEffect(() => {
     if (!control.ready) return;
@@ -224,13 +211,10 @@ export function UsageGuard() {
       const shouldBlock =
         isPro &&
         !!sessionTarget &&
-        usageLimitForTarget(
-          control.policies,
-          control.sectionPolicies,
-          control.seconds,
-          control.sectionSeconds,
-          sessionTarget,
-        ) !== undefined;
+        limitReached(
+          policyForHost(control.limits.sites, sessionTarget.host),
+          usageSeconds(control.seconds, sessionTarget.host),
+        );
       const previous = requested.current.get(session.id);
       if (previous === shouldBlock || (previous === undefined && !shouldBlock)) continue;
       requested.current.set(session.id, shouldBlock);
@@ -245,57 +229,55 @@ export function UsageGuard() {
     }
   }, [control, sessions, reportError, isPro]);
 
-  const sitePolicy = target ? policyForHost(control.policies, target.host) : undefined;
-  const siteSeconds = target ? usageSeconds(control.seconds, target.host) : 0;
-  const partPolicy = target
-    ? policyForSection(control.sectionPolicies, target.host, target.section)
-    : undefined;
-  const partSeconds = target
-    ? sectionUsageSeconds(control.sectionSeconds, target.host, target.section)
-    : 0;
-  const warning = target
-    ? [
-        { policy: sitePolicy, seconds: siteSeconds, section: null },
-        { policy: partPolicy, seconds: partSeconds, section: target.section },
-      ].find(
-        (candidate) =>
-          candidate.policy?.warnSeconds != null &&
-          candidate.seconds >= candidate.policy.warnSeconds &&
-          !limitReached(candidate.policy, candidate.seconds),
-      )
-    : undefined;
-
   useEffect(() => {
-    const threshold = warning?.policy?.warnSeconds;
-    if (
-      !isPro ||
-      sheet !== "none" ||
-      onboarding ||
-      document.visibilityState !== "visible" ||
-      !control.ready ||
-      !host ||
-      !warning ||
-      threshold == null ||
-      blocked
-    )
-      return;
-    const key = `${control.day}:${host}:${warning.section ?? "*"}:${threshold}`;
+    if (!control.ready || !target) return;
+    if (!isPro || sheet !== "none" || onboarding || document.visibilityState !== "visible") return;
+    const part = partPolicy;
+    const site = policy;
+    // The part's own limit comes first: it is the tighter of the two.
+    const notice =
+      part?.limitSeconds != null && partSpent >= part.limitSeconds
+        ? {
+            section: target.section,
+            threshold: part.limitSeconds,
+            reached: true,
+            spent: partSpent,
+          }
+        : part?.warnSeconds != null && partSpent >= part.warnSeconds
+          ? {
+              section: target.section,
+              threshold: part.warnSeconds,
+              reached: false,
+              spent: partSpent,
+            }
+          : site?.warnSeconds != null && seconds >= site.warnSeconds
+            ? { section: null, threshold: site.warnSeconds, reached: false, spent: seconds }
+            : null;
+    if (!notice) return;
+    const key = `${control.day}:${target.host}:${notice.section ?? ""}:${notice.threshold}`;
     if (warned.current.has(key)) return;
     warned.current.add(key);
-    if (rememberWarning(control.day, host, warning.section, threshold)) {
+    if (rememberWarning(control.day, target.host, notice.section, notice.threshold)) {
       useUsageControl.setState({
-        warning: { host, section: warning.section, seconds: warning.seconds },
+        warning: {
+          host: target.host,
+          section: notice.section,
+          seconds: notice.spent,
+          reached: notice.reached,
+        },
       });
     }
   }, [
     isPro,
     control.ready,
     control.day,
-    host,
-    target?.section,
-    warning?.policy?.warnSeconds,
-    warning?.section,
-    warning?.seconds,
+    control.limits,
+    control.sectionSeconds,
+    target,
+    partPolicy,
+    policy,
+    partSpent,
+    seconds,
     blocked,
     sheet,
     onboarding,
@@ -307,18 +289,23 @@ export function UsageGuard() {
     return () => window.clearTimeout(timer);
   }, [control.warning]);
 
-  const warningMatchesPage =
-    control.warning !== null &&
-    control.warning.host === host &&
-    (control.warning.section === null || control.warning.section === target?.section);
+  const warning = control.warning;
   return (
     <>
-      {control.warning && warningMatchesPage && !blocked && sheet === "none" && (
-        <TimeCheck host={control.warning.host} section={control.warning.section} />
+      {warning && !blocked && sheet === "none" && (
+        <TimeCheck
+          host={warning.host}
+          section={warning.section}
+          spent={warning.seconds}
+          policy={
+            warning.section === null
+              ? policyForHost(control.limits.sites, warning.host)
+              : policyForSection(control.limits.sections, warning.host, warning.section)
+          }
+          reached={warning.reached}
+        />
       )}
-      {blocked && sheet === "none" && host && (
-        <LimitReached host={host} section={section} seconds={seconds} />
-      )}
+      {blocked && sheet === "none" && host && <LimitReached host={host} seconds={seconds} />}
     </>
   );
 }
