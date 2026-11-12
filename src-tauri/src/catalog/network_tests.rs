@@ -506,7 +506,6 @@ fn onboarding_rejects_too_many_duplicate_or_unlisted_picks_without_a_request() {
 fn onboarding_installs_picks_and_favorites_only_what_installed() {
     let (routes, keys) = catalog_routes(&["youtube", "reddit", "instagram"], &["reddit"]);
     let f = fixture(routes, &keys);
-    let before = f.library.favorites().unwrap();
     let free = FakeAccount::new(false, None);
 
     let picks = ids(&["youtube", "reddit", "market-missing"]);
@@ -530,7 +529,6 @@ fn onboarding_installs_picks_and_favorites_only_what_installed() {
     );
     assert_eq!(favorites[0].name, "YouTube");
     assert_eq!(favorites[0].url, "https://www.youtube.com/");
-    assert_ne!(favorites.len(), before.len());
 }
 
 #[test]

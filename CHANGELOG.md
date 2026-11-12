@@ -8,6 +8,13 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-12
 
+### feat(onboarding): a new library starts with Google only, and Google is the default search engine
+
+**Area:** `feat(onboarding)`
+
+**Change:** A person who picks nothing in the guide no longer gets Instagram, Facebook, Twitter, Reddit and YouTube as favorites. A new library holds one favorite, Google, which is also the page the app opens first, and the default search engine is Google instead of DuckDuckGo. Libraries that already exist keep their favorites and their search engine (a saved library always records its engine). The version 2 upgrade still recognises the four original favorites.
+
+
 ### fix(media): the app no longer hangs on the splash on iOS
 
 **Area:** `fix(media)`

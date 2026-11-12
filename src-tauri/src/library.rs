@@ -30,13 +30,18 @@ pub const MAX_BOTTOM_MARGIN: u32 = 200;
 const ICON_PREFIX: &str = "data:image/png;base64,";
 
 const YOUTUBE_FAVORITE: (&str, &str) = ("YouTube", "https://m.youtube.com/");
-const DEFAULT_FAVORITES: [(&str, &str); 5] = [
+/// The four favorites a version 2 library started with. Only the upgrade to version 3 reads them,
+/// to recognise a library that was never changed.
+const VERSION_2_FAVORITES: [(&str, &str); 4] = [
     ("Instagram", "https://www.instagram.com/"),
     ("Facebook", "https://www.facebook.com/"),
     ("Twitter", "https://twitter.com/"),
     ("Reddit", "https://www.reddit.com/"),
-    YOUTUBE_FAVORITE,
 ];
+
+/// What a new library holds when the person picks nothing in the guide: the default search
+/// engine, so the app opens on a page and the quick-access menu has one entry.
+const DEFAULT_FAVORITES: [(&str, &str); 1] = [("Google", "https://www.google.com/")];
 
 /// How many favorites a free user can have; more needs Pro. Mirrors `FREE_QUICK_ACCESS_LIMIT` in
 /// the shell, which shows the Pro slots grayed out.
@@ -47,7 +52,7 @@ pub const FREE_FAVORITE_LIMIT: usize = 4;
 pub const PRO_FAVORITE_LIMIT: usize = 6;
 
 /// True when saving `new` favorites over `current` grows the list past what a free user may have.
-/// A list already longer than the limit (Pro lapsed, or the five defaults) can still shrink, be
+/// A list already longer than the limit (Pro lapsed) can still shrink, be
 /// reordered or edited; it just cannot grow.
 pub fn favorites_need_pro(current: usize, new: usize) -> bool {
     new > FREE_FAVORITE_LIMIT && new > current
@@ -67,8 +72,8 @@ pub enum Theme {
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum SearchEngine {
-    #[default]
     DuckDuckGo,
+    #[default]
     Google,
     Bing,
     Brave,
@@ -195,7 +200,7 @@ struct LibraryData {
     /// The shell owns the list of languages, so an unknown tag is kept but never used.
     #[serde(default)]
     locale: Option<String>,
-    /// DuckDuckGo until the user picks another.
+    /// Google until the user picks another.
     #[serde(default)]
     search_engine: SearchEngine,
 }
@@ -670,7 +675,7 @@ fn parse(text: &str) -> Result<(LibraryData, bool)> {
     let mut data: LibraryData = serde_json::from_str(text)?;
     match data.version {
         2 => {
-            let previous_defaults = &DEFAULT_FAVORITES[..4];
+            let previous_defaults = &VERSION_2_FAVORITES;
             if data.favorites.len() == previous_defaults.len()
                 && data
                     .favorites
@@ -721,7 +726,7 @@ fn default_data() -> LibraryData {
         history: Vec::new(),
         ai: AiSettings::default(),
         locale: None,
-        search_engine: SearchEngine::DuckDuckGo,
+        search_engine: SearchEngine::Google,
         incognito_site_options: OptionChoices::new(),
         incognito_favorites: Vec::new(),
     }
@@ -795,17 +800,17 @@ mod tests {
         }
     }
 
-    #[test]
-    fn youtube_is_available_as_a_favorite_on_first_run() {
-        let (_dir, library) = library();
-        let youtube = library
-            .state()
-            .unwrap()
-            .favorites
-            .into_iter()
-            .find(|favorite| favorite.url == "https://m.youtube.com/")
-            .expect("YouTube favorite");
-        assert_eq!(youtube.name, "YouTube");
+    fn version_2_favorites() -> Vec<Favorite> {
+        VERSION_2_FAVORITES
+            .iter()
+            .map(|(name, url)| Favorite {
+                id: Uuid::new_v4(),
+                name: (*name).to_owned(),
+                url: (*url).to_owned(),
+                icon: None,
+                notify: true,
+            })
+            .collect()
     }
 
     #[test]
@@ -814,7 +819,7 @@ mod tests {
         let path = dir.path().join("library.json");
         let mut saved = default_data();
         saved.version = 2;
-        saved.favorites.pop();
+        saved.favorites = version_2_favorites();
         let originals = saved.favorites.clone();
         let profile = saved.profile_id;
         fs::write(&path, serde_json::to_vec(&saved).unwrap()).unwrap();
@@ -829,7 +834,7 @@ mod tests {
 
     #[test]
     fn upgrading_does_not_change_custom_or_empty_favorites() {
-        let original = default_data().favorites[..4].to_vec();
+        let original = version_2_favorites();
         let mut reordered = original.clone();
         reordered.swap(0, 1);
         let mut renamed = original.clone();
@@ -927,7 +932,7 @@ mod tests {
         let (_dir, library) = library();
         assert_eq!(
             library.start_url().unwrap().as_deref(),
-            Some("https://www.instagram.com/")
+            Some("https://www.google.com/")
         );
         library.set_last_url("https://m.youtube.com/feed").unwrap();
         assert_eq!(
@@ -948,8 +953,17 @@ mod tests {
         fs::write(&path, serde_json::to_vec(&saved).unwrap()).unwrap();
         assert_eq!(
             Library::load(path).unwrap().start_url().unwrap().as_deref(),
-            Some("https://www.instagram.com/")
+            Some("https://www.google.com/")
         );
+    }
+
+    #[test]
+    fn a_new_library_has_only_the_default_search_engine_as_a_favorite() {
+        let (_dir, library) = library();
+        let favorites = library.state().unwrap().favorites;
+        assert_eq!(favorites.len(), 1);
+        assert_eq!(favorites[0].name, "Google");
+        assert_eq!(favorites[0].url, "https://www.google.com/");
     }
 
     #[test]
@@ -1055,12 +1069,9 @@ mod tests {
     }
 
     #[test]
-    fn the_search_engine_defaults_to_duckduckgo_and_the_choice_persists() {
+    fn the_search_engine_defaults_to_google_and_the_choice_persists() {
         let (dir, library) = library();
-        assert_eq!(
-            library.state().unwrap().search_engine,
-            SearchEngine::DuckDuckGo
-        );
+        assert_eq!(library.state().unwrap().search_engine, SearchEngine::Google);
         library.set_search_engine(SearchEngine::Brave).unwrap();
         assert_eq!(
             reload(&dir).state().unwrap().search_engine,
@@ -1133,6 +1144,9 @@ mod tests {
     #[test]
     fn icons_are_cached_by_host_and_shown_on_matching_favorites() {
         let (dir, library) = library();
+        library
+            .set_favorites(vec![input("Reddit", "https://www.reddit.com/")])
+            .unwrap();
         let urls = vec!["https://www.reddit.com/".to_owned()];
         assert!(
             library
@@ -1163,6 +1177,9 @@ mod tests {
     #[test]
     fn one_icon_serves_every_host_of_the_same_site() {
         let (_dir, library) = library();
+        library
+            .set_favorites(vec![input("Reddit", "https://www.reddit.com/")])
+            .unwrap();
         library
             .set_icon("reddit.com", "data:image/png;base64,AAAA")
             .unwrap();
@@ -1208,6 +1225,9 @@ mod tests {
     #[test]
     fn a_favorites_icon_survives_clearing_the_history() {
         let (_dir, library) = library();
+        library
+            .set_favorites(vec![input("Reddit", "https://www.reddit.com/")])
+            .unwrap();
         library
             .set_icon("www.reddit.com", "data:image/png;base64,AAAA")
             .unwrap();
