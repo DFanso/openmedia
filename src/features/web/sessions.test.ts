@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { SiteSettings } from "../../shared/ipc";
 import {
   IDLE_LIMIT_MS,
   MAX_SESSIONS,
@@ -7,6 +8,7 @@ import {
   findTypedSession,
   newSession,
   scopeCovers,
+  sessionForFavorite,
   sessionsToClose,
   startSource,
   type Session,
@@ -269,5 +271,37 @@ describe("startSource", () => {
   it("restores any other page as a plain restored session", () => {
     expect(startSource(favorites, "https://example.com/")).toBe("restored");
     expect(startSource([], "https://www.instagram.com/")).toBe("restored");
+  });
+});
+
+describe("a hub's quick-access favorite", () => {
+  const sites: SiteSettings[] = [
+    {
+      recipeId: "messages",
+      name: "Messages Hub",
+      homepage: "https://web.whatsapp.com/",
+      favorite: true,
+      options: [],
+      bottomMargin: null,
+      origin: "user",
+      hub: { tabs: [{ label: "WhatsApp", url: "https://web.whatsapp.com/" }] },
+    },
+  ];
+  const inbox = () => session("inbox", "hub", { scope: "whatsapp.com", hubId: "messages" });
+  const favorites = [{ url: "https://web.whatsapp.com/" }];
+
+  it("finds the hub session, not a plain page of the same site", () => {
+    const plain = session("plain", "favorite", { scope: "whatsapp.com" });
+    expect(sessionForFavorite([plain, inbox()], favorites[0].url, sites)?.id).toBe("inbox");
+  });
+
+  it("keeps the hub session from the idle sweep", () => {
+    const idle = { ...inbox(), lastUsed: NOW - IDLE_LIMIT_MS - 1 };
+    expect(sessionsToClose([idle, session("v", "typed")], "v", NOW, "routine", favorites)).toEqual([
+      "inbox",
+    ]);
+    expect(
+      sessionsToClose([idle, session("v", "typed")], "v", NOW, "routine", favorites, sites),
+    ).toEqual([]);
   });
 });

@@ -580,6 +580,7 @@ export const useApp = create<AppStore>((set, get) => {
         Date.now(),
         pressure,
         selectUsableQuickFavorites(get()),
+        get().sites,
       );
       if (doomed.length === 0) return;
       doomed.forEach((id) => void siteView.close(id).catch(() => {}));
