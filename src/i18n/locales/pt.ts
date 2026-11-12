@@ -134,6 +134,20 @@ export const pt: Messages = {
   "usage.remindAtHint": "Um aviso enquanto ainda dá tempo de concluir.",
   "usage.sliderLimit": "Limite diário de {host}",
   "usage.sliderReminder": "Lembrete de {host}",
+  "usage.partsTitle": "Partes deste site",
+  "usage.partSetLimit": "Definir um limite para esta parte",
+  "usage.partChangeLimit": "Alterar o limite desta parte",
+  "usage.partLimitLabel": "Limite diário para {part} em {host}",
+  "usage.partReminderLabel": "Lembrete para {part} em {host}",
+  "usage.partStopAfter": "Parar de contar depois de",
+  "usage.partPresetsHint":
+    "Escolha um limite diário. Recebe um lembrete antes e, quando o limite for atingido, o tempo aqui deixa de ser contado.",
+  "usage.partStopAfterHint":
+    "O tempo nesta parte deixa de ser contado até à meia-noite. O resto do site continua aberto.",
+  "usage.partTimeCheck": "Controlo de tempo: {part} em {host}",
+  "usage.partLimitReached":
+    "{part} em {host} ultrapassou o limite diário. O tempo aqui já não é contado.",
+  "usage.partStatusReached": "Limite atingido. O tempo aqui já não é contado.",
   "usage.saveHint":
     "As alterações são salvas ao soltar. O tempo conta enquanto o site está na tela e zera à meia-noite.",
 
@@ -198,6 +212,8 @@ export const pt: Messages = {
   "settings.bottomMarginLabel": "Margem inferior para todos os sites",
   "settings.accessibility": "Acessibilidade",
   "guides.read": "Ler o guia",
+  "guides.makeRecipe": "Criar uma receita",
+  "guides.customizeSite": "Personalizar um site",
   "settings.data": "Dados e ajuda",
   "settings.dataNote":
     "O histórico são os endereços que você pesquisou e fica apenas neste dispositivo. Limpar o histórico também apaga a última página, então o app inicia no seu primeiro favorito. Páginas abertas, favoritos e logins são mantidos.",
@@ -239,7 +255,8 @@ export const pt: Messages = {
     "Ainda não há nada aqui. Adicione um favorito abaixo ou marque uma receita com uma estrela.",
   "favorites.more": "Mais favoritos · {count}",
   "favorites.moreLocked": "Mais favoritos",
-  "favorites.add": "Adicionar favorito",
+  "favorites.custom": "Favorito personalizado",
+  "favorites.addFromRecipes": "Adicionar das receitas",
   "favorites.quickFull": "O acesso rápido está cheio, então este foi adicionado a Mais favoritos.",
   "favorites.openRecipe": "Abrir receita",
   "favorites.edit": "Editar {name}",

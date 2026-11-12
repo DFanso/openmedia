@@ -132,6 +132,20 @@ export const nl: Messages = {
   "usage.remindAtHint": "Een seintje terwijl je nog tijd hebt om af te ronden.",
   "usage.sliderLimit": "Dagelijkse limiet voor {host}",
   "usage.sliderReminder": "Herinnering voor {host}",
+  "usage.partsTitle": "Delen van deze site",
+  "usage.partSetLimit": "Een limiet instellen voor dit deel",
+  "usage.partChangeLimit": "Limiet van dit deel wijzigen",
+  "usage.partLimitLabel": "Daglimiet voor {part} op {host}",
+  "usage.partReminderLabel": "Herinnering voor {part} op {host}",
+  "usage.partStopAfter": "Stop met tellen na",
+  "usage.partPresetsHint":
+    "Kies een daglimiet. Je krijgt een herinnering ervoor, en zodra die bereikt is, wordt de tijd hier niet meer geteld.",
+  "usage.partStopAfterHint":
+    "De tijd in dit deel wordt tot middernacht niet meer geteld. De rest van de site blijft open.",
+  "usage.partTimeCheck": "Tijdcontrole: {part} op {host}",
+  "usage.partLimitReached":
+    "{part} op {host} heeft de daglimiet overschreden. De tijd hier wordt niet meer geteld.",
+  "usage.partStatusReached": "Limiet bereikt. De tijd hier wordt niet meer geteld.",
   "usage.saveHint":
     "Wijzigingen worden opgeslagen als je loslaat. De tijd telt zolang de site in beeld is en wordt om middernacht gereset.",
 
@@ -196,6 +210,8 @@ export const nl: Messages = {
   "settings.bottomMarginLabel": "Ondermarge voor alle sites",
   "settings.accessibility": "Toegankelijkheid",
   "guides.read": "Lees de gids",
+  "guides.makeRecipe": "Recept maken",
+  "guides.customizeSite": "Website aanpassen",
   "settings.data": "Gegevens en hulp",
   "settings.dataNote":
     "Geschiedenis bestaat uit de adressen waarnaar je hebt gezocht, alleen op dit apparaat bewaard. Als je die wist, vergeet de app ook de laatste pagina, zodat hij start op je eerste favoriet. Geopende pagina’s, favorieten en inloggegevens blijven bewaard.",
@@ -236,7 +252,8 @@ export const nl: Messages = {
     "Hier staat nog niets. Voeg hieronder een favoriet toe, of markeer een recept met een ster.",
   "favorites.more": "Meer favorieten · {count}",
   "favorites.moreLocked": "Meer favorieten",
-  "favorites.add": "Favoriet toevoegen",
+  "favorites.custom": "Aangepaste favoriet",
+  "favorites.addFromRecipes": "Toevoegen uit recepten",
   "favorites.quickFull": "Snelle toegang is vol, dus deze wordt toegevoegd aan Meer favorieten.",
   "favorites.openRecipe": "Recept openen",
   "favorites.edit": "{name} bewerken",

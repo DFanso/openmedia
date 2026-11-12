@@ -83,9 +83,10 @@ export function Fab() {
   const list = useMemo(() => quickSlots(favorites, isPro), [favorites, isPro]);
   const sessions = useApp((s) => s.sessions);
   const activeId = useApp((s) => s.activeId);
+  const sites = useApp((s) => s.sites);
   const unread = useMemo(
-    () => unreadByFavorite(sessions, usableQuickAccess(favorites, isPro), activeId),
-    [sessions, favorites, isPro, activeId],
+    () => unreadByFavorite(sessions, usableQuickAccess(favorites, isPro), activeId, sites),
+    [sessions, favorites, isPro, activeId, sites],
   );
   const anyUnread = unread.some((count) => count > 0);
   const resting = fabCenter(position.edge, position.yRatio * viewport.height, viewport, insets);

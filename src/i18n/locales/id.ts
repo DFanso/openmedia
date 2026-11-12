@@ -127,6 +127,20 @@ export const id: Messages = {
   "usage.remindAtHint": "Pemberitahuan saat masih ada waktu untuk menyelesaikan.",
   "usage.sliderLimit": "Batas harian untuk {host}",
   "usage.sliderReminder": "Pengingat untuk {host}",
+  "usage.partsTitle": "Bagian situs ini",
+  "usage.partSetLimit": "Atur batas untuk bagian ini",
+  "usage.partChangeLimit": "Ubah batas bagian ini",
+  "usage.partLimitLabel": "Batas harian untuk {part} di {host}",
+  "usage.partReminderLabel": "Pengingat untuk {part} di {host}",
+  "usage.partStopAfter": "Berhenti menghitung setelah",
+  "usage.partPresetsHint":
+    "Pilih batas harian. Anda mendapat pengingat sebelumnya, dan setelah batas tercapai, waktu di sini tidak dihitung lagi.",
+  "usage.partStopAfterHint":
+    "Waktu di bagian ini tidak dihitung lagi sampai tengah malam. Sisa situs tetap terbuka.",
+  "usage.partTimeCheck": "Pemeriksaan waktu: {part} di {host}",
+  "usage.partLimitReached":
+    "{part} di {host} melampaui batas hariannya. Waktu di sini tidak dihitung lagi.",
+  "usage.partStatusReached": "Batas tercapai. Waktu di sini tidak dihitung lagi.",
   "usage.saveHint":
     "Perubahan tersimpan saat Anda melepaskan. Waktu dihitung selama situs tampil di layar dan diatur ulang saat tengah malam.",
 
@@ -191,6 +205,8 @@ export const id: Messages = {
   "settings.bottomMarginLabel": "Margin bawah untuk semua situs",
   "settings.accessibility": "Aksesibilitas",
   "guides.read": "Baca panduan",
+  "guides.makeRecipe": "Buat resep",
+  "guides.customizeSite": "Sesuaikan situs",
   "settings.data": "Data dan bantuan",
   "settings.dataNote":
     "Riwayat adalah alamat yang pernah Anda cari, disimpan hanya di perangkat ini. Mengosongkannya juga melupakan halaman terakhir, jadi aplikasi mulai dari favorit pertama Anda. Halaman yang terbuka, favorit, dan login tetap ada.",
@@ -232,7 +248,8 @@ export const id: Messages = {
     "Belum ada apa-apa di sini. Tambahkan favorit di bawah, atau beri bintang pada resep.",
   "favorites.more": "Favorit lainnya · {count}",
   "favorites.moreLocked": "Favorit lainnya",
-  "favorites.add": "Tambah favorit",
+  "favorites.custom": "Favorit kustom",
+  "favorites.addFromRecipes": "Tambahkan dari resep",
   "favorites.quickFull": "Akses cepat sudah penuh, jadi yang ini ditambahkan ke Favorit lainnya.",
   "favorites.openRecipe": "Buka resep",
   "favorites.edit": "Ubah {name}",

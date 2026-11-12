@@ -1,12 +1,15 @@
 import { quickAccess } from "../../shared/favorites";
-import type { SiteViewState } from "../../shared/ipc";
+import { hubForFavorite } from "../../shared/hubs";
+import type { SiteSettings, SiteViewState } from "../../shared/ipc";
 
-/** Where a session came from: favorites, a hub tab, typed input, or restored app state. */
-export type SessionSource = "favorite" | "hub" | "typed" | "restored";
+/** Where a session came from: tapped from favorites, typed or picked from history, restored, or opened as a hub page. */
+export type SessionSource = "favorite" | "typed" | "restored" | "hub";
 
 export interface Session {
   id: string;
   source: SessionSource;
+  /** The hub recipe a hub session was opened from; null for every other session. */
+  hubId: string | null;
   /** The address the session was opened with. */
   openedUrl: string;
   /** The registrable domain the native side pinned the session to; unknown until it loads. */
@@ -27,10 +30,17 @@ export const MAX_SESSIONS = 5;
 /** Unprotected hidden pages idle longer than this are closed. */
 export const IDLE_LIMIT_MS = 20 * 60_000;
 
-export function newSession(id: string, source: SessionSource, url: string, now: number): Session {
+export function newSession(
+  id: string,
+  source: SessionSource,
+  url: string,
+  now: number,
+  hubId: string | null = null,
+): Session {
   return {
     id,
     source,
+    hubId,
     openedUrl: url,
     scope: null,
     url: null,
@@ -70,46 +80,42 @@ export function scopeCovers(scope: string, url: string): boolean {
   return host !== null && (host === scope || host.endsWith(`.${scope}`));
 }
 
-/** The live session on the requested site, preferring favorites then recent use. */
-function findSessionOnSite(
+/**
+ * The live session a favorite should switch to instead of opening again: one on the favorite's
+ * site, preferring sessions that came from a favorite and then the most recently used. A session
+ * whose domain is not known yet matches only the exact address it was opened with. Hub pages
+ * are sessions of their own: a favorite never switches to one (Instagram must not open the
+ * Messages Hub's inbox), and a page of a hub (`hubId`) switches only to a session of that same hub.
+ */
+export function findFavoriteSession(
   sessions: Session[],
-  url: string,
-  role: "site" | "favorite" | "hub",
+  favoriteUrl: string,
+  hubId: string | null = null,
 ): Session | undefined {
-  let found: Session | undefined;
-  for (const session of sessions) {
-    if (
-      (role === "favorite" && session.source === "hub") ||
-      (role === "hub" && session.source !== "hub") ||
-      !(session.scope ? scopeCovers(session.scope, url) : session.openedUrl === url)
-    ) {
-      continue;
-    }
-    if (
-      !found ||
-      (session.source === "favorite" && found.source !== "favorite") ||
-      ((session.source === "favorite") === (found.source === "favorite") &&
-        session.lastUsed > found.lastUsed)
-    ) {
-      found = session;
-    }
-  }
-  return found;
+  return sessions
+    .filter((s) => s.hubId === hubId)
+    .filter((s) => (s.scope ? scopeCovers(s.scope, favoriteUrl) : s.openedUrl === favoriteUrl))
+    .sort(
+      (a, b) =>
+        Number(b.source === "favorite") - Number(a.source === "favorite") ||
+        b.lastUsed - a.lastUsed,
+    )[0];
 }
 
-/** A live session a favorite can reuse; hub tabs stay separate even when they share its domain. */
-export function findFavoriteSession(sessions: Session[], favoriteUrl: string): Session | undefined {
-  return findSessionOnSite(sessions, favoriteUrl, "favorite");
-}
-
-/** A live session on the favorite's site, including one opened from a hub, for badge/retention. */
-export function findSiteSession(sessions: Session[], url: string): Session | undefined {
-  return findSessionOnSite(sessions, url, "site");
-}
-
-/** A live session for a hub tab, never an ordinary favorite on the same site. */
-export function findHubSession(sessions: Session[], tabUrl: string): Session | undefined {
-  return findSessionOnSite(sessions, tabUrl, "hub");
+/**
+ * The live session of a quick-access favorite. A favorite that stands for a hub (see
+ * `hubForFavorite`) belongs to that hub's session, so it is retained and badged like any other.
+ */
+export function sessionForFavorite(
+  sessions: Session[],
+  favoriteUrl: string,
+  sites: readonly SiteSettings[],
+): Session | undefined {
+  return findFavoriteSession(
+    sessions,
+    favoriteUrl,
+    hubForFavorite(sites, favoriteUrl)?.recipeId ?? null,
+  );
 }
 
 /**
@@ -146,13 +152,14 @@ export function sessionsToClose(
   now: number,
   pressure: Pressure,
   favorites: readonly { url: string }[],
+  sites: readonly SiteSettings[] = [],
 ): string[] {
   const hidden = sessions.filter((s) => s.id !== activeId);
   if (pressure === "memory") return hidden.map((s) => s.id);
 
   const retained = new Set<string>();
   for (const { url } of quickAccess(favorites)) {
-    const session = findSiteSession(sessions, url);
+    const session = sessionForFavorite(sessions, url, sites);
     if (session) retained.add(session.id);
   }
   const unprotected = hidden.filter((s) => !retained.has(s.id));

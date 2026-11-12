@@ -133,6 +133,20 @@ export const uk: Messages = {
   "usage.remindAtHint": "Попередження, поки ще є час завершити справи.",
   "usage.sliderLimit": "Денний ліміт для {host}",
   "usage.sliderReminder": "Нагадування для {host}",
+  "usage.partsTitle": "Частини цього сайту",
+  "usage.partSetLimit": "Задати ліміт для цієї частини",
+  "usage.partChangeLimit": "Змінити ліміт цієї частини",
+  "usage.partLimitLabel": "Денний ліміт для {part} на {host}",
+  "usage.partReminderLabel": "Нагадування для {part} на {host}",
+  "usage.partStopAfter": "Припинити рахувати через",
+  "usage.partPresetsHint":
+    "Виберіть денний ліміт. Ви отримаєте нагадування заздалегідь, а коли ліміт досягнуто, час тут перестане зараховуватися.",
+  "usage.partStopAfterHint":
+    "Час у цій частині не зараховується до опівночі. Решта сайту залишається відкритою.",
+  "usage.partTimeCheck": "Перевірка часу: {part} на {host}",
+  "usage.partLimitReached":
+    "{part} на {host} перевищив денний ліміт. Час тут більше не зараховується.",
+  "usage.partStatusReached": "Ліміт досягнуто. Час тут більше не зараховується.",
   "usage.saveHint":
     "Зміни зберігаються, коли ви відпускаєте повзунок. Час рахується, поки сайт на екрані, і скидається опівночі.",
 
@@ -197,6 +211,8 @@ export const uk: Messages = {
   "settings.bottomMarginLabel": "Нижнє поле для всіх сайтів",
   "settings.accessibility": "Доступність",
   "guides.read": "Читати посібник",
+  "guides.makeRecipe": "Створити рецепт",
+  "guides.customizeSite": "Налаштувати сайт",
   "settings.data": "Дані та довідка",
   "settings.dataNote":
     "Історія — це адреси, які ви шукали; вони зберігаються лише на цьому пристрої. Очищення забуває й останню сторінку, тож застосунок відкриває першу обрану сторінку. Відкриті сторінки, обране та входи в акаунти залишаються.",
@@ -237,7 +253,8 @@ export const uk: Messages = {
   "favorites.quickEmpty": "Тут поки порожньо. Додайте обране нижче або поставте зірку рецепту.",
   "favorites.more": "Ще обране · {count}",
   "favorites.moreLocked": "Ще обране",
-  "favorites.add": "Додати до обраного",
+  "favorites.custom": "Власний обранець",
+  "favorites.addFromRecipes": "Додати з рецептів",
   "favorites.quickFull": "Швидкий доступ заповнено, тож це додано до «Ще обраного».",
   "favorites.openRecipe": "Відкрити рецепт",
   "favorites.edit": "Редагувати {name}",

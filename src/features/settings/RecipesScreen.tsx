@@ -71,8 +71,8 @@ export function RecipesScreen() {
     <Screen title={t("recipes.title")} closeLabel={t("common.back")} onClose={closeSheet} back>
       <p className="px-1 pb-2 text-[13px] leading-snug text-paper/50">{t("recipes.note")}</p>
       <div className="flex flex-col items-start pb-3">
-        <GuideLink slug="your-recipe" />
-        <GuideLink slug="change-a-site" />
+        <GuideLink slug="your-recipe" labelKey="guides.makeRecipe" />
+        <GuideLink slug="change-a-site" labelKey="guides.customizeSite" />
       </div>
       {sites.length === 0 && (
         <div className="flex flex-col items-start gap-3 px-1">
@@ -180,7 +180,9 @@ function SiteOptions({ site }: { site: SiteSettings }) {
   return (
     <div className="flex flex-col gap-5 border-t border-hair px-3 py-4">
       <ImportedNotice site={site} />
-      {site.hub && site.hub.tabs.length > 0 && <HubPages hub={site.hub} onOpen={openHubTab} />}
+      {site.hub && site.hub.tabs.length > 0 && (
+        <HubPages hub={site.hub} onOpen={(url) => openHubTab(url, site.recipeId)} />
+      )}
       <OptionGroups
         site={site}
         onToggle={(optionId, enabled) => void setSiteOption(site.recipeId, optionId, enabled)}
@@ -246,9 +248,14 @@ function HubPages({ hub, onOpen }: { hub: Hub; onOpen: (url: string) => void }) 
 
 function IncognitoSiteOptions({ site }: { site: SiteSettings }) {
   const setIncognitoSiteOption = useApp((s) => s.setIncognitoSiteOption);
+  const openHubTab = useApp((s) => s.openHubTab);
 
   return (
     <div className="flex flex-col gap-5 border-t border-hair px-3 py-4">
+      <ImportedNotice site={site} incognito />
+      {site.hub && site.hub.tabs.length > 0 && (
+        <HubPages hub={site.hub} onOpen={(url) => openHubTab(url, site.recipeId)} />
+      )}
       <OptionGroups
         site={site}
         onToggle={(optionId, enabled) =>

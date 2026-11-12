@@ -135,6 +135,20 @@ export const it: Messages = {
   "usage.remindAtHint": "Un avviso quando c'è ancora tempo per concludere.",
   "usage.sliderLimit": "Limite giornaliero per {host}",
   "usage.sliderReminder": "Promemoria per {host}",
+  "usage.partsTitle": "Parti di questo sito",
+  "usage.partSetLimit": "Imposta un limite per questa parte",
+  "usage.partChangeLimit": "Cambia il limite di questa parte",
+  "usage.partLimitLabel": "Limite giornaliero per {part} su {host}",
+  "usage.partReminderLabel": "Promemoria per {part} su {host}",
+  "usage.partStopAfter": "Smetti di contare dopo",
+  "usage.partPresetsHint":
+    "Scegli un limite giornaliero. Ricevi un avviso prima, e una volta raggiunto il tempo qui non viene più contato.",
+  "usage.partStopAfterHint":
+    "Il tempo in questa parte non viene più contato fino a mezzanotte. Il resto del sito resta aperto.",
+  "usage.partTimeCheck": "Controllo del tempo: {part} su {host}",
+  "usage.partLimitReached":
+    "{part} su {host} ha superato il limite giornaliero. Qui il tempo non viene più contato.",
+  "usage.partStatusReached": "Limite raggiunto. Qui il tempo non viene più contato.",
   "usage.saveHint":
     "Le modifiche si salvano quando rilasci. Il tempo conta mentre il sito è sullo schermo e si azzera a mezzanotte.",
 
@@ -199,6 +213,8 @@ export const it: Messages = {
   "settings.bottomMarginLabel": "Margine inferiore per tutti i siti",
   "settings.accessibility": "Accessibilità",
   "guides.read": "Leggi la guida",
+  "guides.makeRecipe": "Crea una ricetta",
+  "guides.customizeSite": "Personalizza un sito",
   "settings.data": "Dati e assistenza",
   "settings.dataNote":
     "La cronologia è formata dagli indirizzi che hai cercato ed è conservata solo su questo dispositivo. Cancellarla dimentica anche l’ultima pagina, così l’app si apre sul primo preferito. Le pagine aperte, i preferiti e gli accessi restano.",
@@ -239,7 +255,8 @@ export const it: Messages = {
     "Qui non c’è ancora nulla. Aggiungi un preferito qui sotto oppure metti una ricetta tra i preferiti con la stella.",
   "favorites.more": "Altri preferiti · {count}",
   "favorites.moreLocked": "Altri preferiti",
-  "favorites.add": "Aggiungi preferito",
+  "favorites.custom": "Preferito personalizzato",
+  "favorites.addFromRecipes": "Aggiungi dalle ricette",
   "favorites.quickFull":
     "L’accesso rapido è pieno, quindi questo è stato aggiunto ad Altri preferiti.",
   "favorites.openRecipe": "Apri la ricetta",

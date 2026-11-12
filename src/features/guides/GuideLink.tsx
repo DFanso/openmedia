@@ -1,4 +1,5 @@
 import { appError, useApp } from "../../app/store";
+import type { MessageKey } from "../../i18n/messages";
 import { useT } from "../../i18n/useT";
 import { ForwardIcon } from "../../shared/icons";
 import { library } from "../../shared/ipc";
@@ -11,7 +12,13 @@ export type GuideSlug = "connect-ai" | "change-a-site" | "your-recipe" | "market
 export const guideUrl = (slug: GuideSlug): string => `${GUIDES_URL}${slug}/`;
 
 /** A quiet link that opens a guide from the website in the system browser, never in a page view. */
-export function GuideLink({ slug }: { slug: GuideSlug }) {
+export function GuideLink({
+  slug,
+  labelKey = "guides.read",
+}: {
+  slug: GuideSlug;
+  labelKey?: MessageKey;
+}) {
   const t = useT();
 
   return (
@@ -24,7 +31,7 @@ export function GuideLink({ slug }: { slug: GuideSlug }) {
       }}
       className="flex items-center gap-1 px-1 py-1 text-sm font-medium text-accent"
     >
-      {t("guides.read")}
+      {t(labelKey)}
       <span aria-hidden="true" className="rtl:-scale-x-100">
         <ForwardIcon />
       </span>

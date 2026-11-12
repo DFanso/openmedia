@@ -125,6 +125,19 @@ export const th: Messages = {
   "usage.remindAtHint": "แจ้งล่วงหน้าขณะที่ยังมีเวลาสรุปให้เสร็จ",
   "usage.sliderLimit": "ขีดจำกัดรายวันสำหรับ {host}",
   "usage.sliderReminder": "การเตือนสำหรับ {host}",
+  "usage.partsTitle": "ส่วนต่าง ๆ ของเว็บไซต์นี้",
+  "usage.partSetLimit": "ตั้งขีดจำกัดสำหรับส่วนนี้",
+  "usage.partChangeLimit": "เปลี่ยนขีดจำกัดของส่วนนี้",
+  "usage.partLimitLabel": "ขีดจำกัดรายวันของ {part} บน {host}",
+  "usage.partReminderLabel": "การแจ้งเตือนสำหรับ {part} บน {host}",
+  "usage.partStopAfter": "หยุดนับหลังจาก",
+  "usage.partPresetsHint":
+    "เลือกขีดจำกัดรายวัน คุณจะได้รับการแจ้งเตือนก่อน และเมื่อถึงขีดจำกัด เวลาที่นี่จะไม่ถูกนับอีกต่อไป",
+  "usage.partStopAfterHint":
+    "เวลาในส่วนนี้จะไม่ถูกนับอีกต่อไปจนถึงเที่ยงคืน ส่วนอื่นของเว็บไซต์ยังเปิดอยู่",
+  "usage.partTimeCheck": "ตรวจเวลา: {part} บน {host}",
+  "usage.partLimitReached": "{part} บน {host} เกินขีดจำกัดรายวันแล้ว เวลาที่นี่ไม่ถูกนับอีกต่อไป",
+  "usage.partStatusReached": "ถึงขีดจำกัดแล้ว เวลาที่นี่ไม่ถูกนับอีกต่อไป",
   "usage.saveHint":
     "บันทึกการเปลี่ยนแปลงเมื่อคุณปล่อยนิ้ว เวลาจะนับขณะที่เว็บไซต์แสดงอยู่บนหน้าจอ และรีเซ็ตตอนเที่ยงคืน",
 
@@ -183,6 +196,8 @@ export const th: Messages = {
   "settings.bottomMarginLabel": "ขอบล่างสำหรับทุกเว็บไซต์",
   "settings.accessibility": "การช่วยการเข้าถึง",
   "guides.read": "อ่านคู่มือ",
+  "guides.makeRecipe": "สร้างสูตร",
+  "guides.customizeSite": "ปรับแต่งเว็บไซต์",
   "settings.data": "ข้อมูลและความช่วยเหลือ",
   "settings.dataNote":
     "ประวัติคือที่อยู่ที่คุณค้นหา เก็บไว้เฉพาะบนอุปกรณ์นี้ การล้างประวัติจะลืมหน้าสุดท้ายด้วย แอปจึงเริ่มที่รายการโปรดแรกของคุณ หน้าที่เปิดอยู่ รายการโปรด และการเข้าสู่ระบบยังคงอยู่",
@@ -222,7 +237,8 @@ export const th: Messages = {
   "favorites.quickEmpty": "ยังไม่มีอะไรที่นี่ เพิ่มรายการโปรดด้านล่าง หรือกดดาวให้สูตร",
   "favorites.more": "รายการโปรดเพิ่มเติม · {count}",
   "favorites.moreLocked": "รายการโปรดเพิ่มเติม",
-  "favorites.add": "เพิ่มรายการโปรด",
+  "favorites.custom": "รายการโปรดที่กำหนดเอง",
+  "favorites.addFromRecipes": "เพิ่มจากสูตรอาหาร",
   "favorites.quickFull": "ทางลัดเต็มแล้ว รายการนี้จึงถูกเพิ่มในรายการโปรดเพิ่มเติม",
   "favorites.openRecipe": "เปิดสูตร",
   "favorites.edit": "แก้ไข {name}",

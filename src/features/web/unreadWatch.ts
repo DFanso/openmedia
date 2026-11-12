@@ -1,7 +1,8 @@
 import { quickAccess } from "../../shared/favorites";
 import type { Favorite } from "../../shared/ipc";
 import { unreadCount } from "../../shared/unread";
-import { findSiteSession, type Session } from "./sessions";
+import type { SiteSettings } from "../../shared/ipc";
+import { sessionForFavorite, type Session } from "./sessions";
 
 /** A page can rewrite its own title at will, so one session may raise a notification this often. */
 export const NOTIFY_MIN_GAP_MS = 30_000;
@@ -47,9 +48,10 @@ export function quickFavoriteOf(
   sessions: Session[],
   favorites: readonly Favorite[],
   sessionId: string,
+  sites: readonly SiteSettings[] = [],
 ): Favorite | undefined {
   return quickAccess(favorites).find(
-    (favorite) => findSiteSession(sessions, favorite.url)?.id === sessionId,
+    (favorite) => sessionForFavorite(sessions, favorite.url, sites)?.id === sessionId,
   );
 }
 
@@ -61,9 +63,10 @@ export function unreadByFavorite(
   sessions: Session[],
   favorites: readonly Favorite[],
   activeId: string | null,
+  sites: readonly SiteSettings[] = [],
 ): number[] {
   return quickAccess(favorites).map((favorite) => {
-    const session = findSiteSession(sessions, favorite.url);
+    const session = sessionForFavorite(sessions, favorite.url, sites);
     return session && session.id !== activeId ? unreadCount(session.title) : 0;
   });
 }

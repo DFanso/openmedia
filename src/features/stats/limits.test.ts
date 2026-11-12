@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
   LIMIT_STOPS,
+  limitedThings,
   limitSites,
   limitStatus,
   policyKeyFor,
   reconcile,
   secondsUntilMidnight,
+  siteParts,
   stopsFor,
   suggestedWarn,
   suggestHosts,
@@ -152,6 +154,43 @@ describe("limit sites", () => {
     const policies = { "example.com": { warnSeconds: null, limitSeconds: 60 } };
     expect(policyKeyFor(policies, "m.example.com")).toBe("example.com");
     expect(policyKeyFor(policies, "notexample.com")).toBe("notexample.com");
+  });
+});
+
+describe("parts of a site", () => {
+  it("lists the parts used recently and the ones that carry a limit", () => {
+    const sections = { "example.com": { "/watch": { warnSeconds: null, limitSeconds: 600 } } };
+    expect(siteParts("example.com", ["/", "/watch"], sections)).toEqual(["/", "/watch"]);
+    expect(siteParts("other.test", ["/"], sections)).toEqual(["/"]);
+  });
+
+  it("lists every limited site and part, closest to its limit first", () => {
+    const limits = {
+      sites: { "a.test": { warnSeconds: null, limitSeconds: 600 } },
+      sections: {
+        "b.test": { "/watch": { warnSeconds: null, limitSeconds: 60 } },
+      },
+    };
+    const things = limitedThings(
+      limits,
+      { "a.test": 300, "b.test": 30 },
+      { "b.test": { "/watch": 30 } },
+    );
+    expect(things.map((thing) => `${thing.host}${thing.section ?? ""}`)).toEqual([
+      "a.test",
+      "b.test/watch",
+    ]);
+    expect(things[1].spent).toBe(30);
+  });
+
+  it("leaves out the limits that are off", () => {
+    const things = limitedThings(
+      { sites: { "a.test": { warnSeconds: 60, limitSeconds: null } }, sections: {} },
+      { "a.test": 10 },
+      {},
+    );
+    expect(things).toHaveLength(1);
+    expect(things[0].status.state).toBe("ok");
   });
 });
 

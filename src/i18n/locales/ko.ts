@@ -130,6 +130,20 @@ export const ko: Messages = {
   "usage.remindAtHint": "마무리할 시간이 남아 있을 때 미리 알려 드립니다.",
   "usage.sliderLimit": "{host}의 일일 한도",
   "usage.sliderReminder": "{host}의 알림",
+  "usage.partsTitle": "이 사이트의 섹션",
+  "usage.partSetLimit": "이 섹션의 한도 설정",
+  "usage.partChangeLimit": "이 섹션의 한도 변경",
+  "usage.partLimitLabel": "{host}의 {part} 일일 한도",
+  "usage.partReminderLabel": "{host}의 {part} 알림",
+  "usage.partStopAfter": "이 시간이 지나면 집계 중지",
+  "usage.partPresetsHint":
+    "일일 한도를 고르세요. 전에 알림이 오고, 한도에 도달하면 이곳의 시간은 집계되지 않습니다.",
+  "usage.partStopAfterHint":
+    "이 섹션의 시간은 자정까지 집계되지 않습니다. 사이트의 나머지 부분은 계속 열려 있습니다.",
+  "usage.partTimeCheck": "시간 확인: {host}의 {part}",
+  "usage.partLimitReached":
+    "{host}의 {part}가 일일 한도를 넘었습니다. 이곳의 시간은 더 이상 집계되지 않습니다.",
+  "usage.partStatusReached": "한도에 도달했습니다. 이곳의 시간은 더 이상 집계되지 않습니다.",
   "usage.saveHint":
     "손을 떼면 변경 사항이 저장됩니다. 시간은 사이트가 화면에 표시되는 동안 집계되며 자정에 초기화됩니다.",
 
@@ -191,6 +205,8 @@ export const ko: Messages = {
   "settings.bottomMarginLabel": "모든 사이트의 하단 여백",
   "settings.accessibility": "손쉬운 사용",
   "guides.read": "가이드 읽기",
+  "guides.makeRecipe": "레시피 만들기",
+  "guides.customizeSite": "사이트 맞춤 설정",
   "settings.data": "데이터 및 도움말",
   "settings.dataNote":
     "기록은 검색한 주소 목록으로, 이 기기에만 남습니다. 지우면 마지막 페이지도 함께 잊어버려 앱이 첫 즐겨찾기부터 시작합니다. 열어 둔 페이지, 즐겨찾기, 로그인은 그대로 유지됩니다.",
@@ -231,7 +247,8 @@ export const ko: Messages = {
     "아직 아무것도 없습니다. 아래에서 즐겨찾기를 추가하거나, 레시피에 별을 붙이세요.",
   "favorites.more": "즐겨찾기 더 보기 · {count}",
   "favorites.moreLocked": "즐겨찾기 더 보기",
-  "favorites.add": "즐겨찾기 추가",
+  "favorites.custom": "사용자 지정 즐겨찾기",
+  "favorites.addFromRecipes": "레시피에서 추가",
   "favorites.quickFull": "빠른 메뉴가 가득 차 이 항목은 즐겨찾기 더 보기로 추가되었습니다.",
   "favorites.openRecipe": "레시피 열기",
   "favorites.edit": "{name} 편집",
