@@ -12,6 +12,8 @@ export interface RulePreview {
 export interface OptionPreview {
   label: string;
   description: string;
+  /** The labels of a choice option's states, in order; empty for an on/off switch. */
+  choices: string[];
   onByDefault: boolean;
 }
 
@@ -41,8 +43,27 @@ export interface RecipePreview {
   tabs?: HubPreviewTab[];
 }
 
-/** Platform and origin tags are joined by the optional hub listing tag. */
-export type LibraryTag = "official" | "community" | "mobile" | "desktop" | "hub";
+/** The subject categories a bundled recipe can carry (`recipes/categories.json`). */
+export type CategoryTag =
+  | "ai"
+  | "archive"
+  | "education"
+  | "games"
+  | "music"
+  | "news"
+  | "podcasts"
+  | "productivity"
+  | "radio"
+  | "reference"
+  | "search"
+  | "shopping"
+  | "social"
+  | "tech"
+  | "travel"
+  | "video";
+
+/** Platform and origin tags are joined by subject categories and the optional hub listing tag. */
+export type LibraryTag = "official" | "community" | "mobile" | "desktop" | "hub" | CategoryTag;
 
 /** One bundled recipe, as the library lists it. */
 export interface LibraryItem {
@@ -52,7 +73,7 @@ export interface LibraryItem {
   author: string;
   summary: string;
   hosts: string[];
-  /** Platform tags plus one origin tag, and `hub` for hub recipes. Unknown tags are ignored by the shell. */
+  /** Platform tags, subject categories, one origin tag, and `hub` for hub recipes. Unknown tags are ignored by the shell. */
   tags: string[];
   homepage: string | null;
   installedVersion: string | null;

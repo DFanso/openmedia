@@ -5,9 +5,10 @@ use url::Url;
 
 use crate::error::{Error, Result};
 use crate::library::{Favorite, FavoriteInput};
-use crate::recipes::{Hub, OptionChoices, OptionGroup, Origin, Recipes};
+use crate::recipes::{Hub, OptionChoice, OptionChoices, OptionGroup, OptionValue, Origin, Recipes};
 
-/// One toggle as Settings shows it.
+/// One setting as Settings shows it. `choices` is empty for a switch, whose `value` and `default`
+/// are booleans; for a choice option they are ids from `choices`.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OptionView {
@@ -15,9 +16,10 @@ pub struct OptionView {
     pub label: String,
     pub description: String,
     pub group: OptionGroup,
-    pub enabled: bool,
+    pub choices: Vec<OptionChoice>,
+    pub value: OptionValue,
     #[serde(rename = "default")]
-    pub enabled_by_default: bool,
+    pub default_value: OptionValue,
 }
 
 /// A recipe as Settings shows it: its toggles with the user's choices applied, its
@@ -57,11 +59,11 @@ pub fn site_settings(
                     label: option.label.clone(),
                     description: option.description.clone(),
                     group: option.group,
-                    enabled: saved
-                        .and_then(|saved| saved.get(&option.id))
-                        .copied()
-                        .unwrap_or(option.enabled_by_default),
-                    enabled_by_default: option.enabled_by_default,
+                    choices: option.choices.clone(),
+                    value: option
+                        .current(saved.and_then(|saved| saved.get(&option.id)))
+                        .clone(),
+                    default_value: option.default_value.clone(),
                 })
                 .collect();
             options.sort_by_key(|option| option.group);
@@ -154,7 +156,7 @@ mod tests {
             assert!(
                 site.options
                     .iter()
-                    .all(|option| option.enabled == option.enabled_by_default)
+                    .all(|option| option.value == option.default_value)
             );
             assert_eq!(site.bottom_margin, None);
             assert!(!site.favorite);
@@ -189,18 +191,30 @@ mod tests {
         let recipes = Recipes::official_installed();
         let choices = OptionChoices::from([(
             "market.official.youtube".to_owned(),
-            [("shorts".to_owned(), true), ("open-app".to_owned(), false)].into(),
+            [
+                ("shorts".to_owned(), OptionValue::Toggle(true)),
+                ("open-app".to_owned(), OptionValue::Toggle(false)),
+            ]
+            .into(),
         )]);
         let sites = site_settings(&recipes, &choices, &BTreeMap::new(), &[]);
         let youtube = site(&sites, "market.official.youtube");
-        let state = |id: &str| youtube.options.iter().find(|o| o.id == id).unwrap().enabled;
-        assert!(state("shorts"));
-        assert!(!state("open-app"));
+        let state = |id: &str| {
+            youtube
+                .options
+                .iter()
+                .find(|o| o.id == id)
+                .unwrap()
+                .value
+                .clone()
+        };
+        assert_eq!(state("shorts"), OptionValue::Toggle(true));
+        assert_eq!(state("open-app"), OptionValue::Toggle(false));
         assert!(
             site(&sites, "market.official.instagram")
                 .options
                 .iter()
-                .all(|option| option.enabled == option.enabled_by_default)
+                .all(|option| option.value == option.default_value)
         );
     }
 
@@ -277,6 +291,7 @@ mod tests {
     #[test]
     fn every_homepage_belongs_to_its_own_site() {
         let recipes = Recipes::official_installed();
+        let mut stolen = Vec::new();
         for recipe in recipes.all() {
             // A hub opens pages that belong to other sites' recipes, so it owns no page itself.
             if recipe.hub.is_some() {
@@ -285,8 +300,15 @@ mod tests {
             let url = Url::parse(recipe.homepage().unwrap()).unwrap();
             // A hub may also cover the page, as a launcher; the site's own recipe still owns it.
             let owner = recipes.covering(&url).into_iter().find(|r| r.hub.is_none());
-            assert_eq!(owner.map(|r| r.id), Some(recipe.id));
+            if owner.as_ref().map(|r| &r.id) != Some(&recipe.id) {
+                stolen.push(format!(
+                    "{} is claimed by {:?}",
+                    recipe.id,
+                    owner.map(|r| r.id)
+                ));
+            }
         }
+        assert!(stolen.is_empty(), "{}", stolen.join("\n"));
     }
 
     #[test]
@@ -340,7 +362,11 @@ mod tests {
         ];
         let removed =
             with_site_favorite(&recipes, &favorites, "market.official.youtube", false).unwrap();
-        assert_eq!(urls(&removed), ["https://example.com/"]);
+        // YouTube Music is a site of its own, so it stays.
+        assert_eq!(
+            urls(&removed),
+            ["https://example.com/", "https://music.youtube.com/"]
+        );
     }
 
     #[test]

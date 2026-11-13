@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { isFavoriteSite, toggleSiteFavorite } from "../../shared/favorites";
 import { library } from "../../shared/ipc";
+import { offValue } from "../../shared/options";
 import { registrableDomain } from "../../shared/site";
 import { useApp } from "../../app/store";
 import { describeError } from "../../i18n/errors";
-import type { MessageKey } from "../../i18n/messages";
 import { useT } from "../../i18n/useT";
 import { SiteTile } from "../../shared/SiteTile";
 import {
@@ -25,6 +25,7 @@ import {
 } from "./ipc";
 import {
   FILTER_TAGS,
+  activeFilterCount,
   backTarget,
   defaultFilter,
   knownTags,
@@ -33,15 +34,9 @@ import {
   visibleItems,
   type LibraryView,
 } from "./logic";
+import { FilterDialog } from "./FilterDialog";
 import { RecipeReview } from "./RecipeReview";
-
-const TAG_LABELS: Record<LibraryTag, MessageKey> = {
-  official: "library.tag.official",
-  community: "library.tag.community",
-  mobile: "library.tag.mobile",
-  desktop: "library.tag.desktop",
-  hub: "library.tag.hub",
-};
+import { TAG_LABELS } from "./tagLabels";
 
 const iconRequests = new Map<string, Promise<void>>();
 
@@ -107,6 +102,7 @@ function LibraryBody() {
           query={query}
           onQuery={setQuery}
           onToggleTag={(tag) => setFilter((current) => toggleTag(current, tag))}
+          onClearFilter={() => setFilter(new Set())}
           error={error}
           onRetry={() => {
             setError(null);
@@ -137,6 +133,7 @@ interface ListViewProps {
   query: string;
   onQuery: (query: string) => void;
   onToggleTag: (tag: LibraryTag) => void;
+  onClearFilter: () => void;
   error: string | null;
   onRetry: () => void;
   onOpen: (item: LibraryItem) => void;
@@ -148,12 +145,14 @@ function ListView({
   query,
   onQuery,
   onToggleTag,
+  onClearFilter,
   error,
   onRetry,
   onOpen,
 }: ListViewProps) {
   const t = useT();
   const items = listing ? visibleItems(listing.items, filter, query) : [];
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   return (
     <div className="flex flex-col gap-5">
@@ -199,7 +198,25 @@ function ListView({
             {t(TAG_LABELS[tag])}
           </button>
         ))}
+        <button
+          type="button"
+          onClick={() => setFiltersOpen(true)}
+          className="shrink-0 rounded-full border border-hair px-3.5 py-1.5 text-sm font-medium text-paper/75"
+        >
+          {t("library.filterButton")}
+          {activeFilterCount(filter) > 0 && ` (${activeFilterCount(filter)})`}
+        </button>
       </div>
+      {filtersOpen && listing && (
+        <FilterDialog
+          items={listing.items}
+          filter={filter}
+          query={query}
+          onToggleTag={onToggleTag}
+          onClear={onClearFilter}
+          onClose={() => setFiltersOpen(false)}
+        />
+      )}
       {listing && listing.items.length === 0 && (
         <p className="px-1 text-sm text-paper/55">{t("library.empty")}</p>
       )}
@@ -349,7 +366,7 @@ function DetailView({ item, onChanged }: DetailViewProps) {
     }
     if (!freshInstall) return;
     for (const option of site?.options ?? []) {
-      await library.setSiteOption(item.id, option.id, false, false);
+      await library.setSiteOption(item.id, option.id, offValue(option), false);
     }
   };
 

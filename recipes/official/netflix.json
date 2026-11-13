@@ -1,0 +1,185 @@
+{
+  "schema": 1,
+  "id": "market.official.netflix",
+  "name": "Netflix",
+  "version": "1.1.0",
+  "origin": "user",
+  "tags": [
+    "desktop",
+    "mobile"
+  ],
+  "match": [
+    "https://*.netflix.com/*"
+  ],
+  "options": [
+    {
+      "id": "cookie-banners",
+      "label": "Hide cookie banners",
+      "description": "Cookie-consent dialogs from the common consent platforms. The site may still lock scrolling.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "ads",
+      "label": "Hide ads",
+      "description": "Google ad slots and ad iframes.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "app-banners",
+      "label": "Hide app install banners",
+      "description": "The Smart App Banner and install-our-app strips.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "signup-forms",
+      "label": "Hide membership sign-up forms",
+      "description": "The \"Enter your email to create or restart your membership\" boxes on the landing page, at the top and above the footer.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "poster-art",
+      "label": "Poster and hero art",
+      "description": "Show, blur or hide the big hero picture and the Trending Now posters on the landing page.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "trending-row",
+      "label": "Hide the Trending Now row",
+      "description": "The numbered Top 10 row on the logged-out landing page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "faq-features",
+      "label": "Hide features and FAQ",
+      "description": "The feature cards (\"Enjoy on your TV\"...) and the Frequently Asked Questions block.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide the footer",
+      "description": "The contact, legal and language links at the bottom of the landing page.",
+      "group": "content",
+      "default": false
+    }
+  ],
+  "rules": [
+    {
+      "id": "cookie-banners",
+      "label": "Cookie consent dialogs",
+      "type": "hide",
+      "option": "cookie-banners",
+      "target": {
+        "css": "#onetrust-consent-sdk, #onetrust-banner-sdk, #CybotCookiebotDialog, #qc-cmp2-container, .fc-consent-root, #didomi-host, #usercentrics-root, #truste-consent-track, .osano-cm-window, .cc-window, #cookie-banner, #cookie-notice, #cookieBanner"
+      }
+    },
+    {
+      "id": "ad-slots",
+      "label": "Ad slots and ad iframes",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "ins.adsbygoogle, div[id^=\"div-gpt-ad\"], iframe[id^=\"google_ads_iframe\"], iframe[src*=\"doubleclick.net\"], iframe[src*=\"googlesyndication.com\"], div[data-google-query-id]"
+      }
+    },
+    {
+      "id": "app-banners",
+      "label": "App install banners",
+      "type": "hide",
+      "option": "app-banners",
+      "target": {
+        "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
+      }
+    },
+    {
+      "id": "signup-forms",
+      "label": "Sign-up email forms",
+      "type": "hide",
+      "option": "signup-forms",
+      "target": {
+        "css": "form[data-uia=\"email-form\"], [data-uia=\"footer-signup\"]"
+      }
+    },
+    {
+      "id": "art-blur",
+      "label": "Hero and Top 10 art",
+      "type": "css",
+      "option": "poster-art",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "[data-uia=\"hero-vlv\"] img, button[data-uia^=\"top-10-element-\"] span[style*=\"background-image\"]"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "art-hide",
+      "label": "Hero and Top 10 art",
+      "type": "hide",
+      "option": "poster-art",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "[data-uia=\"hero-vlv\"] img, button[data-uia^=\"top-10-element-\"] span[style*=\"background-image\"]"
+      }
+    },
+    {
+      "id": "trending-row",
+      "label": "Trending Now row",
+      "type": "hide",
+      "option": "trending-row",
+      "target": {
+        "css": "[data-uia=\"nmhp-top-10\"]"
+      }
+    },
+    {
+      "id": "faq-features",
+      "label": "Features and FAQ",
+      "type": "hide",
+      "option": "faq-features",
+      "target": {
+        "css": "[data-uia=\"nmhp-full-value-props\"], [data-uia=\"nmhp-faq\"]"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "[data-uia=\"footer\"]"
+      }
+    }
+  ],
+  "meta": {
+    "author": "OpenMedia",
+    "homepage": "https://www.netflix.com/",
+    "summary": "Netflix: hides sign-up forms on the landing page, blurs or hides poster art, can hide the Trending row, FAQ and footer",
+    "notes": "**Checked 2026-11-13**, logged out, headless Chrome, once with an iPhone UA and once with a desktop UA on https://www.netflix.com/ (it redirects to the regional landing page). Both UAs received the same responsive page, so one capture serves as both fixtures. Netflix does not show the logged-in catalogue to a logged-out visitor, so everything below is the marketing landing page only.\n\n- **Sign-up forms**: `form[data-uia=\"email-form\"]` 2 and `[data-uia=\"footer-signup\"]` 1 (LIVE). The Sign In link (`[data-uia=\"header-login-link\"]`) is never hidden.\n- **Poster and hero art**: `[data-uia=\"hero-vlv\"] img` 1 and `button[data-uia^=\"top-10-element-\"] span[style*=\"background-image\"]` 10 (LIVE); the posters are CSS background images, so only the box can be blurred.\n- **Trending row** `[data-uia=\"nmhp-top-10\"]` 1, **features and FAQ** `[data-uia=\"nmhp-full-value-props\"]` 1 and `[data-uia=\"nmhp-faq\"]` 1, **footer** `[data-uia=\"footer\"]` 1 (LIVE).\n\nNot verified (needs a login, which this project never uses): the browse page, the billboard trailer, Netflix Games rows, the title overlay when pausing, profiles. Community lists mention those, but no selector could be re-checked here, so none are included. Class names are hashed (`default-ltr-iqcdef-cache-...`) and are not used; selectors rely on `data-uia` values.",
+    "lastVerified": "2026-11-13"
+  }
+}
