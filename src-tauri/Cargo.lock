@@ -2883,7 +2883,7 @@ name = "openmedia"
 version = "0.1.0"
 dependencies = [
  "adblock",
- "base64 0.22.1",
+ "base64 0.23.1",
  "dotenvy",
  "flate2",
  "keyring",
@@ -4854,7 +4854,7 @@ dependencies = [
 name = "tauri-plugin-siteview"
 version = "0.1.0"
 dependencies = [
- "base64 0.22.1",
+ "base64 0.23.1",
  "block2",
  "image",
  "objc2",
