@@ -17,15 +17,16 @@ All notable changes to OpenMedia are documented here.
 **Verified:** `cargo test` (`ad_block`, `recipes`), Vitest (`youtubeAds.test.ts`). **Not verified:** on a device against live YouTube ads.
 
 **PR:** n/a
-### feat(tabs): the Tabs page lists the favorites beyond quick access
 
-**Area:** `feat(tabs)`
+### feat(favorites): the rest of the favorites get pages of their own
 
-**Change:** The Tabs page has a *More favorites* section under Quick access with every favorite past the first six, so all favorites can be opened from it. Without Pro the section is one locked row that opens the paywall, as in Settings. No new strings (`favorites.more`, `favorites.moreLocked` already exist in all locales).
+**Area:** `feat(favorites)`
 
-**Verified:** `tsc`, ESLint, Prettier, Vitest `src/features/tabs`. **Not verified:** the layout on a device or simulator.
+**Change:** There is no telling how many favorites someone has, so the lists no longer grow in place. The Tabs page shows quick access and, past the first six, a *More favorites · N* button to a Favorites page that lists every favorite of the set in use (the incognito one while incognito); without Pro the entries past the fourth are locked and open the paywall. In Settings the *More favorites* disclosure became a button to a page with the same editing (reorder, edit, remove), and the incognito favorites section has the same page, which is loaded on open and forgotten on close or when the app goes to the background like the incognito recipes page. The Tabs page now follows the incognito set while incognito. No new strings. Replaces the previous Tabs-page section from #207.
 
-**PR:** #207
+**Verified:** `tsc`, ESLint, Prettier, Vitest (459, the sheet-parent test now covers both pages). **Not verified:** layout, and the incognito unlock/forget flow, on a device or simulator.
+
+**PR:** n/a
 
 ### fix(siteview): short-video feeds play on their own
 
