@@ -36,7 +36,7 @@ dependencies {
     implementation("androidx.webkit:webkit:1.14.0")
     implementation("androidx.biometric:biometric:1.1.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0")
-    implementation("androidx.browser:browser:1.9.0")
+    implementation("androidx.browser:browser:1.10.0")
     implementation(project(":tauri-android"))
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20260814")
