@@ -18,6 +18,7 @@ mod share;
 mod sites;
 mod usage;
 mod usage_commands;
+mod video_controls;
 
 use tauri::Manager;
 
@@ -139,6 +140,7 @@ pub fn run() {
             commands::set_site_picture_in_picture,
             commands::set_back_button,
             commands::set_accessibility,
+            commands::set_video_controls,
             commands::ai_state,
             commands::ai_save_provider,
             commands::ai_delete_provider,
