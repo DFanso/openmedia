@@ -214,12 +214,17 @@ export const pl: Messages = {
   "settings.epilepsyProtectionNote":
     "Zatrzymuje animacje, automatycznie odtwarzane wideo i animowane GIF-y w aplikacji i na stronach. Nie wykryje migotania w filmie uruchomionym samodzielnie.",
   "settings.videoControls": "Sterowanie wideo",
-  "settings.videoControlsNote":
-    "Dla pełnoekranowych kanałów wideo, takich jak Shorts i Reels. Każda opcja pozostaje wyłączona, dopóki jej nie włączysz.",
-  "settings.videoSeekBar": "Pasek postępu",
-  "settings.videoSeekBarNote": "Pasek do przeciągania, z czasem do końca.",
-  "settings.videoSpeed": "Przycisk prędkości",
-  "settings.videoSpeedNote": "Stuknij, aby przełączać 0.5×, 1×, 1.25×, 1.5× i 2×.",
+  "settings.videoControlsNote": "Dla pełnoekranowych kanałów wideo, takich jak Shorts i Reels.",
+  "settings.videoPanel": "Sterowanie po stuknięciu",
+  "settings.videoPanelNote":
+    "Stuknij wideo, aby pokazać pauzę, przewijanie o 6 sekund wstecz i do przodu, wyciszenie, prędkość i pasek postępu zamiast własnego działania witryny. Ulubione może to wyłączyć, aby przywrócić własne sterowanie witryny.",
+  "settings.videoFull": "Także w pełnych filmach",
+  "settings.videoFullNote":
+    "Używaj sterowania także na stronach oglądania, zamiast własnego sterowania witryny. Wyłączone zachowuje odtwarzacz witryny, który ma więcej opcji, takich jak napisy i jakość.",
+  "settings.videoHeight": "Wysokość sterowania",
+  "settings.videoHeightNote":
+    "Jak wysoko nad dolną krawędzią znajduje się sterowanie. Ulubione może mieć własną.",
+  "settings.videoHeightLabel": "Wysokość sterowania wideo",
   "settings.videoRemember": "Zapamiętaj prędkość i dźwięk",
   "settings.videoRememberNote":
     "Następne wideo zaczyna się z ostatnio wybraną prędkością i głośnością.",
@@ -331,6 +336,18 @@ export const pl: Messages = {
   "recipes.hubNote":
     "Hub otwiera kilka stron naraz. Każda strona to osobna witryna, z własnymi plikami cookie.",
   "favorites.bottomMargin": "Dolny margines",
+  "favorites.videoControls": "Sterowanie wideo OpenMedia",
+  "favorites.videoControlsNote":
+    "Stuknij wideo, aby pokazać sterowanie OpenMedia. Wyłączone przywraca własne sterowanie witryny.",
+  "favorites.videoFull": "Także w pełnych filmach",
+  "favorites.videoFullNote":
+    "Używaj sterowania także na stronach oglądania tej witryny. Wyłączone zachowuje własny odtwarzacz witryny.",
+  "favorites.videoHeight": "Wysokość sterowania wideo",
+  "favorites.videoHeightShared":
+    "Używa wspólnej wysokości. Przesuń suwak, aby ta witryna miała własną.",
+  "favorites.videoHeightOwn": "Ta witryna ma własną wysokość.",
+  "favorites.videoHeightLabel": "Wysokość sterowania wideo: {site}",
+  "favorites.videoUseShared": "Użyj wspólnych ustawień wideo",
   "recipes.sharedMargin": "Używa wspólnego marginesu. Przesuń suwak, aby ta witryna miała własny.",
   "recipes.ownMargin": "Ta witryna ma własny margines.",
   "recipes.siteMarginLabel": "Dolny margines: {name}",

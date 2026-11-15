@@ -6,6 +6,40 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): a tap never mutes or unmutes a Reel, and Instagram's "Continue watching in the app" wall is hidden
+
+**Area:** `fix(siteview)`
+
+**Problem:** On Instagram Reels a tap showed the panel and also unmuted, and the tap that closed the panel muted the Reel again: Instagram toggles the sound on the press, before the app knows the touch is a tap. Separately, "Continue watching in the app" (with Sign up for Instagram and Open app) sometimes covered a Reel and nothing hid it: it is not a dialog, so the existing app-prompts rule missed it.
+
+**Change:** The press on the video is no longer shown to the site (a press on one of the site's own buttons still is), so a player that toggles the sound on it, with an icon that pops in, never does; a touch that is a swipe reaches the page through its own touch events. As a safeguard the sound is also noted on the press and put back if it changed, so only the panel's mute button changes it. The Instagram recipe (2.0.2) gets `reel-app-wall` under the on-by-default app-prompts option: it hides the `div[role=group]` that holds the backdrop and the card, found by its `a[href*="/accounts/signup"]`. Found by driving headless Chrome with an iPhone user agent over CDP, logged out, on `/reels/` after scrolling to the next reel (it appears on some loads only); a fixture (`logged-out-reel-wall.html`) covers the rule.
+
+**Verified:** Vitest (`videoControls.test.ts`), `cargo test --lib` (the fixture test), ESLint, `tsc`; on the iOS 26.5 simulator on a Reel: the sound state is the same after a tap, a second tap and a third, no mute icon shows 0.25 s after a tap, and a swipe still moves to the next Reel. **Not verified:** that the wall is hidden on a device (the simulator's Instagram is logged in; it showed in headless Chrome only).
+
+**PR:** n/a
+
+### fix(siteview): the panel no longer opens a site's menu, takes Instagram's tap catcher, and a leaving page's video floats (iOS)
+
+**Area:** `fix(siteview)`
+
+**Problem:** On Shorts a tap that showed the panel also opened YouTube's long-press menu (Description, Save to playlist, Captions, Playback speed) under it. The page saw the touch begin and never saw it end, so its hold timer ran out. (The same thing made a watch page show its hold-for-2× badge.) Taps on the panel's empty parts fell through to the site's buttons beneath it. On Instagram Reels a tap only muted, because the player puts one transparent `role=button` over the whole video and that was taken for one of the site's buttons.
+
+**Change:** A tap the panel keeps is now followed by a `touchcancel` to the site, so no hold timer fires. The panel's card catches touches, and touches on it are kept from the site's handlers. A button that covers at least half the video is the site's tap catcher, not a button. A tap is also found from the pointer, which is cancelled for the site like the touch, because Instagram mutes when the pointer is released, before the touch ends. On iOS, leaving a page that is playing a video with sound (Back, an address, a favorite, Home) floats the video in a picture-in-picture window instead of suspending the page; the page stays alive, hidden, until the window is closed or the page in front plays a video of its own. This applies to every site, not only those with the picture-in-picture switch on (that switch still decides leaving the app).
+
+**Verified:** Vitest (`videoControls.test.ts`), ESLint, `tsc`, `swiftc -parse`; on the iOS 26.5 simulator on YouTube Shorts: a tap shows the panel and no menu opens, and a tap on the panel over the Comments button does nothing; switching favorites and opening addresses still works with the float attempt in the path. **Not verified:** that Instagram no longer mutes on a tap (unit-tested only); the floating window itself (the simulator reports no picture-in-picture support, so the attempt always answers no there), Instagram Reels (no account), Android (no mini player is built there).
+
+**PR:** n/a
+
+### feat(siteview): tap a video for OpenMedia's own controls, with a height per favorite
+
+**Area:** `feat(siteview)`
+
+**Change:** In full-screen feeds (Shorts, Reels, TikTok) the controls are hidden until the video is tapped. A tap now shows OpenMedia's panel in place of the site's own tap: pause and play, back and forward 6 seconds, mute, speed, the time left and a seek bar. It goes away after a few seconds, but stays on a paused video. A tap on a button of the site's own is left to the site. A watch page keeps the site's own player, which has much more (captions, quality, hold for 2×); a switch, "Also on full videos", in Settings and per favorite, off by default, puts the panel there too. The remembered speed and sound are now applied only where the panel is in charge; before, a saved 2× was put on every video, which made YouTube show its own "2×" badge on a watch page. There is no volume bar: sites reset a volume a page sets, so it only snapped between muted and full; mute is a button. A tap is found from the touch, because the watch page's player cancels the click. The panel is on by default; Settings > Video controls can turn it off and sets how high it sits (16 px by default). Each favorite's edit form has the same two choices for that site alone: turn the panel off to get the site's own controls back, or give it its own height. The old always-visible seek bar and speed button switches are gone (their choices are not kept; the panel has both). The page script gets the per-site choices by registrable domain, so no site is named in the engine. A double tap to like no longer reaches a site while the panel is on there; turn the panel off for that favorite to get it back.
+
+**Verified:** Vitest (`videoControls.test.ts`, `feedPlayer.test.ts`, the i18n catalog), `cargo test --lib`, clippy, ESLint, `tsc`; on the iOS 26.5 simulator (Shorts and a watch page) and an Android API 36 emulator (Shorts, before the watch-page and touch-tap changes): the panel shows on a tap and the site's own tap is kept from the site, pause, play, skip, mute and speed work, it hides after a few seconds and on a second tap, a per-site height moves it, a per-site off gives the site's own controls back, and the Settings and favorite forms save to `library.json`. **Not verified:** a physical device; Instagram, Reels and TikTok (no account); the translations are machine-made.
+
+**PR:** n/a
+
 ### fix(siteview): the seek bar sits clear of the bottom edge
 
 **Area:** `fix(siteview)`
@@ -312,6 +346,14 @@ All notable changes to OpenMedia are documented here.
 **Verified:** `yarn ts:check`, focused lint/format checks, and browser review at phone width in dark and light themes. **Not verified:** native device rendering.
 
 **PR:** n/a
+
+## 2026-11-15
+
+### chore(release): version 1.0.4
+
+**Area:** `chore(release)`
+
+**Change:** The app version is `1.0.4` (build 1009) in `package.json` and `src-tauri/tauri.conf.json`.
 
 ## 2026-11-14
 

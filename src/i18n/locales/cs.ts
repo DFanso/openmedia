@@ -213,12 +213,17 @@ export const cs: Messages = {
   "settings.epilepsyProtectionNote":
     "Zastaví animace, automaticky spuštěná videa a animované GIFy v aplikaci i na stránkách. Nezjistí blikání ve videu, které spustíte sami.",
   "settings.videoControls": "Ovládání videa",
-  "settings.videoControlsNote":
-    "Pro celoobrazovková videa, například Shorts a Reels. Každá volba zůstane vypnutá, dokud ji nezapnete.",
-  "settings.videoSeekBar": "Posuvník přehrávání",
-  "settings.videoSeekBarNote": "Lišta k tažení s zobrazením zbývajícího času.",
-  "settings.videoSpeed": "Tlačítko rychlosti",
-  "settings.videoSpeedNote": "Klepnutím procházíte rychlosti 0.5×, 1×, 1.25×, 1.5× a 2×.",
+  "settings.videoControlsNote": "Pro celoobrazovková videa, například Shorts a Reels.",
+  "settings.videoPanel": "Ovládání klepnutím",
+  "settings.videoPanelNote":
+    "Klepnutím na video zobrazíte pozastavení, přetočení o 6 sekund zpět a vpřed, ztlumení, rychlost a posuvník přehrávání místo klepnutí samotného webu. Oblíbená stránka to může vypnout a vrátit ovládání webu.",
+  "settings.videoFull": "I u celých videí",
+  "settings.videoFullNote":
+    "Používejte ovládání i na stránkách přehrávání místo ovládání samotného webu. Vypnuto ponechá přehrávač webu, který nabízí více, například titulky a kvalitu.",
+  "settings.videoHeight": "Výška ovládání",
+  "settings.videoHeightNote":
+    "Jak vysoko nad spodním okrajem ovládání leží. Oblíbená stránka může mít vlastní.",
+  "settings.videoHeightLabel": "Výška ovládání videa",
   "settings.videoRemember": "Pamatovat si rychlost a zvuk",
   "settings.videoRememberNote":
     "Další video začne s rychlostí a hlasitostí, které jste naposledy zvolili.",
@@ -330,6 +335,18 @@ export const cs: Messages = {
   "recipes.hubNote":
     "Hub otevře několik webů najednou. Každá stránka je vlastní web s vlastními cookies.",
   "favorites.bottomMargin": "Spodní okraj",
+  "favorites.videoControls": "Ovládání videa OpenMedia",
+  "favorites.videoControlsNote":
+    "Klepnutím na video zobrazíte ovládání OpenMedia. Vypnuto vrátí ovládání samotného webu.",
+  "favorites.videoFull": "I u celých videí",
+  "favorites.videoFullNote":
+    "Používejte ovládání i na stránkách přehrávání tohoto webu. Vypnuto ponechá přehrávač samotného webu.",
+  "favorites.videoHeight": "Výška ovládání videa",
+  "favorites.videoHeightShared":
+    "Používá sdílenou výšku. Posunutím jezdce dáte tomuto webu vlastní.",
+  "favorites.videoHeightOwn": "Tento web má vlastní výšku.",
+  "favorites.videoHeightLabel": "Výška ovládání videa na {site}",
+  "favorites.videoUseShared": "Použít sdílená nastavení videa",
   "recipes.sharedMargin": "Používá sdílený okraj. Posunutím jezdce dáte tomuto webu vlastní.",
   "recipes.ownMargin": "Tento web má vlastní okraj.",
   "recipes.siteMarginLabel": "Spodní okraj webu {name}",
