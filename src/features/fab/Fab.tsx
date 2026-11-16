@@ -3,12 +3,14 @@ import { selectQuickFavorites, useApp } from "../../app/store";
 import { unreadByFavorite } from "../web/unreadWatch";
 import { useT } from "../../i18n/useT";
 import { quickSlots, usableQuickAccess } from "../../shared/favorites";
+import { VIDEO_CONTROLS_DEFAULT } from "../../shared/videoControls";
 import { useInsets, useViewport } from "../../shared/viewport";
 import {
   FAB_SIZE,
   FAVORITE_SIZE,
   HISTORY_SIZE,
   HOLD_SCALE,
+  CONTROLS_SIZE,
   INCOGNITO_SIZE,
   PEEK_HEIGHT,
   PEEK_WIDTH,
@@ -42,6 +44,7 @@ import {
   SlidersIcon,
   StatsIcon,
   TabsIcon,
+  VideoControlsIcon,
 } from "../../shared/icons";
 import { useBackHandler } from "../back/useBackHandler";
 import logoMark from "../../assets/logo-mark.svg";
@@ -79,6 +82,8 @@ export function Fab() {
   const enterIncognito = useApp((s) => s.enterIncognito);
   const exitIncognito = useApp((s) => s.exitIncognito);
   const sheet = useApp((s) => s.sheet);
+  const controlsOn = useApp((s) => (s.state?.videoControls ?? VIDEO_CONTROLS_DEFAULT).panel);
+  const setVideoControls = useApp((s) => s.setVideoControls);
   const openSheet = useApp((s) => s.openSheet);
   const openFavorite = useApp((s) => s.openFavorite);
   const onboardingOpen = useApp((s) => s.onboardingOpen);
@@ -90,9 +95,16 @@ export function Fab() {
 
   const [position, setPosition] = useState<FabPosition>(loadPosition);
   const [gesture, setGesture] = useState<GestureState>(idle);
+  const [controlsCharging, setControlsCharging] = useState(false);
+  const stopControlsHold = () => {
+    clearTimeout(controlsHold.current);
+    setControlsCharging(false);
+  };
   const gestureRef = useRef<GestureState>(idle);
   const holdTimer = useRef(0);
   const ignorePress = useRef(false);
+  const controlsHold = useRef(0);
+  const controlsHeld = useRef(false);
 
   const list = useMemo(() => quickSlots(favorites, isPro), [favorites, isPro]);
   const sessions = useApp((s) => s.sessions);
@@ -122,6 +134,7 @@ export function Fab() {
     else if (target.kind === "stats") openSheet("stats");
     else if (target.kind === "incognito")
       void (incognito.active ? exitIncognito() : enterIncognito());
+    else if (target.kind === "controls") void setVideoControls({ panel: !controlsOn });
     else {
       const slot = list[target.index];
       if (slot?.locked) openSheet("paywall");
@@ -213,7 +226,7 @@ export function Fab() {
     "--dx": `${center.x - target.x}px`,
     "--dy": `${center.y - target.y}px`,
     "--i": index,
-    "--n": list.length + 5,
+    "--n": list.length + 6,
   });
 
   const hidden = sheet !== "none" || onboardingOpen;
@@ -406,6 +419,53 @@ export function Fab() {
             {t("fab.leaveIncognitoHint")}
           </span>
         )}
+      </button>
+
+      <button
+        type="button"
+        data-open={fanOpen}
+        data-active={controlsOn}
+        aria-label={t("fab.videoControls")}
+        aria-pressed={controlsOn}
+        tabIndex={fanOpen ? 0 : -1}
+        data-hold={controlsCharging ? "charging" : "idle"}
+        onPointerDown={() => {
+          controlsHeld.current = false;
+          setControlsCharging(true);
+          controlsHold.current = window.setTimeout(() => {
+            controlsHeld.current = true;
+            setControlsCharging(false);
+            openSheet("video-controls");
+            dispatch({ type: "dismiss" });
+          }, HOLD_MS);
+        }}
+        onPointerUp={stopControlsHold}
+        onPointerLeave={stopControlsHold}
+        onPointerCancel={stopControlsHold}
+        onContextMenu={(event) => event.preventDefault()}
+        onClick={() => {
+          if (controlsHeld.current) {
+            controlsHeld.current = false;
+            return;
+          }
+          select({ kind: "controls" });
+          dispatch({ type: "dismiss" });
+        }}
+        style={{
+          ...fanStyle(layout.controls, list.length + 5),
+          width: CONTROLS_SIZE,
+          height: CONTROLS_SIZE,
+          margin: -CONTROLS_SIZE / 2,
+          touchAction: "none",
+        }}
+        className={`fan-item fab-glass fixed z-20 grid place-items-center rounded-full ${
+          hover?.kind === "controls" ? "border-accent! text-accent" : "text-white"
+        }`}
+      >
+        <VideoControlsIcon on={controlsOn} />
+        <svg className="fab-ring" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="31" pathLength="1" />
+        </svg>
       </button>
 
       <button
