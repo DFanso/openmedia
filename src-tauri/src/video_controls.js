@@ -81,6 +81,44 @@
       };
     }
 
+    // hls.js and Shaka keep their player in a variable of the site's own, out of reach. The
+    // script runs before the page's, so the classes are wrapped as the page defines them and every
+    // player made is remembered (a few, the newest), to be found by the video it is attached to.
+    var PLAYERS = Symbol.for('openmedia.players');
+    if (!window[PLAYERS] && typeof Proxy === 'function') {
+      var made = window[PLAYERS] = [];
+      var track = function (Class) {
+        if (typeof Class !== 'function') return Class;
+        try {
+          return new Proxy(Class, {
+            construct: function (target, args, newTarget) {
+              var instance = Reflect.construct(target, args, newTarget);
+              made.push(instance);
+              if (made.length > 12) made.shift();
+              return instance;
+            }
+          });
+        } catch (_) { return Class; }
+      };
+      var hook = function (name, wrap) {
+        try {
+          if (window[name]) { window[name] = wrap(window[name]); return; }
+          var held;
+          Object.defineProperty(window, name, {
+            configurable: true,
+            enumerable: true,
+            get: function () { return held; },
+            set: function (value) { try { held = wrap(value); } catch (_) { held = value; } }
+          });
+        } catch (_) {}
+      };
+      hook('Hls', track);
+      hook('shaka', function (shaka) {
+        if (shaka && typeof shaka.Player === 'function') shaka.Player = track(shaka.Player);
+        return shaka;
+      });
+    }
+
     // Every video on the page, those inside shadow roots too.
     function allVideos() {
       var found = Array.prototype.slice.call(document.querySelectorAll('video'));
@@ -455,7 +493,7 @@
     }
 
     function firstWindowObject(test) {
-      var objects = windowObjects();
+      var objects = (window[PLAYERS] || []).concat(windowObjects());
       for (var i = 0; i < objects.length; i++) {
         try { if (test(objects[i])) return objects[i]; } catch (_) {}
       }
@@ -605,6 +643,45 @@
             }),
             select: function (at) { plyr.quality = list[at]; }
           };
+        }
+      },
+      {
+        // JW Player: its API is reached through the container the video is in.
+        find: function (video) {
+          if (typeof window.jwplayer !== 'function') return null;
+          var holder = video.closest && video.closest('.jwplayer');
+          var player = holder && holder.id ? window.jwplayer(holder.id) : null;
+          return player && typeof player.getQualityLevels === 'function' ? player : null;
+        },
+        group: function (jw) {
+          var levels = jw.getQualityLevels();
+          if (!Array.isArray(levels)) return null;
+          if (levels.length < 2) return null;
+          var current = jw.getCurrentQuality();
+          return {
+            kind: 'quality',
+            label: 'Quality',
+            items: levels.map(function (level, index) { return { label: String(level.label), selected: index === current }; }),
+            select: function (at) { jw.setCurrentQuality(at); }
+          };
+        }
+      },
+      {
+        // Vidstack (a media-player element): `qualities` lists them, one of which can be selected.
+        find: function (video) {
+          var player = video.closest && video.closest('media-player');
+          return player && player.qualities && typeof player.qualities.autoSelect === 'function' ? player : null;
+        },
+        group: function (player) {
+          var list = Array.prototype.slice.call(player.qualities);
+          list.sort(function (a, b) { return (b.height || 0) - (a.height || 0); });
+          var labels = ['Auto'].concat(list.map(function (quality) { return quality.height ? quality.height + 'p' : String(quality.id); }));
+          var on = 0;
+          if (!player.qualities.auto) list.forEach(function (quality, index) { if (quality.selected) on = index + 1; });
+          return qualityGroup(labels, on, function (at) {
+            if (at === 0) player.qualities.autoSelect();
+            else list[at - 1].selected = true;
+          });
         }
       },
       {

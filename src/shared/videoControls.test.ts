@@ -259,6 +259,8 @@ interface Page {
   teardown: () => void;
   /** What the page told the app about the small player. */
   posts: unknown[];
+  /** The page's window, for what a site defines on it. */
+  window: Record<string, unknown>;
   /** What a frame told its page. */
   parentPosts: unknown[];
   /** The page the frame is in, as the source of its messages. */
@@ -569,6 +571,7 @@ function load(options: {
     posts,
     parentPosts,
     parent,
+    window: win,
     document,
   };
 }
@@ -1193,6 +1196,84 @@ describe("video controls", () => {
     page.win("click", { ...press, isTrusted: false });
     page.tick();
     expect(shown(page)).toBe(true);
+  });
+
+  it("offers JW Player's and Vidstack's quality levels from the video itself", () => {
+    const picks: string[] = [];
+    const jwVideo = new FakeVideo() as FakeVideo & { closest?: (selector: string) => unknown };
+    jwVideo.closest = (selector) => (selector === ".jwplayer" ? { id: "jw6" } : null);
+    const jw = {
+      getQualityLevels: () => [{ label: "360p" }, { label: "720p" }],
+      getCurrentQuality: () => 1,
+      setCurrentQuality: (at: number) => picks.push("jw" + at),
+    };
+    const jwPage = load({
+      videos: [jwVideo],
+      current: jwVideo,
+      win: { jwplayer: (id: string) => (id === "jw6" ? jw : null) },
+    });
+    openPanel(jwPage);
+    buttonWith(jwPage, "gear").fire("pointerup");
+    const rows = jwPage.body
+      .descendants()
+      .find((element) => element.style.display === "block" && element.children.length === 2);
+    expect(rows?.children.map((row) => row.textContent)).toEqual(["\u2003360p", "\u2713 720p"]);
+    rows?.children[0]?.fire("pointerup");
+    expect(picks).toEqual(["jw0"]);
+
+    const qualities = Object.assign(
+      [
+        { id: "a", height: 480, selected: false },
+        { id: "b", height: 720, selected: true },
+      ],
+      { auto: false, autoSelect: () => picks.push("auto") },
+    );
+    const vsVideo = new FakeVideo() as FakeVideo & { closest?: (selector: string) => unknown };
+    vsVideo.closest = (selector) => (selector === "media-player" ? { qualities } : null);
+    const vsPage = load({ videos: [vsVideo], current: vsVideo });
+    openPanel(vsPage);
+    buttonWith(vsPage, "gear").fire("pointerup");
+    const vsRows = vsPage.body
+      .descendants()
+      .find((element) => element.style.display === "block" && element.children.length === 3);
+    expect(vsRows?.children.map((row) => row.textContent)).toEqual([
+      "\u2003Auto",
+      "\u2713 720p",
+      "\u2003480p",
+    ]);
+    vsRows?.children[0]?.fire("pointerup");
+    expect(picks).toEqual(["jw0", "auto"]);
+  });
+
+  it("finds an hls.js player the page keeps in a variable of its own, by remembering the ones it makes", () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video], current: video });
+    class Hls {
+      levels = [{ height: 360 }, { height: 720 }];
+      currentLevel = -1;
+      autoLevelEnabled = true;
+      media: unknown = null;
+      attachMedia(media: unknown) {
+        this.media = media;
+      }
+    }
+    // The page defines its library after the controls started, then makes a player nobody can reach.
+    page.window.Hls = Hls;
+    const player = new (page.window.Hls as typeof Hls)();
+    player.attachMedia(video);
+    expect(player).toBeInstanceOf(Hls);
+    openPanel(page);
+    buttonWith(page, "gear").fire("pointerup");
+    const rows = page.body
+      .descendants()
+      .find((element) => element.style.display === "block" && element.children.length === 3);
+    expect(rows?.children.map((row) => row.textContent)).toEqual([
+      "\u2713 Auto",
+      "\u2003360p",
+      "\u2003720p",
+    ]);
+    rows?.children[2]?.fire("pointerup");
+    expect(player.currentLevel).toBe(1);
   });
 
   it("takes the video full screen with the panel's button, in the phone's own player when there is one", () => {
