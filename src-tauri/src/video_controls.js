@@ -17,6 +17,10 @@
   var NO_AUTOPLAY = Symbol.for('openmedia.noAutoplay');
   var MINI_WINDOW = Symbol.for('openmedia.miniWindow');
   var REFRESH_HOLD = Symbol.for('openmedia.holdRefresh');
+  // A recipe's script offers the options of its site's player (quality, captions, audio) with
+  // `document[Symbol.for('openmedia.videoOptions')] = function (video) { return [group, ...]; }`.
+  var VIDEO_OPTIONS = Symbol.for('openmedia.videoOptions');
+  var VIDEO_MENUS = Symbol.for('openmedia.videoMenus');
   var MINI_CLOSE = Symbol.for('openmedia.miniClose');
   var USER_PAUSE = Symbol.for('openmedia.userPause');
   var STORE = 'openmedia.video';
@@ -49,6 +53,7 @@
   var DRAG_COMMIT = 0.2; // of that: letting go past it keeps the small player, short of it puts the video back
   var DRAG_FLICK = 0.5; // px/ms: a flick this fast down keeps it too
   var DRAG_SETTLE_MS = 200;
+  var HOLD_RATE_MS = 800; // how long after a drag the speed it started with is kept
   var MINI_FIGHTS = 40; // and this many times, then the site wins
   var MINI_BOTTOM = 96; // px from the bottom edge, clear of the browser's own buttons
   var HIDE_MS = 3500; // the panel goes away this long after the last touch on it
@@ -56,12 +61,38 @@
   var INTERACTIVE = 'a,button,input,textarea,select,summary,[role="button"],[role="link"],' +
     '[role="slider"],[role="menuitem"],[role="tab"],[role="switch"],[contenteditable="true"]';
   try {
-    if (window.top !== window) return;
     if (typeof document[KEY] === 'function') document[KEY]();
 
     var wantsSound = !!config.remember;
     var wantsLoopOff = !!(config.loopOff || config.autoAdvance);
     var wantsAdvance = !!config.autoAdvance;
+
+    // Players built as web components keep their video in a shadow root, which a query on the
+    // document does not reach. Roots are noted as the page makes them (the script runs before the
+    // page's own), once for the page however often the controls start again.
+    var SHADOWS = Symbol.for('openmedia.shadowRoots');
+    if (!window[SHADOWS] && window.Element && Element.prototype.attachShadow) {
+      var shadowRoots = window[SHADOWS] = new Set();
+      var attachShadow = Element.prototype.attachShadow;
+      Element.prototype.attachShadow = function () {
+        var root = attachShadow.apply(this, arguments);
+        try { shadowRoots.add(root); } catch (_) {}
+        return root;
+      };
+    }
+
+    // Every video on the page, those inside shadow roots too.
+    function allVideos() {
+      var found = Array.prototype.slice.call(document.querySelectorAll('video'));
+      var roots = window[SHADOWS];
+      if (roots) {
+        roots.forEach(function (root) {
+          if (!root.host || !root.host.isConnected) { roots.delete(root); return; }
+          root.querySelectorAll('video').forEach(function (video) { found.push(video); });
+        });
+      }
+      return found;
+    }
 
     var fresh = new WeakSet();
     var watched = new WeakSet();
@@ -73,6 +104,8 @@
     var ui = null;
     var shown = false;
     var hideTimer = 0;
+    var framed = window.top !== window; // in a frame of the page: a player the page embeds
+    var parentMini = false; // in a frame: the page has made this frame its small player
     var mini = null; // the small player, while one is up
     var ghostUntil = 0; // clicks before this are the tail of a press on a button that has gone since
     var miniWindowed = false; // the page is itself the small window, in the corner of the screen
@@ -94,6 +127,7 @@
     }
 
     function onFeedPage() {
+      if (framed) return false;
       var isFeed = document[IS_FEED];
       return typeof isFeed === 'function' && isFeed();
     }
@@ -102,18 +136,21 @@
       return onFeedPage() && !document.hidden && !window.__openmediaHold;
     }
 
-    // A page that is about one video: it says so (og:type video.*) or its path does.
+    // A page that is about one video: it says so (og:type video.*), its path does, or it is a page
+    // with a video taking a good part of the screen, whatever the site (a player of its own, a file).
     function watchPage() {
       try {
         var meta = document.querySelector && document.querySelector('meta[property="og:type"]');
         var type = meta && meta.getAttribute && meta.getAttribute('content');
         if (type && /^video/i.test(type)) return true;
       } catch (_) {}
-      return !!(window.location && WATCH_PATH.test(window.location.pathname || ''));
+      if (window.location && WATCH_PATH.test(window.location.pathname || '')) return true;
+      return !onFeedPage() && (!!focus() || !!playerFrame());
     }
 
     // Where the panel may show: a feed, or a page about one video.
     function panelPage() {
+      if (framed && (parentMini || !frameBig())) return false;
       return !document.hidden && !window.__openmediaHold && (onFeedPage() || (fullVideosOn() && watchPage()));
     }
 
@@ -124,11 +161,11 @@
       var width = window.innerWidth || document.documentElement.clientWidth;
       var best = null;
       var bestArea = 0;
-      document.querySelectorAll('video').forEach(function (video) {
+      allVideos().forEach(function (video) {
         if (!video.isConnected || (mini && video === mini.video)) return;
         var box = video.getBoundingClientRect();
-        var seen = (Math.min(box.bottom, height) - Math.max(box.top, 0)) *
-          (Math.min(box.right, width) - Math.max(box.left, 0));
+        var seen = Math.max(0, Math.min(box.bottom, height) - Math.max(box.top, 0)) *
+          Math.max(0, Math.min(box.right, width) - Math.max(box.left, 0));
         if (seen > bestArea && seen >= MIN_VIDEO_SHARE * width * height) {
           best = video;
           bestArea = seen;
@@ -205,7 +242,7 @@
       var top = boxOf(video).top;
       var next = null;
       var nextTop = Infinity;
-      document.querySelectorAll('video').forEach(function (candidate) {
+      allVideos().forEach(function (candidate) {
         if (candidate === video || !candidate.isConnected) return;
         var candidateTop = boxOf(candidate).top;
         if (candidateTop > top + NEXT_GAP && candidateTop < nextTop) {
@@ -302,6 +339,10 @@
       expand: ['M9 5v2H6.4l4.3 4.3-1.4 1.4L5 8.4V11H3V5h6zm6 14v-2h2.6l-4.3-4.3 1.4-1.4 4.3 4.3V13h2v6h-6z'],
       close: ['M19 6.4L17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z'],
       pip: ['M19 7h-8v6h8V7z', 'M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm0 16.01H3V4.98h18v14.03z'],
+      fullscreen: ['M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z'],
+      cc: ['M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 7H9.5v-.5h-2v3h2V13H11v1c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1zm7 0h-1.5v-.5h-2v3h2V13H18v1c0 .55-.45 1-1 1h-3c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1z'],
+      audio: ['M12 3a9 9 0 0 0-9 9v7a2 2 0 0 0 2 2h3v-8H5v-1a7 7 0 0 1 14 0v1h-3v8h3a2 2 0 0 0 2-2v-7a9 9 0 0 0-9-9z'],
+      gear: ['M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z'],
       muted: ['M3 9v6h4l5 5V4L7 9H3z', 'M14.5 9.4l1.4-1.4 2.1 2.1 2.1-2.1 1.4 1.4-2.1 2.1 2.1 2.1-1.4 1.4-2.1-2.1-2.1 2.1-1.4-1.4 2.1-2.1z']
     };
 
@@ -311,6 +352,404 @@
       button.textContent = '';
       var extra = name === 'back' || name === 'forward' ? digit(String(SKIP_SECONDS)) : null;
       button.appendChild(icon(ICONS[name], extra));
+    }
+
+    // The video full screen, or back. A phone's own player takes a video (iOS: webkitEnterFullscreen),
+    // otherwise the browser's full screen.
+    function toggleFullscreen(video) {
+      try {
+        // A site's own styles can crop a video that fills the screen; the whole picture is shown.
+        if (!document.getElementById('openmedia-fullscreen')) {
+          var sheet = make('style', '');
+          sheet.id = 'openmedia-fullscreen';
+          sheet.textContent = 'video:fullscreen,video:-webkit-full-screen{object-fit:contain!important;' +
+            'width:100%!important;height:100%!important;background:#000!important}';
+          (document.head || document.documentElement).appendChild(sheet);
+        }
+        if (video.webkitDisplayingFullscreen && video.webkitExitFullscreen) { video.webkitExitFullscreen(); return; }
+        var shown = document.fullscreenElement || document.webkitFullscreenElement;
+        if (shown) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
+        if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+        else if (video.requestFullscreen) video.requestFullscreen();
+        else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+      } catch (_) {}
+    }
+
+    // What the browser itself knows of a video's options, whatever the site: its subtitle and
+    // caption tracks, and (Safari) its audio tracks. A site that draws its own captions or picks its
+    // own quality keeps them to itself: nothing here can read those.
+    function textTracksOf(video) {
+      var found = [];
+      var list = video.textTracks;
+      for (var i = 0; list && i < list.length; i++) {
+        if (list[i].kind === 'subtitles' || list[i].kind === 'captions') found.push(list[i]);
+      }
+      return found;
+    }
+
+    function audioTracksOf(video) {
+      var found = [];
+      var list = video.audioTracks;
+      for (var i = 0; list && i < list.length; i++) found.push(list[i]);
+      return found.length > 1 ? found : [];
+    }
+
+    // Off, then each track in turn, then off again.
+    function cycleCaptions(video) {
+      var tracks = textTracksOf(video);
+      if (!tracks.length) return;
+      var on = -1;
+      tracks.forEach(function (track, index) { if (track.mode === 'showing') on = index; });
+      var next = on + 1;
+      tracks.forEach(function (track, index) {
+        if (index === next) track.mode = 'showing';
+        else if (track.mode === 'showing') track.mode = 'disabled';
+      });
+    }
+
+    // The options a recipe's script offers for its site's player. Each group is
+    // { kind: 'quality' | 'captions' | 'audio' | 'other', label, items: [{ label, selected }],
+    //   select(index) }. What the script returns is the site's, so it is cut to size and to text.
+    var optionGroups = { at: 0, groups: [], signature: '' };
+
+    function normalizeGroups(groups) {
+      return groups.slice(0, 4).map(function (group) {
+        var items = Array.isArray(group && group.items) ? group.items.slice(0, 40) : [];
+        return {
+          kind: /^(quality|captions|audio)$/.test(String(group.kind)) ? String(group.kind) : 'other',
+          label: String(group.label == null ? '' : group.label).slice(0, 24),
+          items: items.map(function (item) {
+            return { label: String(item && item.label != null ? item.label : '').slice(0, 60), selected: !!(item && item.selected) };
+          }),
+          select: typeof group.select === 'function' ? group.select : null
+        };
+      }).filter(function (group) { return group.items.length && group.select; });
+    }
+
+    // Players built with a common library are found from the video itself, so their options
+    // need no recipe. A library object is the site's and may throw on any access, so every
+    // touch of one is inside a try. What is found is kept for LIB_CACHE_MS per video (and the
+    // scan of the window's own values for as long); the groups are built from it on each read.
+    var LIB_CACHE_MS = 3000;
+    var LIB_SCAN_KEYS = 400;
+    var YT_QUALITY = { highres: 'Highest', hd2880: '2880p', hd2160: '2160p', hd1440: '1440p', hd1080: '1080p',
+      hd720: '720p', large: '480p', medium: '360p', small: '240p', tiny: '144p', auto: 'Auto' };
+    var libraryFinds = new WeakMap();
+    var windowScan = { at: -Infinity, objects: [] };
+    var ytChoice = new WeakMap();
+
+    function windowObjects() {
+      var now = Date.now();
+      if (now - windowScan.at < LIB_CACHE_MS) return windowScan.objects;
+      var objects = [];
+      var keys = [];
+      try { keys = Object.keys(window).slice(0, LIB_SCAN_KEYS); } catch (_) {}
+      keys.forEach(function (key) {
+        try {
+          var value = window[key];
+          if (value && typeof value === 'object') objects.push(value);
+        } catch (_) {}
+      });
+      windowScan = { at: now, objects: objects };
+      return objects;
+    }
+
+    function firstWindowObject(test) {
+      var objects = windowObjects();
+      for (var i = 0; i < objects.length; i++) {
+        try { if (test(objects[i])) return objects[i]; } catch (_) {}
+      }
+      return null;
+    }
+
+    function levelLabel(height, bitrate, index) {
+      if (height > 0) return height + 'p';
+      if (bitrate > 0) return Math.round(bitrate / 1000) + ' kbps';
+      return 'Level ' + (index + 1);
+    }
+
+    function qualityGroup(labels, selected, pick) {
+      if (labels.length < 3) return null; // 'Auto' and one level is no choice
+      return {
+        kind: 'quality',
+        label: 'Quality',
+        items: labels.map(function (label, index) { return { label: label, selected: selected === index }; }),
+        select: pick
+      };
+    }
+
+    function containsVideo(element, video) {
+      return element === video || (!!element && typeof element.contains === 'function' && element.contains(video));
+    }
+
+    // Each detector has find(video) -> the library's player or null, and group(player) -> a group or null.
+    var LIBRARIES = [
+      {
+        // video.js: the qualityLevels plugin lists the levels; one is picked by enabling only it.
+        find: function (video) {
+          var lib = window.videojs;
+          if (!lib) return null;
+          var players = typeof lib.getAllPlayers === 'function' ? lib.getAllPlayers() :
+            Object.keys(lib.players || {}).map(function (key) { return lib.players[key]; });
+          for (var i = 0; i < players.length; i++) {
+            var player = players[i];
+            try {
+              if (!player || typeof player.qualityLevels !== 'function') continue;
+              if (containsVideo(player.el(), video)) return player;
+              var tech = player.tech_ || player.tech({ IWillNotUseThisInPlugins: true });
+              if (tech && tech.el() === video) return player;
+            } catch (_) {}
+          }
+          return null;
+        },
+        group: function (player) {
+          var list = player.qualityLevels();
+          var levels = [];
+          for (var i = 0; i < list.length; i++) levels.push(list[i]);
+          var enabled = levels.filter(function (level) { return level.enabled; });
+          var only = enabled.length === 1 ? levels.indexOf(enabled[0]) : -1;
+          var labels = ['Auto'].concat(levels.map(function (level, index) {
+            return levelLabel(level.height, level.bitrate, index);
+          }));
+          return qualityGroup(labels, only < 0 ? 0 : only + 1, function (at) {
+            levels.forEach(function (level, index) { level.enabled = at === 0 || index === at - 1; });
+          });
+        }
+      },
+      {
+        // hls.js: rarely a global of its own, so it is found among the window's values by the
+        // video it is attached to. Level -1 is its automatic choice.
+        find: function (video) {
+          return firstWindowObject(function (o) {
+            return Array.isArray(o.levels) && typeof o.currentLevel === 'number' &&
+              typeof o.attachMedia === 'function' && o.media === video;
+          });
+        },
+        group: function (hls) {
+          var auto = hls.autoLevelEnabled !== undefined ? !!hls.autoLevelEnabled : hls.currentLevel === -1;
+          var labels = ['Auto'].concat(hls.levels.map(function (level, index) {
+            return levelLabel(level.height, level.bitrate, index);
+          }));
+          return qualityGroup(labels, auto ? 0 : hls.currentLevel + 1, function (at) { hls.currentLevel = at - 1; });
+        }
+      },
+      {
+        // dash.js: a fixed level is picked by turning its automatic switching off first.
+        find: function (video) {
+          return firstWindowObject(function (o) {
+            return typeof o.getVideoElement === 'function' && o.getVideoElement() === video &&
+              (typeof o.getBitrateInfoListFor === 'function' || typeof o.getTracksFor === 'function');
+          });
+        },
+        group: function (dash) {
+          var list = dash.getBitrateInfoListFor('video');
+          if (!Array.isArray(list)) return null;
+          var settings = typeof dash.getSettings === 'function' ? dash.getSettings() : null;
+          var abr = settings && settings.streaming && settings.streaming.abr;
+          var auto = !(abr && abr.autoSwitchBitrate && abr.autoSwitchBitrate.video === false);
+          var labels = ['Auto'].concat(list.map(function (info, index) {
+            return levelLabel(info.height, info.bitrate, index);
+          }));
+          var current = dash.getQualityFor('video');
+          var autoSwitch = function (on) {
+            dash.updateSettings({ streaming: { abr: { autoSwitchBitrate: { video: on } } } });
+          };
+          return qualityGroup(labels, auto ? 0 : current + 1, function (at) {
+            autoSwitch(at === 0);
+            if (at > 0) dash.setQualityFor('video', at - 1);
+          });
+        }
+      },
+      {
+        // Shaka: one variant per video height (its best), picked with its automatic choice off.
+        find: function (video) {
+          return firstWindowObject(function (o) {
+            return typeof o.getVariantTracks === 'function' && typeof o.getMediaElement === 'function' &&
+              o.getMediaElement() === video;
+          });
+        },
+        group: function (shaka) {
+          var best = {};
+          var active = 0;
+          shaka.getVariantTracks().forEach(function (track) {
+            if (!(track.height > 0)) return;
+            var kept = best[track.height];
+            if (!kept || (track.bandwidth || 0) > (kept.bandwidth || 0)) best[track.height] = track;
+            if (track.active) active = track.height;
+          });
+          var tracks = Object.keys(best).map(Number).sort(function (a, b) { return b - a; })
+            .map(function (height) { return best[height]; });
+          var config = typeof shaka.getConfiguration === 'function' ? shaka.getConfiguration() : null;
+          var auto = !(config && config.abr && config.abr.enabled === false);
+          var labels = ['Auto'].concat(tracks.map(function (track) { return track.height + 'p'; }));
+          var on = 0;
+          tracks.forEach(function (track, index) { if (track.height === active) on = index + 1; });
+          return qualityGroup(labels, auto ? 0 : on, function (at) {
+            shaka.configure({ abr: { enabled: at === 0 } });
+            if (at > 0) shaka.selectVariantTrack(tracks[at - 1], true);
+          });
+        }
+      },
+      {
+        // Plyr sets itself on the video element.
+        find: function (video) { return video.plyr || null; },
+        group: function (plyr) {
+          var list = plyr.options && plyr.options.quality;
+          if (!Array.isArray(list) || list.length < 2) return null;
+          var current = plyr.quality;
+          return {
+            kind: 'quality',
+            label: 'Quality',
+            items: list.map(function (value) {
+              return { label: typeof value === 'number' ? value + 'p' : String(value), selected: value === current };
+            }),
+            select: function (at) { plyr.quality = list[at]; }
+          };
+        }
+      },
+      {
+        // A player object (YouTube's) that answers for its qualities and holds the video.
+        find: function (video) {
+          var places = [
+            function () { return document.getElementById('movie_player'); },
+            function () { return document.querySelector('.html5-video-player'); }
+          ];
+          for (var i = 0; i < places.length; i++) {
+            try {
+              var player = places[i]();
+              if (player && typeof player.getAvailableQualityLevels === 'function' &&
+                  typeof player.getPlaybackQuality === 'function' &&
+                  (typeof player.setPlaybackQualityRange === 'function' || typeof player.setPlaybackQuality === 'function') &&
+                  containsVideo(player, video)) return player;
+            } catch (_) {}
+          }
+          return null;
+        },
+        group: function (player) {
+          var levels = player.getAvailableQualityLevels();
+          if (!Array.isArray(levels)) return null;
+          var ids = ['auto'].concat(levels.filter(function (id) { return id !== 'auto'; }).map(String));
+          // The player reports the level in play, not whether it was left on automatic.
+          var chosen = ytChoice.has(player) ? ytChoice.get(player) : player.getPlaybackQuality();
+          var labels = ids.map(function (id) {
+            var hd = /^hd(\d+)$/.exec(id);
+            return YT_QUALITY[id] || (hd ? hd[1] + 'p' : id);
+          });
+          return qualityGroup(labels, ids.indexOf(chosen), function (at) {
+            var id = ids[at];
+            ytChoice.set(player, id);
+            if (typeof player.setPlaybackQualityRange === 'function') player.setPlaybackQualityRange(id, id);
+            if (typeof player.setPlaybackQuality === 'function') player.setPlaybackQuality(id);
+          });
+        }
+      }
+    ];
+
+    function libraryGroups(video) {
+      var now = Date.now();
+      var found = libraryFinds.get(video);
+      if (!found || now - found.at >= LIB_CACHE_MS) {
+        found = { at: now, players: [] };
+        LIBRARIES.forEach(function (library) {
+          try {
+            var player = library.find(video);
+            if (player) found.players.push({ library: library, player: player });
+          } catch (_) {}
+        });
+        libraryFinds.set(video, found);
+      }
+      var groups = [];
+      found.players.forEach(function (entry) {
+        try {
+          var group = entry.library.group(entry.player);
+          if (group) groups.push(group);
+        } catch (_) {}
+      });
+      return groups;
+    }
+
+    function readOptions(video) {
+      var groups = [];
+      var provider = document[VIDEO_OPTIONS];
+      if (typeof provider === 'function') {
+        try {
+          var offered = provider(video);
+          if (Array.isArray(offered)) groups = normalizeGroups(offered);
+        } catch (_) {}
+      }
+      // The `videoMenu` rules of a recipe (`video_menu.js`) are offered the same way.
+      var menus = document[VIDEO_MENUS];
+      if (typeof menus === 'function') {
+        try {
+          var offeredByRules = menus(video);
+          if (Array.isArray(offeredByRules)) groups = groups.concat(normalizeGroups(offeredByRules));
+        } catch (_) {}
+      }
+      // A library's groups fill in the kinds the recipe left out.
+      normalizeGroups(libraryGroups(video)).forEach(function (group) {
+        if (!groups.some(function (own) { return own.kind === group.kind; })) groups.push(group);
+      });
+      return groups;
+    }
+
+    function closeMenu() {
+      if (ui && ui.menu) { ui.menu.style.display = 'none'; ui.menu.textContent = ''; }
+      ui && (ui.menu.__group = -1);
+    }
+
+    function openMenu(index) {
+      var group = optionGroups.groups[index];
+      if (!ui || !group) return;
+      if (ui.menu.style.display === 'block' && ui.menu.__group === index) { closeMenu(); return; }
+      ui.menu.textContent = '';
+      ui.menu.__group = index;
+      group.items.forEach(function (item, at) {
+        var row = make('div', 'padding:10px 14px;white-space:nowrap;cursor:pointer;touch-action:manipulation;' +
+          (item.selected ? 'font-weight:600' : 'opacity:.85'));
+        row.textContent = (item.selected ? '\u2713 ' : '\u2003') + item.label;
+        row.addEventListener('pointerdown', stop);
+        row.addEventListener('pointerup', function (event) {
+          stop(event);
+          ghostUntil = Date.now() + GHOST_MS;
+          try { group.select(at); } catch (_) {}
+          closeMenu();
+          optionGroups.at = 0;
+          keepAlive();
+        });
+        ui.menu.appendChild(row);
+      });
+      ui.menu.style.display = 'block';
+    }
+
+    // Buttons for the groups, made again only when the groups change.
+    function syncOptions(video) {
+      var now = Date.now();
+      if (now - optionGroups.at < 700) return;
+      optionGroups.at = now;
+      var groups = readOptions(video);
+      var signature = JSON.stringify(groups.map(function (group) {
+        return [group.kind, group.label, group.items];
+      }));
+      if (signature === optionGroups.signature) return;
+      optionGroups.signature = signature;
+      optionGroups.groups = groups;
+      ui.extras.textContent = '';
+      closeMenu();
+      groups.forEach(function (group, index) {
+        var icon = group.kind === 'captions' ? 'cc' : group.kind === 'audio' ? 'audio' : 'gear';
+        var opener = button(32, icon, function () { openMenu(index); });
+        if (group.label) opener.title = group.label;
+        ui.extras.appendChild(opener);
+      });
+    }
+
+    function cycleAudio(video) {
+      var tracks = audioTracksOf(video);
+      if (!tracks.length) return;
+      var on = 0;
+      tracks.forEach(function (track, index) { if (track.enabled) on = index; });
+      var next = (on + 1) % tracks.length;
+      tracks.forEach(function (track, index) { track.enabled = index === next; });
     }
 
     function button(size, name, action) {
@@ -415,6 +854,193 @@
     // Tells the app whether the small player is up, so it can keep the page when a link is tapped.
     function tellApp(up) {
       try { window.webkit.messageHandlers.openmediaMini.postMessage(up); } catch (_) {}
+    }
+
+
+    // ---- Players the page embeds in a frame ----
+    // A frame cannot be reached from the page (another site's), and its touches do not reach the
+    // page. So the controls run in the frame too, on the video there, and ask the page by message
+    // for what only the page can do: the frame is moved to the corner as it is (moving it in the
+    // document would load it again), and the app is told, from the page only.
+
+    function frameBig() {
+      var area = (window.innerWidth || 0) * (window.innerHeight || 0);
+      var screenArea = ((window.screen && window.screen.width) || 400) * ((window.screen && window.screen.height) || 800);
+      return area >= MIN_VIDEO_SHARE * screenArea;
+    }
+
+    function toPage(message) {
+      try { window.parent.postMessage(message, '*'); } catch (_) {}
+    }
+
+    // The page's frames, those inside shadow roots too.
+    function allFrames() {
+      var found = Array.prototype.slice.call(document.querySelectorAll('iframe'));
+      var roots = window[SHADOWS];
+      if (roots) {
+        roots.forEach(function (root) {
+          if (!root.host || !root.host.isConnected) return;
+          root.querySelectorAll('iframe').forEach(function (frame) { found.push(frame); });
+        });
+      }
+      return found;
+    }
+
+    // The frame that is the page's player: the biggest on screen, over the share a video needs.
+    function playerFrame() {
+      if (framed) return null;
+      var height = window.innerHeight || document.documentElement.clientHeight;
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      var best = null;
+      var bestArea = 0;
+      allFrames().forEach(function (frame) {
+        if (!frame.isConnected || (mini && mini.frame === frame)) return;
+        var box = frame.getBoundingClientRect();
+        var seen = Math.max(0, Math.min(box.bottom, height) - Math.max(box.top, 0)) *
+          Math.max(0, Math.min(box.right, width) - Math.max(box.left, 0));
+        if (seen > bestArea && seen >= MIN_VIDEO_SHARE * width * height) {
+          best = frame;
+          bestArea = seen;
+        }
+      });
+      return best;
+    }
+
+    function frameOf(source) {
+      var found = null;
+      allFrames().forEach(function (frame) { if (frame.contentWindow === source) found = frame; });
+      return found;
+    }
+
+    function tellFrame(frame, message) {
+      try { frame.contentWindow.postMessage(message, '*'); } catch (_) {}
+    }
+
+    var FRAME_CSS_PROPS = ['position', 'right', 'bottom', 'left', 'top', 'width', 'height', 'z-index',
+      'border-radius', 'margin', 'max-width', 'max-height', 'transform', 'background'];
+
+    // The frame follows the box the small player's buttons are in.
+    function syncFrame(state) {
+      if (!state || !state.frame) return;
+      var box = state.root.style;
+      var frame = state.frame.style;
+      frame.setProperty('right', box.right, 'important');
+      frame.setProperty('bottom', box.bottom, 'important');
+      frame.setProperty('width', box.width, 'important');
+      frame.setProperty('height', box.height, 'important');
+      frame.setProperty('border-radius', box.borderRadius, 'important');
+      frame.setProperty('transition', box.transition || 'none', 'important');
+      frame.setProperty('visibility', 'visible', 'important');
+    }
+
+    function miniOnFrame(frame, from) {
+      if (mini || !frame.isConnected || !frame.parentNode) return;
+      var screenWidth = window.innerWidth || document.documentElement.clientWidth || 400;
+      var screenHeight = window.innerHeight || document.documentElement.clientHeight || 800;
+      var here = frame.getBoundingClientRect();
+      var width = Math.round(Math.min(MINI_MAX, screenWidth * MINI_SHARE));
+      var ratio = here.width > 0 && here.height > 0 ? here.width / here.height : 16 / 9;
+      var height = Math.round(Math.min(screenHeight * 0.32, Math.max(90, width / ratio)));
+      var start = {
+        right: screenWidth - here.right, bottom: screenHeight - here.bottom,
+        width: here.width, height: here.height
+      };
+      var root = make('div',
+        'position:fixed;right:' + (from ? start.right : MINI_EDGE) + 'px;bottom:' + (from ? start.bottom : MINI_BOTTOM) +
+        'px;width:' + (from ? start.width : width) + 'px;height:' + (from ? start.height : height) +
+        'px;z-index:2147483647;pointer-events:none;border-radius:' + (from ? 0 : 12) + 'px;touch-action:none');
+      root.setAttribute('data-openmedia-mini', '');
+      var state = {
+        frame: frame, video: null, root: root,
+        marker: document.createElement('div'),
+        style: frame.getAttribute('style'),
+        right: MINI_EDGE, bottom: MINI_BOTTOM, width: width, height: height,
+        start: from ? start : null, stops: []
+      };
+      // Its place in the page stays as it was, so the page does not move under the reader.
+      state.marker.setAttribute('style', 'width:' + here.width + 'px;height:' + here.height + 'px;display:block;' +
+        'flex:none;visibility:hidden');
+      var close = miniButton('close', 28, 'top:6px;right:6px', function () { miniOff(); });
+      var expand = miniButton('expand', 28, 'top:6px;left:6px', function () {
+        try { window.webkit.messageHandlers.openmediaMini.postMessage({ expand: true }); } catch (_) { miniOff(); }
+      });
+      var toggle = miniButton('pause', 34, 'left:6px;bottom:6px', function () { tellFrame(frame, { om: 'toggle' }); });
+      state.toggle = toggle;
+      [close, expand, toggle].forEach(function (button) { button.style.pointerEvents = 'auto'; root.appendChild(button); });
+      frame.parentNode.insertBefore(state.marker, frame);
+      frame.style.setProperty('position', 'fixed', 'important');
+      frame.style.setProperty('z-index', '2147483646', 'important');
+      frame.style.setProperty('margin', '0', 'important');
+      frame.style.setProperty('max-width', 'none', 'important');
+      frame.style.setProperty('max-height', 'none', 'important');
+      frame.style.setProperty('transform', 'none', 'important');
+      frame.style.setProperty('overflow', 'hidden', 'important');
+      frame.style.setProperty('left', 'auto', 'important');
+      frame.style.setProperty('top', 'auto', 'important');
+      frame.style.setProperty('box-shadow', '0 6px 24px rgba(0,0,0,.5)', 'important');
+      (document.documentElement || document.body).appendChild(root);
+      mini = state;
+      syncFrame(state);
+      var watchdog = setInterval(function () { if (!frame.isConnected) miniOff(); }, 500);
+      state.stops.push(function () { clearInterval(watchdog); });
+      tellApp(true);
+      tellFrame(frame, { om: 'mini', on: true });
+    }
+
+    var frameDrag = null; // in the page: a drag that began in a frame
+
+    // What a frame says to the page.
+    function onFrameMessage(event) {
+      var data = event.data;
+      if (!data || typeof data.om !== 'string') return;
+      if (!framed) {
+        var frame = frameOf(event.source);
+        if (!frame) return;
+        if (data.om === 'drag-start') {
+          var top = window.scrollY || (document.scrollingElement && document.scrollingElement.scrollTop) || 0;
+          var ok = !mini && panelOn() && !onFeedPage() && !document.hidden && !window.__openmediaHold &&
+            top <= 1 && frame === playerFrame();
+          frameDrag = ok ? { frame: frame, rect: frame.getBoundingClientRect() } : null;
+          tellFrame(frame, { om: 'drag-ok', ok: ok });
+        } else if (data.om === 'drag-move' && frameDrag && frameDrag.frame === frame) {
+          if (!mini) {
+            var rect = frameDrag.rect;
+            miniOnFrame(frame, { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom });
+          }
+          var reach = (window.innerHeight || document.documentElement.clientHeight || 800) * DRAG_REACH;
+          frameDrag.progress = Math.min(1, Math.max(0, data.dy / reach));
+          miniDrag(frameDrag.progress);
+        } else if (data.om === 'drag-end' && frameDrag && frameDrag.frame === frame) {
+          var held = frameDrag;
+          frameDrag = null;
+          if (!mini || mini.frame !== frame) return;
+          ghostUntil = Date.now() + GHOST_MS;
+          var keep = !data.cancelled && ((held.progress || 0) >= DRAG_COMMIT ||
+            (data.speed > DRAG_FLICK && (held.progress || 0) > 0.08));
+          if (keep) settleMini(function () { miniDrag(1); }, askAppToFloat);
+          else settleMini(function () { miniDrag(0); }, miniOff);
+        } else if (data.om === 'float') {
+          miniOnFrame(frame);
+          askAppToFloat();
+        } else if (data.om === 'unfloat') {
+          miniOff();
+        } else if (data.om === 'paused' && mini && mini.frame === frame && mini.toggle) {
+          setIcon(mini.toggle, data.paused ? 'play' : 'pause');
+        }
+        return;
+      }
+      if (event.source !== window.parent) return;
+      if (data.om === 'drag-ok') {
+        if (drag) drag.ok = !!data.ok;
+      } else if (data.om === 'mini') {
+        parentMini = !!data.on;
+        if (parentMini) hide();
+      } else if (data.om === 'toggle') {
+        var video = focus();
+        if (!video) return;
+        if (video.paused) { try { video.play().catch(function () {}); } catch (_) {} } else video.pause();
+        toPage({ om: 'paused', paused: video.paused });
+      }
     }
 
     function miniOn(video, from) {
@@ -574,8 +1200,9 @@
     // advance: while a watch page is at its top with its video on screen, it counts as scrolled.
     var refreshHeld = false;
     function syncRefreshHold() {
+      if (framed) return;
       var top = window.scrollY || (document.scrollingElement && document.scrollingElement.scrollTop) || 0;
-      var want = !mini && !document.hidden && panelOn() && !onFeedPage() && watchPage() && top <= 1 && !!focus();
+      var want = !mini && !document.hidden && panelOn() && !onFeedPage() && watchPage() && top <= 1 && !!(focus() || playerFrame());
       if (want === refreshHeld) return;
       refreshHeld = want;
       document[REFRESH_HOLD] = want;
@@ -592,6 +1219,7 @@
       mini.root.style.width = mix(a.width, mini.width) + 'px';
       mini.root.style.height = mix(a.height, mini.height) + 'px';
       mini.root.style.borderRadius = Math.round(12 * progress) + 'px';
+      syncFrame(mini);
     }
 
     function settleMini(to, then) {
@@ -600,52 +1228,90 @@
       state.root.style.transition = 'right,bottom,width,height,border-radius'.split(',').map(function (name) {
         return name + ' ' + DRAG_SETTLE_MS + 'ms ease-out';
       }).join(',');
+      syncFrame(state);
       to();
       setTimeout(function () {
         if (mini !== state) return;
         state.root.style.transition = '';
+        syncFrame(state);
         then();
       }, DRAG_SETTLE_MS + 20);
+    }
+
+    // Where a touch is. In a frame that the page then moves under the finger, the position in the
+    // frame stands still while the finger goes on; the position on the screen does not.
+    function touchX(touch) { return framed && typeof touch.screenX === 'number' ? touch.screenX : touch.clientX; }
+    function touchY(touch) { return framed && typeof touch.screenY === 'number' ? touch.screenY : touch.clientY; }
+
+    // A site's press and hold for double speed (YouTube's) starts with the touch, and since the page
+    // keeps the rest of a drag from the site, the touch never ends for it: the speed would stay
+    // doubled. The speed the video had is kept while the drag lasts, and a little after.
+    function holdRate(video, rate) {
+      var back = function () { if (video.playbackRate !== rate) video.playbackRate = rate; };
+      video.addEventListener('ratechange', back);
+      back();
+      return function (after) {
+        setTimeout(function () {
+          video.removeEventListener('ratechange', back);
+          back();
+        }, after);
+      };
     }
 
     function dragStart(event) {
       drag = null;
       if (mini || !event.touches || event.touches.length !== 1 || document.hidden || window.__openmediaHold) return;
+      if (framed && (parentMini || !frameBig())) return;
       if (!panelOn() || onFeedPage() || !watchPage() || inPanel(event.target)) return;
       var top = window.scrollY || (document.scrollingElement && document.scrollingElement.scrollTop) || 0;
       if (top > 1) return;
+      // The page's own video, or its frame: a touch on a frame goes to the frame's own copy of the
+      // controls, but one that lands on something laid over it (an ad's catcher) comes here.
       var video = focus();
-      if (!video) return;
+      var frame = video ? null : playerFrame();
+      if (!video && !frame) return;
       var touch = event.touches[0];
-      var box = boxOf(video);
+      var box = video ? boxOf(video) : frame.getBoundingClientRect();
       if (!(touch.clientX >= box.left && touch.clientX <= box.right && touch.clientY >= box.top && touch.clientY <= box.bottom)) return;
-      if (onSiteButton(event.target, video)) return;
+      if (video && onSiteButton(event.target, video)) return;
       drag = {
-        video: video, x: touch.clientX, y: touch.clientY, engaged: false,
+        video: video, frame: frame, rate: video ? video.playbackRate : 1, x: touchX(touch), y: touchY(touch), engaged: false,
         box: { left: box.left, right: box.right, top: box.top, bottom: box.bottom },
-        last: { y: touch.clientY, at: Date.now() }, speed: 0
+        last: { y: touchY(touch), at: Date.now() }, speed: 0, ok: false
       };
+      // In a frame only the page knows whether it is at its top and this is its player.
+      if (framed) toPage({ om: 'drag-start' });
     }
 
     function dragMove(event) {
       if (!drag || !event.touches || !event.touches.length) return;
       var touch = event.touches[0];
-      var dx = touch.clientX - drag.x;
-      var dy = touch.clientY - drag.y;
+      var dx = touchX(touch) - drag.x;
+      var dy = touchY(touch) - drag.y;
       if (!drag.engaged) {
         if (Math.abs(dx) > DRAG_SLOP && Math.abs(dx) >= Math.abs(dy)) { drag = null; return; }
         if (dy < -DRAG_SLOP) { drag = null; return; }
         if (dy < DRAG_SLOP || dy < Math.abs(dx) * 1.4) return;
-        hide();
-        miniOn(drag.video, drag.box);
-        if (!mini) { drag = null; return; }
+        if (framed) {
+          if (!drag.ok) return;
+          hide();
+        } else {
+          hide();
+          if (drag.frame) miniOnFrame(drag.frame, drag.box); else miniOn(drag.video, drag.box);
+          if (!mini) { drag = null; return; }
+        }
         drag.engaged = true;
+        if (drag.video) drag.release = holdRate(drag.video, drag.rate);
       }
       event.stopImmediatePropagation();
       if (event.cancelable) event.preventDefault();
       var now = Date.now();
-      if (now > drag.last.at) drag.speed = (touch.clientY - drag.last.y) / (now - drag.last.at);
-      drag.last = { y: touch.clientY, at: now };
+      if (now > drag.last.at) drag.speed = (touchY(touch) - drag.last.y) / (now - drag.last.at);
+      drag.last = { y: touchY(touch), at: now };
+      if (framed) {
+        toPage({ om: 'drag-move', dy: dy });
+        return;
+      }
       var reach = (window.innerHeight || document.documentElement.clientHeight || 800) * DRAG_REACH;
       drag.progress = Math.min(1, Math.max(0, dy / reach));
       miniDrag(drag.progress);
@@ -654,10 +1320,15 @@
     function dragEnd(event, cancelled) {
       var held = drag;
       drag = null;
-      if (!held || !held.engaged || !mini) return;
+      if (held && held.release) held.release(HOLD_RATE_MS);
+      if (!held || !held.engaged || (!framed && !mini)) return;
       event.stopImmediatePropagation();
       if (event.cancelable) event.preventDefault();
       ghostUntil = Date.now() + GHOST_MS;
+      if (framed) {
+        toPage({ om: 'drag-end', speed: held.speed, cancelled: !!cancelled });
+        return;
+      }
       var keep = !cancelled && (held.progress >= DRAG_COMMIT || (held.speed > DRAG_FLICK && held.progress > 0.08));
       if (keep) {
         settleMini(function () { miniDrag(1); }, askAppToFloat);
@@ -689,6 +1360,7 @@
         var pair = part.split(/:(.+)/);
         mini.root.style.setProperty(pair[0], pair[1]);
       });
+      syncFrame(mini);
     }
 
     function miniOff() {
@@ -697,6 +1369,14 @@
       mini = null;
       tellApp(false);
       state.stops.forEach(function (step) { try { step(); } catch (_) {} });
+      if (state.frame) {
+        if (state.style === null) state.frame.removeAttribute('style'); else state.frame.setAttribute('style', state.style);
+        if (state.marker.parentNode) state.marker.parentNode.removeChild(state.marker);
+        if (state.root.parentNode) state.root.parentNode.removeChild(state.root);
+        tellFrame(state.frame, { om: 'mini', on: false });
+        if (miniWindowed) document.documentElement.style.visibility = 'hidden';
+        return;
+      }
       var video = state.video;
       var home = state.marker.parentNode;
       if (state.style === null) video.removeAttribute('style'); else video.setAttribute('style', state.style);
@@ -726,7 +1406,7 @@
         '-webkit-user-select:none;user-select:none');
       root.setAttribute('data-openmedia-controls', '');
       var card = make('div',
-        'pointer-events:auto;margin:0 12px;padding:10px 14px 2px;border-radius:18px;background:rgba(0,0,0,.62);' +
+        'position:relative;pointer-events:auto;margin:0 12px;padding:10px 14px 2px;border-radius:18px;background:rgba(0,0,0,.62);' +
         '-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)');
       var transport = make('div',
         'display:flex;align-items:center;justify-content:center;gap:30px;padding-bottom:6px');
@@ -757,7 +1437,9 @@
         if (!target.muted && target.volume === 0) target.volume = 1;
       });
       var floatButton = button(32, 'pip', function (target) {
-        if (mini) {
+        if (framed) {
+          toPage({ om: parentMini ? 'unfloat' : 'float' });
+        } else if (mini) {
           miniOff();
         } else {
           miniOn(target);
@@ -765,6 +1447,7 @@
         }
         hide();
       });
+      var fullButton = button(32, 'fullscreen', function (target) { toggleFullscreen(target); });
       var left = make('span', 'margin-left:auto;min-width:48px;text-align:right');
       var pill = make('span',
         'pointer-events:auto;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.18);' +
@@ -783,8 +1466,18 @@
         keepAlive();
         paint(target);
       });
+      var extras = make('span', 'display:flex;align-items:center;gap:10px');
+      var cc = button(32, 'cc', function (target) { cycleCaptions(target); });
+      var audio = button(32, 'audio', function (target) { cycleAudio(target); });
+      var note = make('span',
+        'font-size:12px;opacity:.85;max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap');
+      cc.style.display = 'none';
+      audio.style.display = 'none';
       row.appendChild(mute);
-      if (floatButton) row.appendChild(floatButton);
+      row.appendChild(cc);
+      row.appendChild(audio);
+      row.appendChild(note);
+      row.appendChild(extras);
       row.appendChild(left);
       row.appendChild(pill);
       var seek = slider(30, function (ratio) {
@@ -793,6 +1486,18 @@
         target.currentTime = ratio * target.duration;
         paint(target);
       });
+      // The small player's button in the top left corner, full screen in the top right.
+      floatButton.style.cssText += ';position:absolute;top:8px;left:10px';
+      fullButton.style.cssText += ';position:absolute;top:8px;right:10px';
+      card.appendChild(floatButton);
+      card.appendChild(fullButton);
+      // The list a group's button opens, above the panel.
+      var menu = make('div',
+        'display:none;position:absolute;right:0;bottom:calc(100% + 8px);max-height:40vh;overflow-y:auto;' +
+        'border-radius:14px;background:rgba(0,0,0,.85);color:#fff;pointer-events:auto;' +
+        '-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)');
+      menu.__group = -1;
+      card.appendChild(menu);
       card.appendChild(transport);
       card.appendChild(row);
       card.appendChild(seek.track);
@@ -802,7 +1507,7 @@
       });
       parent.appendChild(root);
       ui = {
-        root: root, toggle: toggle, mute: mute, left: left, pill: pill, seek: seek
+        root: root, toggle: toggle, mute: mute, cc: cc, audio: audio, note: note, extras: extras, menu: menu, left: left, pill: pill, seek: seek
       };
       return ui;
     }
@@ -821,10 +1526,21 @@
       ui.pill.textContent = (Math.round(rate * 100) / 100) + '\u00d7';
       setIcon(ui.toggle, video.paused ? 'play' : 'pause');
       setIcon(ui.mute, video.muted || video.volume === 0 ? 'muted' : 'sound');
+      var texts = textTracksOf(video);
+      var showing = texts.filter(function (track) { return track.mode === 'showing'; })[0];
+      syncOptions(video);
+      var kinds = optionGroups.groups.map(function (group) { return group.kind; });
+      ui.cc.style.display = texts.length && kinds.indexOf('captions') < 0 ? 'flex' : 'none';
+      ui.cc.style.opacity = showing ? '1' : '.45';
+      var audios = audioTracksOf(video);
+      var heard = audios.filter(function (track) { return track.enabled; })[0];
+      ui.audio.style.display = audios.length && kinds.indexOf('audio') < 0 ? 'flex' : 'none';
+      ui.note.textContent = (showing && showing.label) || (heard && heard.label) || '';
     }
 
     function hide() {
       shown = false;
+      closeMenu();
       clearTimeout(hideTimer);
       if (ui) {
         ui.root.style.display = 'none';
@@ -845,7 +1561,7 @@
     function tick() {
       syncRefreshHold();
       if (active()) {
-        document.querySelectorAll('video').forEach(prepare);
+        allVideos().forEach(prepare);
       }
       var video = shown && panelPage() && panelOn() ? focus() : null;
       if (video !== lastVideo) {
@@ -1142,25 +1858,35 @@
 
     function tapped() { lastTap = Date.now(); }
 
+    // Presses a script makes (the menu rules click the site's own controls, a site may too) are not
+    // the reader's, and must not show or hide the panel.
+    function trusted(handler) {
+      return function (event) {
+        if (event.isTrusted === false) return;
+        return handler.apply(this, arguments);
+      };
+    }
+
     function on(target, name, handler, options) {
       target.addEventListener(name, handler, options);
       teardown.push(function () { target.removeEventListener(name, handler, options); });
     }
 
-    on(document, 'touchend', tapped, { capture: true, passive: true });
-    on(document, 'click', tapped, { capture: true, passive: true });
-    on(window, 'pointerdown', onPointerDown, { capture: true, passive: true });
-    on(window, 'pointermove', onPointerMove, { capture: true, passive: true });
-    on(window, 'pointercancel', onPointerCancel, { capture: true, passive: true });
-    on(window, 'pointerup', onPointerUp, { capture: true });
-    on(window, 'touchstart', dragStart, { capture: true, passive: true });
-    on(window, 'touchmove', dragMove, { capture: true, passive: false });
-    on(window, 'touchend', function (event) { dragEnd(event, false); }, { capture: true, passive: false });
-    on(window, 'touchcancel', function (event) { dragEnd(event, true); }, { capture: true, passive: false });
-    on(window, 'touchstart', onTouchStart, { capture: true, passive: true });
-    on(window, 'touchmove', keepFromSite, { capture: true, passive: true });
-    on(window, 'touchend', onTouchEnd, { capture: true });
-    on(window, 'click', onClick, { capture: true });
+    on(document, 'touchend', trusted(tapped), { capture: true, passive: true });
+    on(document, 'click', trusted(tapped), { capture: true, passive: true });
+    on(window, 'pointerdown', trusted(onPointerDown), { capture: true, passive: true });
+    on(window, 'pointermove', trusted(onPointerMove), { capture: true, passive: true });
+    on(window, 'pointercancel', trusted(onPointerCancel), { capture: true, passive: true });
+    on(window, 'pointerup', trusted(onPointerUp), { capture: true });
+    on(window, 'message', onFrameMessage, { capture: true, passive: true });
+    on(window, 'touchstart', trusted(dragStart), { capture: true, passive: true });
+    on(window, 'touchmove', trusted(dragMove), { capture: true, passive: false });
+    on(window, 'touchend', trusted(function (event) { dragEnd(event, false); }), { capture: true, passive: false });
+    on(window, 'touchcancel', trusted(function (event) { dragEnd(event, true); }), { capture: true, passive: false });
+    on(window, 'touchstart', trusted(onTouchStart), { capture: true, passive: true });
+    on(window, 'touchmove', trusted(keepFromSite), { capture: true, passive: true });
+    on(window, 'touchend', trusted(onTouchEnd), { capture: true });
+    on(window, 'click', trusted(onClick), { capture: true });
     on(document, 'keydown', tapped, { capture: true, passive: true });
     // A new source is a new video: it gets the remembered speed and sound, once it has started.
     on(document, 'loadstart', function (event) {
