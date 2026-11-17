@@ -137,6 +137,8 @@ export interface AppStore {
   sheet: Sheet;
   /** Where closing a child page of Settings returns to; `none` for every other sheet. */
   sheetParent: "none" | "settings";
+  /** The favorite Settings opens with expanded and in view, consumed once by the favorites list. */
+  focusFavoriteId: string | null;
   /** The recipe the Recipes page opens with expanded, set when a favorite sends the user there. */
   recipeFocus: string | null;
   onboardingOpen: boolean;
@@ -157,6 +159,9 @@ export interface AppStore {
   assistant: AssistantState;
   load: () => Promise<void>;
   openSheet: (sheet: Sheet) => void;
+  /** Opens Settings with this favorite's editor expanded and scrolled into view. */
+  openFavoriteSettings: (favoriteId: string) => void;
+  clearFavoriteFocus: () => void;
   closeSheet: () => void;
   /** An empty page with the command bar open: a new tab. The sessions stay open underneath it. */
   openNewTab: () => void;
@@ -519,6 +524,7 @@ export const useApp = create<AppStore>((set, get) => {
     sheet: "none",
     sheetParent: "none",
     recipeFocus: null,
+    focusFavoriteId: null,
     onboardingOpen: false,
     sessions: [],
     activeId: null,
@@ -569,6 +575,10 @@ export const useApp = create<AppStore>((set, get) => {
     openNewTab: () => {
       set((current) => ({ ...showSheet(current, "assistant"), blankTab: true }));
     },
+    openFavoriteSettings: (favoriteId) => {
+      set((current) => ({ ...showSheet(current, "settings"), focusFavoriteId: favoriteId }));
+    },
+    clearFavoriteFocus: () => set({ focusFavoriteId: null }),
     closeSheet: () =>
       set((current) => ({
         sheet: isSettingsChild(current.sheet) ? current.sheetParent : "none",

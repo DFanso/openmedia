@@ -250,8 +250,6 @@ export const pt: Messages = {
   "settings.title": "Configurações",
   "settings.close": "Fechar configurações",
   "settings.appearance": "Aparência",
-  "settings.appearanceNote":
-    "Aplica-se ao app e aos sites que seguem o esquema de cores do sistema.",
   "settings.themeLabel": "Tema",
   "settings.themeSystem": "Sistema",
   "settings.themeLight": "Claro",
@@ -414,12 +412,9 @@ export const pt: Messages = {
   "recipes.removeFavorite": "Remover {name} dos favoritos",
   "recipes.hub": "Hub",
   "settings.darkMode": "Modo escuro",
-  "settings.darkModeNote": "Escurece as páginas que você abre.",
   "settings.darkEnabled": "Escurecer páginas",
   "settings.darkEnabledNote":
     "Ativa o modo escuro em todos os sites que não têm uma escolha própria.",
-  "settings.darkSitesNote":
-    "Estas configurações valem para todos os sites, a menos que um site tenha escolha própria. Defina uma nas configurações de um favorito.",
   "settings.darkMethod": "Método",
   "settings.darkMethodDynamic": "Dinâmico",
   "settings.darkMethodDynamicNote":
@@ -451,9 +446,7 @@ export const pt: Messages = {
   "settings.darkText": "Cor do texto",
   "settings.darkSchedule": "Agendamento",
   "settings.darkScheduleAlways": "Sempre",
-  "settings.darkScheduleSystem": "Tema do app",
   "settings.darkScheduleTime": "Horário",
-  "settings.darkScheduleSystemNote": "Escurece as páginas enquanto o tema do app for escuro.",
   "settings.darkFrom": "Das",
   "settings.darkTo": "Até",
   "settings.darkBehavior": "Comportamento",
@@ -467,7 +460,6 @@ export const pt: Messages = {
   "settings.darkImages": "Ajustar imagens",
   "settings.darkImagesNote":
     "Inverte ícones e logotipos escuros em fundo transparente e suaviza diagramas claros grandes.",
-  "settings.darkSites": "Sites com escolha própria",
   "settings.darkSitesEmpty": "Nenhum ainda.",
   "settings.darkSiteRemove": "Remover a escolha de modo escuro de {site}",
   "settings.darkReset": "Restaurar padrões",
@@ -486,9 +478,7 @@ export const pt: Messages = {
   "favorites.videoHeightOwn": "Este site tem a sua própria altura.",
   "favorites.videoHeightLabel": "Altura dos controlos de vídeo de {site}",
   "favorites.videoUseShared": "Usar as definições de vídeo partilhadas",
-  "favorites.darkMode": "Modo escuro",
   "favorites.darkModeLabel": "Modo escuro de {site}",
-  "favorites.darkFollow": "Seguir as configurações",
   "favorites.darkOn": "Sempre ligado",
   "favorites.darkOff": "Desligado",
   "favorites.darkMethod": "Método para este site",
@@ -798,4 +788,26 @@ export const pt: Messages = {
   "tabs.statToday": "{value} hoje",
   "tabs.statShowing": "Exibindo agora",
   "tabs.statIdle": "Usado {value}",
+  "settings.appearanceNote":
+    "Aplica-se apenas ao app. O aspeto das páginas define-se no modo escuro.",
+  "settings.darkScheduleSystem": "Sistema",
+  "settings.darkScheduleSystemNote": "Segue a definição clara ou escura do dispositivo.",
+  "favorites.videoPanel": "Painel de controles",
+  "favorites.videoPanelLabel": "Painel de controles de vídeo de {site}",
+  "favorites.darkMode": "Modo escuro específico",
+  "favorites.darkFollow": "Seguir o geral",
+  "settings.darkModeNote": "Configurações gerais, o padrão de cada site",
+  "settings.darkModeTitle": "Modo escuro geral",
+  "settings.darkModeSubtitle":
+    "O padrão de cada site. A escolha própria de modo escuro de um favorito o substitui.",
+  "settings.darkSites": "Sites com configurações específicas",
+  "settings.darkSitesNote":
+    "Estas configurações valem para todos os sites, a menos que um site tenha configurações específicas. Defina-as em um favorito.",
+  "favorites.darkModeNote": "Substitui o modo escuro geral neste site.",
+  "fab.darkMode":
+    "Modo escuro. Toque para ligar ou desligar em todos os sites, mantenha pressionado para as configurações gerais.",
+  "fab.darkModeSite":
+    "Modo escuro deste site. Toque para ligar ou desligar, mantenha pressionado para as configurações dele.",
+  "favorites.darkEffectiveOn": "O modo escuro está ligado neste site.",
+  "favorites.darkEffectiveOff": "O modo escuro está desligado neste site.",
 };

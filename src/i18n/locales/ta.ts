@@ -252,8 +252,6 @@ export const ta: Messages = {
   "settings.title": "அமைப்புகள்",
   "settings.close": "அமைப்புகளை மூடு",
   "settings.appearance": "தோற்றம்",
-  "settings.appearanceNote":
-    "செயலிக்கும், அமைப்பின் வண்ணத் திட்டத்தைப் பின்பற்றும் தளங்களுக்கும் பொருந்தும்.",
   "settings.themeLabel": "தீம்",
   "settings.themeSystem": "அமைப்பு",
   "settings.themeLight": "வெளிர்",
@@ -419,12 +417,9 @@ export const ta: Messages = {
   "recipes.removeFavorite": "{name} ஐப் பிடித்துக்கொள்ளவிடைகளிலிருந்து அகற்று",
   "recipes.hub": "ஹப்",
   "settings.darkMode": "இருண்ட பயன்முறை",
-  "settings.darkModeNote": "நீங்கள் திறக்கும் பக்கங்களை இருளாக்கும்.",
   "settings.darkEnabled": "பக்கங்களை இருளாக்கு",
   "settings.darkEnabledNote":
     "தனக்கென தேர்வு இல்லாத ஒவ்வொரு தளத்திலும் இருண்ட பயன்முறையை இயக்கும்.",
-  "settings.darkSitesNote":
-    "ஒரு தளத்திற்குத் தனி தேர்வு இல்லாதவரை இந்த அமைப்புகள் எல்லா தளங்களுக்கும் பொருந்தும். பிடித்தவையின் அமைப்புகளில் அதை அமைக்கவும்.",
   "settings.darkMethod": "முறை",
   "settings.darkMethodDynamic": "டைனமிக்",
   "settings.darkMethodDynamicNote":
@@ -456,10 +451,7 @@ export const ta: Messages = {
   "settings.darkText": "உரை நிறம்",
   "settings.darkSchedule": "அட்டவணை",
   "settings.darkScheduleAlways": "எப்போதும்",
-  "settings.darkScheduleSystem": "செயலியின் தீம்",
   "settings.darkScheduleTime": "நேரம்",
-  "settings.darkScheduleSystemNote":
-    "செயலியின் தீம் இருண்டதாக இருக்கும்போது பக்கங்களை இருளாக்கும்.",
   "settings.darkFrom": "தொடக்கம்",
   "settings.darkTo": "முடிவு",
   "settings.darkBehavior": "நடத்தை",
@@ -475,7 +467,6 @@ export const ta: Messages = {
   "settings.darkImages": "படங்களைச் சரிசெய்",
   "settings.darkImagesNote":
     "ஒளிஊடுருவும் பின்னணியிலுள்ள இருண்ட ஐகான்கள் மற்றும் லோகோக்களைத் தலைகீழாக்கி, பெரிய வெளிர் வரைபடங்களின் ஒளியைக் குறைக்கும்.",
-  "settings.darkSites": "தனி தேர்வு உள்ள தளங்கள்",
   "settings.darkSitesEmpty": "இதுவரை இல்லை.",
   "settings.darkSiteRemove": "{site} தளத்துக்கான இருண்ட பயன்முறை தேர்வை நீக்கு",
   "settings.darkReset": "இயல்புநிலைக்கு மீட்டமை",
@@ -494,9 +485,7 @@ export const ta: Messages = {
   "favorites.videoHeightOwn": "இந்தத் தளத்திற்கு தனி உயரம் உள்ளது.",
   "favorites.videoHeightLabel": "{site} வீடியோ கட்டுப்பாடுகளின் உயரம்",
   "favorites.videoUseShared": "பகிர்ந்த வீடியோ அமைப்புகளைப் பயன்படுத்து",
-  "favorites.darkMode": "இருண்ட பயன்முறை",
   "favorites.darkModeLabel": "{site} இருண்ட பயன்முறை",
-  "favorites.darkFollow": "அமைப்புகளைப் பின்பற்று",
   "favorites.darkOn": "எப்போதும் இயக்கம்",
   "favorites.darkOff": "முடக்கு",
   "favorites.darkMethod": "இந்தத் தளத்துக்கான முறை",
@@ -813,4 +802,26 @@ export const ta: Messages = {
   "tabs.statToday": "இன்று {value}",
   "tabs.statShowing": "இப்போது காட்டப்படுகிறது",
   "tabs.statIdle": "பயன்படுத்தியது {value}",
+  "settings.appearanceNote":
+    "செயலிக்கு மட்டும் பொருந்தும். பக்கங்கள் எப்படித் தெரியும் என்பது இருண்ட பயன்முறையில் அமைக்கப்படும்.",
+  "settings.darkScheduleSystem": "அமைப்பு",
+  "settings.darkScheduleSystemNote": "சாதனத்தின் வெளிர் அல்லது இருண்ட அமைப்பைப் பின்பற்றும்.",
+  "favorites.videoPanel": "கட்டுப்பாட்டுப் பலகை",
+  "favorites.videoPanelLabel": "{site} வீடியோ கட்டுப்பாட்டுப் பலகை",
+  "favorites.darkMode": "குறிப்பிட்ட இருண்ட பயன்முறை",
+  "favorites.darkFollow": "பொதுவானதைப் பின்பற்று",
+  "settings.darkModeNote": "பொது அமைப்புகள், எல்லா தளங்களுக்குமான இயல்புநிலை",
+  "settings.darkModeTitle": "பொது இருண்ட பயன்முறை",
+  "settings.darkModeSubtitle":
+    "எல்லா தளங்களுக்குமான இயல்புநிலை. பிடித்தவையின் சொந்த இருண்ட பயன்முறை தேர்வு இதை மீறும்.",
+  "settings.darkSites": "குறிப்பிட்ட அமைப்புகளுடன் உள்ள தளங்கள்",
+  "settings.darkSitesNote":
+    "ஒரு தளத்திற்குக் குறிப்பிட்ட அமைப்புகள் இல்லாதவரை இந்த அமைப்புகள் எல்லா தளங்களுக்கும் பொருந்தும். பிடித்தவையில் அவற்றை அமைக்கவும்.",
+  "favorites.darkModeNote": "இந்தத் தளத்துக்குப் பொது இருண்ட பயன்முறையை மீறும்.",
+  "fab.darkMode":
+    "இருண்ட பயன்முறை. எல்லா தளங்களுக்கும் இயக்க அல்லது அணைக்கத் தட்டவும், பொது அமைப்புகளுக்கு அழுத்திப் பிடிக்கவும்.",
+  "fab.darkModeSite":
+    "இந்தத் தளத்துக்கான இருண்ட பயன்முறை. இயக்க அல்லது அணைக்கத் தட்டவும், அதன் அமைப்புகளுக்கு அழுத்திப் பிடிக்கவும்.",
+  "favorites.darkEffectiveOn": "இந்தத் தளத்தில் இருண்ட பயன்முறை இயக்கத்தில் உள்ளது.",
+  "favorites.darkEffectiveOff": "இந்தத் தளத்தில் இருண்ட பயன்முறை அணைக்கப்பட்டுள்ளது.",
 };

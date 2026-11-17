@@ -236,7 +236,6 @@ export const bn: Messages = {
   "settings.title": "সেটিংস",
   "settings.close": "সেটিংস বন্ধ করুন",
   "settings.appearance": "অ্যাপের চেহারা",
-  "settings.appearanceNote": "অ্যাপে এবং সিস্টেমের রঙ বিন্যাস অনুসরণ করে এমন সাইটেও প্রযোজ্য।",
   "settings.themeLabel": "থিম",
   "settings.themeSystem": "সিস্টেম",
   "settings.themeLight": "লাইট",
@@ -396,11 +395,8 @@ export const bn: Messages = {
   "recipes.removeFavorite": "{name} পছন্দের তালিকা থেকে সরান",
   "recipes.hub": "হাব",
   "settings.darkMode": "ডার্ক মোড",
-  "settings.darkModeNote": "আপনার খোলা পেজগুলো গাঢ় করে।",
   "settings.darkEnabled": "পেজ গাঢ় করুন",
   "settings.darkEnabledNote": "যে সাইটের নিজস্ব কোনো পছন্দ নেই, সেই সব সাইটে ডার্ক মোড চালু করে।",
-  "settings.darkSitesNote":
-    "সাইটের নিজস্ব পছন্দ না থাকলে এই সেটিংস সব সাইটে প্রযোজ্য। কোনো ফেভারিটের সেটিংসে গিয়ে সেটি ঠিক করুন।",
   "settings.darkMethod": "পদ্ধতি",
   "settings.darkMethodDynamic": "ডাইনামিক",
   "settings.darkMethodDynamicNote":
@@ -432,9 +428,7 @@ export const bn: Messages = {
   "settings.darkText": "লেখার রং",
   "settings.darkSchedule": "সময়সূচি",
   "settings.darkScheduleAlways": "সবসময়",
-  "settings.darkScheduleSystem": "অ্যাপের থিম",
   "settings.darkScheduleTime": "সময়",
-  "settings.darkScheduleSystemNote": "অ্যাপের থিম ডার্ক থাকলে পেজ গাঢ় করে।",
   "settings.darkFrom": "শুরু",
   "settings.darkTo": "শেষ",
   "settings.darkBehavior": "আচরণ",
@@ -447,7 +441,6 @@ export const bn: Messages = {
   "settings.darkImages": "ছবি সামঞ্জস্য করুন",
   "settings.darkImagesNote":
     "স্বচ্ছ ব্যাকগ্রাউন্ডে থাকা গাঢ় আইকন ও লোগো উল্টে দেয় এবং বড় হালকা ডায়াগ্রামের উজ্জ্বলতা কমায়।",
-  "settings.darkSites": "নিজস্ব পছন্দ আছে এমন সাইট",
   "settings.darkSitesEmpty": "এখনো নেই।",
   "settings.darkSiteRemove": "{site}-এর ডার্ক মোড পছন্দ সরান",
   "settings.darkReset": "ডিফল্টে রিসেট করুন",
@@ -466,9 +459,7 @@ export const bn: Messages = {
   "favorites.videoHeightOwn": "এই সাইটের নিজস্ব উচ্চতা আছে।",
   "favorites.videoHeightLabel": "{site}-এর ভিডিও নিয়ন্ত্রণের উচ্চতা",
   "favorites.videoUseShared": "সাধারণ ভিডিও সেটিংস ব্যবহার করুন",
-  "favorites.darkMode": "ডার্ক মোড",
   "favorites.darkModeLabel": "{site} ডার্ক মোড",
-  "favorites.darkFollow": "সেটিংস অনুসরণ করুন",
   "favorites.darkOn": "সবসময় চালু",
   "favorites.darkOff": "বন্ধ",
   "favorites.darkMethod": "এই সাইটের পদ্ধতি",
@@ -777,4 +768,25 @@ export const bn: Messages = {
   "tabs.statToday": "আজ {value}",
   "tabs.statShowing": "এখন দেখানো হচ্ছে",
   "tabs.statIdle": "ব্যবহৃত {value}",
+  "settings.appearanceNote": "শুধু অ্যাপে প্রযোজ্য। পেজ দেখতে কেমন হবে তা ডার্ক মোডে ঠিক হয়।",
+  "settings.darkScheduleSystem": "সিস্টেম",
+  "settings.darkScheduleSystemNote": "ডিভাইসের লাইট বা ডার্ক সেটিং অনুসরণ করে।",
+  "favorites.videoPanel": "নিয়ন্ত্রণ প্যানেল",
+  "favorites.videoPanelLabel": "{site} ভিডিও নিয়ন্ত্রণ প্যানেল",
+  "favorites.darkMode": "নির্দিষ্ট ডার্ক মোড",
+  "favorites.darkFollow": "সাধারণ অনুসরণ করুন",
+  "settings.darkModeNote": "সাধারণ সেটিংস, সব সাইটের ডিফল্ট",
+  "settings.darkModeTitle": "সাধারণ ডার্ক মোড",
+  "settings.darkModeSubtitle":
+    "সব সাইটের ডিফল্ট। কোনো ফেভারিটের নিজস্ব ডার্ক মোড পছন্দ এটিকে ছাপিয়ে যায়।",
+  "settings.darkSites": "নির্দিষ্ট সেটিংসওয়ালা সাইট",
+  "settings.darkSitesNote":
+    "কোনো সাইটের নির্দিষ্ট সেটিংস না থাকলে এই সেটিংস সব সাইটে প্রযোজ্য। ফেভারিটে সেগুলো ঠিক করুন।",
+  "favorites.darkModeNote": "এই সাইটের জন্য সাধারণ ডার্ক মোডকে ছাপিয়ে যায়।",
+  "fab.darkMode":
+    "ডার্ক মোড। সব সাইটের জন্য চালু বা বন্ধ করতে ট্যাপ করুন, সাধারণ সেটিংসের জন্য চেপে ধরুন।",
+  "fab.darkModeSite":
+    "এই সাইটের ডার্ক মোড। চালু বা বন্ধ করতে ট্যাপ করুন, এর সেটিংসের জন্য চেপে ধরুন।",
+  "favorites.darkEffectiveOn": "এই সাইটে ডার্ক মোড চালু আছে।",
+  "favorites.darkEffectiveOff": "এই সাইটে ডার্ক মোড বন্ধ আছে।",
 };

@@ -246,8 +246,6 @@ export const nl: Messages = {
   "settings.title": "Instellingen",
   "settings.close": "Instellingen sluiten",
   "settings.appearance": "Uiterlijk",
-  "settings.appearanceNote":
-    "Geldt voor de app en voor sites die het kleurenschema van het systeem volgen.",
   "settings.themeLabel": "Thema",
   "settings.themeSystem": "Systeem",
   "settings.themeLight": "Licht",
@@ -407,11 +405,8 @@ export const nl: Messages = {
   "recipes.removeFavorite": "{name} verwijderen uit favorieten",
   "recipes.hub": "Hub",
   "settings.darkMode": "Donkere modus",
-  "settings.darkModeNote": "Maakt de pagina's die je opent donker.",
   "settings.darkEnabled": "Pagina's donker maken",
   "settings.darkEnabledNote": "Zet de donkere modus aan voor elke site zonder eigen keuze.",
-  "settings.darkSitesNote":
-    "Deze instellingen gelden voor elke site, tenzij een site een eigen keuze heeft. Stel er een in via de instellingen van een favoriet.",
   "settings.darkMethod": "Methode",
   "settings.darkMethodDynamic": "Dynamisch",
   "settings.darkMethodDynamicNote":
@@ -443,9 +438,7 @@ export const nl: Messages = {
   "settings.darkText": "Tekstkleur",
   "settings.darkSchedule": "Schema",
   "settings.darkScheduleAlways": "Altijd",
-  "settings.darkScheduleSystem": "App-thema",
   "settings.darkScheduleTime": "Tijd",
-  "settings.darkScheduleSystemNote": "Maakt pagina's donker zolang het thema van de app donker is.",
   "settings.darkFrom": "Van",
   "settings.darkTo": "Tot",
   "settings.darkBehavior": "Gedrag",
@@ -459,7 +452,6 @@ export const nl: Messages = {
   "settings.darkImages": "Afbeeldingen aanpassen",
   "settings.darkImagesNote":
     "Keert donkere pictogrammen en logo's op transparante achtergrond om en temt grote lichte diagrammen.",
-  "settings.darkSites": "Sites met eigen keuze",
   "settings.darkSitesEmpty": "Nog geen.",
   "settings.darkSiteRemove": "De keuze voor de donkere modus van {site} verwijderen",
   "settings.darkReset": "Standaardwaarden herstellen",
@@ -478,9 +470,7 @@ export const nl: Messages = {
   "favorites.videoHeightOwn": "Deze site heeft een eigen hoogte.",
   "favorites.videoHeightLabel": "Hoogte videobediening van {site}",
   "favorites.videoUseShared": "Gedeelde video-instellingen gebruiken",
-  "favorites.darkMode": "Donkere modus",
   "favorites.darkModeLabel": "Donkere modus voor {site}",
-  "favorites.darkFollow": "Instellingen volgen",
   "favorites.darkOn": "Altijd aan",
   "favorites.darkOff": "Uit",
   "favorites.darkMethod": "Methode voor deze site",
@@ -799,4 +789,26 @@ export const nl: Messages = {
   "tabs.statToday": "{value} vandaag",
   "tabs.statShowing": "Nu zichtbaar",
   "tabs.statIdle": "Gebruikt {value}",
+  "settings.appearanceNote":
+    "Geldt alleen voor de app. Hoe pagina's eruitzien stel je in bij Donkere modus.",
+  "settings.darkScheduleSystem": "Systeem",
+  "settings.darkScheduleSystemNote": "Volgt de lichte of donkere instelling van het apparaat.",
+  "favorites.videoPanel": "Bedieningspaneel",
+  "favorites.videoPanelLabel": "Videobedieningspaneel van {site}",
+  "favorites.darkMode": "Specifieke donkere modus",
+  "favorites.darkFollow": "Algemeen volgen",
+  "settings.darkModeNote": "Algemene instellingen, de standaard voor elke site",
+  "settings.darkModeTitle": "Algemene donkere modus",
+  "settings.darkModeSubtitle":
+    "De standaard voor elke site. De eigen keuze van een favoriet overschrijft hem.",
+  "settings.darkSites": "Sites met specifieke instellingen",
+  "settings.darkSitesNote":
+    "Deze instellingen gelden voor elke site, tenzij een site specifieke instellingen heeft. Stel ze in bij een favoriet.",
+  "favorites.darkModeNote": "Overschrijft de algemene donkere modus voor deze site.",
+  "fab.darkMode":
+    "Donkere modus. Tik om hem voor alle sites aan of uit te zetten, houd ingedrukt voor de algemene instellingen.",
+  "fab.darkModeSite":
+    "Donkere modus voor deze site. Tik om hem aan of uit te zetten, houd ingedrukt voor de instellingen ervan.",
+  "favorites.darkEffectiveOn": "Donkere modus staat aan voor deze site.",
+  "favorites.darkEffectiveOff": "Donkere modus staat uit voor deze site.",
 };

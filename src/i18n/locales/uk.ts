@@ -248,8 +248,6 @@ export const uk: Messages = {
   "settings.title": "Налаштування",
   "settings.close": "Закрити налаштування",
   "settings.appearance": "Вигляд",
-  "settings.appearanceNote":
-    "Стосується застосунку та сайтів, які використовують системну колірну схему.",
   "settings.themeLabel": "Тема",
   "settings.themeSystem": "Системна",
   "settings.themeLight": "Світла",
@@ -411,11 +409,8 @@ export const uk: Messages = {
   "recipes.removeFavorite": "Прибрати {name} з обраного",
   "recipes.hub": "Хаб",
   "settings.darkMode": "Темний режим",
-  "settings.darkModeNote": "Затемнює сторінки, які ви відкриваєте.",
   "settings.darkEnabled": "Затемнювати сторінки",
   "settings.darkEnabledNote": "Вмикає темний режим на кожному сайті, що не має власного вибору.",
-  "settings.darkSitesNote":
-    "Ці налаштування діють на всіх сайтах, якщо сайт не має власного вибору. Задайте його в налаштуваннях обраного.",
   "settings.darkMethod": "Метод",
   "settings.darkMethodDynamic": "Динамічний",
   "settings.darkMethodDynamicNote":
@@ -447,9 +442,7 @@ export const uk: Messages = {
   "settings.darkText": "Колір тексту",
   "settings.darkSchedule": "Розклад",
   "settings.darkScheduleAlways": "Завжди",
-  "settings.darkScheduleSystem": "Тема застосунку",
   "settings.darkScheduleTime": "Час",
-  "settings.darkScheduleSystemNote": "Затемнює сторінки, поки тема застосунку темна.",
   "settings.darkFrom": "З",
   "settings.darkTo": "До",
   "settings.darkBehavior": "Поведінка",
@@ -463,7 +456,6 @@ export const uk: Messages = {
   "settings.darkImages": "Коригувати зображення",
   "settings.darkImagesNote":
     "Інвертує темні значки й логотипи на прозорому тлі та пом’якшує великі світлі діаграми.",
-  "settings.darkSites": "Сайти з власним вибором",
   "settings.darkSitesEmpty": "Поки немає.",
   "settings.darkSiteRemove": "Прибрати вибір темного режиму для {site}",
   "settings.darkReset": "Скинути до типових",
@@ -482,9 +474,7 @@ export const uk: Messages = {
   "favorites.videoHeightOwn": "Цей сайт має власну висоту.",
   "favorites.videoHeightLabel": "Висота керування відео для {site}",
   "favorites.videoUseShared": "Використовувати спільні налаштування відео",
-  "favorites.darkMode": "Темний режим",
   "favorites.darkModeLabel": "Темний режим для {site}",
-  "favorites.darkFollow": "Як у налаштуваннях",
   "favorites.darkOn": "Завжди ввімкнено",
   "favorites.darkOff": "Вимкнено",
   "favorites.darkMethod": "Метод для цього сайту",
@@ -797,4 +787,26 @@ export const uk: Messages = {
   "tabs.statToday": "Сьогодні {value}",
   "tabs.statShowing": "Показується зараз",
   "tabs.statIdle": "Використано {value}",
+  "settings.appearanceNote":
+    "Стосується лише застосунку. Вигляд сторінок задається в темному режимі.",
+  "settings.darkScheduleSystem": "Система",
+  "settings.darkScheduleSystemNote": "Дотримується світлого або темного налаштування пристрою.",
+  "favorites.videoPanel": "Панель керування",
+  "favorites.videoPanelLabel": "Панель керування відео на {site}",
+  "favorites.darkMode": "Окремий темний режим",
+  "favorites.darkFollow": "Як у загальному",
+  "settings.darkModeNote": "Загальні налаштування, типові для кожного сайту",
+  "settings.darkModeTitle": "Загальний темний режим",
+  "settings.darkModeSubtitle":
+    "Типовий для кожного сайту. Власний вибір темного режиму в обраного його перевизначає.",
+  "settings.darkSites": "Сайти з окремими налаштуваннями",
+  "settings.darkSitesNote":
+    "Ці налаштування діють на всіх сайтах, якщо сайт не має окремих налаштувань. Задайте їх в обраному.",
+  "favorites.darkModeNote": "Перевизначає загальний темний режим для цього сайту.",
+  "fab.darkMode":
+    "Темний режим. Торкніться, щоб увімкнути або вимкнути його для всіх сайтів, утримуйте для загальних налаштувань.",
+  "fab.darkModeSite":
+    "Темний режим для цього сайту. Торкніться, щоб увімкнути або вимкнути, утримуйте для його налаштувань.",
+  "favorites.darkEffectiveOn": "Темний режим для цього сайту ввімкнено.",
+  "favorites.darkEffectiveOff": "Темний режим для цього сайту вимкнено.",
 };

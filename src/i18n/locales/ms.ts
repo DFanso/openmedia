@@ -244,8 +244,6 @@ export const ms: Messages = {
   "settings.title": "Tetapan",
   "settings.close": "Tutup tetapan",
   "settings.appearance": "Penampilan",
-  "settings.appearanceNote":
-    "Berkuat kuasa untuk aplikasi dan untuk laman yang mengikut skim warna sistem.",
   "settings.themeLabel": "Tema",
   "settings.themeSystem": "Sistem",
   "settings.themeLight": "Cerah",
@@ -407,12 +405,9 @@ export const ms: Messages = {
   "recipes.removeFavorite": "Buang {name} daripada kegemaran",
   "recipes.hub": "Hab",
   "settings.darkMode": "Mod gelap",
-  "settings.darkModeNote": "Menggelapkan laman yang anda buka.",
   "settings.darkEnabled": "Gelapkan laman",
   "settings.darkEnabledNote":
     "Menghidupkan mod gelap untuk setiap tapak yang tiada pilihan sendiri.",
-  "settings.darkSitesNote":
-    "Tetapan ini digunakan pada setiap tapak melainkan tapak itu mempunyai pilihan sendiri. Tetapkannya dalam tetapan kegemaran.",
   "settings.darkMethod": "Kaedah",
   "settings.darkMethodDynamic": "Dinamik",
   "settings.darkMethodDynamicNote":
@@ -444,9 +439,7 @@ export const ms: Messages = {
   "settings.darkText": "Warna teks",
   "settings.darkSchedule": "Jadual",
   "settings.darkScheduleAlways": "Sentiasa",
-  "settings.darkScheduleSystem": "Tema aplikasi",
   "settings.darkScheduleTime": "Masa",
-  "settings.darkScheduleSystemNote": "Menggelapkan laman semasa tema aplikasi gelap.",
   "settings.darkFrom": "Dari",
   "settings.darkTo": "Hingga",
   "settings.darkBehavior": "Tingkah laku",
@@ -459,7 +452,6 @@ export const ms: Messages = {
   "settings.darkImages": "Laraskan imej",
   "settings.darkImagesNote":
     "Menyongsangkan ikon dan logo gelap pada latar belakang lutsinar dan melembutkan gambar rajah cerah yang besar.",
-  "settings.darkSites": "Tapak dengan pilihan sendiri",
   "settings.darkSitesEmpty": "Belum ada.",
   "settings.darkSiteRemove": "Alih keluar pilihan mod gelap untuk {site}",
   "settings.darkReset": "Tetapkan semula kepada lalai",
@@ -478,9 +470,7 @@ export const ms: Messages = {
   "favorites.videoHeightOwn": "Laman ini mempunyai ketinggian sendiri.",
   "favorites.videoHeightLabel": "Ketinggian kawalan video {site}",
   "favorites.videoUseShared": "Guna tetapan video bersama",
-  "favorites.darkMode": "Mod gelap",
   "favorites.darkModeLabel": "Mod gelap {site}",
-  "favorites.darkFollow": "Ikut tetapan",
   "favorites.darkOn": "Sentiasa hidup",
   "favorites.darkOff": "Mati",
   "favorites.darkMethod": "Kaedah untuk tapak ini",
@@ -796,4 +786,25 @@ export const ms: Messages = {
   "tabs.statToday": "{value} hari ini",
   "tabs.statShowing": "Sedang dipaparkan",
   "tabs.statIdle": "Digunakan {value}",
+  "settings.appearanceNote": "Hanya terpakai pada aplikasi. Rupa laman ditetapkan dalam Mod gelap.",
+  "settings.darkScheduleSystem": "Sistem",
+  "settings.darkScheduleSystemNote": "Mengikut tetapan cerah atau gelap peranti.",
+  "favorites.videoPanel": "Panel kawalan",
+  "favorites.videoPanelLabel": "Panel kawalan video {site}",
+  "favorites.darkMode": "Mod gelap khusus",
+  "favorites.darkFollow": "Ikut tetapan umum",
+  "settings.darkModeNote": "Tetapan umum, lalai untuk setiap tapak",
+  "settings.darkModeTitle": "Mod gelap umum",
+  "settings.darkModeSubtitle":
+    "Lalai untuk setiap tapak. Pilihan mod gelap kegemaran itu sendiri mengatasinya.",
+  "settings.darkSites": "Tapak dengan tetapan khusus",
+  "settings.darkSitesNote":
+    "Tetapan ini digunakan pada setiap tapak melainkan tapak itu mempunyai tetapan khusus. Tetapkannya dalam kegemaran.",
+  "favorites.darkModeNote": "Mengatasi mod gelap umum untuk tapak ini.",
+  "fab.darkMode":
+    "Mod gelap. Ketik untuk menghidupkan atau mematikannya bagi semua tapak, tekan lama untuk tetapan umum.",
+  "fab.darkModeSite":
+    "Mod gelap untuk tapak ini. Ketik untuk menghidupkan atau mematikannya, tekan lama untuk tetapannya.",
+  "favorites.darkEffectiveOn": "Mod gelap dihidupkan untuk tapak ini.",
+  "favorites.darkEffectiveOff": "Mod gelap dimatikan untuk tapak ini.",
 };

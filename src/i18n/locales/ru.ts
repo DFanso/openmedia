@@ -247,8 +247,6 @@ export const ru: Messages = {
   "settings.title": "Настройки",
   "settings.close": "Закрыть настройки",
   "settings.appearance": "Оформление",
-  "settings.appearanceNote":
-    "Применяется к приложению и к сайтам, которые следуют системной цветовой схеме.",
   "settings.themeLabel": "Тема",
   "settings.themeSystem": "Системная",
   "settings.themeLight": "Светлая",
@@ -410,12 +408,9 @@ export const ru: Messages = {
   "recipes.removeFavorite": "Убрать {name} из избранного",
   "recipes.hub": "Хаб",
   "settings.darkMode": "Тёмный режим",
-  "settings.darkModeNote": "Затемняет открываемые страницы.",
   "settings.darkEnabled": "Затемнять страницы",
   "settings.darkEnabledNote":
     "Включает тёмный режим на всех сайтах, у которых нет собственного выбора.",
-  "settings.darkSitesNote":
-    "Эти настройки действуют на всех сайтах, если у сайта нет собственного выбора. Задайте его в настройках избранного.",
   "settings.darkMethod": "Метод",
   "settings.darkMethodDynamic": "Динамический",
   "settings.darkMethodDynamicNote":
@@ -447,9 +442,7 @@ export const ru: Messages = {
   "settings.darkText": "Цвет текста",
   "settings.darkSchedule": "Расписание",
   "settings.darkScheduleAlways": "Всегда",
-  "settings.darkScheduleSystem": "Тема приложения",
   "settings.darkScheduleTime": "Время",
-  "settings.darkScheduleSystemNote": "Затемняет страницы, пока тема приложения тёмная.",
   "settings.darkFrom": "С",
   "settings.darkTo": "До",
   "settings.darkBehavior": "Поведение",
@@ -463,7 +456,6 @@ export const ru: Messages = {
   "settings.darkImages": "Настраивать изображения",
   "settings.darkImagesNote":
     "Инвертирует тёмные значки и логотипы на прозрачном фоне и приглушает крупные светлые схемы.",
-  "settings.darkSites": "Сайты с собственным выбором",
   "settings.darkSitesEmpty": "Пока нет.",
   "settings.darkSiteRemove": "Удалить выбор тёмного режима для {site}",
   "settings.darkReset": "Сбросить настройки",
@@ -482,9 +474,7 @@ export const ru: Messages = {
   "favorites.videoHeightOwn": "У этого сайта своя высота.",
   "favorites.videoHeightLabel": "Высота управления видео для {site}",
   "favorites.videoUseShared": "Использовать общие настройки видео",
-  "favorites.darkMode": "Тёмный режим",
   "favorites.darkModeLabel": "Тёмный режим для {site}",
-  "favorites.darkFollow": "Как в настройках",
   "favorites.darkOn": "Всегда включён",
   "favorites.darkOff": "Выключен",
   "favorites.darkMethod": "Метод для этого сайта",
@@ -796,4 +786,26 @@ export const ru: Messages = {
   "tabs.statToday": "Сегодня {value}",
   "tabs.statShowing": "Показывается сейчас",
   "tabs.statIdle": "Использовался {value}",
+  "settings.appearanceNote":
+    "Применяется только к приложению. Вид страниц задаётся в тёмном режиме.",
+  "settings.darkScheduleSystem": "Система",
+  "settings.darkScheduleSystemNote": "Следует светлой или тёмной настройке устройства.",
+  "favorites.videoPanel": "Панель управления",
+  "favorites.videoPanelLabel": "Панель управления видео на {site}",
+  "favorites.darkMode": "Отдельный тёмный режим",
+  "favorites.darkFollow": "Как в общем",
+  "settings.darkModeNote": "Общие настройки, по умолчанию для каждого сайта",
+  "settings.darkModeTitle": "Общий тёмный режим",
+  "settings.darkModeSubtitle":
+    "По умолчанию для каждого сайта. Собственный выбор тёмного режима у избранного его переопределяет.",
+  "settings.darkSites": "Сайты с отдельными настройками",
+  "settings.darkSitesNote":
+    "Эти настройки действуют на всех сайтах, если у сайта нет отдельных настроек. Задайте их в избранном.",
+  "favorites.darkModeNote": "Переопределяет общий тёмный режим для этого сайта.",
+  "fab.darkMode":
+    "Тёмный режим. Нажмите, чтобы включить или выключить его на всех сайтах, удерживайте для общих настроек.",
+  "fab.darkModeSite":
+    "Тёмный режим для этого сайта. Нажмите, чтобы включить или выключить, удерживайте для его настроек.",
+  "favorites.darkEffectiveOn": "Тёмный режим для этого сайта включён.",
+  "favorites.darkEffectiveOff": "Тёмный режим для этого сайта выключен.",
 };

@@ -249,7 +249,6 @@ export const pl: Messages = {
   "settings.title": "Ustawienia",
   "settings.close": "Zamknij ustawienia",
   "settings.appearance": "Wygląd",
-  "settings.appearanceNote": "Dotyczy aplikacji oraz witryn, które stosują się do motywu systemu.",
   "settings.themeLabel": "Motyw",
   "settings.themeSystem": "Systemowy",
   "settings.themeLight": "Jasny",
@@ -411,11 +410,8 @@ export const pl: Messages = {
   "recipes.removeFavorite": "Usuń {name} z ulubionych",
   "recipes.hub": "Hub",
   "settings.darkMode": "Tryb ciemny",
-  "settings.darkModeNote": "Przyciemnia otwierane strony.",
   "settings.darkEnabled": "Przyciemniaj strony",
   "settings.darkEnabledNote": "Włącza tryb ciemny na każdej witrynie bez własnego wyboru.",
-  "settings.darkSitesNote":
-    "Te ustawienia dotyczą każdej witryny, chyba że ma ona własny wybór. Ustaw go w ustawieniach ulubionej.",
   "settings.darkMethod": "Metoda",
   "settings.darkMethodDynamic": "Dynamiczna",
   "settings.darkMethodDynamicNote":
@@ -447,9 +443,7 @@ export const pl: Messages = {
   "settings.darkText": "Kolor tekstu",
   "settings.darkSchedule": "Harmonogram",
   "settings.darkScheduleAlways": "Zawsze",
-  "settings.darkScheduleSystem": "Motyw aplikacji",
   "settings.darkScheduleTime": "Godziny",
-  "settings.darkScheduleSystemNote": "Przyciemnia strony, gdy motyw aplikacji jest ciemny.",
   "settings.darkFrom": "Od",
   "settings.darkTo": "Do",
   "settings.darkBehavior": "Zachowanie",
@@ -463,7 +457,6 @@ export const pl: Messages = {
   "settings.darkImages": "Dopasuj obrazy",
   "settings.darkImagesNote":
     "Odwraca ciemne ikony i logo na przezroczystym tle oraz łagodzi duże jasne diagramy.",
-  "settings.darkSites": "Witryny z własnym wyborem",
   "settings.darkSitesEmpty": "Jeszcze żadnych.",
   "settings.darkSiteRemove": "Usuń wybór trybu ciemnego dla {site}",
   "settings.darkReset": "Przywróć ustawienia domyślne",
@@ -482,9 +475,7 @@ export const pl: Messages = {
   "favorites.videoHeightOwn": "Ta witryna ma własną wysokość.",
   "favorites.videoHeightLabel": "Wysokość sterowania wideo: {site}",
   "favorites.videoUseShared": "Użyj wspólnych ustawień wideo",
-  "favorites.darkMode": "Tryb ciemny",
   "favorites.darkModeLabel": "Tryb ciemny dla {site}",
-  "favorites.darkFollow": "Zgodnie z ustawieniami",
   "favorites.darkOn": "Zawsze włączony",
   "favorites.darkOff": "Wyłączony",
   "favorites.darkMethod": "Metoda dla tej witryny",
@@ -794,4 +785,25 @@ export const pl: Messages = {
   "tabs.statToday": "Dziś {value}",
   "tabs.statShowing": "Wyświetlana teraz",
   "tabs.statIdle": "Użyto {value}",
+  "settings.appearanceNote": "Dotyczy tylko aplikacji. Wygląd stron ustawia się w trybie ciemnym.",
+  "settings.darkScheduleSystem": "Systemowy",
+  "settings.darkScheduleSystemNote": "Stosuje się do jasnego lub ciemnego ustawienia urządzenia.",
+  "favorites.videoPanel": "Panel sterowania",
+  "favorites.videoPanelLabel": "Panel sterowania wideo w {site}",
+  "favorites.darkMode": "Szczegółowy tryb ciemny",
+  "favorites.darkFollow": "Zgodnie z ogólnym",
+  "settings.darkModeNote": "Ustawienia ogólne, domyślne dla każdej witryny",
+  "settings.darkModeTitle": "Ogólny tryb ciemny",
+  "settings.darkModeSubtitle":
+    "Domyślny dla każdej witryny. Własny wybór trybu ciemnego w ulubionej go zastępuje.",
+  "settings.darkSites": "Witryny z ustawieniami szczegółowymi",
+  "settings.darkSitesNote":
+    "Te ustawienia dotyczą każdej witryny, chyba że ma ona ustawienia szczegółowe. Ustaw je w ulubionej.",
+  "favorites.darkModeNote": "Zastępuje ogólny tryb ciemny dla tej witryny.",
+  "fab.darkMode":
+    "Tryb ciemny. Stuknij, aby włączyć lub wyłączyć go we wszystkich witrynach, przytrzymaj, aby otworzyć ustawienia ogólne.",
+  "fab.darkModeSite":
+    "Tryb ciemny tej witryny. Stuknij, aby go włączyć lub wyłączyć, przytrzymaj, aby otworzyć jego ustawienia.",
+  "favorites.darkEffectiveOn": "Tryb ciemny jest włączony dla tej witryny.",
+  "favorites.darkEffectiveOff": "Tryb ciemny jest wyłączony dla tej witryny.",
 };

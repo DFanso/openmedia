@@ -252,8 +252,6 @@ export const el: Messages = {
   "settings.title": "Ρυθμίσεις",
   "settings.close": "Κλείσιμο ρυθμίσεων",
   "settings.appearance": "Εμφάνιση",
-  "settings.appearanceNote":
-    "Ισχύει για την εφαρμογή και για τους ιστότοπους που ακολουθούν το χρωματικό σύστημα της συσκευής.",
   "settings.themeLabel": "Θέμα",
   "settings.themeSystem": "Σύστημα",
   "settings.themeLight": "Φωτεινό",
@@ -418,12 +416,9 @@ export const el: Messages = {
   "recipes.removeFavorite": "Αφαίρεση {name} από τα αγαπημένα",
   "recipes.hub": "Hub",
   "settings.darkMode": "Σκοτεινή λειτουργία",
-  "settings.darkModeNote": "Σκουραίνει τις σελίδες που ανοίγετε.",
   "settings.darkEnabled": "Σκούρεμα σελίδων",
   "settings.darkEnabledNote":
     "Ενεργοποιεί τη σκοτεινή λειτουργία σε κάθε ιστότοπο που δεν έχει δική του επιλογή.",
-  "settings.darkSitesNote":
-    "Αυτές οι ρυθμίσεις ισχύουν για κάθε ιστότοπο, εκτός αν ο ιστότοπος έχει δική του επιλογή. Ορίστε την στις ρυθμίσεις ενός αγαπημένου.",
   "settings.darkMethod": "Μέθοδος",
   "settings.darkMethodDynamic": "Δυναμική",
   "settings.darkMethodDynamicNote":
@@ -455,10 +450,7 @@ export const el: Messages = {
   "settings.darkText": "Χρώμα κειμένου",
   "settings.darkSchedule": "Πρόγραμμα",
   "settings.darkScheduleAlways": "Πάντα",
-  "settings.darkScheduleSystem": "Θέμα εφαρμογής",
   "settings.darkScheduleTime": "Ώρα",
-  "settings.darkScheduleSystemNote":
-    "Σκουραίνει τις σελίδες όταν το θέμα της εφαρμογής είναι σκοτεινό.",
   "settings.darkFrom": "Από",
   "settings.darkTo": "Έως",
   "settings.darkBehavior": "Συμπεριφορά",
@@ -473,7 +465,6 @@ export const el: Messages = {
   "settings.darkImages": "Προσαρμογή εικόνων",
   "settings.darkImagesNote":
     "Αντιστρέφει σκούρα εικονίδια και λογότυπα σε διαφανή φόντα και μειώνει την ένταση μεγάλων φωτεινών διαγραμμάτων.",
-  "settings.darkSites": "Ιστότοποι με δική τους επιλογή",
   "settings.darkSitesEmpty": "Κανένας ακόμη.",
   "settings.darkSiteRemove": "Αφαίρεση της επιλογής σκοτεινής λειτουργίας για το {site}",
   "settings.darkReset": "Επαναφορά στις προεπιλογές",
@@ -492,9 +483,7 @@ export const el: Messages = {
   "favorites.videoHeightOwn": "Αυτός ο ιστότοπος έχει δικό του ύψος.",
   "favorites.videoHeightLabel": "Ύψος στοιχείων ελέγχου βίντεο για {site}",
   "favorites.videoUseShared": "Χρήση των κοινών ρυθμίσεων βίντεο",
-  "favorites.darkMode": "Σκοτεινή λειτουργία",
   "favorites.darkModeLabel": "Σκοτεινή λειτουργία για {site}",
-  "favorites.darkFollow": "Ακολουθεί τις ρυθμίσεις",
   "favorites.darkOn": "Πάντα ενεργό",
   "favorites.darkOff": "Ανενεργό",
   "favorites.darkMethod": "Μέθοδος για αυτόν τον ιστότοπο",
@@ -810,4 +799,26 @@ export const el: Messages = {
   "tabs.statToday": "{value} σήμερα",
   "tabs.statShowing": "Εμφανίζεται τώρα",
   "tabs.statIdle": "Χρήση {value}",
+  "settings.appearanceNote":
+    "Ισχύει μόνο για την εφαρμογή. Η εμφάνιση των σελίδων ορίζεται στη Σκοτεινή λειτουργία.",
+  "settings.darkScheduleSystem": "Σύστημα",
+  "settings.darkScheduleSystemNote": "Ακολουθεί τη φωτεινή ή σκοτεινή ρύθμιση της συσκευής.",
+  "favorites.videoPanel": "Πίνακας ελέγχου",
+  "favorites.videoPanelLabel": "Πίνακας ελέγχου βίντεο στο {site}",
+  "favorites.darkMode": "Συγκεκριμένη σκοτεινή λειτουργία",
+  "favorites.darkFollow": "Ακολουθεί τις γενικές",
+  "settings.darkModeNote": "Γενικές ρυθμίσεις, η προεπιλογή για κάθε ιστότοπο",
+  "settings.darkModeTitle": "Γενική σκοτεινή λειτουργία",
+  "settings.darkModeSubtitle":
+    "Η προεπιλογή για κάθε ιστότοπο. Η δική του επιλογή σκοτεινής λειτουργίας ενός αγαπημένου την παρακάμπτει.",
+  "settings.darkSites": "Ιστότοποι με συγκεκριμένες ρυθμίσεις",
+  "settings.darkSitesNote":
+    "Αυτές οι ρυθμίσεις ισχύουν για κάθε ιστότοπο, εκτός αν ο ιστότοπος έχει συγκεκριμένες ρυθμίσεις. Ορίστε τις σε ένα αγαπημένο.",
+  "favorites.darkModeNote": "Παρακάμπτει τη γενική σκοτεινή λειτουργία για αυτόν τον ιστότοπο.",
+  "fab.darkMode":
+    "Σκοτεινή λειτουργία. Πατήστε για ενεργοποίηση ή απενεργοποίηση σε όλους τους ιστότοπους, παρατεταμένο πάτημα για γενικές ρυθμίσεις.",
+  "fab.darkModeSite":
+    "Σκοτεινή λειτουργία για αυτόν τον ιστότοπο. Πατήστε για ενεργοποίηση ή απενεργοποίηση, παρατεταμένο πάτημα για τις ρυθμίσεις του.",
+  "favorites.darkEffectiveOn": "Η σκοτεινή λειτουργία είναι ενεργή για αυτόν τον ιστότοπο.",
+  "favorites.darkEffectiveOff": "Η σκοτεινή λειτουργία είναι ανενεργή για αυτόν τον ιστότοπο.",
 };

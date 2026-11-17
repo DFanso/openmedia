@@ -73,7 +73,7 @@ const SLIDERS: readonly SliderSpec[] = [
 
 /**
  * Dark mode for the pages the user opens: on or off, how pages are darkened, the colours and when
- * it applies. A site can have its own choice, set in its favorite's settings.
+ * it applies. A favorite can have its own choice.
  */
 export function DarkModeScreen() {
   const open = useApp((s) => s.sheet === "dark-mode");
@@ -93,8 +93,8 @@ export function DarkModeScreen() {
 
   return (
     <Screen
-      title={t("settings.darkMode")}
-      subtitle={t("settings.darkModeNote")}
+      title={t("settings.darkModeTitle")}
+      subtitle={t("settings.darkModeSubtitle")}
       closeLabel={t(parent === "settings" ? "common.back" : "settings.close")}
       onClose={closeSheet}
       back={parent === "settings"}

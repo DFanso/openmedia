@@ -71,6 +71,18 @@ describe("pages opened from Settings", () => {
   });
 });
 
+describe("a favorite's settings", () => {
+  it("opens Settings and keeps the favorite to expand until it is consumed", () => {
+    useApp.getState().openFavoriteSettings("f1");
+    expect(useApp.getState().sheet).toBe("settings");
+    expect(useApp.getState().focusFavoriteId).toBe("f1");
+    useApp.getState().clearFavoriteFocus();
+    expect(useApp.getState().focusFavoriteId).toBeNull();
+    useApp.getState().closeSheet();
+    expect(useApp.getState().sheet).toBe("none");
+  });
+});
+
 describe("closing sites from the Tabs screen", () => {
   const live = (id: string, lastUsed: number) => ({
     ...newSession(id, "typed", `https://${id}.example/`, lastUsed),

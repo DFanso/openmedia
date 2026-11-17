@@ -244,8 +244,6 @@ export const de: Messages = {
   "settings.title": "Einstellungen",
   "settings.close": "Einstellungen schließen",
   "settings.appearance": "Darstellung",
-  "settings.appearanceNote":
-    "Gilt für die App sowie für Websites, die dem Farbschema des Systems folgen.",
   "settings.themeLabel": "Design",
   "settings.themeSystem": "System",
   "settings.themeLight": "Hell",
@@ -410,12 +408,9 @@ export const de: Messages = {
   "recipes.removeFavorite": "{name} aus Favoriten entfernen",
   "recipes.hub": "Hub",
   "settings.darkMode": "Dunkelmodus",
-  "settings.darkModeNote": "Dunkelt die Seiten ab, die du öffnest.",
   "settings.darkEnabled": "Seiten abdunkeln",
   "settings.darkEnabledNote":
     "Schaltet den Dunkelmodus für jede Seite ein, die keine eigene Wahl hat.",
-  "settings.darkSitesNote":
-    "Diese Einstellungen gelten für jede Seite, sofern sie keine eigene Wahl hat. Lege eine in den Einstellungen eines Favoriten fest.",
   "settings.darkMethod": "Methode",
   "settings.darkMethodDynamic": "Dynamisch",
   "settings.darkMethodDynamicNote":
@@ -447,9 +442,7 @@ export const de: Messages = {
   "settings.darkText": "Textfarbe",
   "settings.darkSchedule": "Zeitplan",
   "settings.darkScheduleAlways": "Immer",
-  "settings.darkScheduleSystem": "App-Design",
   "settings.darkScheduleTime": "Zeit",
-  "settings.darkScheduleSystemNote": "Dunkelt Seiten ab, solange das Design der App dunkel ist.",
   "settings.darkFrom": "Von",
   "settings.darkTo": "Bis",
   "settings.darkBehavior": "Verhalten",
@@ -463,7 +456,6 @@ export const de: Messages = {
   "settings.darkImages": "Bilder anpassen",
   "settings.darkImagesNote":
     "Kehrt dunkle Symbole und Logos auf transparentem Grund um und dämpft große helle Diagramme.",
-  "settings.darkSites": "Seiten mit eigener Wahl",
   "settings.darkSitesEmpty": "Noch keine.",
   "settings.darkSiteRemove": "Dunkelmodus-Wahl für {site} entfernen",
   "settings.darkReset": "Auf Standard zurücksetzen",
@@ -482,9 +474,7 @@ export const de: Messages = {
   "favorites.videoHeightOwn": "Diese Website hat eine eigene Höhe.",
   "favorites.videoHeightLabel": "Höhe der Videosteuerung für {site}",
   "favorites.videoUseShared": "Die gemeinsamen Videoeinstellungen verwenden",
-  "favorites.darkMode": "Dunkelmodus",
   "favorites.darkModeLabel": "Dunkelmodus für {site}",
-  "favorites.darkFollow": "Einstellungen folgen",
   "favorites.darkOn": "Immer an",
   "favorites.darkOff": "Aus",
   "favorites.darkMethod": "Methode für diese Seite",
@@ -810,4 +800,26 @@ export const de: Messages = {
   "tabs.statToday": "Heute {value}",
   "tabs.statShowing": "Wird angezeigt",
   "tabs.statIdle": "Zuletzt genutzt {value}",
+  "settings.appearanceNote":
+    "Gilt nur für die App. Wie Seiten aussehen, legst du im Dunkelmodus fest.",
+  "settings.darkScheduleSystem": "System",
+  "settings.darkScheduleSystemNote": "Folgt der hellen oder dunklen Einstellung des Geräts.",
+  "favorites.videoPanel": "Steuerungsleiste",
+  "favorites.videoPanelLabel": "Videosteuerungsleiste auf {site}",
+  "favorites.darkMode": "Spezifischer Dunkelmodus",
+  "favorites.darkFollow": "Allgemein folgen",
+  "settings.darkModeNote": "Allgemeine Einstellungen, der Standard für jede Seite",
+  "settings.darkModeTitle": "Allgemeiner Dunkelmodus",
+  "settings.darkModeSubtitle":
+    "Der Standard für jede Seite. Die eigene Dunkelmodus-Wahl eines Favoriten überschreibt ihn.",
+  "settings.darkSites": "Seiten mit spezifischen Einstellungen",
+  "settings.darkSitesNote":
+    "Diese Einstellungen gelten für jede Seite, sofern sie keine spezifischen Einstellungen hat. Lege sie bei einem Favoriten fest.",
+  "favorites.darkModeNote": "Überschreibt den allgemeinen Dunkelmodus für diese Seite.",
+  "fab.darkMode":
+    "Dunkelmodus. Tippen schaltet ihn für alle Seiten ein oder aus, gedrückt halten öffnet die allgemeinen Einstellungen.",
+  "fab.darkModeSite":
+    "Dunkelmodus für diese Seite. Tippen schaltet ihn ein oder aus, gedrückt halten öffnet seine Einstellungen.",
+  "favorites.darkEffectiveOn": "Der Dunkelmodus ist für diese Seite an.",
+  "favorites.darkEffectiveOff": "Der Dunkelmodus ist für diese Seite aus.",
 };
