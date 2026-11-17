@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(fab): the technology detector and color picker froze iOS and found little; a new draggable color picker
+
+**Area:** `fix(fab)`, `feat(fab)`, `fix(siteview)`
+
+**Cause:** `color_pick_*` and `tech_detect` were synchronous Tauri commands. They run on the main thread, and the iOS plugin answers `evaluate` from the main thread, so the app waited for itself and froze. The technology detector also found almost nothing on real sites: on iOS the evidence script ran in an isolated JavaScript world that cannot see a page's globals, it read only the markup's script tags (bundled and dynamically loaded scripts were missed), and its table had no signature for what modern bundled sites leave behind.
+
+**Change:** The commands are `async`. `evaluate` gains a page-world option (iOS; Android and macOS have one world) used only by the detector, which now also reads the properties libraries leave on elements, the root custom properties, the browser's resource timing and more signatures (Preact, Lit, Solid, Qwik, Meta Comet, Google Maps, Mapbox, Leaflet, Chart.js, D3, Video.js, hls.js, Shaka, Firebase, Socket.IO, Lottie, Swiper, Axios). The color picker is a loupe: a big circle with a thick ring and a dot that you drag, the ring showing the color under the dot, with Cancel and Accept in the bar; Accept shows the color with Copy, Copy RGB and Done. The color is the pixel the web view really draws (a new Rust-only `sample_color` in the plugin: iOS `takeSnapshot`, Android a 1x1 draw), so photos, video frames and gradients read correctly.
+
+**Verified:** iOS 26.5 simulator, driven with idb: before, tapping the detector froze the app; after, it lists React, Next.js, Hotwire Turbo, DoubleClick, AdSense, Bootstrap (bbc.com), React, GA4, reCAPTCHA, Cloudflare (medium.com), Lit, Sentry, reCAPTCHA (reddit.com), Meta Comet (instagram.com), jQuery and jsDelivr (a fixture). The loupe over a cross-origin Reddit photo read `#2F3941`; Accept showed hex, `rgb()`, Copy RGB and Done. Android emulator (System WebView): the detector lists the same for bbc.com and the loupe over the photo read `#A3B5C3`. Rust and web checks pass. **Not verified:** a device; hardware video on Android (may read black); pinch-zoomed pages on iOS (the sampled point is not scaled for zoom); macOS (keeps the page's own guess). New translations are unreviewed (Sinhala, Tamil, Bengali, Urdu, Arabic least certain).
+
 ### feat(dark-mode): a dark mode button in the fan, general and specific dark mode, and Appearance for the app only
 
 **Area:** `feat(fab)`, `feat(settings)`, `fix(siteview)`
