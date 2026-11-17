@@ -381,6 +381,7 @@ export const ru: Messages = {
   "library.review.hides": "Скрывает",
   "library.review.redirects": "Перенаправляет",
   "library.review.restyles": "Меняет оформление",
+  "library.review.prunes": "Удаляет",
   "library.review.runsCode": "Запускает код",
   "library.review.showCode": "Показать код",
   "library.review.hideCode": "Скрыть код",

@@ -124,6 +124,7 @@ const REVIEW_VERBS = {
   hide: "library.review.hides",
   css: "library.review.restyles",
   redirect: "library.review.redirects",
+  prune: "library.review.prunes",
 } as const;
 
 function RuleRow({ rule }: { rule: RulePreview }) {

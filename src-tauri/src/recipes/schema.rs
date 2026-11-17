@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use url::Url;
 
 use super::matcher::Matcher;
+use super::prune::{self, PruneRemove};
 use super::route::{RouteGlob, validate_target};
 use super::script_policy::{self, Finding, MAX_CODE_BYTES, MAX_SCRIPT_RULES, MAX_TOTAL_CODE_BYTES};
 use super::selector::{targets_page_root, validate_declarations, validate_selector};
@@ -300,6 +301,23 @@ pub enum Rule {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         close: Option<Target>,
     },
+    /// Removes items from the JSON the page's own `fetch` and `XMLHttpRequest` calls receive,
+    /// before the page reads it. A declarative rule, not code: it starts no request and sends
+    /// nothing; see `prune`.
+    Prune {
+        id: String,
+        label: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        option: Option<String>,
+        /// For a rule on a choice option: the choices in which it applies.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        choice: Option<Vec<String>>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        on: Option<Vec<String>>,
+        /// Request paths on the page's own site (`*` matches any run of characters).
+        urls: Vec<String>,
+        remove: Vec<PruneRemove>,
+    },
     /// Sends a page whose path matches `when.path` to the path `to` of the same site, on load and
     /// on every navigation the page makes without reloading. Nothing runs from the recipe; the
     /// app's own runtime does the replacing.
@@ -325,6 +343,7 @@ impl Rule {
             | Self::Css { id, .. }
             | Self::Script { id, .. }
             | Self::VideoMenu { id, .. }
+            | Self::Prune { id, .. }
             | Self::Redirect { id, .. } => id,
         }
     }
@@ -336,6 +355,7 @@ impl Rule {
             | Self::Css { option, .. }
             | Self::Script { option, .. }
             | Self::VideoMenu { option, .. }
+            | Self::Prune { option, .. }
             | Self::Redirect { option, .. } => option.as_deref(),
         }
     }
@@ -347,6 +367,7 @@ impl Rule {
             | Self::Css { choice, .. }
             | Self::Script { choice, .. }
             | Self::VideoMenu { choice, .. }
+            | Self::Prune { choice, .. }
             | Self::Redirect { choice, .. } => choice.as_deref(),
         }
     }
@@ -358,6 +379,7 @@ impl Rule {
             | Self::Css { on, .. }
             | Self::Script { on, .. }
             | Self::VideoMenu { on, .. }
+            | Self::Prune { on, .. }
             | Self::Redirect { on, .. } => on.as_deref(),
         }
     }
@@ -466,6 +488,7 @@ impl Recipe {
         self.validate_homepage()?;
         self.validate_script_totals()?;
         self.validate_video_menus()?;
+        self.validate_prunes()?;
         let mut seen = HashSet::new();
         for rule in &self.rules {
             if !seen.insert(rule.id()) {
@@ -529,6 +552,9 @@ impl Recipe {
                     }
                     validate_video_menu(id, title, open, items, selected, close.as_ref())?;
                 }
+                Rule::Prune {
+                    id, urls, remove, ..
+                } => prune::validate(id, urls, remove)?,
                 Rule::Redirect { id, when, to, .. } => validate_redirect(id, &when.path, to)?,
             }
         }
@@ -566,6 +592,21 @@ impl Recipe {
         if count > MAX_VIDEO_MENUS {
             return Err(Error::Recipe(format!(
                 "recipe {} has too many video menus",
+                self.id
+            )));
+        }
+        Ok(())
+    }
+
+    fn validate_prunes(&self) -> Result<()> {
+        let count = self
+            .rules
+            .iter()
+            .filter(|rule| matches!(rule, Rule::Prune { .. }))
+            .count();
+        if count > prune::MAX_PRUNE_RULES {
+            return Err(Error::Recipe(format!(
+                "recipe {} has too many prune rules",
                 self.id
             )));
         }

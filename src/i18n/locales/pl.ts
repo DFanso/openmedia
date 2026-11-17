@@ -380,6 +380,7 @@ export const pl: Messages = {
   "library.review.hides": "Ukrywa",
   "library.review.redirects": "Przekierowuje",
   "library.review.restyles": "Zmienia wygląd",
+  "library.review.prunes": "Usuwa",
   "library.review.runsCode": "Uruchamia kod",
   "library.review.showCode": "Pokaż kod",
   "library.review.hideCode": "Ukryj kod",

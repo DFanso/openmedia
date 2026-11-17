@@ -2,7 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 
 export interface RulePreview {
   label: string;
-  kind: "hide" | "css" | "script" | "redirect";
+  kind: "hide" | "css" | "script" | "redirect" | "prune";
   selector: string;
   declarations: Record<string, string>;
   /** The script text of a `script` rule, shown in full; absent for other rules. */

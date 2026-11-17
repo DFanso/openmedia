@@ -4,6 +4,7 @@ use std::fmt::Write;
 use serde::Serialize;
 
 use super::matcher::Matcher;
+use super::prune::{self, PRUNE_RUNTIME, PagePrune};
 use super::route::RouteGlob;
 use super::schema::{OptionValue, Recipe, Rule, Selected, VideoMenuKind};
 use super::script_policy::wrap;
@@ -20,6 +21,7 @@ struct PageRecipe {
     css: String,
     scripts: Vec<usize>,
     menus: Vec<PageMenu>,
+    prunes: Vec<PagePrune>,
     redirects: Vec<PageRedirect>,
 }
 
@@ -69,7 +71,10 @@ fn css_of<'a>(rules: impl Iterator<Item = &'a Rule>) -> String {
     for rule in rules {
         let _ = match rule {
             Rule::Hide { target, .. } => writeln!(css, "{}{{display:none!important}}", target.css),
-            Rule::Script { .. } | Rule::VideoMenu { .. } | Rule::Redirect { .. } => Ok(()),
+            Rule::Script { .. }
+            | Rule::VideoMenu { .. }
+            | Rule::Prune { .. }
+            | Rule::Redirect { .. } => Ok(()),
             Rule::Css {
                 target,
                 declarations,
@@ -150,6 +155,12 @@ fn page_recipes(
                     _ => None,
                 })
                 .collect();
+            let prunes = scoped()
+                .filter_map(|rule| match rule {
+                    Rule::Prune { urls, remove, .. } => Some(prune::page_rule(urls, remove)),
+                    _ => None,
+                })
+                .collect();
             let redirects = scoped()
                 .filter_map(|rule| match rule {
                     Rule::Redirect { id, when, to, .. } => {
@@ -168,6 +179,7 @@ fn page_recipes(
                 css: css_of(scoped()),
                 scripts: indices,
                 menus,
+                prunes,
                 redirects,
             })
         })
@@ -190,6 +202,11 @@ pub fn page_script(recipes: &[Recipe], choices: &OptionChoices) -> Result<String
     let json = serde_json::to_string(&page).map_err(|e| Error::Recipe(e.to_string()))?;
     let menu_runtime = if page.iter().any(|recipe| !recipe.menus.is_empty()) {
         MENU_RUNTIME.trim()
+    } else {
+        "null"
+    };
+    let prune_runtime = if page.iter().any(|recipe| !recipe.prunes.is_empty()) {
+        PRUNE_RUNTIME.trim()
     } else {
         "null"
     };
@@ -220,6 +237,14 @@ pub fn page_script(recipes: &[Recipe], choices: &OptionChoices) -> Result<String
     const menus = found.reduce((all, recipe) => all.concat(recipe.menus), []);
     if (menuRuntime && menus.length) {{
       try {{ menuRuntime(menus); }} catch (_) {{}}
+    }}
+    const pruneRuntime = {prune_runtime};
+    const prunes = found.reduce((all, recipe) => all.concat(recipe.prunes), []);
+    const pruneState = window[Symbol.for("openmedia.prune")];
+    if (pruneRuntime && prunes.length) {{
+      try {{ pruneRuntime(prunes); }} catch (_) {{}}
+    }} else if (pruneState) {{
+      try {{ pruneState.rules = []; }} catch (_) {{}}
     }}
     const run = (index) => {{
       try {{ scripts[index].call(undefined); }} catch (_) {{}}

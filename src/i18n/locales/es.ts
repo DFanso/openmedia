@@ -384,6 +384,7 @@ export const es: Messages = {
   "library.review.hides": "Oculta",
   "library.review.redirects": "Redirige",
   "library.review.restyles": "Cambia el aspecto de",
+  "library.review.prunes": "Elimina",
   "library.review.runsCode": "Ejecuta código",
   "library.review.showCode": "Mostrar el código",
   "library.review.hideCode": "Ocultar el código",

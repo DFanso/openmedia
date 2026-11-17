@@ -380,6 +380,7 @@ export const sv: Messages = {
   "library.review.hides": "Döljer",
   "library.review.redirects": "Omdirigerar",
   "library.review.restyles": "Ändrar utseendet",
+  "library.review.prunes": "Tar bort",
   "library.review.runsCode": "Kör kod",
   "library.review.showCode": "Visa koden",
   "library.review.hideCode": "Dölj koden",

@@ -387,6 +387,7 @@ export const el: Messages = {
   "library.review.hides": "Κρύβει",
   "library.review.redirects": "Ανακατευθύνει",
   "library.review.restyles": "Αλλάζει την εμφάνιση",
+  "library.review.prunes": "Αφαιρεί",
   "library.review.runsCode": "Εκτελεί κώδικα",
   "library.review.showCode": "Εμφάνιση κώδικα",
   "library.review.hideCode": "Απόκρυψη κώδικα",

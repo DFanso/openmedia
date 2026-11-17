@@ -382,6 +382,7 @@ export const uk: Messages = {
   "library.review.hides": "Приховує",
   "library.review.redirects": "Перенаправляє",
   "library.review.restyles": "Змінює вигляд",
+  "library.review.prunes": "Видаляє",
   "library.review.runsCode": "Запускає код",
   "library.review.showCode": "Показати код",
   "library.review.hideCode": "Сховати код",

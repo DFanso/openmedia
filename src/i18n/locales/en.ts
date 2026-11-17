@@ -376,6 +376,7 @@ export const en = {
   "library.review.hides": "Hides",
   "library.review.redirects": "Redirects",
   "library.review.restyles": "Restyles",
+  "library.review.prunes": "Removes",
   "library.review.runsCode": "Runs code",
   "library.review.showCode": "Show the code",
   "library.review.hideCode": "Hide the code",

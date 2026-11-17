@@ -364,6 +364,7 @@ export const ar: Messages = {
   "library.review.hides": "تُخفي",
   "library.review.redirects": "تعيد التوجيه",
   "library.review.restyles": "تُغيّر المظهر",
+  "library.review.prunes": "تُزيل",
   "library.review.runsCode": "يشغّل شيفرة",
   "library.review.showCode": "إظهار الشيفرة",
   "library.review.hideCode": "إخفاء الشيفرة",

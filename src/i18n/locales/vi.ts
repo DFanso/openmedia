@@ -373,6 +373,7 @@ export const vi: Messages = {
   "library.review.hides": "Ẩn",
   "library.review.redirects": "Chuyển hướng",
   "library.review.restyles": "Đổi kiểu dáng",
+  "library.review.prunes": "Xóa",
   "library.review.runsCode": "Chạy mã",
   "library.review.showCode": "Xem mã",
   "library.review.hideCode": "Ẩn mã",
