@@ -64,6 +64,7 @@ function CategoryPanel({
     case "general":
       return (
         <>
+          <ProfilesLink />
           <AppearanceSection />
           <LanguageSection />
         </>
@@ -136,6 +137,22 @@ function FanButtonSwitches() {
         description={t("settings.techDetectorNote")}
         checked={techDetector}
         onChange={(on) => void setTechDetector(on)}
+      />
+    </Group>
+  );
+}
+
+/** The row that opens the profiles: who is in use, and the others to switch to. */
+function ProfilesLink() {
+  const openSheet = useApp((s) => s.openSheet);
+  const t = useT();
+
+  return (
+    <Group>
+      <NavRow
+        title={t("settings.profiles")}
+        note={t("settings.profilesNote")}
+        onClick={() => openSheet("profiles")}
       />
     </Group>
   );

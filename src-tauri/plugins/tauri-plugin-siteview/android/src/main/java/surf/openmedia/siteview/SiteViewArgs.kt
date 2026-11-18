@@ -141,3 +141,8 @@ class ShareArgs {
 class ClearSiteDataArgs {
     var site: String = ""
 }
+
+@InvokeArg
+class RemoveProfileArgs {
+    var profile: String = ""
+}

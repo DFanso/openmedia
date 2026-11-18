@@ -42,10 +42,12 @@ const MAX_MADE_BYTES: usize = 256 * 1024;
 const CUSTOM_PREFIX: &str = "custom.";
 
 /// The recipes in effect: the ones the user or the assistant made (`custom.`) and the ones
-/// installed from the library (`market.`, or `imported.` from earlier versions). Files live in `dir`, so app updates never touch
-/// them. The page script is compiled on demand, because it depends on the user's toggles.
+/// installed from the library (`market.`, or `imported.` from earlier versions). Files live in
+/// `dir`, the profile's recipe folder, so app updates never touch them; a switch of profile puts
+/// another profile's folder in place (`adopt`). The page script is compiled on demand, because it
+/// depends on the user's toggles.
 pub struct Recipes {
-    dir: PathBuf,
+    dir: RwLock<PathBuf>,
     custom: RwLock<BTreeMap<String, Recipe>>,
     imported: RwLock<BTreeMap<String, Recipe>>,
 }
@@ -71,10 +73,37 @@ impl Recipes {
             }
         }
         Ok(Self {
-            dir,
+            dir: RwLock::new(dir),
             custom: RwLock::new(custom),
             imported: RwLock::new(imported),
         })
+    }
+
+    /// Takes over `other`'s folder and recipes, as a switch of profile does.
+    pub fn adopt(&self, other: Recipes) {
+        let Recipes {
+            dir,
+            custom,
+            imported,
+        } = other;
+        *self.dir.write().unwrap_or_else(PoisonError::into_inner) =
+            dir.into_inner().unwrap_or_else(PoisonError::into_inner);
+        *self.custom.write().unwrap_or_else(PoisonError::into_inner) =
+            custom.into_inner().unwrap_or_else(PoisonError::into_inner);
+        *self
+            .imported
+            .write()
+            .unwrap_or_else(PoisonError::into_inner) = imported
+            .into_inner()
+            .unwrap_or_else(PoisonError::into_inner);
+    }
+
+    /// Where the recipe `id` is saved.
+    fn file(&self, id: &str) -> PathBuf {
+        self.dir
+            .read()
+            .unwrap_or_else(PoisonError::into_inner)
+            .join(format!("{id}.json"))
     }
 
     /// Made recipes first, then installed ones, each in id order.
@@ -111,10 +140,7 @@ impl Recipes {
     /// whatever produced it.
     pub fn save_made(&self, recipe: &Recipe) -> Result<Recipe> {
         let saved = parse_custom(&serde_json::to_string(recipe)?)?;
-        write_atomically(
-            &self.dir.join(format!("{}.json", saved.id)),
-            &serde_json::to_vec_pretty(&saved)?,
-        )?;
+        write_atomically(&self.file(&saved.id), &serde_json::to_vec_pretty(&saved)?)?;
         self.custom
             .write()
             .unwrap_or_else(PoisonError::into_inner)
@@ -127,7 +153,7 @@ impl Recipes {
         if self.imported_version(id).is_none() {
             return Err(Error::UnknownSite);
         }
-        match fs::remove_file(self.dir.join(format!("{id}.json"))) {
+        match fs::remove_file(self.file(id)) {
             Err(error) if error.kind() != std::io::ErrorKind::NotFound => return Err(error.into()),
             _ => {}
         }
@@ -156,10 +182,7 @@ impl Recipes {
     }
 
     fn store_imported(&self, recipe: Recipe) -> Result<Recipe> {
-        write_atomically(
-            &self.dir.join(format!("{}.json", recipe.id)),
-            &serde_json::to_vec_pretty(&recipe)?,
-        )?;
+        write_atomically(&self.file(&recipe.id), &serde_json::to_vec_pretty(&recipe)?)?;
         self.imported
             .write()
             .unwrap_or_else(PoisonError::into_inner)
@@ -212,7 +235,7 @@ impl Recipes {
             .map(|recipe| (recipe.id.clone(), recipe))
             .collect();
         Self {
-            dir: PathBuf::from("/nonexistent/openmedia-test"),
+            dir: RwLock::new(PathBuf::from("/nonexistent/openmedia-test")),
             custom: RwLock::new(BTreeMap::new()),
             imported: RwLock::new(imported),
         }

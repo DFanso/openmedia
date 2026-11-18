@@ -32,6 +32,7 @@ export const PEEK_WIDTH = 22;
 export const PEEK_HEIGHT = 56;
 export const FAVORITE_SIZE = 52;
 export const SETTINGS_SIZE = 44;
+export const PROFILES_SIZE = 44;
 export const HISTORY_SIZE = 44;
 export const TABS_SIZE = 44;
 export const STATS_SIZE = 44;
@@ -115,6 +116,7 @@ export type FanTarget =
   | { kind: "colorPicker" }
   | { kind: "techDetector" }
   | { kind: "downloads" }
+  | { kind: "profiles" }
   | { kind: "settings" };
 
 /**

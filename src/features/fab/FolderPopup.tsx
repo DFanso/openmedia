@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { useT } from "../../i18n/useT";
+import { Glyph, isGlyph } from "../../shared/glyphs";
 import { FolderIcon } from "../../shared/icons";
 import type { Favorite } from "../../shared/ipc";
 import { useBackHandler } from "../back/useBackHandler";
@@ -33,7 +34,7 @@ export function FolderPopup({
   onOpenAll,
 }: {
   name: string;
-  /** The emoji the user gave the folder, if any. */
+  /** The icon the user gave the folder, if any. */
   icon?: string;
   members: FolderMember[];
   onPick: (member: FolderMember) => void;
@@ -56,13 +57,7 @@ export function FolderPopup({
         className="glass assistant-dock fixed top-1/2 left-1/2 z-[61] max-h-[70vh] w-[min(88vw,22rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-3xl p-4 text-paper"
       >
         <div className="mb-3 flex items-center gap-2 px-1 text-sm font-medium text-paper/70">
-          {icon ? (
-            <span aria-hidden="true" className="text-lg leading-none">
-              {icon}
-            </span>
-          ) : (
-            <FolderIcon size={18} />
-          )}
+          {isGlyph(icon) ? <Glyph name={icon} size={18} /> : <FolderIcon size={18} />}
           <span className="min-w-0 flex-1 truncate">{name}</span>
           {onOpenAll && members.length > 1 && (
             <button

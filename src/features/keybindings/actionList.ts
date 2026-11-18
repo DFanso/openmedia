@@ -59,6 +59,7 @@ export const ACTIONS: readonly ActionInfo[] = [
   action("navigate", "nav.library", "Recipe library"),
   action("navigate", "nav.stats", "Usage"),
   action("navigate", "nav.settings", "Settings"),
+  action("navigate", "nav.profiles", "Profiles"),
   action("navigate", "nav.keybindings", "Keyboard shortcuts"),
 
   action("tabs", "tab.switcher", "Show all tabs"),

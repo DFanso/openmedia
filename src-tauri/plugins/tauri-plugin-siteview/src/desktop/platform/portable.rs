@@ -7,7 +7,7 @@ use std::{
     sync::{Mutex, PoisonError},
 };
 
-use tauri::{Runtime, Webview, webview::WebviewBuilder};
+use tauri::{AppHandle, Runtime, Webview, webview::WebviewBuilder};
 use url::Url;
 use uuid::Uuid;
 
@@ -31,6 +31,11 @@ pub const APPLIES_RULE_LISTS: bool = false;
 
 /// Only macOS filters the shell's clicks by region; here the regions are kept in the plugin state.
 pub fn set_regions(_regions: Vec<Rect>) {}
+
+/// These system web views give no pixel to read, so the page script's own color is used.
+pub fn sample_color<R: Runtime>(_webview: &Webview<R>, _x: f64, _y: f64) -> Result<Option<String>> {
+    Ok(None)
+}
 
 /// The shell's web view fills the window, so a page's coordinates need no offset.
 pub fn content_insets<R: Runtime>(_webview: &Webview<R>) -> Result<(f64, f64, f64, f64)> {
@@ -101,6 +106,21 @@ pub fn configure_profile<R: Runtime>(
     profile: Uuid,
 ) -> WebviewBuilder<R> {
     builder.data_directory(profiles.join(profile.to_string()))
+}
+
+/// Erases a profile by deleting its data folder. The system web view refuses while a view of the
+/// profile still holds it.
+pub fn remove_profile<R: Runtime>(
+    _app: &AppHandle<R>,
+    profiles: &Path,
+    profile: Uuid,
+) -> Result<()> {
+    match std::fs::remove_dir_all(profiles.join(profile.to_string())) {
+        Err(error) if error.kind() != std::io::ErrorKind::NotFound => {
+            Err(Error::Native(error.to_string()))
+        }
+        _ => Ok(()),
+    }
 }
 
 /// Shows the folder holding a finished download.

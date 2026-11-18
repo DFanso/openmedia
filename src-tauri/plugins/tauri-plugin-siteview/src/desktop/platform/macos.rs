@@ -10,7 +10,7 @@ use objc2::{
     rc::Retained,
     runtime::{AnyObject, Bool},
 };
-use objc2_foundation::{NSArray, NSEdgeInsets, NSError, NSString};
+use objc2_foundation::{NSArray, NSEdgeInsets, NSError, NSRect, NSString, NSUUID};
 use objc2_local_authentication::{LAContext, LAPolicy};
 use objc2_web_kit::{
     WKContentRuleList, WKContentRuleListStore, WKUserContentController, WKUserScript,
@@ -155,6 +155,92 @@ pub fn has_keyboard<R: Runtime>(webview: &Webview<R>) -> bool {
         }
     })
     .unwrap_or(false)
+}
+
+/// The color the page view shows at a point of its viewport, in CSS pixels: a one-pixel snapshot
+/// of what WebKit rendered, so images, video frames, gradients and text read as well as
+/// backgrounds do. `None` when WebKit gives no image. Never on the main thread: the snapshot
+/// finishes there.
+pub fn sample_color<R: Runtime>(webview: &Webview<R>, x: f64, y: f64) -> Result<Option<String>> {
+    let (sender, receiver) = mpsc::channel();
+    with_view(webview, move |view| {
+        // SAFETY: main thread; every object is a live WebKit or AppKit object, and the block only
+        // sends a plain value.
+        unsafe {
+            let bounds: NSRect = msg_send![view, bounds];
+            let zoom = view.pageZoom();
+            let point =
+                |css: f64, extent: f64| (css * zoom).floor().clamp(0.0, (extent - 1.0).max(0.0));
+            let mut rect = bounds;
+            rect.origin.x = point(x, bounds.size.width);
+            rect.origin.y = point(y, bounds.size.height);
+            rect.size.width = 1.0;
+            rect.size.height = 1.0;
+            let configuration: Retained<AnyObject> =
+                msg_send![class!(WKSnapshotConfiguration), new];
+            let _: () = msg_send![&*configuration, setRect: rect];
+            let width: Retained<AnyObject> = msg_send![class!(NSNumber), numberWithDouble: 1.0f64];
+            let _: () = msg_send![&*configuration, setSnapshotWidth: &*width];
+            let done = RcBlock::new(move |image: *mut AnyObject, _error: *mut AnyObject| {
+                let _ = sender.send(pixel_hex(image));
+            });
+            let _: () = msg_send![
+                view,
+                takeSnapshotWithConfiguration: &*configuration,
+                completionHandler: &*done
+            ];
+        }
+    })?;
+    receiver
+        .recv_timeout(MAIN_THREAD_WAIT)
+        .map_err(|_| Error::PageTimeout)
+}
+
+/// The first pixel of an `NSImage` as `#rrggbb`, drawn over white so a see-through pixel reads as
+/// it looks on a page.
+///
+/// # Safety
+/// Main thread; `image` is null or a live `NSImage`.
+unsafe fn pixel_hex(image: *mut AnyObject) -> Option<String> {
+    if image.is_null() {
+        return None;
+    }
+    let (mut red, mut green, mut blue, mut alpha) = (0.0f64, 0.0f64, 0.0f64, 0.0f64);
+    // SAFETY: each receiver is checked for null before it is messaged.
+    unsafe {
+        let tiff: *mut AnyObject = msg_send![image, TIFFRepresentation];
+        if tiff.is_null() {
+            return None;
+        }
+        let rep: *mut AnyObject = msg_send![class!(NSBitmapImageRep), imageRepWithData: tiff];
+        if rep.is_null() {
+            return None;
+        }
+        let color: *mut AnyObject = msg_send![rep, colorAtX: 0isize, y: 0isize];
+        if color.is_null() {
+            return None;
+        }
+        let space: *mut AnyObject = msg_send![class!(NSColorSpace), sRGBColorSpace];
+        let srgb: *mut AnyObject = msg_send![color, colorUsingColorSpace: space];
+        if srgb.is_null() {
+            return None;
+        }
+        let _: () = msg_send![
+            srgb,
+            getRed: &mut red as *mut f64,
+            green: &mut green as *mut f64,
+            blue: &mut blue as *mut f64,
+            alpha: &mut alpha as *mut f64
+        ];
+    }
+    let channel =
+        |value: f64| ((value * alpha + (1.0 - alpha)).clamp(0.0, 1.0) * 255.0).round() as u8;
+    Some(format!(
+        "#{:02x}{:02x}{:02x}",
+        channel(red),
+        channel(green),
+        channel(blue)
+    ))
 }
 
 /// Prepares the shell's web view (see `shell.rs`); run it again after each page view is added.
@@ -427,6 +513,38 @@ pub fn clear_site_data<R: Runtime>(webview: &Webview<R>, site: &str) -> Result<(
     finished
         .recv_timeout(CLEAR_DATA_WAIT)
         .map_err(|_| Error::PageTimeout)
+}
+
+/// Erases profile `profile`'s whole data store. WebKit refuses while a web view of it is alive.
+pub fn remove_profile<R: Runtime>(
+    app: &AppHandle<R>,
+    _profiles: &Path,
+    profile: Uuid,
+) -> Result<()> {
+    let (done, finished) = mpsc::channel();
+    app.run_on_main_thread(move || {
+        let Some(main) = MainThreadMarker::new() else {
+            let _ = done.send(false);
+            return;
+        };
+        let identifier = NSUUID::from_bytes(profile.into_bytes());
+        let removed = RcBlock::new(move |error: *mut NSError| {
+            let _ = done.send(error.is_null());
+        });
+        // SAFETY: a WebKit call on the main thread; the block owns its sender and runs once.
+        unsafe {
+            WKWebsiteDataStore::removeDataStoreForIdentifier_completionHandler(
+                &identifier,
+                &removed,
+                main,
+            );
+        }
+    })?;
+    match finished.recv_timeout(CLEAR_DATA_WAIT) {
+        Ok(true) => Ok(()),
+        Ok(false) => Err(Error::ProfileInUse),
+        Err(_) => Err(Error::PageTimeout),
+    }
 }
 
 #[cfg(test)]

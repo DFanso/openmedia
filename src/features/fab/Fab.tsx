@@ -47,6 +47,7 @@ import {
   INCOGNITO_SIZE,
   PEEK_HEIGHT,
   PEEK_WIDTH,
+  PROFILES_SIZE,
   SETTINGS_SIZE,
   STATS_SIZE,
   TABS_SIZE,
@@ -102,6 +103,9 @@ import {
   TabsIcon,
   VideoControlsIcon,
 } from "../../shared/icons";
+import { Glyph, isGlyph } from "../../shared/glyphs";
+import { ProfileAvatar } from "../profiles/ProfileAvatar";
+import { selectActiveProfile, shownProfile } from "../profiles/profiles";
 import { useBackHandler } from "../back/useBackHandler";
 import logoMark from "../../assets/logo-mark.svg";
 import { useEntitlementStore } from "../paywall/store";
@@ -432,6 +436,7 @@ function FloatingButton() {
   const onboardingOpen = useApp((s) => s.onboardingOpen);
   const setFabEdge = useApp((s) => s.setFabEdge);
   const isPro = useEntitlementStore((state) => state.status === "pro");
+  const activeProfile = useApp(selectActiveProfile);
   // Icons of sites that are open arrive after the fact; redraw when one does.
   useIconCache((cache) => cache.icons);
   const t = useT();
@@ -565,6 +570,7 @@ function FloatingButton() {
 
   const select = (target: FanTarget) => {
     if (target.kind === "settings") openSheet("settings");
+    else if (target.kind === "profiles") openSheet("profiles");
     else if (target.kind === "history") openSheet("history");
     else if (target.kind === "tabs") openSheet("tabs");
     else if (target.kind === "stats") openSheet("stats");
@@ -618,6 +624,7 @@ function FloatingButton() {
 
   const folderEntry = (item: Extract<FavoriteItem, { kind: "folder" }>, section: number): Entry => {
     const unreadCount = item.members.reduce((sum, member) => sum + (unread[member.index] ?? 0), 0);
+    const icon = folderIcon(folders, item.name);
     return {
       lane: "ring",
       target: { kind: "folder", name: item.name },
@@ -632,10 +639,8 @@ function FloatingButton() {
       className: "text-white",
       content: (
         <>
-          {folderIcon(folders, item.name) ? (
-            <span aria-hidden="true" className="text-[22px] leading-none">
-              {folderIcon(folders, item.name)}
-            </span>
+          {isGlyph(icon) ? (
+            <Glyph name={icon} size={24} />
           ) : (
             <span className="grid grid-cols-2 gap-0.5">
               {item.members.slice(0, 4).map(({ favorite }) =>
@@ -697,7 +702,15 @@ function FloatingButton() {
   };
 
   const tool = (
-    kind: "history" | "tabs" | "stats" | "settings" | "colorPicker" | "techDetector" | "downloads",
+    kind:
+      | "history"
+      | "tabs"
+      | "stats"
+      | "profiles"
+      | "settings"
+      | "colorPicker"
+      | "techDetector"
+      | "downloads",
     size: number,
     label: string,
     content: ReactNode,
@@ -721,6 +734,14 @@ function FloatingButton() {
     ),
     tool("tabs", TABS_SIZE, t("fab.tabs"), <TabsIcon />),
     tool("history", HISTORY_SIZE, t("fab.history"), <HistoryIcon />),
+    tool(
+      "profiles",
+      PROFILES_SIZE,
+      activeProfile
+        ? t("fab.profilesActive", { name: shownProfile(activeProfile, t).name })
+        : t("fab.profiles"),
+      <ProfileAvatar profile={activeProfile} size={20} />,
+    ),
     tool("settings", SETTINGS_SIZE, t("fab.settings"), <SlidersIcon />),
   ];
   const switchTools: Entry[] = [

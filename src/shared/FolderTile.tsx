@@ -1,7 +1,8 @@
+import { Glyph, isGlyph } from "./glyphs";
 import { FolderIcon } from "./icons";
 
 interface FolderTileProps {
-  /** The emoji the user chose; without one the tile shows what is in the folder. */
+  /** The icon the user chose; without one the tile shows what is in the folder. */
   icon?: string;
   /** The favorites in the folder, for the tile that has no icon of its own. */
   members: readonly { name: string; icon?: string }[];
@@ -11,10 +12,10 @@ interface FolderTileProps {
 export function FolderTile({ icon, members }: FolderTileProps) {
   const frame =
     "grid size-10 shrink-0 place-items-center overflow-hidden rounded-[10px] bg-accent/15 text-accent";
-  if (icon) {
+  if (isGlyph(icon)) {
     return (
-      <span aria-hidden="true" className={`${frame} text-xl leading-none`}>
-        {icon}
+      <span aria-hidden="true" className={frame}>
+        <Glyph name={icon} size={22} />
       </span>
     );
   }

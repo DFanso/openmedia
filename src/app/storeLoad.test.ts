@@ -37,6 +37,7 @@ const startup = {
   darkMode: DARK_MODE_DEFAULT,
   darkSites: {},
   bootSession: { id: "boot-session", url: "https://m.youtube.com/watch?v=example" },
+  profiles: { active: "default", profiles: [{ id: "default" }] },
   desktop: false,
 } satisfies Startup;
 

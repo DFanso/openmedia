@@ -4,9 +4,17 @@ import logoMark from "../../assets/logo-mark.svg";
 import { useT } from "../../i18n/useT";
 import type { MessageKey } from "../../i18n/messages";
 import { QUICK_ACCESS_LIMIT } from "../../shared/favorites";
-import { HistoryIcon, IncognitoIcon, SlidersIcon, StatsIcon } from "../../shared/icons";
+import {
+  ChevronLeftIcon,
+  HistoryIcon,
+  IncognitoIcon,
+  SlidersIcon,
+  StatsIcon,
+  TabsIcon,
+} from "../../shared/icons";
 import { useBackHandler } from "../back/useBackHandler";
 import { onboarding } from "../library/ipc";
+import { ProfileAvatar } from "../profiles/ProfileAvatar";
 import { QuickAccessStep, type OptionsState } from "./QuickAccessStep";
 import { toggleSelection } from "./selection";
 
@@ -50,7 +58,7 @@ function TapVisual() {
   );
 }
 
-/** Offsets from the button's centre, in px. Favorites arc out; the four controls stack above it. */
+/** Offsets from the button's centre, in px. Favorites arc out; the tools stack above it. */
 const DEMO_FAVORITES = [
   { label: "I", x: 70, y: -100 },
   { label: "F", x: 114, y: -50 },
@@ -60,13 +68,15 @@ const DEMO_FAVORITES = [
 ];
 
 const DEMO_CONTROLS = [
-  { key: "incognito", icon: <IncognitoIcon />, y: -188 },
-  { key: "usage", icon: <StatsIcon />, y: -146 },
-  { key: "history", icon: <HistoryIcon />, y: -104 },
+  { key: "incognito", icon: <IncognitoIcon />, y: -272 },
+  { key: "usage", icon: <StatsIcon />, y: -230 },
+  { key: "tabs", icon: <TabsIcon />, y: -188 },
+  { key: "history", icon: <HistoryIcon />, y: -146 },
+  { key: "profiles", icon: <ProfileAvatar profile={null} size={20} />, y: -104 },
   { key: "settings", icon: <SlidersIcon />, y: -62 },
 ];
 
-const DEMO_BUTTON_CENTER = { x: 56, y: 214 };
+const DEMO_BUTTON_CENTER = { x: 56, y: 300 };
 
 function demoItemStyle(index: number, x: number, y: number, size: number): DemoItemStyle {
   return {
@@ -82,7 +92,7 @@ function demoItemStyle(index: number, x: number, y: number, size: number): DemoI
 
 function HoldVisual() {
   return (
-    <div className="relative h-80 w-64">
+    <div className="relative h-[28rem] w-64">
       <div className="absolute" style={{ left: 24, top: DEMO_BUTTON_CENTER.y - 32 }}>
         <MiniButton pulsing />
       </div>
@@ -110,11 +120,14 @@ function HoldVisual() {
 
 function DragVisual() {
   return (
-    <div className="relative h-56 w-56">
+    <div className="relative h-56 w-56 overflow-hidden">
       <div className="absolute inset-y-0 right-3 w-px bg-hair" />
-      <div className="demo-slide absolute top-1/2 right-0 -mt-7">
+      <div className="demo-slide absolute top-1/2 right-0 -mt-8">
         <MiniButton />
       </div>
+      <span className="demo-peek glass absolute top-1/2 right-0 grid h-14 w-[22px] -translate-y-1/2 place-items-center rounded-s-xl text-paper/80">
+        <ChevronLeftIcon size={18} />
+      </span>
     </div>
   );
 }

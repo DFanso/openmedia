@@ -118,8 +118,48 @@ pub struct Favorite {
     pub folder: Option<String>,
 }
 
-/// How many characters a folder's icon may have: one emoji, with its joiners and selectors.
-pub const MAX_FOLDER_ICON_CHARS: usize = 8;
+/// The longest icon name a folder or profile may carry.
+pub const MAX_ICON_NAME_CHARS: usize = 24;
+
+/// Whether `name` can name one of the icons the shell draws (`briefcase`, `music`): lowercase
+/// letters, digits and hyphens, starting with a letter. The shell owns the drawings, so a name it
+/// does not know is drawn as no icon.
+pub fn is_icon_name(name: &str) -> bool {
+    name.len() <= MAX_ICON_NAME_CHARS
+        && name.starts_with(|c: char| c.is_ascii_lowercase())
+        && name
+            .chars()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
+}
+
+/// The emoji earlier versions offered as folder icons, and the drawn icon that took each one's
+/// place. Read only when a library is loaded, to carry a saved choice over.
+const EMOJI_ICONS: [(&str, &str); 24] = [
+    ("📁", "folder"),
+    ("⭐", "star"),
+    ("❤", "heart"),
+    ("🏠", "home"),
+    ("💼", "briefcase"),
+    ("🎬", "film"),
+    ("🎵", "music"),
+    ("🎮", "game"),
+    ("📚", "book"),
+    ("📰", "news"),
+    ("🛒", "cart"),
+    ("✈", "plane"),
+    ("🍔", "food"),
+    ("💬", "chat"),
+    ("📷", "camera"),
+    ("🎓", "school"),
+    ("💰", "money"),
+    ("🔧", "wrench"),
+    ("🧪", "flask"),
+    ("🌍", "globe"),
+    ("⚽", "ball"),
+    ("🧠", "brain"),
+    ("🔒", "lock"),
+    ("🎨", "palette"),
+];
 
 /// A folder as the user manages it: a name and, when chosen, an icon. Favorites name the folder
 /// they are in; a folder with no favorites lives only here. Without an icon the folder shows the
@@ -304,11 +344,12 @@ struct LibraryData {
     dark_sites: BTreeMap<String, SiteDark>,
 }
 
-/// The user's favorites, page, theme and provider settings, persisted as one JSON file. Holds no
-/// secrets and no cookies: site sessions live in the native data store of `profile_id`, and API
-/// keys in the OS secure store.
+/// The user's favorites, page, theme and provider settings, persisted as one JSON file per
+/// profile. Holds no secrets and no cookies: site sessions live in the native data store of
+/// `profile_id`, and API keys in the OS secure store. A switch of profile puts another profile's
+/// file in place (`adopt`); the app keeps this one object.
 pub struct Library {
-    path: PathBuf,
+    path: Mutex<PathBuf>,
     data: Mutex<LibraryData>,
 }
 
@@ -320,7 +361,7 @@ impl Library {
             Err(e) => return Err(e.into()),
         };
         let library = Self {
-            path,
+            path: Mutex::new(path),
             data: Mutex::new(data),
         };
         if needs_save {
@@ -330,8 +371,41 @@ impl Library {
         Ok(library)
     }
 
+    /// Writes a new profile's library at `path`: the defaults, with the site data store
+    /// `profile_id`, in the language and theme given. The guide runs when it is first opened.
+    pub fn create(
+        path: &Path,
+        profile_id: Uuid,
+        locale: Option<String>,
+        theme: Theme,
+    ) -> Result<()> {
+        let data = LibraryData {
+            profile_id,
+            locale,
+            theme,
+            ..default_data()
+        };
+        write_atomically(path, &serde_json::to_vec_pretty(&data)?)?;
+        Ok(())
+    }
+
+    /// Takes over `other`'s file and everything in it, as a switch of profile does. Later changes
+    /// are saved to that file.
+    pub fn adopt(&self, other: Library) -> Result<()> {
+        let mut data = self.lock()?;
+        let mut path = self.path.lock().map_err(|_| Error::Poisoned)?;
+        *data = other.data.into_inner().map_err(|_| Error::Poisoned)?;
+        *path = other.path.into_inner().map_err(|_| Error::Poisoned)?;
+        Ok(())
+    }
+
     pub fn profile_id(&self) -> Result<Uuid> {
         Ok(self.lock()?.profile_id)
+    }
+
+    /// The language the user picked; `None` follows the device.
+    pub fn locale(&self) -> Result<Option<String>> {
+        Ok(self.lock()?.locale.clone())
     }
 
     /// The page to open at launch: the last page the user was on, else the first favorite. An
@@ -875,7 +949,8 @@ impl Library {
     }
 
     fn save(&self, data: &LibraryData) -> Result<()> {
-        write_atomically(&self.path, &serde_json::to_vec_pretty(data)?)?;
+        let path = self.path.lock().map_err(|_| Error::Poisoned)?;
+        write_atomically(&path, &serde_json::to_vec_pretty(data)?)?;
         Ok(())
     }
 }
@@ -1000,9 +1075,32 @@ fn parse(text: &str) -> Result<(LibraryData, bool)> {
             .incognito_favorites
             .as_deref_mut()
             .is_some_and(drop_foreign_landings);
-    let migrated = data.version != FORMAT_VERSION || dropped;
+    let redrawn =
+        migrate_folder_icons(&mut data.folders) | migrate_folder_icons(&mut data.incognito_folders);
+    let migrated = data.version != FORMAT_VERSION || dropped || redrawn;
     data.version = FORMAT_VERSION;
     Ok((data, migrated))
+}
+
+/// A folder icon saved as an emoji becomes the drawn icon that took its place; any other icon that
+/// is not a name is dropped, so the folder shows what is in it. True when any changed.
+fn migrate_folder_icons(folders: &mut [Folder]) -> bool {
+    let mut changed = false;
+    for folder in folders {
+        let Some(icon) = folder.icon.as_deref() else {
+            continue;
+        };
+        if is_icon_name(icon) {
+            continue;
+        }
+        let emoji = icon.trim().trim_end_matches('\u{fe0f}');
+        folder.icon = EMOJI_ICONS
+            .iter()
+            .find(|(saved, _)| *saved == emoji)
+            .map(|(_, name)| (*name).to_owned());
+        changed = true;
+    }
+    changed
 }
 
 /// A landing page the favorite's own site does not own can only come from a hand-edited file:
@@ -1097,10 +1195,8 @@ fn folders_from_input(inputs: Vec<Folder>) -> Result<Vec<Folder>> {
         }
         let icon = match input.icon.as_deref().map(str::trim) {
             None | Some("") => None,
-            Some(icon) if icon.chars().count() > MAX_FOLDER_ICON_CHARS => {
-                return Err(Error::InvalidFolder);
-            }
-            Some(icon) => Some(icon.to_owned()),
+            Some(icon) if is_icon_name(icon) => Some(icon.to_owned()),
+            Some(_) => return Err(Error::InvalidFolder),
         };
         if folders
             .iter()
@@ -1427,13 +1523,16 @@ mod tests {
             .set_folders(
                 Mode::Normal,
                 vec![
-                    folder(" Work ", Some("💼")),
+                    folder(" Work ", Some("briefcase")),
                     folder("work", None),
                     folder("Fun", Some(" ")),
                 ],
             )
             .unwrap();
-        assert_eq!(saved, vec![folder("Work", Some("💼")), folder("Fun", None)]);
+        assert_eq!(
+            saved,
+            vec![folder("Work", Some("briefcase")), folder("Fun", None)]
+        );
         assert_eq!(library.state().unwrap().folders, saved);
         assert!(library.folders(Mode::Incognito).unwrap().is_empty());
         assert!(
@@ -1441,11 +1540,72 @@ mod tests {
                 .set_folders(Mode::Normal, vec![folder("", None)])
                 .is_err()
         );
-        assert!(
-            library
-                .set_folders(Mode::Normal, vec![folder("A", Some("123456789"))])
-                .is_err()
+        for icon in ["💼", "Briefcase", "two words", "9lives", &"a".repeat(25)] {
+            assert!(
+                library
+                    .set_folders(Mode::Normal, vec![folder("A", Some(icon))])
+                    .is_err(),
+                "{icon}"
+            );
+        }
+    }
+
+    #[test]
+    fn emoji_folder_icons_from_earlier_versions_become_drawn_icons() {
+        let (dir, library) = library();
+        drop(library);
+        let path = dir.path().join("library.json");
+        let mut saved: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
+        saved["folders"] = serde_json::json!([
+            { "name": "Work", "icon": "💼" },
+            { "name": "Fun", "icon": "❤️" },
+            { "name": "Odd", "icon": "🦄" },
+            { "name": "Kept", "icon": "music" },
+        ]);
+        saved["incognitoFolders"] = serde_json::json!([{ "name": "Away", "icon": "✈️" }]);
+        fs::write(&path, saved.to_string()).unwrap();
+
+        let library = reload(&dir);
+        let icons = |folders: Vec<Folder>| -> Vec<Option<String>> {
+            folders.into_iter().map(|folder| folder.icon).collect()
+        };
+        assert_eq!(
+            icons(library.folders(Mode::Normal).unwrap()),
+            [Some("briefcase"), Some("heart"), None, Some("music")]
+                .map(|icon| icon.map(str::to_owned))
         );
+        assert_eq!(
+            icons(library.folders(Mode::Incognito).unwrap()),
+            [Some("plane".to_owned())]
+        );
+        assert!(!fs::read_to_string(&path).unwrap().contains('💼'));
+    }
+
+    #[test]
+    fn an_adopted_library_is_read_and_written_in_its_own_file() {
+        let (dir, library) = library();
+        let first = library.profile_id().unwrap();
+        let other = dir.path().join("other").join("library.json");
+        let id = Uuid::new_v4();
+        Library::create(&other, id, Some("de".into()), Theme::Dark).unwrap();
+
+        library
+            .adopt(Library::load(other.clone()).unwrap())
+            .unwrap();
+        let state = library.state().unwrap();
+        assert_eq!(state.profile_id, id);
+        assert!(!state.onboarded);
+        assert_eq!(state.locale.as_deref(), Some("de"));
+        assert_eq!(state.theme, Theme::Dark);
+
+        library
+            .set_favorites(vec![input("A", "https://a.example/")])
+            .unwrap();
+        assert_eq!(Library::load(other).unwrap().favorites().unwrap().len(), 1);
+        let untouched = reload(&dir);
+        assert_eq!(untouched.profile_id().unwrap(), first);
+        assert_eq!(untouched.favorites().unwrap()[0].name, "Google");
     }
 
     #[test]

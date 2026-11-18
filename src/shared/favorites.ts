@@ -122,34 +122,6 @@ export function folderNames(favorites: readonly { folder?: string | null }[]): s
   return [...names.values()];
 }
 
-/** The icons a folder can be given, an emoji each. A folder with none shows what is in it. */
-export const FOLDER_ICONS: readonly string[] = [
-  "📁",
-  "⭐",
-  "❤️",
-  "🏠",
-  "💼",
-  "🎬",
-  "🎵",
-  "🎮",
-  "📚",
-  "📰",
-  "🛒",
-  "✈️",
-  "🍔",
-  "💬",
-  "📷",
-  "🎓",
-  "💰",
-  "🔧",
-  "🧪",
-  "🌍",
-  "⚽",
-  "🧠",
-  "🔒",
-  "🎨",
-];
-
 /**
  * Every folder to offer when filing a favorite: the managed ones, then any a favorite names that
  * has no entry of its own (a file saved before folders were managed).

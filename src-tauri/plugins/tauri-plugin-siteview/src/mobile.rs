@@ -12,7 +12,7 @@ use crate::events::{
 use crate::models::*;
 use crate::validate::{
     check_auth_reason, check_evaluate_result, check_share_title, check_site, is_color_hex,
-    parse_bridge_body, parse_session_id, parse_web_url, wrap_evaluate_script,
+    parse_bridge_body, parse_profile_id, parse_session_id, parse_web_url, wrap_evaluate_script,
 };
 use crate::{Error, Result};
 
@@ -239,6 +239,16 @@ impl<R: Runtime> Siteview<R> {
     pub fn clear_site_data(&self, request: ClearSiteDataRequest) -> Result<()> {
         let site = check_site(&request.site)?;
         self.run("clearSiteData", serde_json::json!({ "site": site }))
+    }
+
+    /// Erases a deleted profile's whole site data store. Rust-only, like `clear_site_data`. The
+    /// system refuses while a view of the profile is alive.
+    pub fn remove_profile(&self, request: RemoveProfileRequest) -> Result<()> {
+        let profile = parse_profile_id(&request.profile)?;
+        self.run(
+            "removeProfile",
+            serde_json::json!({ "profile": profile.to_string() }),
+        )
     }
 
     /// Asks the device owner for Face ID, Touch ID or the device passcode and says whether they

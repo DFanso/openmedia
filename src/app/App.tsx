@@ -99,6 +99,11 @@ const SiteDarkModeScreen = lazy(() =>
 const KeybindingsScreen = lazy(() =>
   loadKeybindings().then((module) => ({ default: module.KeybindingsScreen })),
 );
+const ProfilesScreen = lazy(() =>
+  import("../features/profiles/ProfilesScreen").then((module) => ({
+    default: module.ProfilesScreen,
+  })),
+);
 const SettingsScreen = lazy(() =>
   loadSettings().then((module) => ({ default: module.SettingsScreen })),
 );
@@ -230,6 +235,7 @@ export function App() {
       <Suspense fallback={null}>{sheet === "site-video" && <SiteVideoControlsScreen />}</Suspense>
       <Suspense fallback={null}>{sheet === "site-dark-mode" && <SiteDarkModeScreen />}</Suspense>
       <Suspense fallback={null}>{sheet === "keybindings" && <KeybindingsScreen />}</Suspense>
+      <Suspense fallback={null}>{sheet === "profiles" && <ProfilesScreen />}</Suspense>
       <Suspense fallback={null}>{(idle || sheet === "stats") && <StatsSheet />}</Suspense>
       <Suspense fallback={null}>{onboardingOpen && <Onboarding />}</Suspense>
       {sheet === "paywall" && <PaywallSheet />}

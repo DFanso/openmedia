@@ -220,10 +220,10 @@ A hidden session whose web content process dies is dropped natively and the shel
 - **Layering.** The native site view is *below* the transparent shell, so the button draws over the page. A native `TouchRouter` sends a touch to the shell inside the rectangles the shell reports (`[data-hit]` elements), and to the page everywhere else. Details: [Platform Support](./platform-support.md#layout-model-mobile).
 - **Gesture logic** is a pure state machine (`features/fab/gesture.ts`) and the layout math is pure (`features/fab/geometry.ts`), both unit-tested. The fan layout searches rotations, side flips and a compacting arc until every item fits on screen, for 0 to 6 favorites at any height; the edge column holds settings, history and stats.
 - **Persistence.** Favorites, history, theme, cached icons, provider settings, AI preview preference and onboarding remain in `library.json` (format v4, preserving v2/v3 upgrades). Local usage is separate in `usage.json`: date -> host -> section -> seconds, plus optional daily policies, downtime schedules, pause-screen delays and the settings lock (with its Rust-owned unlock request time). Totals retain 30 days; clearing totals preserves all of these. All usage commands are shell-only. Day changes reload that date's persisted totals before enforcement resumes. Button position and warning-dismissal bookkeeping are local UI preferences.
+- **Profiles.** The tool column has a Profiles button (the profile's icon or first letter) that opens the Profiles page: switch, add, rename, pick an icon, delete. Each profile has its own favorites, settings, recipes and site sign-ins; see [Profiles](./profiles.md). Folder and profile icons are the app's own line drawings (`src/shared/glyphs.tsx`), never emoji.
 
 ## Not connected yet
 
-- **Multiple profiles.** One hidden profile owns the site's cookies. Profile management is deferred.
 - **Android and desktop.** Android implementation exists but is not device-verified; desktop site views are deferred.
 
 ## Known gaps

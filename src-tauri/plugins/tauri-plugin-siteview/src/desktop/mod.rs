@@ -1218,6 +1218,23 @@ impl<R: Runtime> Siteview<R> {
         Ok(webview.reload()?)
     }
 
+    /// Erases a deleted profile's whole site data store. Rust-only, like `clear_site_data`.
+    /// Refused while a page of the profile is open: the system web view cannot erase a store in
+    /// use.
+    pub fn remove_profile(&self, request: RemoveProfileRequest) -> Result<()> {
+        let profile = parse_profile_id(&request.profile)?;
+        let in_use = self
+            .inner
+            .state()
+            .sessions
+            .values()
+            .any(|session| session.profile == profile);
+        if in_use {
+            return Err(Error::ProfileInUse);
+        }
+        platform::remove_profile(&self.inner.app, &self.inner.profiles_dir()?, profile)
+    }
+
     /// The system's owner check (Touch ID or the account password on a Mac, Windows Hello on
     /// Windows, the PolicyKit prompt on Linux). Rust-only: there is no command for it, so no
     /// webview can raise or answer the prompt. Waits for the person.
@@ -1248,9 +1265,15 @@ impl<R: Runtime> Siteview<R> {
         check_evaluate_result(json)
     }
 
-    /// Reads no pixel: the page script's own color is used on the Mac. Rust-only like `evaluate`.
-    pub fn sample_color(&self, _request: SampleColorRequest) -> Result<Option<String>> {
-        Ok(None)
+    /// The color the active page shows at a point of its viewport. Rust-only like `evaluate`.
+    /// `None` where the system web view gives no pixel (Windows, Linux): the page script's own
+    /// color is used there.
+    pub fn sample_color(&self, request: SampleColorRequest) -> Result<Option<String>> {
+        if !request.x.is_finite() || !request.y.is_finite() {
+            return Ok(None);
+        }
+        let webview = self.inner.active_webview()?;
+        platform::sample_color(&webview, request.x, request.y)
     }
 }
 
