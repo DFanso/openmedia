@@ -24,7 +24,11 @@ export function ColorPickBar() {
   useEffect(() => {
     if (!waiting) return;
     let stopped = false;
+    let inFlight = false;
     const timer = window.setInterval(() => {
+      // A native pixel read is slow on a phone: never queue another behind it.
+      if (inFlight) return;
+      inFlight = true;
       colorPick
         .read()
         .then((reading) => {
@@ -37,6 +41,9 @@ export function ColorPickBar() {
           if (stopped) return;
           setColorPick(null);
           reportError(appError(error));
+        })
+        .finally(() => {
+          inFlight = false;
         });
     }, POLL_MS);
     return () => {

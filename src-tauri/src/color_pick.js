@@ -7,6 +7,7 @@
   var RING = 14;
   var DOT = 8;
   var LIFT = 70;
+  var SAMPLE_MS = 120;
 
   // x, y: the loupe's centre in viewport CSS px. native: hex came from the real pixel (setHex)
   // since the last move; accept() re-samples the page only while it is false.
@@ -22,6 +23,7 @@
   loupe.style.cssText =
     'position:absolute;left:0;top:0;box-sizing:border-box;pointer-events:none;border-radius:50%;' +
     'width:' + SIZE + 'px;height:' + SIZE + 'px;border:' + RING + 'px solid #000;' +
+    'will-change:transform;' +
     'box-shadow:0 0 0 2px #fff,0 0 0 3px rgba(0,0,0,.6),inset 0 0 0 1px #fff,inset 0 0 0 2px rgba(0,0,0,.6);';
   var dot = document.createElement('div');
   dot.style.cssText =
@@ -37,11 +39,15 @@
   var cx = 0;
   var cy = 0;
   var frame = 0;
+  var timer = 0;
+  var last = 0;
   var pointer = null;
 
   function stop() {
     if (frame) cancelAnimationFrame(frame);
+    clearTimeout(timer);
     frame = 0;
+    timer = 0;
     if (layer.parentNode) layer.parentNode.removeChild(layer);
     if (pick.status === 'waiting') pick.status = 'cancelled';
   }
@@ -49,7 +55,9 @@
   function accept() {
     if (pick.status !== 'waiting') return;
     if (frame) cancelAnimationFrame(frame);
+    clearTimeout(timer);
     frame = 0;
+    timer = 0;
     if (!pick.native) sample();
     pick.status = 'done';
     if (layer.parentNode) layer.parentNode.removeChild(layer);
@@ -120,7 +128,7 @@
     cy = Math.max(SIZE / 2, Math.min(h - SIZE / 2, cy));
     pick.x = cx;
     pick.y = cy;
-    loupe.style.transform = 'translate(' + (cx - SIZE / 2) + 'px,' + (cy - SIZE / 2) + 'px)';
+    loupe.style.transform = 'translate3d(' + (cx - SIZE / 2) + 'px,' + (cy - SIZE / 2) + 'px,0)';
   }
 
   /** Reads the colour under the loupe's centre; the layer is hidden so it is not what is read. */
@@ -138,17 +146,26 @@
     }
   }
 
+  // Sampling hides the layer and reads computed styles, which forces a style recalculation: far
+  // too heavy to run on every pointer move. The loupe itself moves on every move; its colour is
+  // read at most every SAMPLE_MS while dragging, and once more when the pointer rests.
   function schedule() {
-    if (frame) return;
-    frame = requestAnimationFrame(function () {
-      frame = 0;
-      sample();
-    });
+    if (timer) return;
+    var wait = Math.max(0, SAMPLE_MS - (performance.now() - last));
+    timer = setTimeout(function () {
+      timer = 0;
+      frame = requestAnimationFrame(function () {
+        frame = 0;
+        last = performance.now();
+        sample();
+      });
+    }, wait);
   }
 
+  /** The finger hides what is under it, so touch rides above it; a mouse pointer has no such need. */
   function moveTo(event) {
     cx = event.clientX;
-    cy = event.clientY - LIFT;
+    cy = event.clientY - (event.pointerType === 'mouse' || event.pointerType === 'pen' ? 0 : LIFT);
     pick.native = false;
     place();
     schedule();
