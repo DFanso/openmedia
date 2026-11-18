@@ -202,8 +202,9 @@ impl ChatData {
     }
 }
 
+/// The saved chats of one profile; a switch of profile puts another profile's file in place.
 pub struct Chats {
-    path: PathBuf,
+    path: Mutex<PathBuf>,
     data: Mutex<ChatData>,
 }
 
@@ -222,9 +223,18 @@ impl Chats {
             Err(e) => return Err(e.into()),
         };
         Ok(Self {
-            path,
+            path: Mutex::new(path),
             data: Mutex::new(data),
         })
+    }
+
+    /// Takes over `other`'s file and chats, as a switch of profile does.
+    pub fn adopt(&self, other: Chats) -> Result<()> {
+        let mut data = self.lock()?;
+        let mut path = self.path.lock().map_err(|_| Error::Poisoned)?;
+        *data = other.data.into_inner().map_err(|_| Error::Poisoned)?;
+        *path = other.path.into_inner().map_err(|_| Error::Poisoned)?;
+        Ok(())
     }
 
     fn lock(&self) -> Result<MutexGuard<'_, ChatData>> {
@@ -232,7 +242,8 @@ impl Chats {
     }
 
     fn persist(&self, data: &ChatData) -> Result<()> {
-        write_atomically(&self.path, &serde_json::to_vec(data)?)?;
+        let path = self.path.lock().map_err(|_| Error::Poisoned)?;
+        write_atomically(&path, &serde_json::to_vec(data)?)?;
         Ok(())
     }
 

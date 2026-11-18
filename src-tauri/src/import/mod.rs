@@ -480,7 +480,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         Fixture {
             library: Library::load(dir.path().join("library.json")).unwrap(),
-            vault: Vault::new(dir.path().join("passwords.vault")),
+            vault: Vault::new(dir.path().join("passwords.vault"), crate::vault::KEY_ID),
             secrets: MemoryStore::default(),
             recipes: crate::recipes::Recipes::load(dir.path().join("recipes")).unwrap(),
             official: official(),

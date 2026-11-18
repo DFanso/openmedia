@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import {
-  FOLDER_ICONS,
   asInput,
   deleteFolder,
   folderChoices,
@@ -10,6 +9,8 @@ import {
   saveFolder,
 } from "../../shared/favorites";
 import { FolderTile } from "../../shared/FolderTile";
+import { GlyphPicker } from "../../shared/GlyphPicker";
+import { isGlyph } from "../../shared/glyphs";
 import { PlusIcon } from "../../shared/icons";
 import type { Favorite, FavoriteInput, Folder } from "../../shared/ipc";
 import { Screen } from "../../shared/Screen";
@@ -175,7 +176,9 @@ interface EditorProps {
 
 function FolderEditor({ initial, members, taken, onCommit, onDelete, onCancel }: EditorProps) {
   const [name, setName] = useState(initial.name);
-  const [icon, setIcon] = useState<string | undefined>(initial.icon);
+  const [icon, setIcon] = useState<string | undefined>(
+    isGlyph(initial.icon) ? initial.icon : undefined,
+  );
   const [confirming, setConfirming] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
   const t = useT();
@@ -187,11 +190,6 @@ function FolderEditor({ initial, members, taken, onCommit, onDelete, onCancel }:
     }
     await onCommit(name, icon);
   };
-
-  const choice = (selected: boolean) =>
-    `grid size-11 place-items-center rounded-xl border text-xl leading-none ${
-      selected ? "border-accent bg-accent/15" : "border-hair bg-paper/[0.04]"
-    }`;
 
   return (
     <div className="flex flex-col gap-3 border-t border-hair bg-paper/[0.03] px-4 py-3.5">
@@ -207,32 +205,12 @@ function FolderEditor({ initial, members, taken, onCommit, onDelete, onCancel }:
         }}
       />
       <div className="text-sm font-medium">{t("folders.iconLabel")}</div>
-      <div role="radiogroup" aria-label={t("folders.iconLabel")} className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          role="radio"
-          aria-checked={icon === undefined}
-          aria-label={t("folders.iconAuto")}
-          title={t("folders.iconAuto")}
-          onClick={() => setIcon(undefined)}
-          className={choice(icon === undefined)}
-        >
-          <FolderTile members={members} />
-        </button>
-        {FOLDER_ICONS.map((emoji) => (
-          <button
-            key={emoji}
-            type="button"
-            role="radio"
-            aria-checked={icon === emoji}
-            aria-label={emoji}
-            onClick={() => setIcon(emoji)}
-            className={choice(icon === emoji)}
-          >
-            {emoji}
-          </button>
-        ))}
-      </div>
+      <GlyphPicker
+        label={t("folders.iconLabel")}
+        value={icon}
+        onChange={setIcon}
+        none={{ label: t("folders.iconAuto"), content: <FolderTile members={members} /> }}
+      />
       <p className="text-sm leading-snug text-paper/55">{t("folders.iconAuto")}</p>
       {problem && <p className="text-sm text-accent">{problem}</p>}
       {confirming && <p className="text-sm text-paper/70">{t("folders.deleteNote")}</p>}

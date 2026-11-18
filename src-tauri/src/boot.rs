@@ -15,6 +15,7 @@ use uuid::Uuid;
 use crate::commands::open_session;
 use crate::error::Result;
 use crate::library::{AppState, Library};
+use crate::profiles::ProfileList;
 
 /// What the shell needs to take over the page Rust already opened.
 #[derive(Debug, Clone, Serialize)]
@@ -30,6 +31,8 @@ pub struct Startup {
     #[serde(flatten)]
     pub state: AppState,
     pub boot_session: Option<BootSession>,
+    /// Every profile and the one in use.
+    pub profiles: ProfileList,
     /// The page is a child webview beside the shell, not a native layer under it; see
     /// `tauri-plugin-siteview/src/desktop`.
     pub desktop: bool,
@@ -39,16 +42,25 @@ pub struct Startup {
 type Opened = Result<Option<String>>;
 
 pub struct Boot {
-    session: Option<BootSession>,
-    opening: Mutex<Option<JoinHandle<Opened>>>,
+    launch: Mutex<Launch>,
 }
 
-impl Boot {
-    /// Begins opening the start page, if there is one. Needs the library, recipes and ad-block
-    /// state to be managed already, because the open runs at once on another thread.
-    pub fn start(app: &AppHandle, library: &Library) -> Result<Self> {
+/// The start page being opened for the shell, until the shell adopts it.
+struct Launch {
+    session: Option<BootSession>,
+    opening: Option<JoinHandle<Opened>>,
+}
+
+impl Launch {
+    const IDLE: Self = Self {
+        session: None,
+        opening: None,
+    };
+
+    /// Begins opening the start page, if there is one.
+    fn begin(app: &AppHandle, library: &Library) -> Result<Self> {
         let Some(url) = library.start_url()? else {
-            return Ok(Self::idle());
+            return Ok(Self::IDLE);
         };
         warm_dns(&url);
         let session = BootSession {
@@ -64,32 +76,52 @@ impl Boot {
         };
         Ok(Self {
             session: Some(session),
-            opening: Mutex::new(Some(opening)),
+            opening: Some(opening),
+        })
+    }
+}
+
+impl Boot {
+    /// Begins opening the start page, if there is one. Needs the library, recipes and ad-block
+    /// state to be managed already, because the open runs at once on another thread.
+    pub fn start(app: &AppHandle, library: &Library) -> Result<Self> {
+        Ok(Self {
+            launch: Mutex::new(Launch::begin(app, library)?),
         })
     }
 
-    fn idle() -> Self {
-        Self {
-            session: None,
-            opening: Mutex::new(None),
-        }
+    /// Opens the start page of the profile just switched to. The shell reloads and adopts it, as
+    /// it does at launch.
+    pub fn restart(&self, app: &AppHandle, library: &Library) -> Result<()> {
+        let launch = Launch::begin(app, library)?;
+        *self.lock() = launch;
+        Ok(())
+    }
+
+    fn lock(&self) -> std::sync::MutexGuard<'_, Launch> {
+        self.launch
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
     }
 
     pub fn session(&self) -> Option<BootSession> {
-        self.session.clone()
+        self.lock().session.clone()
     }
 
     /// Waits for the start page's open and hands over its warning. `None` means there is nothing
     /// to adopt: `id` is not the start page, it was already adopted, or opening it failed.
     pub async fn adopt(&self, id: &str) -> Option<Option<String>> {
-        if self.session.as_ref().is_none_or(|session| session.id != id) {
-            return None;
-        }
-        let opening = self
-            .opening
-            .lock()
-            .unwrap_or_else(std::sync::PoisonError::into_inner)
-            .take()?;
+        let opening = {
+            let mut launch = self.lock();
+            if launch
+                .session
+                .as_ref()
+                .is_none_or(|session| session.id != id)
+            {
+                return None;
+            }
+            launch.opening.take()?
+        };
         opening.await.ok()?.ok()
     }
 }
@@ -118,11 +150,13 @@ mod tests {
 
     fn boot_opening(result: Opened) -> Boot {
         Boot {
-            session: Some(BootSession {
-                id: "boot".into(),
-                url: "https://www.instagram.com/".into(),
+            launch: Mutex::new(Launch {
+                session: Some(BootSession {
+                    id: "boot".into(),
+                    url: "https://www.instagram.com/".into(),
+                }),
+                opening: Some(tauri::async_runtime::spawn(async move { result })),
             }),
-            opening: Mutex::new(Some(tauri::async_runtime::spawn(async move { result }))),
         }
     }
 
@@ -152,7 +186,9 @@ mod tests {
 
     #[test]
     fn with_no_start_page_nothing_can_be_adopted() {
-        let boot = Boot::idle();
+        let boot = Boot {
+            launch: Mutex::new(Launch::IDLE),
+        };
         assert!(boot.session().is_none());
         assert_eq!(adopt(&boot, "boot"), None);
     }

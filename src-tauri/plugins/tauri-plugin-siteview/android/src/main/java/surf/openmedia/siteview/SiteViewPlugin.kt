@@ -778,6 +778,33 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     }
 
     /**
+     * Erases a deleted profile's whole data store. Rust-only: no webview can call it. The System
+     * WebView refuses while a view of the profile is alive, so Rust tries again at the next launch.
+     * A profile that was never made (or a WebView without profiles) has nothing to erase.
+     */
+    @Command
+    fun removeProfile(invoke: Invoke) {
+        val args = invoke.parseArgs(RemoveProfileArgs::class.java)
+        activity.runOnUiThread {
+            if (sessions.values.any { it.profile == args.profile }) {
+                invoke.reject("a page of the profile is still open")
+                return@runOnUiThread
+            }
+            if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
+                invoke.resolve()
+                return@runOnUiThread
+            }
+            try {
+                val store = ProfileStore.getInstance()
+                if (store.getProfile(args.profile) != null) store.deleteProfile(args.profile)
+                invoke.resolve()
+            } catch (error: Exception) {
+                invoke.reject("the profile could not be erased: ${error.message}")
+            }
+        }
+    }
+
+    /**
      * Shows the system file picker for a page's `<input type=file>` and hands the answer back.
      * A newer request cancels the one still waiting. Returns false when this activity cannot host
      * the picker, which leaves the input doing nothing, as before.

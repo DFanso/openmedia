@@ -19,6 +19,7 @@ mod keyboard;
 mod library;
 mod link_clean;
 mod ota;
+mod profiles;
 mod recipe_library;
 pub mod recipes;
 mod schedule;
@@ -56,7 +57,10 @@ pub fn run() {
             #[cfg(desktop)]
             desktop_menu::install(app.handle())?;
             let data_dir = app.path().app_data_dir()?;
-            let library = library::Library::load(data_dir.join("library.json"))?;
+            let profiles = profiles::Profiles::load(data_dir.clone())?;
+            let stores = profiles.open(profiles.active()?)?;
+            app.manage(profiles);
+            let library = stores.library;
             let ad_block_enabled = library.ad_block_enabled()?;
             let background_media = library.background_media_sites()?;
             let picture_in_picture = library.picture_in_picture_sites()?;
@@ -72,11 +76,13 @@ pub fn run() {
                 let _ = commands::push_picture_in_picture(&handle, picture_in_picture);
                 // Likewise: a failure leaves every site with the device's own page.
                 let _ = commands::push_desktop_sites(&handle, desktop_sites);
+                // Deleted profiles' site data no page holds any more; see `profiles.rs`.
+                profiles::erase_site_data(&handle);
             });
             app.manage(incognito::Incognito::default());
             app.manage(import::ImportState::default());
             app.manage(import_commands::Unlock::default());
-            app.manage(vault::Vault::new(data_dir.join("passwords.vault")));
+            app.manage(stores.vault);
             let emitter = app.handle().clone();
             let downloads = downloads::Manager::load(
                 data_dir.join("downloads.json"),
@@ -88,7 +94,7 @@ pub fn run() {
                 }),
             )?;
             app.manage(downloads);
-            app.manage(recipes::Recipes::load(data_dir.join("recipes"))?);
+            app.manage(stores.recipes);
             app.manage(share::Shares::from_build());
             let ad_block = ad_block::AdBlock::bundled(app.path().app_cache_dir()?.join("ad-block"));
             app.manage(ad_block.clone());
@@ -105,7 +111,7 @@ pub fn run() {
             app.manage(usage);
             app.manage(ai::agent::Agent::default());
             app.manage(ai::hub::Hubs::default());
-            app.manage(ai::chats::Chats::load(data_dir.join("chats.json"))?);
+            app.manage(stores.chats);
             app.manage(commands::Secrets(Box::new(secrets::KeychainStore)));
             app.manage(entitlement::Entitlement::from_build());
             entitlement::start(app.handle());
@@ -169,6 +175,11 @@ pub fn run() {
             incognito::set_incognito_favorites,
             incognito::get_incognito_folders,
             incognito::set_incognito_folders,
+            profiles::profiles_list,
+            profiles::profile_create,
+            profiles::profile_update,
+            profiles::profile_delete,
+            profiles::profile_switch,
             commands::complete_onboarding,
             commands::reset_onboarding,
             commands::open_external,

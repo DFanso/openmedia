@@ -7,7 +7,7 @@ use std::{
     sync::{Mutex, PoisonError},
 };
 
-use tauri::{Runtime, Webview, webview::WebviewBuilder};
+use tauri::{AppHandle, Runtime, Webview, webview::WebviewBuilder};
 use url::Url;
 use uuid::Uuid;
 
@@ -101,6 +101,21 @@ pub fn configure_profile<R: Runtime>(
     profile: Uuid,
 ) -> WebviewBuilder<R> {
     builder.data_directory(profiles.join(profile.to_string()))
+}
+
+/// Erases a profile by deleting its data folder. The system web view refuses while a view of the
+/// profile still holds it.
+pub fn remove_profile<R: Runtime>(
+    _app: &AppHandle<R>,
+    profiles: &Path,
+    profile: Uuid,
+) -> Result<()> {
+    match std::fs::remove_dir_all(profiles.join(profile.to_string())) {
+        Err(error) if error.kind() != std::io::ErrorKind::NotFound => {
+            Err(Error::Native(error.to_string()))
+        }
+        _ => Ok(()),
+    }
 }
 
 /// Shows the folder holding a finished download.

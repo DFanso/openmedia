@@ -246,6 +246,14 @@ pub struct ClearSiteDataRequest {
     pub site: String,
 }
 
+/// A deleted profile whose whole site data store is erased. Rust-only like `ClearSiteDataRequest`:
+/// not a Tauri command, so no webview can erase a store.
+#[derive(Debug, Clone, Deserialize)]
+pub struct RemoveProfileRequest {
+    /// The profile's id, a UUID.
+    pub profile: String,
+}
+
 /// A script for the active page. Rust-only: not a Tauri command, never reachable from a webview.
 #[derive(Debug, Clone, Deserialize)]
 pub struct EvaluateRequest {

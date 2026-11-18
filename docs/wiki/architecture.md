@@ -1,6 +1,6 @@
 # Architecture
 
-> **Status: Partially implemented.** The React shell, Rust core, iOS and Android native site-view plugins, BYOK assistant, hub builder and local usage controls exist. Hubs launch independent sessions for multiple sites; they do not merge site data. iOS has simulator verification; Android device/emulator behavior is unverified. macOS site views exist (debug builds run on one Mac); Windows and Linux site views, profile selection, and parts of the planned runtime remain unimplemented.
+> **Status: Partially implemented.** The React shell, Rust core, iOS and Android native site-view plugins, BYOK assistant, hub builder, local usage controls and [profiles](./profiles.md) exist. Hubs launch independent sessions for multiple sites; they do not merge site data. iOS has simulator verification; Android device/emulator behavior is unverified. macOS site views exist (debug builds run on one Mac); Windows and Linux site views and parts of the planned runtime remain unimplemented.
 
 ## Overview
 
@@ -156,11 +156,12 @@ sequenceDiagram
 
 | Data | Location | Notes |
 |------|----------|-------|
-| Favorites, settings, history and provider configuration | `<app_data>/library.json` | No API keys |
-| Usage records and policies | `<app_data>/usage.json` | Local data |
-| User recipes, imported recipes and added library recipes | `<app_data>/recipes/` | The bundled recipes are embedded in the binary; *Add* writes a local copy here |
+| Profiles: the list, the one in use and the first | `<app_data>/profiles.json` | See [Profiles](./profiles.md) |
+| Favorites, settings, history and provider configuration | `<app_data>/library.json` (first profile) or `<app_data>/profile-data/<id>/library.json` | No API keys |
+| Usage records and policies | `<app_data>/usage.json` | Local data, shared by every profile |
+| User recipes, imported recipes and added library recipes | `recipes/` beside the profile's `library.json` | The bundled recipes are embedded in the binary; *Add* writes a local copy here |
 | API keys | OS secure storage | iOS Keychain; Android Keystore-backed plugin; never returned to the shell |
-| Site cookies/storage | Native webview profile store | Android behavior is not device-verified |
+| Site cookies/storage | Native webview profile store, one per profile | Android behavior is not device-verified |
 
 There is no cross-device sync. There is no way to move a recipe between devices as text; a recipe that should reach everyone is shared as a pull request ([Recipe Library and Sharing](./recipe-library.md)).
 

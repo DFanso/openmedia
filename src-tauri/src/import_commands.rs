@@ -39,7 +39,7 @@ impl Unlock {
         }
     }
 
-    fn close(&self) {
+    pub(crate) fn close(&self) {
         if let Ok(mut until) = self.0.lock() {
             *until = None;
         }

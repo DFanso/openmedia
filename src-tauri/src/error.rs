@@ -11,9 +11,17 @@ pub enum Error {
     #[error("a favorite needs a name of 1-20 characters")]
     InvalidFavoriteName,
     #[error(
-        "a folder needs a name of 1-20 characters, an icon of at most 8, and a layout of 2 to 8 web addresses"
+        "a folder needs a name of 1-20 characters, a known icon, and a layout of 2 to 8 web addresses"
     )]
     InvalidFolder,
+    #[error("a profile needs a name of 1-20 characters and a known icon")]
+    InvalidProfile,
+    #[error("no such profile")]
+    UnknownProfile,
+    #[error("the profile in use cannot be deleted; switch to another one first")]
+    ActiveProfile,
+    #[error("at most {0} profiles are allowed")]
+    TooManyProfiles(usize),
     #[error("a landing page must be an address on the favorite's own site")]
     InvalidLanding,
     #[error("no such site to favorite")]

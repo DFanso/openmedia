@@ -1,6 +1,7 @@
 //! The password vault: logins brought in from another browser, kept encrypted on disk.
 //!
-//! One file, `passwords.vault`, holds every login as JSON sealed with AES-256-GCM. The 256-bit key
+//! One file per profile, `passwords.vault`, holds that profile's logins as JSON sealed with
+//! AES-256-GCM. Each profile's 256-bit key
 //! is random and lives only in the OS secure store (Keychain, Credential Manager, Secret Service,
 //! Android Keystore) through [`SecretStore`]; it is read in Rust and never leaves it. A file
 //! copied off the device is noise without the key, and the key without the file opens nothing.
@@ -27,7 +28,9 @@ use zeroize::{Zeroize, Zeroizing};
 use crate::error::{Error, Result};
 use crate::secrets::SecretStore;
 
-/// The secret-store id of the vault key. A fixed id: there is one vault per install.
+/// The secret-store id of the first profile's vault key, from before there were profiles. Every
+/// other profile's key is kept under that profile's id, so clearing one vault never touches
+/// another's key.
 pub const KEY_ID: Uuid = Uuid::from_u128(0x6f70_656e_6d65_6469_612d_7661_756c_7431);
 
 const MAGIC: &[u8; 4] = b"OMV1";
@@ -87,23 +90,40 @@ pub struct NewEntry {
 }
 
 pub struct Vault {
+    /// Held for every read-modify-write, so two imports never lose each other's logins. A switch
+    /// of profile replaces it (`adopt`).
+    place: Mutex<Place>,
+}
+
+/// Where one profile's vault lives: its file, and the secure-store id of its key.
+struct Place {
     path: PathBuf,
-    /// Serializes read-modify-write, so two imports never lose each other's logins.
-    lock: Mutex<()>,
+    key_id: Uuid,
 }
 
 impl Vault {
-    pub fn new(path: PathBuf) -> Self {
+    pub fn new(path: PathBuf, key_id: Uuid) -> Self {
         Self {
-            path,
-            lock: Mutex::new(()),
+            place: Mutex::new(Place { path, key_id }),
         }
     }
 
+    /// Takes over `other`'s file and key, as a switch of profile does.
+    pub fn adopt(&self, other: Vault) -> Result<()> {
+        *self.lock()? = other.place.into_inner().map_err(|_| Error::Poisoned)?;
+        Ok(())
+    }
+
+    fn lock(&self) -> Result<std::sync::MutexGuard<'_, Place>> {
+        self.place.lock().map_err(|_| Error::Poisoned)
+    }
+}
+
+impl Place {
     /// The vault key, made on first use. A store that cannot hold it is an error: the vault never
     /// falls back to a key on disk.
     fn key(&self, store: &dyn SecretStore, create: bool) -> Result<Option<LessSafeKey>> {
-        let hex = match store.get(KEY_ID)? {
+        let hex = match store.get(self.key_id)? {
             Some(hex) => hex,
             None if create => {
                 let mut raw = Zeroizing::new([0u8; KEY_BYTES]);
@@ -112,7 +132,7 @@ impl Vault {
                     .map_err(|_| Error::Vault("no source of randomness"))?;
                 let hex =
                     Zeroizing::new(raw.iter().map(|b| format!("{b:02x}")).collect::<String>());
-                store.set(KEY_ID, &hex)?;
+                store.set(self.key_id, &hex)?;
                 hex
             }
             None => return Ok(None),
@@ -158,17 +178,22 @@ impl Vault {
         file.extend_from_slice(MAGIC);
         file.extend_from_slice(&nonce_bytes);
         file.extend_from_slice(&body);
+        if let Some(parent) = self.path.parent() {
+            fs::create_dir_all(parent)?;
+        }
         write_private(&self.path, &file)
     }
+}
 
+impl Vault {
     /// Adds logins; one for the same origin and username replaces the older one. Returns how many
     /// were added or updated.
     pub fn add_many(&self, store: &dyn SecretStore, new: Vec<NewEntry>) -> Result<usize> {
-        let _guard = self.lock.lock().map_err(|_| Error::Poisoned)?;
-        let Some(key) = self.key(store, true)? else {
+        let place = self.lock()?;
+        let Some(key) = place.key(store, true)? else {
             return Ok(0);
         };
-        let mut entries = self.read(&key)?;
+        let mut entries = place.read(&key)?;
         let mut changed = 0;
         for item in new {
             let position = entries
@@ -194,18 +219,18 @@ impl Vault {
             }
         }
         if changed > 0 {
-            self.write(&key, &entries)?;
+            place.write(&key, &entries)?;
         }
         Ok(changed)
     }
 
     /// Every login without its password, by site then username.
     pub fn list(&self, store: &dyn SecretStore) -> Result<Vec<Meta>> {
-        let _guard = self.lock.lock().map_err(|_| Error::Poisoned)?;
-        let Some(key) = self.key(store, false)? else {
+        let place = self.lock()?;
+        let Some(key) = place.key(store, false)? else {
             return Ok(Vec::new());
         };
-        let mut metas: Vec<Meta> = self.read(&key)?.iter().map(Meta::from).collect();
+        let mut metas: Vec<Meta> = place.read(&key)?.iter().map(Meta::from).collect();
         metas.sort_by(|a, b| (&a.site, &a.username).cmp(&(&b.site, &b.username)));
         Ok(metas)
     }
@@ -221,36 +246,36 @@ impl Vault {
 
     /// One login with its password, for the caller to show or fill.
     pub fn get(&self, store: &dyn SecretStore, id: Uuid) -> Result<Option<Entry>> {
-        let _guard = self.lock.lock().map_err(|_| Error::Poisoned)?;
-        let Some(key) = self.key(store, false)? else {
+        let place = self.lock()?;
+        let Some(key) = place.key(store, false)? else {
             return Ok(None);
         };
-        Ok(self.read(&key)?.into_iter().find(|entry| entry.id == id))
+        Ok(place.read(&key)?.into_iter().find(|entry| entry.id == id))
     }
 
     pub fn delete(&self, store: &dyn SecretStore, id: Uuid) -> Result<()> {
-        let _guard = self.lock.lock().map_err(|_| Error::Poisoned)?;
-        let Some(key) = self.key(store, false)? else {
+        let place = self.lock()?;
+        let Some(key) = place.key(store, false)? else {
             return Ok(());
         };
-        let mut entries = self.read(&key)?;
+        let mut entries = place.read(&key)?;
         let before = entries.len();
         entries.retain(|entry| entry.id != id);
         if entries.len() != before {
-            self.write(&key, &entries)?;
+            place.write(&key, &entries)?;
         }
         Ok(())
     }
 
-    /// Forgets every login: the file and the key.
+    /// Forgets every login of this profile: the file and the key.
     pub fn clear(&self, store: &dyn SecretStore) -> Result<()> {
-        let _guard = self.lock.lock().map_err(|_| Error::Poisoned)?;
-        match fs::remove_file(&self.path) {
+        let place = self.lock()?;
+        match fs::remove_file(&place.path) {
             Ok(()) => {}
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
             Err(e) => return Err(e.into()),
         }
-        store.delete(KEY_ID)
+        store.delete(place.key_id)
     }
 }
 
@@ -295,7 +320,7 @@ mod tests {
 
     fn vault() -> (tempfile::TempDir, Vault, MemoryStore) {
         let dir = tempfile::tempdir().unwrap();
-        let vault = Vault::new(dir.path().join("passwords.vault"));
+        let vault = Vault::new(dir.path().join("passwords.vault"), KEY_ID);
         (dir, vault, MemoryStore::default())
     }
 
@@ -402,6 +427,29 @@ mod tests {
         assert!(!serde_json::to_string(&metas).unwrap().contains("secret-pw"));
         assert_eq!(vault.count_for_site(&store, "example.com").unwrap(), 1);
         assert_eq!(vault.count_for_site(&store, "other.org").unwrap(), 0);
+    }
+
+    #[test]
+    fn each_profiles_vault_has_its_own_file_and_key() {
+        let (dir, vault, store) = vault();
+        vault
+            .add_many(&store, vec![new_entry("https://example.com", "a", "1")])
+            .unwrap();
+        let other_key = Uuid::new_v4();
+        let other = dir.path().join("other").join("passwords.vault");
+        vault.adopt(Vault::new(other.clone(), other_key)).unwrap();
+        assert!(vault.list(&store).unwrap().is_empty());
+        vault
+            .add_many(&store, vec![new_entry("https://example.com", "b", "2")])
+            .unwrap();
+        assert!(other.exists());
+        vault.clear(&store).unwrap();
+        assert!(store.get(other_key).unwrap().is_none());
+
+        vault
+            .adopt(Vault::new(dir.path().join("passwords.vault"), KEY_ID))
+            .unwrap();
+        assert_eq!(vault.list(&store).unwrap()[0].username, "a");
     }
 
     #[test]

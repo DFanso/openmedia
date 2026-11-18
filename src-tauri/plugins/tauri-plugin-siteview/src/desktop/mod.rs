@@ -1218,6 +1218,23 @@ impl<R: Runtime> Siteview<R> {
         Ok(webview.reload()?)
     }
 
+    /// Erases a deleted profile's whole site data store. Rust-only, like `clear_site_data`.
+    /// Refused while a page of the profile is open: the system web view cannot erase a store in
+    /// use.
+    pub fn remove_profile(&self, request: RemoveProfileRequest) -> Result<()> {
+        let profile = parse_profile_id(&request.profile)?;
+        let in_use = self
+            .inner
+            .state()
+            .sessions
+            .values()
+            .any(|session| session.profile == profile);
+        if in_use {
+            return Err(Error::ProfileInUse);
+        }
+        platform::remove_profile(&self.inner.app, &self.inner.profiles_dir()?, profile)
+    }
+
     /// The system's owner check (Touch ID or the account password on a Mac, Windows Hello on
     /// Windows, the PolicyKit prompt on Linux). Rust-only: there is no command for it, so no
     /// webview can raise or answer the prompt. Waits for the person.

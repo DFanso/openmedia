@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(profiles): profiles, each with its own favorites, settings, recipes and sign-ins; drawn icons instead of emoji
+
+**Area:** `feat(profiles)`
+
+**Change:** The app can hold up to 10 profiles. Each has its own `library.json` (favorites, folders, every setting, history, assistant providers, incognito set), recipes and their choices, chats, password vault with its own key, keyboard shortcuts, and site data store, so its sign-ins and cookies are its own; usage limits, downloads and purchases stay shared. The floating button's tool column gains a Profiles button, Settings → General a Profiles row, and the keyboard an `nav.profiles` action; the Profiles page switches (closing the open pages and reloading into the profile), adds, renames, gives an icon and deletes. Deleting erases the profile's files, secrets and site data (`remove_profile`, Rust-only, on macOS, iOS, Android, Windows and Linux). Folder icons are now the app's line-drawn icons, stored by name; a folder saved with an emoji icon is migrated on load. See [Profiles](docs/wiki/profiles.md).
+
+**Verified:** `cargo test --workspace`, `cargo clippy --workspace -D warnings`, Vitest (including every locale's new keys), TypeScript, ESLint, Prettier. **Not verified:** switching, sign-in isolation or erasing a profile's site data on any device, simulator or desktop build.
+
 ### fix(page-tools): the Desktop site button reads Mobile site while a site gets its desktop page
 
 **Area:** `fix(page-tools)`

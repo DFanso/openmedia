@@ -340,6 +340,10 @@ class ClearSiteDataArgs: Decodable {
   let site: String
 }
 
+class RemoveProfileArgs: Decodable {
+  let profile: String
+}
+
 class AuthenticateArgs: Decodable {
   let reason: String
 }
@@ -1085,6 +1089,32 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
             if !session.blocked { session.view.reload() }
             invoke.resolve()
           }
+        }
+      }
+    }
+  }
+
+  /// Erases a deleted profile's whole data store. Rust-only: no webview can call it. WebKit
+  /// refuses while a view of the profile is alive, so Rust tries again at the next launch.
+  @objc public func removeProfile(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(RemoveProfileArgs.self)
+    guard let profileId = UUID(uuidString: args.profile) else {
+      invoke.reject("invalid profile id")
+      return
+    }
+    DispatchQueue.main.async {
+      let inUse =
+        self.sessions.values.contains { $0.profileId == profileId }
+        || self.standby?.profileId == profileId
+      if inUse {
+        invoke.reject("a page of the profile is still open")
+        return
+      }
+      WKWebsiteDataStore.remove(forIdentifier: profileId) { error in
+        if let error {
+          invoke.reject(error.localizedDescription)
+        } else {
+          invoke.resolve()
         }
       }
     }

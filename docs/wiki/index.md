@@ -26,6 +26,7 @@ OpenMedia is a Tauri v2 app for browsing websites in native web views and custom
 | [Site Playbooks](./site-playbooks.md) | Per-site options for the official recipes, what every selector matched and how it was checked, what CSS cannot do, and the selector-writing rules for the in-app assistant |
 | [Internationalization](./i18n.md) | 29 UI languages, message catalog, plurals, right-to-left, adding a language |
 | [Accessibility](./accessibility.md) | Epilepsy protection and the dyslexia aids (reading font, text spacing, page tint): what they change in the app and on pages, and what they cannot do |
+| [Profiles](./profiles.md) | Separate sets of favorites, settings, recipes, passwords and site sign-ins: what is per profile, files, switching, deleting, icons |
 | [Dark Mode for Pages](./dark-mode.md) | Dark Reader style dark mode for sites: methods, colour settings, schedule, per-site choices, the engine, the `dark` recipe rule and the assistant |
 | [Downloads](./downloads.md) | The download manager: list, segments, pause and resume, page media sniffer, batch descriptors, naming masks and rules, what a site can and cannot reach |
 | [Import and the Password Vault](./import-and-passwords.md) | Bringing bookmarks, history, passwords and search from another browser's exported files; the encrypted vault, unlock window and one-tap fill |

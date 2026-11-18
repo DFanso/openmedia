@@ -53,10 +53,15 @@ pub struct Secrets(pub Box<dyn SecretStore>);
 
 /// Async so it runs off the main thread: at launch that thread is busy creating web views.
 #[tauri::command]
-pub async fn get_state(library: State<'_, Library>, boot: State<'_, Boot>) -> Result<Startup> {
+pub async fn get_state(
+    library: State<'_, Library>,
+    profiles: State<'_, crate::profiles::Profiles>,
+    boot: State<'_, Boot>,
+) -> Result<Startup> {
     Ok(Startup {
         state: library.state()?,
         boot_session: boot.session(),
+        profiles: profiles.list()?,
         desktop: cfg!(desktop),
     })
 }

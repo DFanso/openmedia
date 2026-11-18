@@ -118,6 +118,7 @@ const RUNNERS: Readonly<Record<string, Runner>> = {
   "nav.library": showSheet("library"),
   "nav.stats": showSheet("stats"),
   "nav.settings": showSheet("settings"),
+  "nav.profiles": showSheet("profiles"),
   "nav.keybindings": showSheet("keybindings"),
 
   "tab.switcher": showSheet("tabs"),

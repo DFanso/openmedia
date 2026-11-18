@@ -50,7 +50,12 @@ import {
   type SiteSettings,
   type SiteViewState,
   type Theme,
+  type ProfileInput,
+  type ProfileList,
 } from "../shared/ipc";
+import { profilesIpc } from "../features/profiles/profiles";
+import { KEYBINDINGS_STORAGE, useKeybindings } from "../features/keybindings/store";
+import { forgetProfile, rememberProfile } from "../shared/profileStorage";
 import { hiddenTabIds, moveTab, tabAfterClose } from "../features/tabs/tabs";
 import {
   arrange,
@@ -116,7 +121,8 @@ export type Sheet =
   | "dark-mode"
   | "site-video"
   | "site-dark-mode"
-  | "keybindings";
+  | "keybindings"
+  | "profiles";
 
 /** The pages about one favorite's site, which `openSiteSheet` fills in. */
 export type SiteSheet = "site-dark-mode" | "site-video";
@@ -142,6 +148,7 @@ const SETTINGS_CHILDREN: readonly Sheet[] = [
   "site-video",
   "site-dark-mode",
   "keybindings",
+  "profiles",
 ];
 const isSettingsChild = (sheet: Sheet): boolean => SETTINGS_CHILDREN.includes(sheet);
 
@@ -202,6 +209,10 @@ export interface IncognitoState {
 
 export interface AppStore {
   state: AppState | null;
+  /** Every profile and the one in use; null until the startup state arrives. */
+  profiles: ProfileList | null;
+  /** Pages are closing and the app is about to reload into another profile. */
+  profileSwitching: boolean;
   /** Desktop: the page sits beside the shell's controls and steps aside for its overlays. */
   desktop: boolean;
   error: string | null;
@@ -424,6 +435,14 @@ export interface AppStore {
   saveIncognitoFolders: (folders: Folder[], favorites?: FavoriteInput[]) => Promise<boolean>;
   loadIncognitoSites: () => Promise<void>;
   setIncognitoSiteOption: (recipeId: string, optionId: string, value: OptionValue) => Promise<void>;
+  /** Adds a profile; true when it was saved. */
+  createProfile: (input: ProfileInput) => Promise<boolean>;
+  /** Renames a profile or changes its icon; true when it was saved. */
+  updateProfile: (id: string, input: ProfileInput) => Promise<boolean>;
+  /** Deletes a profile that is not in use, with everything it kept. */
+  deleteProfile: (id: string) => Promise<void>;
+  /** Closes every page, makes `id` the profile in use, and reloads the app into it. */
+  switchProfile: (id: string) => Promise<void>;
 }
 
 function updateSite(
@@ -475,6 +494,9 @@ export function appError(error: unknown): string {
   }
   return describeError(error, createTranslator(selectLocale(useApp.getState())));
 }
+
+/** What the shell keeps in its own storage per profile (`profileStorage`). */
+const PROFILE_STORAGE: readonly string[] = [KEYBINDINGS_STORAGE];
 
 let nonce = 0;
 
@@ -700,14 +722,17 @@ export const useApp = create<AppStore>((set, get) => {
     sites: [],
     incognito: { active: false, favorites: [], folders: [], busy: false },
     incognitoSites: [],
+    profiles: null,
+    profileSwitching: false,
     aiState: null,
     assistant: initialAssistant,
 
     load: async () => {
       try {
-        const { bootSession, desktop, ...state } = await library.getState();
+        const { bootSession, desktop, profiles, ...state } = await library.getState();
         void siteView.setColorScheme(state.theme).catch(() => {});
-        set({ state, desktop, onboardingOpen: !state.onboarded });
+        if (rememberProfile(profiles.active, PROFILE_STORAGE)) useKeybindings.getState().reload();
+        set({ state, profiles, desktop, onboardingOpen: !state.onboarded });
         applyIcons();
         if (bootSession && !get().sessions.some((session) => session.id === bootSession.id)) {
           startSession(
@@ -1699,6 +1724,53 @@ export const useApp = create<AppStore>((set, get) => {
         await library.setSiteOption(recipeId, optionId, value, true);
       } catch (error) {
         set({ incognitoSites: before, error: appError(error) });
+      }
+    },
+
+    createProfile: async (input) => {
+      try {
+        set({ profiles: await profilesIpc.create(input), error: null });
+        return true;
+      } catch (error) {
+        set({ error: appError(error) });
+        return false;
+      }
+    },
+
+    updateProfile: async (id, input) => {
+      try {
+        set({ profiles: await profilesIpc.update(id, input), error: null });
+        return true;
+      } catch (error) {
+        set({ error: appError(error) });
+        return false;
+      }
+    },
+
+    deleteProfile: async (id) => {
+      try {
+        set({ profiles: await profilesIpc.remove(id), error: null });
+        forgetProfile(id, PROFILE_STORAGE);
+      } catch (error) {
+        set({ error: appError(error) });
+      }
+    },
+
+    switchProfile: async (id) => {
+      const { profiles, profileSwitching } = get();
+      if (!profiles || profileSwitching || id === profiles.active) return;
+      set({ profileSwitching: true });
+      get().cancelAssistant();
+      // The pages belong to the profile being left: none may outlive the reload.
+      const ids = get().sessions.map((session) => session.id);
+      await Promise.all(ids.map((session) => siteView.close(session).catch(() => {})));
+      get().forgetSessions(ids);
+      try {
+        await profilesIpc.switchTo(id);
+        rememberProfile(id, PROFILE_STORAGE);
+        window.location.reload();
+      } catch (error) {
+        set({ profileSwitching: false, blankTab: true, error: appError(error) });
       }
     },
   };

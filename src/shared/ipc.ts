@@ -213,9 +213,29 @@ export interface BootSession {
   url: string;
 }
 
+/** One set of everything the user keeps, with its own site sign-ins; see `profiles.rs`. */
+export interface Profile {
+  id: string;
+  /** Absent for the first profile until it is named; the shell shows a default name. */
+  name?: string;
+  /** A drawn icon, by name (`glyphs.tsx`). */
+  icon?: string;
+}
+
+export interface ProfileList {
+  active: string;
+  profiles: Profile[];
+}
+
+export interface ProfileInput {
+  name: string;
+  icon?: string;
+}
+
 /** `get_state`: the saved state plus the page opened for it, if there is one. */
 export interface Startup extends AppState {
   bootSession: BootSession | null;
+  profiles: ProfileList;
   /** The page is a view beside the shell, not a layer under it: the shell lays out around it. */
   desktop: boolean;
 }

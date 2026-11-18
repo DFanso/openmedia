@@ -8,6 +8,8 @@ pub enum Error {
     InvalidUrl(String),
     #[error("only http and https urls can be opened")]
     UnsupportedScheme,
+    #[error("a page of the profile is still open")]
+    ProfileInUse,
     #[error("invalid profile id")]
     InvalidProfile,
     #[error("invalid session id")]

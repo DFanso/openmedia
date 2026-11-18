@@ -40,6 +40,12 @@ impl Incognito {
     fn set_active(&self, active: bool) {
         self.active.store(active, Ordering::SeqCst);
     }
+
+    /// Back to the normal set without touching the pages, for a switch of profile, which
+    /// replaces both sets and gives the pages their script itself.
+    pub(crate) fn leave(&self) {
+        self.set_active(false);
+    }
 }
 
 /// Puts incognito on or off and gives the open pages the recipe script of the set now in play.

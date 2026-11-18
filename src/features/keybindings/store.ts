@@ -1,8 +1,10 @@
 import { create } from "zustand";
+import { profileKey } from "../../shared/profileStorage";
 import { PROFILES, type Profile } from "./presets";
 import type { Overrides } from "./keymap";
 
-const STORAGE_KEY = "om.keybindings";
+/** Keys are a profile's own: they are saved under this, with the profile's id (`profileStorage`). */
+export const KEYBINDINGS_STORAGE = "om.keybindings";
 
 interface Saved {
   enabled: boolean;
@@ -30,7 +32,9 @@ function readOverrides(value: unknown): Overrides {
 
 export function loadSaved(): Saved {
   try {
-    const value: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "null");
+    const value: unknown = JSON.parse(
+      localStorage.getItem(profileKey(KEYBINDINGS_STORAGE)) ?? "null",
+    );
     if (value && typeof value === "object") {
       const saved = value as Record<string, unknown>;
       return {
@@ -58,6 +62,8 @@ interface KeybindingsStore extends Saved {
   /** A shortcut is being recorded: no key may run an action meanwhile. Never saved. */
   capturing: boolean;
   setCapturing: (capturing: boolean) => void;
+  /** Reads the keys of the profile now in use. */
+  reload: () => void;
 }
 
 export const useKeybindings = create<KeybindingsStore>((set, get) => {
@@ -65,13 +71,17 @@ export const useKeybindings = create<KeybindingsStore>((set, get) => {
     set(changes);
     const { enabled, profile, overrides, showFab } = get();
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ enabled, profile, overrides, showFab }));
+      localStorage.setItem(
+        profileKey(KEYBINDINGS_STORAGE),
+        JSON.stringify({ enabled, profile, overrides, showFab }),
+      );
     } catch {
       // the choice still holds for this session
     }
   };
   return {
     ...loadSaved(),
+    reload: () => set(loadSaved()),
     capturing: false,
     setCapturing: (capturing) => set({ capturing }),
     setEnabled: (enabled) => save(enabled ? { enabled } : { enabled, showFab: true }),

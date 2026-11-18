@@ -10,7 +10,7 @@ use objc2::{
     rc::Retained,
     runtime::{AnyObject, Bool},
 };
-use objc2_foundation::{NSArray, NSEdgeInsets, NSError, NSString};
+use objc2_foundation::{NSArray, NSEdgeInsets, NSError, NSString, NSUUID};
 use objc2_local_authentication::{LAContext, LAPolicy};
 use objc2_web_kit::{
     WKContentRuleList, WKContentRuleListStore, WKUserContentController, WKUserScript,
@@ -427,6 +427,38 @@ pub fn clear_site_data<R: Runtime>(webview: &Webview<R>, site: &str) -> Result<(
     finished
         .recv_timeout(CLEAR_DATA_WAIT)
         .map_err(|_| Error::PageTimeout)
+}
+
+/// Erases profile `profile`'s whole data store. WebKit refuses while a web view of it is alive.
+pub fn remove_profile<R: Runtime>(
+    app: &AppHandle<R>,
+    _profiles: &Path,
+    profile: Uuid,
+) -> Result<()> {
+    let (done, finished) = mpsc::channel();
+    app.run_on_main_thread(move || {
+        let Some(main) = MainThreadMarker::new() else {
+            let _ = done.send(false);
+            return;
+        };
+        let identifier = NSUUID::from_bytes(profile.into_bytes());
+        let removed = RcBlock::new(move |error: *mut NSError| {
+            let _ = done.send(error.is_null());
+        });
+        // SAFETY: a WebKit call on the main thread; the block owns its sender and runs once.
+        unsafe {
+            WKWebsiteDataStore::removeDataStoreForIdentifier_completionHandler(
+                &identifier,
+                &removed,
+                main,
+            );
+        }
+    })?;
+    match finished.recv_timeout(CLEAR_DATA_WAIT) {
+        Ok(true) => Ok(()),
+        Ok(false) => Err(Error::ProfileInUse),
+        Err(_) => Err(Error::PageTimeout),
+    }
 }
 
 #[cfg(test)]
