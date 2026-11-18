@@ -68,15 +68,15 @@ const DEMO_FAVORITES = [
 ];
 
 const DEMO_CONTROLS = [
-  { key: "incognito", icon: <IncognitoIcon />, y: -230 },
-  { key: "usage", icon: <StatsIcon />, y: -188 },
-  { key: "tabs", icon: <TabsIcon />, y: -146 },
-  { key: "history", icon: <HistoryIcon />, y: -104 },
-  { key: "profiles", icon: <ProfileAvatar profile={null} size={20} />, y: -62 },
-  { key: "settings", icon: <SlidersIcon />, y: -20 },
+  { key: "incognito", icon: <IncognitoIcon />, y: -272 },
+  { key: "usage", icon: <StatsIcon />, y: -230 },
+  { key: "tabs", icon: <TabsIcon />, y: -188 },
+  { key: "history", icon: <HistoryIcon />, y: -146 },
+  { key: "profiles", icon: <ProfileAvatar profile={null} size={20} />, y: -104 },
+  { key: "settings", icon: <SlidersIcon />, y: -62 },
 ];
 
-const DEMO_BUTTON_CENTER = { x: 56, y: 276 };
+const DEMO_BUTTON_CENTER = { x: 56, y: 300 };
 
 function demoItemStyle(index: number, x: number, y: number, size: number): DemoItemStyle {
   return {
@@ -92,7 +92,7 @@ function demoItemStyle(index: number, x: number, y: number, size: number): DemoI
 
 function HoldVisual() {
   return (
-    <div className="relative h-[26rem] w-64">
+    <div className="relative h-[28rem] w-64">
       <div className="absolute" style={{ left: 24, top: DEMO_BUTTON_CENTER.y - 32 }}>
         <MiniButton pulsing />
       </div>
