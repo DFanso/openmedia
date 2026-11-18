@@ -24,6 +24,16 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** `cargo test --workspace`, `cargo clippy --workspace -D warnings`, Vitest (including every locale's new keys), TypeScript, ESLint, Prettier. **Not verified:** switching, sign-in isolation or erasing a profile's site data on any device, simulator or desktop build.
 
+### feat(import): import straight from a browser on this computer
+
+**Area:** `feat(import)`
+
+**Problem:** Leaving another browser meant exporting bookmarks, history and a passwords CSV by hand and choosing each file. Most browsers import in a few taps.
+
+**Change:** On Windows, macOS (direct build) and Linux, Settings > Import from another browser lists the browsers found (Chrome, Edge, Brave, Vivaldi, Arc, Chromium, Firefox, Safari) with their profiles; one tap reads bookmarks, history, the default search engine and saved logins into the same preview as before (`import/browsers/`, commands `import_browsers` and `import_from_browser`). Chromium passwords are opened with the key the OS keeps for that browser (Keychain, DPAPI, Secret Service), fetched only when the profile has logins; the OS may ask the person to allow it. Logins Firefox or a newer Chrome seals themselves are counted and the person is pointed at the browser's own export. iOS and the store sandboxes find nothing and keep the exported-file path. Choosing the same profile twice counts once.
+
+**Verified:** Rust unit tests over generated Chromium, Firefox and Safari fixtures (CBC and GCM round trips), read-only probe of the Chrome, Chromium and Firefox profiles on a Mac (counts only), clippy, Vitest catalog test, TypeScript, ESLint, Prettier. **Not verified:** the Keychain, DPAPI and Secret Service prompts and the Windows and Linux builds on real machines (the DPAPI call type-checks for `x86_64-pc-windows-msvc`).
+
 ### fix(page-tools): the Desktop site button reads Mobile site while a site gets its desktop page
 
 **Area:** `fix(page-tools)`
