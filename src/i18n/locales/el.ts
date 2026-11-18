@@ -293,8 +293,6 @@ export const el: Messages = {
   "onboarding.quickEmpty":
     "Δεν υπάρχουν ακόμη επίσημες συνταγές για αυτή τη συσκευή. Μπορείτε να προσθέσετε μερικές αργότερα από τη βιβλιοθήκη συνταγών.",
   "onboarding.quickCount": "{count} από {limit} επιλεγμένα",
-  "onboarding.quickProHint":
-    "Αυτό είναι το μέγιστο που επιτρέπει το πακέτο σας. Το Pro έχει περισσότερες θέσεις.",
   "onboarding.applying": "Προσθήκη…",
   "onboarding.partial":
     "Δεν ήταν δυνατή η προσθήκη: {names}. Μπορείτε να τις προσθέσετε αργότερα από τη βιβλιοθήκη συνταγών.",
@@ -438,7 +436,7 @@ export const el: Messages = {
   "favorites.quickEmpty":
     "Δεν υπάρχει τίποτα ακόμη. Προσθέστε ένα αγαπημένο παρακάτω ή βάλετε αστερίσκο σε μια συνταγή.",
   "favorites.more": "Περισσότερα αγαπημένα · {count}",
-  "favorites.moreLocked": "Περισσότερα αγαπημένα",
+  "favorites.moreTitle": "Περισσότερα αγαπημένα",
   "favorites.custom": "Προσαρμοσμένο αγαπημένο",
   "favorites.addFromRecipes": "Προσθήκη από συνταγές",
   "favorites.quickFull":
@@ -819,7 +817,7 @@ export const el: Messages = {
   "notify.newActivity": "Νέα δραστηριότητα",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "Ξεκλειδώστε τον AI βοηθό, την αόρατη λειτουργία και τα όρια χρήσης.",
+  "paywall.subtitle": "Ξεκλειδώστε τον AI βοηθό και τα όρια χρήσης.",
   "paywall.close": "Κλείσιμο τοίχου πληρωμής",
   "paywall.locked": "Δυνατότητα Pro",
   "paywall.lifetime": "Εφ' όρου ζωής",
@@ -871,6 +869,11 @@ export const el: Messages = {
     "Το κλείσιμο ενός ιστοτόπου τερματίζει μόνο την ανοιχτή σελίδα του. Τα αγαπημένα και το ιστορικό σας παραμένουν.",
   "tabs.closeOne": "Κλείσιμο {name}",
   "tabs.resetOne": "Επαναφορά του {name} στην αρχική σελίδα",
+  "tabs.moveUp": "Μετακίνηση του {name} πάνω",
+  "tabs.moveDown": "Μετακίνηση του {name} κάτω",
+  "tabs.number": "Καρτέλα {value}",
+  "tabs.arrangeNote":
+    "Οι αριθμοί είναι οι συντομεύσεις καρτελών. Κρατήστε πατημένο έναν ιστότοπο και σύρετέ τον ή χρησιμοποιήστε τα βέλη για να αλλάξετε τη σειρά.",
   "tabs.quickAccess": "Γρήγορη πρόσβαση",
   "tabs.history": "Ιστορικό",
   "tabs.allHistory": "Όλο το ιστορικό ({count})",

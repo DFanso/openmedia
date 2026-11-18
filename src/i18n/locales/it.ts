@@ -291,7 +291,6 @@ export const it: Messages = {
   "onboarding.quickEmpty":
     "Per questo dispositivo non ci sono ancora ricette ufficiali. Puoi aggiungerne in seguito dalla libreria delle ricette.",
   "onboarding.quickCount": "{count} di {limit} scelte",
-  "onboarding.quickProHint": "È il massimo consentito dal tuo piano. Pro ha più posti.",
   "onboarding.applying": "Aggiunta in corso…",
   "onboarding.partial":
     "Impossibile aggiungere: {names}. Puoi aggiungerle in seguito dalla libreria delle ricette.",
@@ -435,7 +434,7 @@ export const it: Messages = {
   "favorites.quickEmpty":
     "Qui non c’è ancora nulla. Aggiungi un preferito qui sotto oppure metti una ricetta tra i preferiti con la stella.",
   "favorites.more": "Altri preferiti · {count}",
-  "favorites.moreLocked": "Altri preferiti",
+  "favorites.moreTitle": "Altri preferiti",
   "favorites.custom": "Preferito personalizzato",
   "favorites.addFromRecipes": "Aggiungi dalle ricette",
   "favorites.quickFull":
@@ -813,7 +812,7 @@ export const it: Messages = {
   "notify.newActivity": "Nuova attività",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "Sblocca l'assistente IA, la modalità in incognito e i limiti di uso.",
+  "paywall.subtitle": "Sblocca l'assistente IA e i limiti di uso.",
   "paywall.close": "Chiudi paywall",
   "paywall.locked": "Funzione Pro",
   "paywall.lifetime": "A vita",
@@ -864,6 +863,11 @@ export const it: Messages = {
     "Chiudere un sito termina solo la sua pagina aperta. Preferiti e cronologia restano.",
   "tabs.closeOne": "Chiudi {name}",
   "tabs.resetOne": "Ripristina {name} alla pagina iniziale",
+  "tabs.moveUp": "Sposta {name} su",
+  "tabs.moveDown": "Sposta {name} giù",
+  "tabs.number": "Scheda {value}",
+  "tabs.arrangeNote":
+    "I numeri sono le scorciatoie delle schede. Tieni premuto un sito e trascinalo, o usa le frecce, per cambiare l'ordine.",
   "tabs.quickAccess": "Accesso rapido",
   "tabs.history": "Cronologia",
   "tabs.allHistory": "Tutta la cronologia ({count})",

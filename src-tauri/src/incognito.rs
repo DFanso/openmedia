@@ -19,7 +19,6 @@ use tauri_plugin_siteview::{
 };
 
 use crate::commands::{current_script, script_for};
-use crate::entitlement::Entitlement;
 use crate::error::Result;
 use crate::library::{Favorite, FavoriteInput, Folder, Library, Mode};
 use crate::recipes::Recipes;
@@ -60,15 +59,6 @@ fn switch_mode(app: &AppHandle, active: bool) -> Result<()> {
     Ok(())
 }
 
-/// Leaves incognito when the entitlement is gone. Used when Pro is lost, so the private set is
-/// not left open behind the paywall.
-pub fn leave_incognito(app: &AppHandle) {
-    if !app.state::<Incognito>().is_active() {
-        return;
-    }
-    let _ = switch_mode(app, false);
-}
-
 /// Which biometric this device has, only so the shell draws Face ID or a fingerprint. Free of
 /// charge and without a prompt. A failure counts as a fingerprint, the generic one.
 #[tauri::command]
@@ -82,12 +72,7 @@ pub async fn biometry_kind(app: AppHandle) -> Result<BiometryKind> {
 /// Async because the plugin waits for native code that needs the main thread: a synchronous
 /// command would deadlock the app.
 #[tauri::command]
-pub async fn unlock_incognito(
-    app: AppHandle,
-    entitlement: State<'_, Entitlement>,
-    reason: String,
-) -> Result<bool> {
-    entitlement.require_pro()?;
+pub async fn unlock_incognito(app: AppHandle, reason: String) -> Result<bool> {
     Ok(app
         .siteview()
         .authenticate(AuthenticateRequest { reason })?)
@@ -96,12 +81,7 @@ pub async fn unlock_incognito(
 /// Turns incognito on after a successful check and returns its quick-access favorites. `None`
 /// means the check was cancelled or failed, and nothing changed.
 #[tauri::command]
-pub async fn enter_incognito(
-    app: AppHandle,
-    entitlement: State<'_, Entitlement>,
-    reason: String,
-) -> Result<Option<Vec<Favorite>>> {
-    entitlement.require_pro()?;
+pub async fn enter_incognito(app: AppHandle, reason: String) -> Result<Option<Vec<Favorite>>> {
     if !app
         .siteview()
         .authenticate(AuthenticateRequest { reason })?
@@ -120,11 +100,7 @@ pub async fn exit_incognito(app: AppHandle) -> Result<()> {
 }
 
 #[tauri::command(async)]
-pub fn get_incognito_favorites(
-    library: State<'_, Library>,
-    entitlement: State<'_, Entitlement>,
-) -> Result<Vec<Favorite>> {
-    entitlement.require_pro()?;
+pub fn get_incognito_favorites(library: State<'_, Library>) -> Result<Vec<Favorite>> {
     library.incognito_favorites()
 }
 
@@ -132,20 +108,14 @@ pub fn get_incognito_favorites(
 #[tauri::command(async)]
 pub fn set_incognito_favorites(
     library: State<'_, Library>,
-    entitlement: State<'_, Entitlement>,
     favorites: Vec<FavoriteInput>,
 ) -> Result<Vec<Favorite>> {
-    entitlement.require_pro()?;
     library.set_incognito_favorites(favorites)
 }
 
 /// The incognito folders, handed out only after a biometric check.
 #[tauri::command(async)]
-pub fn get_incognito_folders(
-    library: State<'_, Library>,
-    entitlement: State<'_, Entitlement>,
-) -> Result<Vec<Folder>> {
-    entitlement.require_pro()?;
+pub fn get_incognito_folders(library: State<'_, Library>) -> Result<Vec<Folder>> {
     library.folders(Mode::Incognito)
 }
 
@@ -153,10 +123,8 @@ pub fn get_incognito_folders(
 #[tauri::command(async)]
 pub fn set_incognito_folders(
     library: State<'_, Library>,
-    entitlement: State<'_, Entitlement>,
     folders: Vec<Folder>,
 ) -> Result<Vec<Folder>> {
-    entitlement.require_pro()?;
     library.set_folders(Mode::Incognito, folders)
 }
 

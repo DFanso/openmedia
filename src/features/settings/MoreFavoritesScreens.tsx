@@ -17,7 +17,7 @@ export function MoreFavoritesScreen() {
 
   return (
     <Screen
-      title={t("favorites.moreLocked")}
+      title={t("favorites.moreTitle")}
       closeLabel={t("common.back")}
       onClose={closeSheet}
       back
@@ -48,7 +48,7 @@ export function IncognitoMoreFavoritesScreen() {
 
   return (
     <Screen
-      title={t("favorites.moreLocked")}
+      title={t("favorites.moreTitle")}
       closeLabel={t("common.back")}
       onClose={closeSheet}
       back

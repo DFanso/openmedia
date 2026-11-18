@@ -282,7 +282,6 @@ export const ur: Messages = {
   "onboarding.quickEmpty":
     "اس آلے کے لیے ابھی کوئی سرکاری نسخہ درج نہیں ہے۔ آپ بعد میں نسخوں کی لائبریری سے کچھ شامل کر سکتے ہیں۔",
   "onboarding.quickCount": "{limit} میں سے {count} منتخب",
-  "onboarding.quickProHint": "آپ کا پلان اس سے زیادہ کی اجازت نہیں دیتا۔ Pro میں مزید خانے ہیں۔",
   "onboarding.applying": "شامل ہو رہی ہیں…",
   "onboarding.partial":
     "شامل نہیں ہو سکے: {names}۔ آپ انہیں بعد میں نسخوں کی لائبریری سے شامل کر سکتے ہیں۔",
@@ -425,7 +424,7 @@ export const ur: Messages = {
   "favorites.quickAccess": "تیز رسائی · {limit} میں سے {count}",
   "favorites.quickEmpty": "یہاں ابھی کچھ نہیں۔ نیچے پسندیدہ شامل کریں، یا کسی ریسپی کو ستارہ دیں۔",
   "favorites.more": "مزید پسندیدہ · {count}",
-  "favorites.moreLocked": "مزید پسندیدہ",
+  "favorites.moreTitle": "مزید پسندیدہ",
   "favorites.custom": "حسبِ منشا پسندیدہ",
   "favorites.addFromRecipes": "ترکیبوں سے شامل کریں",
   "favorites.quickFull": "تیز رسائی مکمل ہے، اس لیے یہ مزید پسندیدہ میں شامل کی گئی ہے۔",
@@ -795,7 +794,7 @@ export const ur: Messages = {
   "notify.newActivity": "نئی سرگرمی",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "AI معاون، انکوگنیٹو موڈ اور استعمال کی حدود کھولیں۔",
+  "paywall.subtitle": "AI معاون اور استعمال کی حدود کھولیں۔",
   "paywall.close": "ادائیگی کی دیوار بند کریں",
   "paywall.locked": "Pro خصوصیت",
   "paywall.lifetime": "لائم فائٹ",
@@ -846,6 +845,11 @@ export const ur: Messages = {
     "سائٹ بند کرنے سے صرف اس کا کھلا صفحہ ختم ہوتا ہے۔ آپ کے پسندیدہ اور ہسٹری برقرار رہتے ہیں۔",
   "tabs.closeOne": "{name} بند کریں",
   "tabs.resetOne": "{name} کو ابتدائی صفحے پر ری سیٹ کریں",
+  "tabs.moveUp": "{name} کو اوپر لے جائیں",
+  "tabs.moveDown": "{name} کو نیچے لے جائیں",
+  "tabs.number": "ٹیب {value}",
+  "tabs.arrangeNote":
+    "نمبر ٹیب کے شارٹ کٹ ہیں۔ ترتیب بدلنے کے لیے کسی سائٹ کو دبائے رکھ کر گھسیٹیں، یا تیر استعمال کریں۔",
   "tabs.quickAccess": "فوری رسائی",
   "tabs.history": "ہسٹری",
   "tabs.allHistory": "پوری ہسٹری ({count})",

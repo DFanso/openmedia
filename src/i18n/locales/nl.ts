@@ -287,7 +287,6 @@ export const nl: Messages = {
   "onboarding.quickEmpty":
     "Er staan nog geen officiële recepten voor dit apparaat. Je kunt er later een paar toevoegen vanuit de receptenbibliotheek.",
   "onboarding.quickCount": "{count} van {limit} gekozen",
-  "onboarding.quickProHint": "Dat is het maximum van je abonnement. Pro heeft meer plekken.",
   "onboarding.applying": "Toevoegen…",
   "onboarding.partial":
     "Kon niet worden toegevoegd: {names}. Je kunt ze later toevoegen vanuit de receptenbibliotheek.",
@@ -431,7 +430,7 @@ export const nl: Messages = {
   "favorites.quickEmpty":
     "Hier staat nog niets. Voeg hieronder een favoriet toe, of markeer een recept met een ster.",
   "favorites.more": "Meer favorieten · {count}",
-  "favorites.moreLocked": "Meer favorieten",
+  "favorites.moreTitle": "Meer favorieten",
   "favorites.custom": "Aangepaste favoriet",
   "favorites.addFromRecipes": "Toevoegen uit recepten",
   "favorites.quickFull": "Snelle toegang is vol, dus deze wordt toegevoegd aan Meer favorieten.",
@@ -810,7 +809,7 @@ export const nl: Messages = {
   "notify.newActivity": "Nieuwe activiteit",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "Ontgrendel de AI-assistent, incognitomodus en gebruikslimieten.",
+  "paywall.subtitle": "Ontgrendel de AI-assistent en gebruikslimieten.",
   "paywall.close": "Betaalmuur sluiten",
   "paywall.locked": "Pro-functie",
   "paywall.lifetime": "Levenslang",
@@ -861,6 +860,11 @@ export const nl: Messages = {
     "Een site sluiten beëindigt alleen de geopende pagina. Je favorieten en geschiedenis blijven.",
   "tabs.closeOne": "{name} sluiten",
   "tabs.resetOne": "{name} terugzetten naar de startpagina",
+  "tabs.moveUp": "{name} omhoog",
+  "tabs.moveDown": "{name} omlaag",
+  "tabs.number": "Tabblad {value}",
+  "tabs.arrangeNote":
+    "De nummers zijn de sneltoetsen voor tabbladen. Houd een site ingedrukt en sleep, of gebruik de pijlen, om de volgorde te wijzigen.",
   "tabs.quickAccess": "Snelle toegang",
   "tabs.history": "Geschiedenis",
   "tabs.allHistory": "Alle geschiedenis ({count})",

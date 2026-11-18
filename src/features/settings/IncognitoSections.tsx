@@ -2,10 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import { useApp, type Sheet } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { QUICK_ACCESS_LIMIT } from "../../shared/favorites";
-import { ForwardIcon, ProIcon } from "../../shared/icons";
+import { ForwardIcon } from "../../shared/icons";
 import { Screen } from "../../shared/Screen";
 import { BiometricIcon } from "../incognito/BiometricIcon";
-import { useEntitlementStore } from "../paywall/store";
 import { FavoritesEditor } from "./FavoritesSection";
 import { SiteCard } from "./RecipesScreen";
 import { Group, LockedSection } from "./ui";
@@ -21,15 +20,13 @@ export function IncognitoFavoritesSection() {
   const load = useApp((s) => s.loadIncognitoFavorites);
   const forget = useApp((s) => s.forgetIncognitoFavorites);
   const save = useApp((s) => s.saveIncognitoFavorites);
-  const needsPro = useEntitlementStore((s) => s.status !== "pro");
   const t = useT();
 
   return (
     <LockedSection
       title={t("incognito.favoritesTitle")}
       note={t("incognito.favoritesNote", { limit: QUICK_ACCESS_LIMIT })}
-      lockedHint={needsPro ? t("paywall.locked") : t("incognito.locked")}
-      needsPro={needsPro}
+      lockedHint={t("incognito.locked")}
       unlock={unlock}
       onUnlocked={load}
       onLocked={forget}
@@ -52,7 +49,6 @@ export function IncognitoFavoritesSection() {
 export function IncognitoRecipesLink() {
   const openSheet = useApp((s) => s.openSheet);
   const unlock = useApp((s) => s.unlockIncognito);
-  const needsPro = useEntitlementStore((s) => s.status !== "pro");
   const [checking, setChecking] = useState(false);
   const incognitoActive = useApp((s) => s.incognito.active);
   const t = useT();
@@ -61,7 +57,6 @@ export function IncognitoRecipesLink() {
     if (checking) return;
     setChecking(true);
     try {
-      // Without Pro the check opens the paywall and fails, so the page stays closed.
       if (!(await unlock())) return;
       openSheet("incognito-recipes");
     } finally {
@@ -82,16 +77,10 @@ export function IncognitoRecipesLink() {
           <span className="block text-base font-medium">{t("incognito.recipesTitle")}</span>
           <span className="block text-sm text-paper/55">{t("incognito.locked")}</span>
         </span>
-        {needsPro ? (
-          <span className="pro-badge grid size-6 shrink-0 place-items-center rounded-full">
-            <ProIcon size={12} />
+        {!incognitoActive && (
+          <span aria-hidden="true" className="shrink-0 text-paper/45">
+            <BiometricIcon size={18} />
           </span>
-        ) : (
-          !incognitoActive && (
-            <span aria-hidden="true" className="shrink-0 text-paper/45">
-              <BiometricIcon size={18} />
-            </span>
-          )
         )}
         <span aria-hidden="true" className="text-paper/50 rtl:-scale-x-100">
           <ForwardIcon />

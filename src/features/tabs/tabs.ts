@@ -8,6 +8,26 @@ export function orderedTabs(sessions: readonly Session[], activeId: string | nul
   );
 }
 
+/** Highest number a shortcut can select directly: `tab.select1` to `tab.select8`. */
+export const NUMBERED_TABS = 8;
+
+/** The number keyboard shortcut that selects the tab at `index` (0-based), or null past the eighth. */
+export function tabNumber(index: number): number | null {
+  return index >= 0 && index < NUMBERED_TABS ? index + 1 : null;
+}
+
+/** A copy of `sessions` with `id` moved to `toIndex` (clamped); unchanged when `id` is unknown. */
+export function moveTab(sessions: readonly Session[], id: string, toIndex: number): Session[] {
+  const from = sessions.findIndex((session) => session.id === id);
+  const next = [...sessions];
+  if (from < 0) return next;
+  const to = Math.min(Math.max(Math.trunc(toIndex), 0), sessions.length - 1);
+  if (to === from) return next;
+  const [moved] = next.splice(from, 1);
+  next.splice(to, 0, moved);
+  return next;
+}
+
 /** Every session but the visible one: what "Close the others" ends. */
 export function hiddenTabIds(sessions: readonly Session[], activeId: string | null): string[] {
   return sessions.filter((session) => session.id !== activeId).map((session) => session.id);

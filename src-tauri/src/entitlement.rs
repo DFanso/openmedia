@@ -28,7 +28,6 @@ use tauri_plugin_billing::{
 };
 
 use crate::error::{Error, Result};
-use crate::incognito;
 
 pub const ENTITLEMENT_ID: &str = "pro";
 pub const CHANGED_EVENT: &str = "entitlement:changed";
@@ -73,7 +72,6 @@ pub struct EntitlementView {
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 struct Transition {
     changed: bool,
-    pro_lost: bool,
 }
 
 /// A missing, empty or placeholder key means purchases are not configured.
@@ -183,7 +181,6 @@ impl Machine {
         let after = self.view();
         Transition {
             changed: before != after,
-            pro_lost: before.status == Status::Pro && after.status != Status::Pro,
         }
     }
 }
@@ -254,12 +251,6 @@ fn with_retry<T, E>(
 fn publish(app: &AppHandle, transition: Transition) {
     if transition.changed {
         let _ = app.emit(CHANGED_EVENT, app.state::<Entitlement>().view());
-    }
-    if transition.pro_lost {
-        // Switching incognito off calls into native code, which must not run on the thread
-        // that delivered a store event.
-        let handle = AppHandle::clone(app);
-        tauri::async_runtime::spawn_blocking(move || incognito::leave_incognito(&handle));
     }
 }
 
@@ -449,7 +440,7 @@ mod tests {
         let mut machine = configured();
         let transition = machine.apply_fetched(machine.begin_fetch(), snapshot(true));
         assert_eq!(machine.status(), Status::Pro);
-        assert!(transition.changed && !transition.pro_lost);
+        assert!(transition.changed);
         assert_eq!(machine.view().snapshot, Some(snapshot(true)));
     }
 
@@ -460,15 +451,6 @@ mod tests {
         let transition = machine.give_up();
         assert_eq!(machine.status(), Status::Pro);
         assert_eq!(transition, Transition::default());
-    }
-
-    #[test]
-    fn a_store_answer_that_ends_pro_reports_the_loss() {
-        let mut machine = configured();
-        machine.apply_authoritative(snapshot(true));
-        let transition = machine.apply_authoritative(snapshot(false));
-        assert_eq!(machine.status(), Status::Free);
-        assert!(transition.pro_lost);
     }
 
     #[test]

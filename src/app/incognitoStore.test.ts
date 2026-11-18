@@ -105,14 +105,6 @@ describe("incognito mode", () => {
     expect(useApp.getState().incognito.active).toBe(true);
   });
 
-  it("opens the paywall instead of requesting biometric access for a free user", async () => {
-    useEntitlementStore.setState({ status: "free", configured: true, snapshot: null });
-    await useApp.getState().enterIncognito();
-    expect(calls("enter_incognito")).toHaveLength(0);
-    expect(useApp.getState().sheet).toBe("paywall");
-    expect(useApp.getState().incognito.active).toBe(false);
-  });
-
   it("keeps the incognito favorites while it is on, but forgets an unlocked section's copy otherwise", () => {
     useApp.setState({ incognito: { active: false, favorites: secret, folders: [], busy: false } });
     useApp.getState().forgetIncognitoFavorites();

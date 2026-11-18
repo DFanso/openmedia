@@ -280,7 +280,6 @@ export const vi: Messages = {
   "onboarding.quickEmpty":
     "Chưa có công thức chính thức nào dành cho thiết bị này. Bạn có thể thêm sau từ thư viện công thức.",
   "onboarding.quickCount": "Đã chọn {count}/{limit}",
-  "onboarding.quickProHint": "Đó là mức tối đa gói của bạn cho phép. Pro có nhiều chỗ hơn.",
   "onboarding.applying": "Đang thêm…",
   "onboarding.partial": "Không thể thêm: {names}. Bạn có thể thêm sau từ thư viện công thức.",
   "onboarding.libraryTitle": "Một thư viện công thức.",
@@ -422,7 +421,7 @@ export const vi: Messages = {
   "favorites.quickEmpty":
     "Chưa có gì ở đây. Thêm một mục yêu thích bên dưới, hoặc đánh dấu sao một công thức.",
   "favorites.more": "Yêu thích khác · {count}",
-  "favorites.moreLocked": "Yêu thích khác",
+  "favorites.moreTitle": "Yêu thích khác",
   "favorites.custom": "Mục yêu thích tùy chỉnh",
   "favorites.addFromRecipes": "Thêm từ công thức",
   "favorites.quickFull": "Truy cập nhanh đã đầy, nên mục này được thêm vào Yêu thích khác.",
@@ -792,7 +791,7 @@ export const vi: Messages = {
   "notify.newActivity": "Có hoạt động mới",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "Mở khóa trợ lý AI, chế độ ẩn danh và giới hạn sử dụng.",
+  "paywall.subtitle": "Mở khóa trợ lý AI và giới hạn sử dụng.",
   "paywall.close": "Đóng màn hình thanh toán",
   "paywall.locked": "Tính năng Pro",
   "paywall.lifetime": "Trọn đời",
@@ -844,6 +843,11 @@ export const vi: Messages = {
     "Đóng một trang chỉ kết thúc trang đang mở của nó. Mục yêu thích và lịch sử vẫn còn.",
   "tabs.closeOne": "Đóng {name}",
   "tabs.resetOne": "Đặt lại {name} về trang bắt đầu",
+  "tabs.moveUp": "Chuyển {name} lên",
+  "tabs.moveDown": "Chuyển {name} xuống",
+  "tabs.number": "Thẻ {value}",
+  "tabs.arrangeNote":
+    "Các số là phím tắt của thẻ. Nhấn giữ một trang rồi kéo, hoặc dùng mũi tên, để đổi thứ tự.",
   "tabs.quickAccess": "Truy cập nhanh",
   "tabs.history": "Lịch sử",
   "tabs.allHistory": "Toàn bộ lịch sử ({count})",

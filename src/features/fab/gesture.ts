@@ -2,6 +2,24 @@ import type { FanTarget, Point } from "./geometry";
 
 export const DRAG_SLOP = 8;
 export const HOLD_MS = 380;
+/** How long a press on a draggable site button is held before it lifts and can be dragged out. */
+export const CARRY_HOLD_MS = 350;
+
+/** A site button's hold: building up, or armed so that moving it outward starts a drag. */
+export type CarryHold = "idle" | "charging" | "armed";
+
+/**
+ * Where a press on a draggable button stands. `heldMs` is how long the press has lasted, or null
+ * when nothing is pressed; `strayed` is true once the pointer moved past the slop before the hold
+ * finished, which ends it for good: such a press turns the dial or slides, it never lifts.
+ */
+export function carryHold(heldMs: number | null, strayed: boolean): CarryHold {
+  if (heldMs === null || strayed) return "idle";
+  return heldMs >= CARRY_HOLD_MS ? "armed" : "charging";
+}
+
+/** Whether a pointer `moved` pixels from where it went down has left the press behind. */
+export const strayedFromPress = (moved: number): boolean => moved > DRAG_SLOP;
 
 export type GestureState =
   | { phase: "idle" }

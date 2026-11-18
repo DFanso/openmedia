@@ -281,7 +281,6 @@ export const si: Messages = {
   "onboarding.quickEmpty":
     "මෙම උපාංගය සඳහා නිල ක්‍රම තවම ලැයිස්තුගත කර නැත. ඔබට පසුව ක්‍රම පුස්තකාලයෙන් කීපයක් එකතු කළ හැක.",
   "onboarding.quickCount": "{limit} න් {count} ක් තෝරා ඇත",
-  "onboarding.quickProHint": "ඔබගේ සැලසුම ඉඩ දෙන උපරිමය එයයි. Pro හි තවත් ඉඩ ඇත.",
   "onboarding.applying": "එකතු කරමින්…",
   "onboarding.partial": "එකතු කළ නොහැකි විය: {names}. ඔබට ඒවා පසුව ක්‍රම පුස්තකාලයෙන් එකතු කළ හැක.",
   "onboarding.libraryTitle": "ක්‍රම පුස්තකාලයක්.",
@@ -422,7 +421,7 @@ export const si: Messages = {
   "favorites.quickEmpty":
     "මෙහි තවම කිසිවක් නැත. පහළින් ආදරණීයක් එකතු කරන්න, හෝ ක්‍රමයකට තරු ලකුණ දෙන්න.",
   "favorites.more": "තවත් ආදරණීය · {count}",
-  "favorites.moreLocked": "තවත් ආදරණීය",
+  "favorites.moreTitle": "තවත් ආදරණීය",
   "favorites.custom": "අභිරුචි ප්‍රියතමය",
   "favorites.addFromRecipes": "වට්ටෝරුවලින් එක් කරන්න",
   "favorites.quickFull": "ඉක්මන් ප්‍රවේශය පිරිච්ච බැවිට මෙය තවත් ආදරණීය අතරතුරට එකතු කරනු ලැබේ.",
@@ -795,7 +794,7 @@ export const si: Messages = {
   "notify.newActivity": "නව ක්‍රියාකාරකම්",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "AI සහායක, අනාධික මුද්ද සහ භාවිත සීමා අගුළු ඇරිය.",
+  "paywall.subtitle": "AI සහායක සහ භාවිත සීමා අගුළු ඇරිය.",
   "paywall.close": "ගෙවීම් බිත්තිය වසන්න",
   "paywall.locked": "Pro විශේෂතාවය",
   "paywall.lifetime": "ජීවිත කාලයකට",
@@ -847,6 +846,11 @@ export const si: Messages = {
     "අඩවියක් වැසීමෙන් එහි විවෘත පිටුව පමණක් අවසන් වේ. ඔබේ ප්‍රියතම සහ ඉතිහාසය ඉතිරි වේ.",
   "tabs.closeOne": "{name} වසන්න",
   "tabs.resetOne": "{name} ආරම්භක පිටුවට යළි සකසන්න",
+  "tabs.moveUp": "{name} ඉහළට ගෙන යන්න",
+  "tabs.moveDown": "{name} පහළට ගෙන යන්න",
+  "tabs.number": "ටැබය {value}",
+  "tabs.arrangeNote":
+    "අංක යනු ටැබ කෙටිමං වේ. අනුපිළිවෙල වෙනස් කිරීමට අඩවියක් අල්ලාගෙන ඇදගන්න, නැතහොත් ඊතල භාවිත කරන්න.",
   "tabs.quickAccess": "ඉක්මන් ප්‍රවේශය",
   "tabs.history": "ඉතිහාසය",
   "tabs.allHistory": "සම්පූර්ණ ඉතිහාසය ({count})",

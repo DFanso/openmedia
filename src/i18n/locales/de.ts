@@ -284,7 +284,6 @@ export const de: Messages = {
   "onboarding.quickEmpty":
     "Für dieses Gerät sind noch keine offiziellen Rezepte aufgeführt. Du kannst später welche aus der Rezeptbibliothek hinzufügen.",
   "onboarding.quickCount": "{count} von {limit} gewählt",
-  "onboarding.quickProHint": "Mehr erlaubt dein Tarif nicht. Mit Pro gibt es mehr Plätze.",
   "onboarding.applying": "Wird hinzugefügt…",
   "onboarding.partial":
     "Konnte nicht hinzugefügt werden: {names}. Du kannst sie später aus der Rezeptbibliothek hinzufügen.",
@@ -430,7 +429,7 @@ export const de: Messages = {
   "favorites.quickEmpty":
     "Noch nichts hier. Füge unten einen Favoriten hinzu oder markiere ein Rezept mit einem Stern.",
   "favorites.more": "Weitere Favoriten · {count}",
-  "favorites.moreLocked": "Weitere Favoriten",
+  "favorites.moreTitle": "Weitere Favoriten",
   "favorites.custom": "Eigener Favorit",
   "favorites.addFromRecipes": "Aus Rezepten hinzufügen",
   "favorites.quickFull":
@@ -820,7 +819,7 @@ export const de: Messages = {
   "notify.newActivity": "Neue Aktivität",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "Freischalten: KI-Assistent, Inkognito-Modus und Nutzungslimits.",
+  "paywall.subtitle": "Freischalten: KI-Assistent und Nutzungslimits.",
   "paywall.close": "Bezahlwand schließen",
   "paywall.locked": "Pro-Funktion",
   "paywall.lifetime": "Lebenslang",
@@ -872,6 +871,11 @@ export const de: Messages = {
     "Beim Schließen wird nur die geöffnete Seite beendet. Favoriten und Verlauf bleiben erhalten.",
   "tabs.closeOne": "{name} schließen",
   "tabs.resetOne": "{name} auf Startseite zurücksetzen",
+  "tabs.moveUp": "{name} nach oben",
+  "tabs.moveDown": "{name} nach unten",
+  "tabs.number": "Tab {value}",
+  "tabs.arrangeNote":
+    "Die Nummern sind die Tab-Kürzel. Halte eine Seite gedrückt und ziehe sie, oder nutze die Pfeile, um die Reihenfolge zu ändern.",
   "tabs.quickAccess": "Schnellzugriff",
   "tabs.history": "Verlauf",
   "tabs.allHistory": "Gesamter Verlauf ({count})",

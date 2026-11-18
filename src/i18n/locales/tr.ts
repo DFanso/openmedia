@@ -288,8 +288,6 @@ export const tr: Messages = {
   "onboarding.quickEmpty":
     "Bu cihaz için henüz resmî tarif listelenmiyor. Daha sonra tarif kitaplığından ekleyebilirsin.",
   "onboarding.quickCount": "{limit} içinden {count} seçildi",
-  "onboarding.quickProHint":
-    "Planınızın izin verdiği en fazla sayı bu. Pro'da daha fazla yuva var.",
   "onboarding.applying": "Ekleniyor…",
   "onboarding.partial": "Eklenemedi: {names}. Daha sonra tarif kitaplığından ekleyebilirsin.",
   "onboarding.libraryTitle": "Bir tarif kitaplığı.",
@@ -430,7 +428,7 @@ export const tr: Messages = {
   "favorites.quickEmpty":
     "Burada henüz bir şey yok. Aşağıya bir favori ekleyin ya da bir tarifi yıldızlayın.",
   "favorites.more": "Diğer favoriler · {count}",
-  "favorites.moreLocked": "Diğer favoriler",
+  "favorites.moreTitle": "Diğer favoriler",
   "favorites.custom": "Özel favori",
   "favorites.addFromRecipes": "Tariflerden ekle",
   "favorites.quickFull": "Hızlı erişim dolu, bu yüzden bu da Diğer favorilere eklendi.",
@@ -803,7 +801,7 @@ export const tr: Messages = {
   "notify.newActivity": "Yeni etkinlik",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "Yapay zekâ asistanını, gizli modu ve kullanım sınırlarını aç.",
+  "paywall.subtitle": "Yapay zekâ asistanını ve kullanım sınırlarını aç.",
   "paywall.close": "Ödeme duvarını kapat",
   "paywall.locked": "Pro özelliği",
   "paywall.lifetime": "Ömür boyu",
@@ -854,6 +852,11 @@ export const tr: Messages = {
     "Bir siteyi kapatmak yalnızca açık sayfasını sonlandırır. Favorileriniz ve geçmişiniz kalır.",
   "tabs.closeOne": "{name} sitesini kapat",
   "tabs.resetOne": "{name} sitesini başlangıç sayfasına sıfırla",
+  "tabs.moveUp": "{name} öğesini yukarı taşı",
+  "tabs.moveDown": "{name} öğesini aşağı taşı",
+  "tabs.number": "Sekme {value}",
+  "tabs.arrangeNote":
+    "Numaralar sekme kısayollarıdır. Sırayı değiştirmek için bir siteye basılı tutup sürükleyin ya da okları kullanın.",
   "tabs.quickAccess": "Hızlı erişim",
   "tabs.history": "Geçmiş",
   "tabs.allHistory": "Tüm geçmiş ({count})",

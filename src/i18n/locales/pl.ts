@@ -289,7 +289,6 @@ export const pl: Messages = {
   "onboarding.quickEmpty":
     "Na to urządzenie nie ma jeszcze oficjalnych przepisów. Możesz dodać je później z biblioteki przepisów.",
   "onboarding.quickCount": "Wybrano {count} z {limit}",
-  "onboarding.quickProHint": "To maksimum w Twoim planie. Pro ma więcej miejsc.",
   "onboarding.applying": "Dodawanie…",
   "onboarding.partial":
     "Nie udało się dodać: {names}. Możesz je dodać później z biblioteki przepisów.",
@@ -431,7 +430,7 @@ export const pl: Messages = {
   "favorites.quickAccess": "Szybki dostęp · {count} z {limit}",
   "favorites.quickEmpty": "Na razie pusto. Dodaj ulubioną poniżej lub oznacz gwiazdką przepis.",
   "favorites.more": "Więcej ulubionych · {count}",
-  "favorites.moreLocked": "Więcej ulubionych",
+  "favorites.moreTitle": "Więcej ulubionych",
   "favorites.custom": "Własny ulubiony",
   "favorites.addFromRecipes": "Dodaj z przepisów",
   "favorites.quickFull":
@@ -805,7 +804,7 @@ export const pl: Messages = {
   "notify.newActivity": "Nowa aktywność",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "Odblokuj asystenta AI, tryb incognito i limity użycia.",
+  "paywall.subtitle": "Odblokuj asystenta AI i limity użycia.",
   "paywall.close": "Zamknij ścianę płatności",
   "paywall.locked": "Funkcja Pro",
   "paywall.lifetime": "Dożywotni",
@@ -856,6 +855,11 @@ export const pl: Messages = {
     "Zamknięcie witryny kończy tylko jej otwartą stronę. Ulubione i historia zostają.",
   "tabs.closeOne": "Zamknij {name}",
   "tabs.resetOne": "Przywróć {name} do strony startowej",
+  "tabs.moveUp": "Przesuń {name} w górę",
+  "tabs.moveDown": "Przesuń {name} w dół",
+  "tabs.number": "Karta {value}",
+  "tabs.arrangeNote":
+    "Numery to skróty kart. Przytrzymaj witrynę i przeciągnij lub użyj strzałek, aby zmienić kolejność.",
   "tabs.quickAccess": "Szybki dostęp",
   "tabs.history": "Historia",
   "tabs.allHistory": "Cała historia ({count})",

@@ -18,7 +18,6 @@ use uuid::Uuid;
 use zeroize::Zeroizing;
 
 use crate::commands::Secrets;
-use crate::entitlement::Entitlement;
 use crate::error::{Error, Result};
 use crate::fill;
 use crate::import::{self, Choices, ImportResult, ImportState, Preview};
@@ -93,7 +92,6 @@ pub async fn import_apply(
 ) -> Result<ImportResult> {
     let vault = app.state::<Vault>();
     let secrets = app.state::<Secrets>();
-    let entitlement = app.state::<Entitlement>();
     let official = official();
     let install = |id: &str| crate::recipe_library::install(&recipes, id);
     let result = import::apply(
@@ -103,7 +101,6 @@ pub async fn import_apply(
             vault: &vault,
             secrets: secrets.0.as_ref(),
             official: &official,
-            pro: entitlement.require_pro().is_ok(),
             install: &install,
         },
         &choices,

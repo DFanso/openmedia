@@ -1,12 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { quickAccessLimit, toggleSelection } from "./selection";
-
-describe("quickAccessLimit", () => {
-  it("is three for free and five for Pro", () => {
-    expect(quickAccessLimit(false)).toBe(3);
-    expect(quickAccessLimit(true)).toBe(5);
-  });
-});
+import { toggleSelection } from "./selection";
 
 describe("toggleSelection", () => {
   it("adds in order and removes on a second tap", () => {

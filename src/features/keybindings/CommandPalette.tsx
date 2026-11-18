@@ -4,13 +4,12 @@ import { useBackHandler } from "../back/useBackHandler";
 import { useT } from "../../i18n/useT";
 import { useApp } from "../../app/store";
 import { SearchIcon } from "../../shared/icons";
-import { ACTIONS, GROUP_TITLES } from "./actionList";
+import { GROUP_TITLES } from "./actionList";
 import { formatSequence } from "./chord";
-import { effectiveBindings } from "./keymap";
 import { usePalette } from "./paletteStore";
 import { runAction } from "./runActions";
 import { PagePicker } from "../tiling/PagePicker";
-import { useKeybindings } from "./store";
+import { useBindings } from "./useBindings";
 
 /**
  * Every action by name, searchable; the keys that run each are shown beside it. Adding a window
@@ -27,25 +26,20 @@ export function CommandPalette() {
 
 function PaletteBody() {
   const setOpen = usePalette((s) => s.setOpen);
-  const profile = useKeybindings((s) => s.profile);
-  const overrides = useKeybindings((s) => s.overrides);
   const t = useT();
   const mac = isMac();
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(0);
   const input = useRef<HTMLInputElement>(null);
   const list = useRef<HTMLUListElement>(null);
-  const bindings = useMemo(
-    () => effectiveBindings(profile, overrides, mac),
-    [profile, overrides, mac],
-  );
+  const { actions, bindings } = useBindings();
   const matches = useMemo(() => {
     const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-    return ACTIONS.filter((info) => {
+    return actions.filter((info) => {
       const label = info.label.toLowerCase();
       return words.every((word) => label.includes(word));
     });
-  }, [query]);
+  }, [actions, query]);
 
   useBackHandler(true, () => setOpen(false));
   useEffect(() => {

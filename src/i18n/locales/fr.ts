@@ -293,7 +293,6 @@ export const fr: Messages = {
   "onboarding.quickEmpty":
     "Aucune recette officielle n’est encore proposée pour cet appareil. Vous pourrez en ajouter plus tard depuis la bibliothèque de recettes.",
   "onboarding.quickCount": "{count} sur {limit} choisis",
-  "onboarding.quickProHint": "C’est le maximum de votre offre. Pro offre plus d’emplacements.",
   "onboarding.applying": "Ajout en cours…",
   "onboarding.partial":
     "Impossible d’ajouter : {names}. Vous pourrez les ajouter plus tard depuis la bibliothèque de recettes.",
@@ -439,7 +438,7 @@ export const fr: Messages = {
   "favorites.quickEmpty":
     "Rien ici pour le moment. Ajoutez un favori ci-dessous ou mettez une recette en favori.",
   "favorites.more": "Autres favoris · {count}",
-  "favorites.moreLocked": "Autres favoris",
+  "favorites.moreTitle": "Autres favoris",
   "favorites.custom": "Favori personnalisé",
   "favorites.addFromRecipes": "Ajouter depuis les recettes",
   "favorites.quickFull": "L’accès rapide est plein : ce favori est ajouté aux autres favoris.",
@@ -825,7 +824,7 @@ export const fr: Messages = {
   "notify.newActivity": "Nouvelle activité",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "Débloquez l'assistant IA, le mode incognito et les limites d'utilisation.",
+  "paywall.subtitle": "Débloquez l'assistant IA et les limites d'utilisation.",
   "paywall.close": "Fermer le mur de paiement",
   "paywall.locked": "Fonction Pro",
   "paywall.lifetime": "À vie",
@@ -876,6 +875,11 @@ export const fr: Messages = {
     "Fermer un site ne ferme que sa page ouverte. Vos favoris et votre historique restent.",
   "tabs.closeOne": "Fermer {name}",
   "tabs.resetOne": "Réinitialiser {name} à sa page de départ",
+  "tabs.moveUp": "Monter {name}",
+  "tabs.moveDown": "Descendre {name}",
+  "tabs.number": "Onglet {value}",
+  "tabs.arrangeNote":
+    "Les numéros sont les raccourcis des onglets. Maintenez un site et faites-le glisser, ou utilisez les flèches, pour changer l'ordre.",
   "tabs.quickAccess": "Accès rapide",
   "tabs.history": "Historique",
   "tabs.allHistory": "Tout l'historique ({count})",

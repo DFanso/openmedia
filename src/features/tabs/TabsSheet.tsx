@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { selectLocale, selectQuickFavorites, useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { QUICK_ACCESS_LIMIT, displayHost, quickAccess } from "../../shared/favorites";
@@ -12,7 +12,12 @@ import { formatDuration, localDay } from "../stats/format";
 import { Group, GroupLabel, primaryBlockButton, quietButton } from "../settings/ui";
 import { findFavoriteSession, type Session } from "../web/sessions";
 import { FavoriteRows } from "./FavoriteRows";
-import { formatMs, orderedTabs, secondsTodayFor } from "./tabs";
+import { formatMs, secondsTodayFor, tabNumber } from "./tabs";
+
+/** How long a press has to stay put before the row lifts and can be dragged. */
+const HOLD_MS = 350;
+/** How far a press may wander before the hold is given up and the page scrolls instead. */
+const HOLD_SLOP_PX = 8;
 
 const NO_HISTORY: string[] = [];
 /** How many recent addresses the Tabs screen shows; the History screen has them all. */
@@ -34,9 +39,11 @@ export function TabsSheet() {
   const closeSession = useApp((s) => s.closeSession);
   const resetSession = useApp((s) => s.resetSession);
   const closeOtherSessions = useApp((s) => s.closeOtherSessions);
+  const moveSession = useApp((s) => s.moveSession);
   const t = useT();
   const [report, setReport] = useState<UsageReport | null>(null);
   const [now, setNow] = useState(() => Date.now());
+  const [drag, setDrag] = useState<{ from: number; to: number } | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -56,7 +63,7 @@ export function TabsSheet() {
 
   if (!open) return null;
 
-  const tabs = orderedTabs(sessions, activeId);
+  const tabs = sessions;
 
   return (
     <Screen
@@ -76,10 +83,13 @@ export function TabsSheet() {
             <Empty text={t("tabs.openEmpty")} />
           ) : (
             <Group>
-              {tabs.map((session) => (
+              {tabs.map((session, index) => (
                 <OpenTab
                   key={session.id}
                   session={session}
+                  index={index}
+                  count={tabs.length}
+                  dropMark={dropMarkFor(index, drag)}
                   active={session.id === activeId && !blankTab}
                   now={now}
                   secondsToday={secondsTodayFor(report, session.scope)}
@@ -87,6 +97,10 @@ export function TabsSheet() {
                   onOpen={() => openSession(session.id)}
                   onClose={() => closeSession(session.id)}
                   onReset={() => resetSession(session.id)}
+                  onMove={(toIndex) => moveSession(session.id, toIndex)}
+                  onDragTarget={(toIndex) =>
+                    setDrag(toIndex === null ? null : { from: index, to: toIndex })
+                  }
                 />
               ))}
             </Group>
@@ -97,6 +111,11 @@ export function TabsSheet() {
             </button>
           )}
           <p className="px-1 pt-2 text-[13px] leading-snug text-paper/50">{t("tabs.closeNote")}</p>
+          {tabs.length > 1 && (
+            <p className="px-1 pt-2 text-[13px] leading-snug text-paper/50">
+              {t("tabs.arrangeNote")}
+            </p>
+          )}
         </section>
 
         <section>
@@ -162,8 +181,20 @@ function Empty({ text }: { text: string }) {
   );
 }
 
+/** Where the drop line sits on a row while another row is dragged over the list. */
+function dropMarkFor(
+  index: number,
+  drag: { from: number; to: number } | null,
+): "before" | "after" | null {
+  if (drag === null || index !== drag.to || drag.to === drag.from) return null;
+  return drag.to < drag.from ? "before" : "after";
+}
+
 interface OpenTabProps {
   session: Session;
+  index: number;
+  count: number;
+  dropMark: "before" | "after" | null;
   active: boolean;
   now: number;
   secondsToday: number | null;
@@ -171,10 +202,23 @@ interface OpenTabProps {
   onOpen: () => void;
   onClose: () => void;
   onReset: () => void;
+  onMove: (toIndex: number) => void;
+  onDragTarget: (toIndex: number | null) => void;
+}
+
+interface Press {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  armed: boolean;
+  timer: number;
 }
 
 function OpenTab({
   session,
+  index,
+  count,
+  dropMark,
   active,
   now,
   secondsToday,
@@ -182,6 +226,8 @@ function OpenTab({
   onOpen,
   onClose,
   onReset,
+  onMove,
+  onDragTarget,
 }: OpenTabProps) {
   const t = useT();
   const locale = useApp(selectLocale);
@@ -190,6 +236,12 @@ function OpenTab({
   const icon = useIconForUrl(address, favorites);
   const title = session.title?.trim() || host;
   const idleMs = now - session.lastUsed;
+  const number = tabNumber(index);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const press = useRef<Press | null>(null);
+  const suppressClick = useRef(false);
+  const [lifted, setLifted] = useState(false);
+  const [offset, setOffset] = useState(0);
   const stats = [
     session.paintMs !== null ? t("tabs.statPaint", { value: formatMs(session.paintMs) }) : null,
     session.loadMs !== null ? t("tabs.statLoad", { value: formatMs(session.loadMs) }) : null,
@@ -197,14 +249,117 @@ function OpenTab({
     active ? t("tabs.statShowing") : t("tabs.statIdle", { value: relativeAge(idleMs, locale) }),
   ].filter((part): part is string => part !== null);
 
+  useEffect(() => {
+    if (!lifted) return;
+    const keepStill = (event: TouchEvent) => event.preventDefault();
+    window.addEventListener("touchmove", keepStill, { passive: false });
+    return () => window.removeEventListener("touchmove", keepStill);
+  }, [lifted]);
+
+  useEffect(
+    () => () => {
+      if (press.current) window.clearTimeout(press.current.timer);
+    },
+    [],
+  );
+
+  const targetFor = (dy: number) => {
+    const height = rowRef.current?.offsetHeight ?? 1;
+    return Math.min(Math.max(index + Math.round(dy / height), 0), count - 1);
+  };
+
+  const endPress = () => {
+    if (press.current) window.clearTimeout(press.current.timer);
+    press.current = null;
+    setLifted(false);
+    setOffset(0);
+    onDragTarget(null);
+  };
+
+  const onPointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    if (event.button !== 0 || count < 2) return;
+    const target = event.currentTarget;
+    const pointerId = event.pointerId;
+    const timer = window.setTimeout(() => {
+      if (!press.current) return;
+      press.current.armed = true;
+      target.setPointerCapture(pointerId);
+      setLifted(true);
+    }, HOLD_MS);
+    press.current = {
+      pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      armed: false,
+      timer,
+    };
+  };
+
+  const onPointerMove = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    const current = press.current;
+    if (!current || event.pointerId !== current.pointerId) return;
+    const dy = event.clientY - current.startY;
+    if (!current.armed) {
+      if (Math.hypot(event.clientX - current.startX, dy) > HOLD_SLOP_PX) {
+        window.clearTimeout(current.timer);
+        press.current = null;
+      }
+      return;
+    }
+    setOffset(dy);
+    onDragTarget(targetFor(dy));
+  };
+
+  const onPointerUp = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    const current = press.current;
+    if (!current || event.pointerId !== current.pointerId) return;
+    if (current.armed) {
+      suppressClick.current = true;
+      const to = targetFor(event.clientY - current.startY);
+      if (to !== index) onMove(to);
+    }
+    endPress();
+  };
+
+  const onClick = () => {
+    if (suppressClick.current) {
+      suppressClick.current = false;
+      return;
+    }
+    onOpen();
+  };
+
   return (
-    <div className="flex items-center">
+    <div
+      ref={rowRef}
+      data-lifted={lifted ? "true" : undefined}
+      style={lifted ? { transform: `translateY(${offset}px) scale(1.02)` } : undefined}
+      className={`relative flex items-center transition-[transform,box-shadow] duration-150 ${
+        lifted ? "z-10 rounded-xl bg-ink shadow-2xl shadow-black/50" : ""
+      } ${dropMark === "before" ? "border-t-2 border-t-paper" : ""} ${
+        dropMark === "after" ? "border-b-2 border-b-paper" : ""
+      }`}
+    >
       <button
         type="button"
         aria-current={active ? "page" : undefined}
-        onClick={onOpen}
-        className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3 text-start active:bg-paper/[0.06]"
+        onClick={onClick}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={endPress}
+        onContextMenu={(event) => event.preventDefault()}
+        className="flex min-w-0 flex-1 select-none items-center gap-3 px-4 py-3 text-start aria-[current=page]:bg-paper/[0.08] active:bg-paper/[0.06]"
       >
+        <span
+          role={number === null ? undefined : "img"}
+          aria-label={number === null ? undefined : t("tabs.number", { value: number })}
+          className={`grid size-5 shrink-0 place-items-center rounded-md text-[11px] font-semibold tabular-nums ${
+            number === null ? "" : "bg-paper/10 text-paper/70"
+          }`}
+        >
+          {number}
+        </span>
         <SiteTile name={host} icon={icon} />
         <span className="min-w-0 flex-1">
           <span className="block truncate text-base font-medium">{title}</span>
@@ -214,6 +369,28 @@ function OpenTab({
           </span>
         </span>
       </button>
+      {count > 1 && (
+        <span className="flex shrink-0 flex-col">
+          <button
+            type="button"
+            aria-label={t("tabs.moveUp", { name: title })}
+            disabled={index === 0}
+            onClick={() => onMove(index - 1)}
+            className="grid h-6 w-9 place-items-center text-paper/55 active:bg-paper/[0.06] disabled:opacity-30"
+          >
+            <MoveIcon up />
+          </button>
+          <button
+            type="button"
+            aria-label={t("tabs.moveDown", { name: title })}
+            disabled={index === count - 1}
+            onClick={() => onMove(index + 1)}
+            className="grid h-6 w-9 place-items-center text-paper/55 active:bg-paper/[0.06] disabled:opacity-30"
+          >
+            <MoveIcon up={false} />
+          </button>
+        </span>
+      )}
       <button
         type="button"
         aria-label={t("tabs.resetOne", { name: title })}
@@ -231,6 +408,24 @@ function OpenTab({
         <TabsCloseIcon />
       </button>
     </div>
+  );
+}
+
+function MoveIcon({ up }: { up: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d={up ? "M6 15l6-6 6 6" : "M6 9l6 6 6-6"} />
+    </svg>
   );
 }
 

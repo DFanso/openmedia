@@ -1,7 +1,15 @@
 import { describe, expect, it } from "vitest";
 import type { UsageReport } from "../../shared/ipc";
 import { newSession, type Session } from "../web/sessions";
-import { formatMs, hiddenTabIds, orderedTabs, secondsTodayFor, tabAfterClose } from "./tabs";
+import {
+  formatMs,
+  hiddenTabIds,
+  moveTab,
+  orderedTabs,
+  secondsTodayFor,
+  tabAfterClose,
+  tabNumber,
+} from "./tabs";
 
 const session = (id: string, lastUsed: number): Session => ({
   ...newSession(id, "typed", `https://${id}.example/`, lastUsed),
@@ -13,6 +21,35 @@ describe("orderedTabs", () => {
     const list = [session("a", 10), session("b", 30), session("c", 20)];
     expect(orderedTabs(list, "a").map((s) => s.id)).toEqual(["a", "b", "c"]);
     expect(orderedTabs(list, null).map((s) => s.id)).toEqual(["b", "c", "a"]);
+  });
+});
+
+describe("tab numbers", () => {
+  it("numbers the first eight tabs as the shortcuts do and no others", () => {
+    expect([0, 1, 7].map(tabNumber)).toEqual([1, 2, 8]);
+    expect(tabNumber(8)).toBeNull();
+    expect(tabNumber(-1)).toBeNull();
+  });
+});
+
+describe("moveTab", () => {
+  const list = [session("a", 1), session("b", 2), session("c", 3)];
+  const ids = (sessions: Session[]) => sessions.map((s) => s.id);
+
+  it("moves a tab down and up", () => {
+    expect(ids(moveTab(list, "a", 2))).toEqual(["b", "c", "a"]);
+    expect(ids(moveTab(list, "c", 0))).toEqual(["c", "a", "b"]);
+  });
+
+  it("clamps the position and leaves the input alone", () => {
+    expect(ids(moveTab(list, "a", 99))).toEqual(["b", "c", "a"]);
+    expect(ids(moveTab(list, "c", -5))).toEqual(["c", "a", "b"]);
+    expect(ids(list)).toEqual(["a", "b", "c"]);
+  });
+
+  it("changes nothing for the same position or an unknown tab", () => {
+    expect(ids(moveTab(list, "b", 1))).toEqual(["a", "b", "c"]);
+    expect(ids(moveTab(list, "zzz", 0))).toEqual(["a", "b", "c"]);
   });
 });
 

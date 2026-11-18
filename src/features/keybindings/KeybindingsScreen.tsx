@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { isMac } from "../../shared/platform";
@@ -7,11 +7,12 @@ import { Segmented } from "../settings/Segmented";
 import { NavRow } from "../settings/SiteParts";
 import { Switch } from "../settings/Switch";
 import { Group, field, quietButton } from "../settings/ui";
-import { ACTIONS, ACTIONS_BY_ID, GROUP_ORDER, GROUP_TITLES, type ActionInfo } from "./actionList";
+import { GROUP_ORDER, GROUP_TITLES, type ActionInfo } from "./actionList";
 import { chordFromEvent, formatSequence, isReservedChord } from "./chord";
-import { conflictsOf, effectiveBindings } from "./keymap";
+import { conflictsOf } from "./keymap";
 import { PROFILES, type Profile } from "./presets";
 import { useKeybindings } from "./store";
+import { useBindings } from "./useBindings";
 
 /** The row in Settings that opens the keyboard shortcuts page. Desktop only. */
 export function KeybindingsLink() {
@@ -161,16 +162,13 @@ export function KeybindingsScreen() {
   const closeSheet = useApp((s) => s.closeSheet);
   const parent = useApp((s) => s.sheetParent);
   const { enabled, profile, overrides } = useKeybindings();
+  const { actions, byId, bindings } = useBindings();
   const { setEnabled, setProfile, setBinding, resetBinding, resetAll } = useKeybindings.getState();
   const t = useT();
   const mac = isMac();
   const [query, setQuery] = useState("");
   const [recordingId, setRecordingId] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const bindings = useMemo(
-    () => effectiveBindings(profile, overrides, mac),
-    [profile, overrides, mac],
-  );
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
 
   if (!open) return null;
@@ -182,7 +180,7 @@ export function KeybindingsScreen() {
       return;
     }
     const clashes = conflictsOf(bindings, id, sequence).map(
-      (other) => ACTIONS_BY_ID[other]?.label ?? other,
+      (other) => byId.get(other)?.label ?? other,
     );
     setNotice(clashes.length > 0 ? t("keys.conflict", { name: clashes.join(", ") }) : null);
     setBinding(id, [...new Set([...(bindings.get(id) ?? []), sequence])]);
@@ -237,11 +235,17 @@ export function KeybindingsScreen() {
           </p>
         )}
         {GROUP_ORDER.map((group) => {
-          const infos = ACTIONS.filter((info) => info.group === group && visible(info));
+          const infos = actions.filter((info) => info.group === group && visible(info));
           if (infos.length === 0) return null;
           return (
             <section key={group} className="flex flex-col gap-2">
               <h2 className="eyebrow px-1">{GROUP_TITLES[group]}</h2>
+              {group === "favorites" && (
+                <p className="px-1 text-[13px] leading-snug text-paper/50">
+                  Give a favorite or a folder keys to open it from anywhere. Folders open their
+                  saved windows.
+                </p>
+              )}
               <Group>
                 {infos.map((info) => (
                   <ActionRow

@@ -206,6 +206,44 @@ input {
   animation: ring-fill 380ms linear forwards;
 }
 
+/* A site button held in the dial or a folder: the ring fills while the hold builds, the button
+   swells, and once armed it is lifted (bigger, with a shadow) and can be dragged out. */
+.fan-item[data-carry="charging"] .fab-ring circle,
+.carry-tile[data-carry="charging"] .fab-ring circle {
+  opacity: 1;
+  animation: ring-fill 350ms linear forwards;
+}
+
+.fan-item[data-carry="armed"] .fab-ring circle,
+.carry-tile[data-carry="armed"] .fab-ring circle {
+  opacity: 1;
+  stroke-dashoffset: 0;
+}
+
+.fan-item[data-carry="charging"],
+.carry-tile[data-carry="charging"] {
+  animation: carry-swell 350ms ease-out forwards;
+}
+
+.fan-item[data-carry="armed"],
+.carry-tile[data-carry="armed"] {
+  scale: 1.18;
+  filter: drop-shadow(0 8px 14px rgb(0 0 0 / 0.5));
+  animation: carry-lift 160ms var(--ease-spring);
+}
+
+@keyframes carry-swell {
+  to {
+    scale: 1.08;
+  }
+}
+
+@keyframes carry-lift {
+  from {
+    scale: 1.08;
+  }
+}
+
 .fab[data-hold="open"] .fab-ring circle {
   opacity: 1;
   stroke-dashoffset: 0;
@@ -629,4 +667,9 @@ svg {
 :root[data-calm] .fab[data-hold="charging"] .fab-ring circle,
 :root[data-calm] .fan-item[data-hold="charging"] .fab-ring circle {
   animation-duration: 380ms !important;
+}
+
+:root[data-calm] .fan-item[data-carry="charging"] .fab-ring circle,
+:root[data-calm] .carry-tile[data-carry="charging"] .fab-ring circle {
+  animation-duration: 350ms !important;
 }

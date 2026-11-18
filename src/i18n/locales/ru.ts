@@ -287,7 +287,6 @@ export const ru: Messages = {
   "onboarding.quickEmpty":
     "Для этого устройства пока нет официальных рецептов. Вы сможете добавить их позже из библиотеки рецептов.",
   "onboarding.quickCount": "Выбрано {count} из {limit}",
-  "onboarding.quickProHint": "Это максимум для вашего тарифа. В Pro мест больше.",
   "onboarding.applying": "Добавление…",
   "onboarding.partial":
     "Не удалось добавить: {names}. Вы сможете добавить их позже из библиотеки рецептов.",
@@ -429,7 +428,7 @@ export const ru: Messages = {
   "favorites.quickAccess": "Быстрый доступ · {count} из {limit}",
   "favorites.quickEmpty": "Пока пусто. Добавьте избранное ниже или поставьте звезду рецепту.",
   "favorites.more": "Ещё избранное · {count}",
-  "favorites.moreLocked": "Ещё избранное",
+  "favorites.moreTitle": "Ещё избранное",
   "favorites.custom": "Настраиваемое избранное",
   "favorites.addFromRecipes": "Добавить из рецептов",
   "favorites.quickFull": "Быстрый доступ заполнен, поэтому это добавлено в «Ещё избранное».",
@@ -806,7 +805,7 @@ export const ru: Messages = {
   "notify.newActivity": "Новая активность",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "Разблокируйте ИИ-помощника, режим инкогнито и лимиты использования.",
+  "paywall.subtitle": "Разблокируйте ИИ-помощника и лимиты использования.",
   "paywall.close": "Закрыть экран оплаты",
   "paywall.locked": "Функция Pro",
   "paywall.lifetime": "Навсегда",
@@ -857,6 +856,11 @@ export const ru: Messages = {
     "Закрытие сайта завершает только его открытую страницу. Избранное и история сохраняются.",
   "tabs.closeOne": "Закрыть {name}",
   "tabs.resetOne": "Сбросить {name} на стартовую страницу",
+  "tabs.moveUp": "Переместить {name} вверх",
+  "tabs.moveDown": "Переместить {name} вниз",
+  "tabs.number": "Вкладка {value}",
+  "tabs.arrangeNote":
+    "Номера — это горячие клавиши вкладок. Чтобы изменить порядок, удерживайте сайт и перетащите его или используйте стрелки.",
   "tabs.quickAccess": "Быстрый доступ",
   "tabs.history": "История",
   "tabs.allHistory": "Вся история ({count})",

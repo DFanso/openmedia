@@ -287,7 +287,6 @@ export const uk: Messages = {
   "onboarding.quickEmpty":
     "Для цього пристрою ще немає офіційних рецептів. Ви зможете додати їх пізніше з бібліотеки рецептів.",
   "onboarding.quickCount": "Вибрано {count} з {limit}",
-  "onboarding.quickProHint": "Це максимум, який дозволяє ваш план. У Pro слотів більше.",
   "onboarding.applying": "Додавання…",
   "onboarding.partial":
     "Не вдалося додати: {names}. Ви зможете додати їх пізніше з бібліотеки рецептів.",
@@ -430,7 +429,7 @@ export const uk: Messages = {
   "favorites.quickAccess": "Швидкий доступ · {count} з {limit}",
   "favorites.quickEmpty": "Тут поки порожньо. Додайте обране нижче або поставте зірку рецепту.",
   "favorites.more": "Ще обране · {count}",
-  "favorites.moreLocked": "Ще обране",
+  "favorites.moreTitle": "Ще обране",
   "favorites.custom": "Власний обранець",
   "favorites.addFromRecipes": "Додати з рецептів",
   "favorites.quickFull": "Швидкий доступ заповнено, тож це додано до «Ще обраного».",
@@ -805,7 +804,7 @@ export const uk: Messages = {
   "notify.newActivity": "Нова активність",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "Розблокуйте ШІ-асистента, режим інкогніто та ліміти використання.",
+  "paywall.subtitle": "Розблокуйте ШІ-асистента та ліміти використання.",
   "paywall.close": "Закрити екран оплати",
   "paywall.locked": "Функція Pro",
   "paywall.lifetime": "Назавжди",
@@ -857,6 +856,11 @@ export const uk: Messages = {
     "Закриття сайту завершує лише його відкриту сторінку. Обране та історія залишаються.",
   "tabs.closeOne": "Закрити {name}",
   "tabs.resetOne": "Скинути {name} до початкової сторінки",
+  "tabs.moveUp": "Перемістити {name} вгору",
+  "tabs.moveDown": "Перемістити {name} вниз",
+  "tabs.number": "Вкладка {value}",
+  "tabs.arrangeNote":
+    "Номери — це гарячі клавіші вкладок. Щоб змінити порядок, утримуйте сайт і перетягніть його або скористайтеся стрілками.",
   "tabs.quickAccess": "Швидкий доступ",
   "tabs.history": "Історія",
   "tabs.allHistory": "Уся історія ({count})",

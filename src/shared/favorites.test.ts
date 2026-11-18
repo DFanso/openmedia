@@ -12,12 +12,10 @@ import {
   favoriteStartUrl,
   isFavoriteSite,
   quickAccess,
-  quickSlots,
   recipeForFavorite,
   resolveLanding,
   saveFolder,
   toggleSiteFavorite,
-  usableQuickAccess,
 } from "./favorites";
 
 describe("quickAccess", () => {
@@ -29,41 +27,6 @@ describe("quickAccess", () => {
   it("shows everything when there are few favorites", () => {
     expect(quickAccess(["a", "b"])).toEqual(["a", "b"]);
     expect(quickAccess([])).toEqual([]);
-  });
-});
-
-describe("quickSlots", () => {
-  const names = ["a", "b", "c", "d", "e", "f", "g", "h"];
-
-  it("gives Pro one usable slot per favorite, up to five", () => {
-    expect(quickSlots(names, true)).toEqual(
-      names.slice(0, 5).map((favorite) => ({ favorite, locked: false })),
-    );
-    expect(quickSlots(["a"], true)).toEqual([{ favorite: "a", locked: false }]);
-  });
-
-  it("gives a free user three usable slots and two locked ones holding the next favorites", () => {
-    expect(quickSlots(names, false)).toEqual([
-      { favorite: "a", locked: false },
-      { favorite: "b", locked: false },
-      { favorite: "c", locked: false },
-      { favorite: "d", locked: true },
-      { favorite: "e", locked: true },
-    ]);
-  });
-
-  it("always shows the two locked slots to a free user, empty when there is nothing for them", () => {
-    expect(quickSlots(["a", "b"], false)).toEqual([
-      { favorite: "a", locked: false },
-      { favorite: "b", locked: false },
-      { favorite: null, locked: true },
-      { favorite: null, locked: true },
-    ]);
-  });
-
-  it("lists only what a free user can open", () => {
-    expect(usableQuickAccess(names, false)).toEqual(["a", "b", "c"]);
-    expect(usableQuickAccess(names, true)).toEqual(names.slice(0, 5));
   });
 });
 

@@ -280,7 +280,6 @@ export const ko: Messages = {
   "onboarding.quickEmpty":
     "이 기기에 맞는 공식 레시피가 아직 없습니다. 나중에 레시피 라이브러리에서 추가할 수 있습니다.",
   "onboarding.quickCount": "{limit}개 중 {count}개 선택됨",
-  "onboarding.quickProHint": "현재 요금제에서 허용하는 최대치입니다. Pro는 슬롯이 더 많습니다.",
   "onboarding.applying": "추가하는 중…",
   "onboarding.partial":
     "추가하지 못한 항목: {names}. 나중에 레시피 라이브러리에서 추가할 수 있습니다.",
@@ -420,7 +419,7 @@ export const ko: Messages = {
   "favorites.quickEmpty":
     "아직 아무것도 없습니다. 아래에서 즐겨찾기를 추가하거나, 레시피에 별을 붙이세요.",
   "favorites.more": "즐겨찾기 더 보기 · {count}",
-  "favorites.moreLocked": "즐겨찾기 더 보기",
+  "favorites.moreTitle": "즐겨찾기 더 보기",
   "favorites.custom": "사용자 지정 즐겨찾기",
   "favorites.addFromRecipes": "레시피에서 추가",
   "favorites.quickFull": "빠른 메뉴가 가득 차 이 항목은 즐겨찾기 더 보기로 추가되었습니다.",
@@ -788,7 +787,7 @@ export const ko: Messages = {
   "notify.newActivity": "새로운 활동",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "AI 어시스턴트, 시크릿 모드, 사용량 제한을 잠금 해제하세요.",
+  "paywall.subtitle": "AI 어시스턴트와 사용량 제한을 잠금 해제하세요.",
   "paywall.close": "페이월 닫기",
   "paywall.locked": "Pro 기능",
   "paywall.lifetime": "일회 구매",
@@ -837,6 +836,11 @@ export const ko: Messages = {
   "tabs.closeNote": "사이트를 닫으면 열려 있는 페이지만 종료됩니다. 즐겨찾기와 기록은 유지됩니다.",
   "tabs.closeOne": "{name} 닫기",
   "tabs.resetOne": "{name}을(를) 첫 페이지로 초기화",
+  "tabs.moveUp": "{name} 위로 이동",
+  "tabs.moveDown": "{name} 아래로 이동",
+  "tabs.number": "탭 {value}",
+  "tabs.arrangeNote":
+    "번호는 탭 단축키입니다. 사이트를 길게 눌러 끌거나 화살표를 사용해 순서를 바꾸세요.",
   "tabs.quickAccess": "빠른 접근",
   "tabs.history": "기록",
   "tabs.allHistory": "전체 기록({count})",

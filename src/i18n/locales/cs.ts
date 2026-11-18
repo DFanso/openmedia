@@ -286,7 +286,6 @@ export const cs: Messages = {
   "onboarding.quickEmpty":
     "Pro toto zařízení zatím nejsou uvedeny žádné oficiální recepty. Můžete je přidat později z knihovny receptů.",
   "onboarding.quickCount": "Vybráno {count} z {limit}",
-  "onboarding.quickProHint": "Víc váš tarif nedovoluje. Pro má více míst.",
   "onboarding.applying": "Přidávání…",
   "onboarding.partial":
     "Nepodařilo se přidat: {names}. Můžete je přidat později z knihovny receptů.",
@@ -426,7 +425,7 @@ export const cs: Messages = {
   "favorites.quickEmpty":
     "Zatím tu nic není. Přidejte oblíbenou stránku níže, nebo označte hvězdičkou recept.",
   "favorites.more": "Další oblíbené · {count}",
-  "favorites.moreLocked": "Další oblíbené",
+  "favorites.moreTitle": "Další oblíbené",
   "favorites.custom": "Vlastní oblíbená stránka",
   "favorites.addFromRecipes": "Přidat z receptů",
   "favorites.quickFull":
@@ -799,7 +798,7 @@ export const cs: Messages = {
   "notify.newActivity": "Nová aktivita",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "Odemkněte AI asistenta, režim inkognito a limity používání.",
+  "paywall.subtitle": "Odemkněte AI asistenta a limity používání.",
   "paywall.close": "Zavřít platební stěnu",
   "paywall.locked": "Funkce Pro",
   "paywall.lifetime": "Doživotní",
@@ -850,6 +849,11 @@ export const cs: Messages = {
     "Zavřením webu se ukončí jen jeho otevřená stránka. Oblíbené a historie zůstanou.",
   "tabs.closeOne": "Zavřít {name}",
   "tabs.resetOne": "Obnovit {name} na úvodní stránku",
+  "tabs.moveUp": "Posunout {name} nahoru",
+  "tabs.moveDown": "Posunout {name} dolů",
+  "tabs.number": "Karta {value}",
+  "tabs.arrangeNote":
+    "Čísla odpovídají zkratkám karet. Pořadí změníte podržením a přetažením webu nebo šipkami.",
   "tabs.quickAccess": "Rychlý přístup",
   "tabs.history": "Historie",
   "tabs.allHistory": "Celá historie ({count})",

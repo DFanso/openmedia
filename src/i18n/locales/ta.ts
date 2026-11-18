@@ -293,8 +293,6 @@ export const ta: Messages = {
   "onboarding.quickEmpty":
     "இந்தச் சாதனத்துக்கு அதிகாரப்பூர்வ ரெசிபிகள் இன்னும் பட்டியலிடப்படவில்லை. பிறகு ரெசிபி நூலகத்திலிருந்து சிலவற்றைச் சேர்க்கலாம்.",
   "onboarding.quickCount": "{limit} இல் {count} தேர்ந்தெடுக்கப்பட்டது",
-  "onboarding.quickProHint":
-    "உன் திட்டம் அனுமதிக்கும் அதிகபட்சம் இதுவே. Pro-வில் கூடுதல் இடங்கள் உண்டு.",
   "onboarding.applying": "சேர்க்கிறது…",
   "onboarding.partial":
     "சேர்க்க முடியவில்லை: {names}. இவற்றைப் பிறகு ரெசிபி நூலகத்திலிருந்து சேர்க்கலாம்.",
@@ -440,7 +438,7 @@ export const ta: Messages = {
   "favorites.quickEmpty":
     "இங்கே இன்னும் எதுவும் இல்லை. கீழே ஒரு பிடித்துக்கொள்ளவிடையைச் சேர்க்கவும், அல்லது ஒரு ரெசிபியை நட்சத்திரமாக இடவும்.",
   "favorites.more": "மேலும் பிடித்துக்கொள்ளவிடைகள் · {count}",
-  "favorites.moreLocked": "மேலும் பிடித்துக்கொள்ளவிடைகள்",
+  "favorites.moreTitle": "மேலும் பிடித்துக்கொள்ளவிடைகள்",
   "favorites.custom": "தனிப்பயன் விருப்பம்",
   "favorites.addFromRecipes": "செய்முறைகளிலிருந்து சேர்",
   "favorites.quickFull":
@@ -823,7 +821,7 @@ export const ta: Messages = {
   "notify.newActivity": "புதிய செயல்பாடு",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "AI உதவியாளர், அழுகுமறை முறை மற்றும் பயன்பாட்டு வரம்புகளைத் திற.",
+  "paywall.subtitle": "AI உதவியாளர் மற்றும் பயன்பாட்டு வரம்புகளைத் திற.",
   "paywall.close": "கட்டணத் திரையை மூடு",
   "paywall.locked": "Pro அம்சம்",
   "paywall.lifetime": "வாழ்நாள்",
@@ -875,6 +873,11 @@ export const ta: Messages = {
     "தளத்தை மூடினால் அதன் திறந்த பக்கம் மட்டுமே முடிகிறது. உங்கள் பிடித்தவை மற்றும் வரலாறு இருக்கும்.",
   "tabs.closeOne": "{name} ஐ மூடு",
   "tabs.resetOne": "{name} ஐ தொடக்கப் பக்கத்திற்கு மீட்டமை",
+  "tabs.moveUp": "{name} ஐ மேலே நகர்த்து",
+  "tabs.moveDown": "{name} ஐ கீழே நகர்த்து",
+  "tabs.number": "தாவல் {value}",
+  "tabs.arrangeNote":
+    "எண்கள் தாவல் குறுக்குவழிகள். வரிசையை மாற்ற தளத்தை அழுத்திப் பிடித்து இழுக்கவும், அல்லது அம்புகளைப் பயன்படுத்தவும்.",
   "tabs.quickAccess": "விரைவு அணுகல்",
   "tabs.history": "வரலாறு",
   "tabs.allHistory": "முழு வரலாறு ({count})",

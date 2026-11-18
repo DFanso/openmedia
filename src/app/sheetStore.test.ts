@@ -69,9 +69,9 @@ describe("pages opened from Settings", () => {
     expect(useApp.getState().sheet).toBe("none");
   });
 
-  it("a paywall raised by a Pro-only action inside Settings also returns to Settings", async () => {
+  it("a paywall raised by a Pro-only action inside Settings also returns to Settings", () => {
     useApp.getState().openSheet("settings");
-    await useApp.getState().enterIncognito();
+    useApp.getState().openSheet("stats");
     expect(useApp.getState().sheet).toBe("paywall");
     useApp.getState().closeSheet();
     expect(useApp.getState().sheet).toBe("settings");

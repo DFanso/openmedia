@@ -276,7 +276,6 @@ export const ar: Messages = {
   "onboarding.quickEmpty":
     "لا توجد وصفات رسمية لهذا الجهاز بعد. يمكنك إضافة بعضها لاحقًا من مكتبة الوصفات.",
   "onboarding.quickCount": "تم اختيار {count} من {limit}",
-  "onboarding.quickProHint": "هذا أقصى ما تسمح به باقتك. تتيح Pro خانات أكثر.",
   "onboarding.applying": "جارٍ الإضافة…",
   "onboarding.partial": "تعذّرت إضافة: {names}. يمكنك إضافتها لاحقًا من مكتبة الوصفات.",
   "onboarding.libraryTitle": "مكتبة وصفات.",
@@ -410,7 +409,7 @@ export const ar: Messages = {
   "favorites.quickAccess": "وصول سريع · {count} من {limit}",
   "favorites.quickEmpty": "لا شيء هنا بعد. أضف مفضلة أدناه، أو ضع نجمة على وصفة.",
   "favorites.more": "المزيد من المفضلة · {count}",
-  "favorites.moreLocked": "المزيد من المفضلة",
+  "favorites.moreTitle": "المزيد من المفضلة",
   "favorites.custom": "مفضلة مخصصة",
   "favorites.addFromRecipes": "أضف من الوصفات",
   "favorites.quickFull": "الوصول السريع ممتلئ، لذا أضيفت هذه إلى المزيد من المفضلة.",
@@ -769,7 +768,7 @@ export const ar: Messages = {
   "notify.newActivity": "نشاط جديد",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "افتح المساعد الذكي ووضع التصفح الخفي وحدود الاستخدام.",
+  "paywall.subtitle": "افتح المساعد الذكي وحدود الاستخدام.",
   "paywall.close": "إغلاق صفحة الدفع",
   "paywall.locked": "ميزة Pro",
   "paywall.lifetime": "مدى الحياة",
@@ -818,6 +817,11 @@ export const ar: Messages = {
   "tabs.closeNote": "إغلاق موقع ينهي صفحته المفتوحة فقط. تبقى مفضلاتك وسجلك.",
   "tabs.closeOne": "إغلاق {name}",
   "tabs.resetOne": "إعادة {name} إلى صفحته الأولى",
+  "tabs.moveUp": "نقل {name} للأعلى",
+  "tabs.moveDown": "نقل {name} للأسفل",
+  "tabs.number": "علامة التبويب {value}",
+  "tabs.arrangeNote":
+    "الأرقام هي اختصارات علامات التبويب. اضغط مطولًا على موقع واسحبه، أو استخدم الأسهم، لتغيير الترتيب.",
   "tabs.quickAccess": "الوصول السريع",
   "tabs.history": "السجل",
   "tabs.allHistory": "كل السجل ({count})",

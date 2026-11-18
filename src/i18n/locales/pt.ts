@@ -290,7 +290,6 @@ export const pt: Messages = {
   "onboarding.quickEmpty":
     "Ainda não há receitas oficiais listadas para este dispositivo. Você pode adicionar algumas depois, na biblioteca de receitas.",
   "onboarding.quickCount": "{count} de {limit} escolhidos",
-  "onboarding.quickProHint": "Esse é o máximo que o seu plano permite. O Pro tem mais vagas.",
   "onboarding.applying": "Adicionando…",
   "onboarding.partial":
     "Não foi possível adicionar: {names}. Você pode adicioná-las depois, na biblioteca de receitas.",
@@ -434,7 +433,7 @@ export const pt: Messages = {
   "favorites.quickEmpty":
     "Ainda não há nada aqui. Adicione um favorito abaixo ou marque uma receita com uma estrela.",
   "favorites.more": "Mais favoritos · {count}",
-  "favorites.moreLocked": "Mais favoritos",
+  "favorites.moreTitle": "Mais favoritos",
   "favorites.custom": "Favorito personalizado",
   "favorites.addFromRecipes": "Adicionar das receitas",
   "favorites.quickFull": "O acesso rápido está cheio, então este foi adicionado a Mais favoritos.",
@@ -808,7 +807,7 @@ export const pt: Messages = {
   "notify.newActivity": "Nova atividade",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "Desbloqueie o assistente de IA, o modo incógnito e os limites de uso.",
+  "paywall.subtitle": "Desbloqueie o assistente de IA e os limites de uso.",
   "paywall.close": "Fechar paywall",
   "paywall.locked": "Recurso Pro",
   "paywall.lifetime": "Vitalício",
@@ -859,6 +858,11 @@ export const pt: Messages = {
     "Fechar um site só encerra a página aberta. Seus favoritos e o histórico continuam.",
   "tabs.closeOne": "Fechar {name}",
   "tabs.resetOne": "Redefinir {name} para a página inicial",
+  "tabs.moveUp": "Mover {name} para cima",
+  "tabs.moveDown": "Mover {name} para baixo",
+  "tabs.number": "Aba {value}",
+  "tabs.arrangeNote":
+    "Os números são os atalhos das abas. Mantenha um site pressionado e arraste, ou use as setas, para mudar a ordem.",
   "tabs.quickAccess": "Acesso rápido",
   "tabs.history": "Histórico",
   "tabs.allHistory": "Todo o histórico ({count})",

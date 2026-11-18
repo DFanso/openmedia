@@ -287,7 +287,6 @@ export const sv: Messages = {
   "onboarding.quickEmpty":
     "Inga officiella recept finns ännu för den här enheten. Du kan lägga till några senare från receptbiblioteket.",
   "onboarding.quickCount": "{count} av {limit} valda",
-  "onboarding.quickProHint": "Det är det mesta din plan tillåter. Pro har fler platser.",
   "onboarding.applying": "Lägger till…",
   "onboarding.partial":
     "Kunde inte läggas till: {names}. Du kan lägga till dem senare från receptbiblioteket.",
@@ -431,7 +430,7 @@ export const sv: Messages = {
   "favorites.quickEmpty":
     "Inget här ännu. Lägg till en favorit nedan, eller stjärnmärk ett recept.",
   "favorites.more": "Fler favoriter · {count}",
-  "favorites.moreLocked": "Fler favoriter",
+  "favorites.moreTitle": "Fler favoriter",
   "favorites.custom": "Egen favorit",
   "favorites.addFromRecipes": "Lägg till från recept",
   "favorites.quickFull": "Snabbåtkomst är full, så den här läggs till under Fler favoriter.",
@@ -805,7 +804,7 @@ export const sv: Messages = {
   "notify.newActivity": "Ny aktivitet",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "Lås upp AI-assistenten, inkognitoläge och användningsgränser.",
+  "paywall.subtitle": "Lås upp AI-assistenten och användningsgränser.",
   "paywall.close": "Stäng betalväggen",
   "paywall.locked": "Pro-funktion",
   "paywall.lifetime": "Livstid",
@@ -856,6 +855,11 @@ export const sv: Messages = {
     "Att stänga en webbplats avslutar bara dess öppna sida. Dina favoriter och din historik finns kvar.",
   "tabs.closeOne": "Stäng {name}",
   "tabs.resetOne": "Återställ {name} till startsidan",
+  "tabs.moveUp": "Flytta {name} upp",
+  "tabs.moveDown": "Flytta {name} ned",
+  "tabs.number": "Flik {value}",
+  "tabs.arrangeNote":
+    "Siffrorna är flikgenvägarna. Håll ned en webbplats och dra, eller använd pilarna, för att ändra ordningen.",
   "tabs.quickAccess": "Snabbåtkomst",
   "tabs.history": "Historik",
   "tabs.allHistory": "All historik ({count})",

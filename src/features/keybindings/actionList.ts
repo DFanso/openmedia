@@ -1,6 +1,10 @@
+import type { Favorite, Folder } from "../../shared/ipc";
+import { folderKey } from "../../shared/favorites";
+
 /** What a shortcut can do. Every entry can be bound to any keys; `runActions.ts` carries each one out. */
 
-export type ActionGroup = "navigate" | "tabs" | "windows" | "page" | "view" | "tools" | "app";
+export type ActionGroup =
+  "navigate" | "tabs" | "windows" | "page" | "view" | "tools" | "app" | "favorites";
 
 export const GROUP_TITLES: Readonly<Record<ActionGroup, string>> = {
   navigate: "Navigate",
@@ -10,6 +14,7 @@ export const GROUP_TITLES: Readonly<Record<ActionGroup, string>> = {
   view: "Scroll and move",
   tools: "Tools",
   app: "App",
+  favorites: "Favorites and folders",
 };
 
 export const GROUP_ORDER: readonly ActionGroup[] = [
@@ -20,6 +25,7 @@ export const GROUP_ORDER: readonly ActionGroup[] = [
   "view",
   "tools",
   "app",
+  "favorites",
 ];
 
 export interface ActionInfo {
@@ -127,3 +133,52 @@ export const ACTIONS: readonly ActionInfo[] = [
 export const ACTIONS_BY_ID: Readonly<Record<string, ActionInfo>> = Object.fromEntries(
   ACTIONS.map((info) => [info.id, info]),
 );
+
+export const FAVORITE_PREFIX = "fav.";
+export const FOLDER_PREFIX = "folder.";
+
+/** Whether an action id belongs to a favorite or folder rather than the fixed list. */
+export const isLibraryAction = (id: string): boolean =>
+  id.startsWith(FAVORITE_PREFIX) || id.startsWith(FOLDER_PREFIX);
+
+export const favoriteActionId = (favorite: Pick<Favorite, "id">): string =>
+  `${FAVORITE_PREFIX}${favorite.id}`;
+
+/** A folder is told apart by its trimmed, lower-cased name, as everywhere else; encoded so no id holds `#` or spaces. */
+export const folderActionId = (name: string): string =>
+  `${FOLDER_PREFIX}${encodeURIComponent(folderKey(name) ?? name)}`;
+
+/** The folder name an action id stands for, as the library knows it, or null when none matches. */
+export function folderOfAction(
+  id: string,
+  favorites: readonly Favorite[],
+  folders: readonly Folder[],
+): string | null {
+  if (!id.startsWith(FOLDER_PREFIX)) return null;
+  return libraryFolders(favorites, folders).find((name) => folderActionId(name) === id) ?? null;
+}
+
+/** The folder names of the library: the saved folders and any a favorite is filed in. */
+function libraryFolders(favorites: readonly Favorite[], folders: readonly Folder[]): string[] {
+  const seen = new Map<string, string>();
+  for (const name of [...folders.map((folder) => folder.name), ...favorites.map((f) => f.folder)]) {
+    const key = folderKey(name);
+    if (key !== null && name && !seen.has(key)) seen.set(key, name.trim());
+  }
+  return [...seen.values()];
+}
+
+/** One action per favorite and per folder of the library, each bindable like a fixed action. */
+export function libraryActions(
+  favorites: readonly Favorite[],
+  folders: readonly Folder[],
+): ActionInfo[] {
+  return [
+    ...favorites.map((favorite) =>
+      action("favorites", favoriteActionId(favorite), `Open ${favorite.name}`),
+    ),
+    ...libraryFolders(favorites, folders).map((name) =>
+      action("favorites", folderActionId(name), `Open folder ${name}`),
+    ),
+  ];
+}

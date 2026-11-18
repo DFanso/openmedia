@@ -1,4 +1,10 @@
-import { selectPage, useApp, type Sheet } from "../../app/store";
+import {
+  selectPage,
+  selectQuickFavorites,
+  selectQuickFolders,
+  useApp,
+  type Sheet,
+} from "../../app/store";
 import { keyboard, siteView, type PageScroll } from "../../shared/ipc";
 import type { Theme } from "../../shared/ipc";
 import { runBackHandler } from "../back/backStack";
@@ -11,6 +17,7 @@ import { usePalette } from "./paletteStore";
 import { useKeybindings } from "./store";
 import { RESIZE_STEP } from "../tiling/layout";
 import { useFolderDialog } from "../tiling/folderDialog";
+import { FAVORITE_PREFIX, folderOfAction } from "./actionList";
 
 type Runner = (count: number) => void | Promise<void>;
 
@@ -201,6 +208,18 @@ const RUNNERS: Readonly<Record<string, Runner>> = {
   "app.fab": () => useKeybindings.getState().setShowFab(!useKeybindings.getState().showFab),
 };
 
+/** The favorite or folder an id names, opened as the floating button opens it; ids of gone ones do nothing. */
+const libraryRunner = (id: string): Runner | undefined => {
+  if (id.startsWith(FAVORITE_PREFIX)) {
+    const favorite = selectQuickFavorites(app()).find(
+      (item) => `${FAVORITE_PREFIX}${item.id}` === id,
+    );
+    return favorite ? () => app().openFavorite(favorite) : undefined;
+  }
+  const folder = folderOfAction(id, selectQuickFavorites(app()), selectQuickFolders(app()));
+  return folder === null ? undefined : () => app().openFolder(folder);
+};
+
 /** How long the menu and the shell may both report one key press. */
 const SAME_PRESS_MS = 120;
 let last = { id: "", at: 0, source: "key" };
@@ -210,7 +229,7 @@ let last = { id: "", at: 0, source: "key" };
  * from the other of the two within an instant runs once.
  */
 export async function runAction(id: string, count = 1, source: "key" | "menu" = "key") {
-  const runner = RUNNERS[id];
+  const runner = RUNNERS[id] ?? libraryRunner(id);
   if (!runner) return;
   const now = performance.now();
   if (last.id === id && last.source !== source && now - last.at < SAME_PRESS_MS) return;

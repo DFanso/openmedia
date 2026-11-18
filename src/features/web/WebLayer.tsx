@@ -7,8 +7,7 @@ import { Spinner } from "../../shared/Spinner";
 import { usePageMargin } from "./usePageMargin";
 import { readRect, useSiteViewRect } from "./useSiteViewRect";
 import { observeTitle, quickFavoriteOf, type Watch } from "./unreadWatch";
-import { usableQuickAccess } from "../../shared/favorites";
-import { useEntitlementStore } from "../paywall/store";
+import { quickAccess } from "../../shared/favorites";
 import { advanceTrail } from "./sessions";
 import { leftSearchForSite } from "../history/searchVisit";
 import { HubBar } from "../hubs/HubBar";
@@ -126,10 +125,7 @@ export function WebLayer() {
       );
       watches.set(page.session, observation.watch);
       if (!observation.notify) return;
-      const favorites = usableQuickAccess(
-        state?.favorites ?? [],
-        useEntitlementStore.getState().status === "pro",
-      );
+      const favorites = quickAccess(state?.favorites ?? []);
       const favorite = quickFavoriteOf(sessions, favorites, page.session, useApp.getState().sites);
       if (favorite?.notify) {
         void siteView

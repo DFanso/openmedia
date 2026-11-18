@@ -1,22 +1,26 @@
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useApp } from "../../app/store";
 import { keyboard, type MenuShortcut } from "../../shared/ipc";
 import { isMac } from "../../shared/platform";
 import { runBackHandler } from "../back/backStack";
-import { ACTIONS, ACTIONS_BY_ID, GROUP_TITLES } from "../keybindings/actionList";
+import { GROUP_TITLES, type ActionInfo } from "../keybindings/actionList";
 import { chordFromEvent, toAccelerator } from "../keybindings/chord";
 import { isTyping } from "../keybindings/dom";
-import { effectiveBindings, Matcher } from "../keybindings/keymap";
+import { Matcher } from "../keybindings/keymap";
 import { runAction } from "../keybindings/runActions";
 import { useKeybindings } from "../keybindings/store";
+import { useBindings } from "../keybindings/useBindings";
 
 /** How long a binding of several chords waits for the next one. */
 const SEQUENCE_MS = 1000;
 
 /** Each action that has a menu-safe binding, once per such binding, for the menu bar. */
-function menuShortcuts(bindings: ReadonlyMap<string, readonly string[]>): MenuShortcut[] {
+function menuShortcuts(
+  actions: readonly ActionInfo[],
+  bindings: ReadonlyMap<string, readonly string[]>,
+): MenuShortcut[] {
   const shortcuts: MenuShortcut[] = [];
-  for (const info of ACTIONS) {
+  for (const info of actions) {
     let copy = 0;
     for (const sequence of bindings.get(info.id) ?? []) {
       const accelerator = toAccelerator(sequence);
@@ -42,12 +46,8 @@ export function useDesktopInput() {
   const desktop = useApp((s) => s.desktop);
   const enabled = useKeybindings((s) => s.enabled);
   const profile = useKeybindings((s) => s.profile);
-  const overrides = useKeybindings((s) => s.overrides);
   const mac = isMac();
-  const bindings = useMemo(
-    () => effectiveBindings(profile, overrides, mac),
-    [profile, overrides, mac],
-  );
+  const { actions, byId, bindings } = useBindings();
 
   useEffect(() => {
     document.documentElement.toggleAttribute("data-desktop", desktop);
@@ -55,8 +55,10 @@ export function useDesktopInput() {
 
   useEffect(() => {
     if (!desktop) return;
-    void keyboard.setMenuShortcuts(enabled ? menuShortcuts(bindings) : []).catch(() => undefined);
-  }, [desktop, enabled, bindings]);
+    void keyboard
+      .setMenuShortcuts(enabled ? menuShortcuts(actions, bindings) : [])
+      .catch(() => undefined);
+  }, [desktop, enabled, actions, bindings]);
 
   useEffect(() => {
     if (!desktop || !enabled) return;
@@ -92,7 +94,7 @@ export function useDesktopInput() {
         }, SEQUENCE_MS);
         return;
       }
-      if (event.repeat && !ACTIONS_BY_ID[press.action]?.repeatable) return;
+      if (event.repeat && !byId.get(press.action)?.repeatable) return;
       void runAction(press.action, press.count);
     };
     window.addEventListener("keydown", onKey);
@@ -100,5 +102,5 @@ export function useDesktopInput() {
       window.clearTimeout(timer);
       window.removeEventListener("keydown", onKey);
     };
-  }, [desktop, enabled, bindings, profile, mac]);
+  }, [desktop, enabled, bindings, byId, profile, mac]);
 }

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { asInput, favoriteStartUrl, folderKey, usableQuickAccess } from "../shared/favorites";
+import { asInput, favoriteStartUrl, folderKey, quickAccess } from "../shared/favorites";
 import {
   assistantReducer,
   initialAssistant,
@@ -51,7 +51,7 @@ import {
   type SiteViewState,
   type Theme,
 } from "../shared/ipc";
-import { hiddenTabIds, tabAfterClose } from "../features/tabs/tabs";
+import { hiddenTabIds, moveTab, tabAfterClose } from "../features/tabs/tabs";
 import {
   arrange,
   contains,
@@ -289,6 +289,8 @@ export interface AppStore {
   resetSession: (id: string) => void;
   /** Ends every live session but the visible one. */
   closeOtherSessions: () => void;
+  /** Moves a tab to a position in the list the number shortcuts index; nothing else changes. */
+  moveSession: (id: string, toIndex: number) => void;
   /**
    * A page dropped on a window: a favorite opens (or its live session comes) beside the target,
    * or in its place for the middle; an open session moves there. A null target is a drop on an
@@ -454,9 +456,9 @@ export const selectQuickFavorites = (store: AppStore): readonly Favorite[] =>
 export const selectQuickFolders = (store: AppStore): readonly Folder[] =>
   store.incognito.active ? store.incognito.folders : (store.state?.folders ?? NO_FOLDERS);
 
-/** The quick-access favorites the user may open right now: without Pro, the first four of them. */
-export const selectUsableQuickFavorites = (store: AppStore): readonly Favorite[] =>
-  usableQuickAccess(selectQuickFavorites(store), useEntitlementStore.getState().status === "pro");
+/** The quick-access favorites the floating button fans out right now. */
+export const selectQuickAccessFavorites = (store: AppStore): readonly Favorite[] =>
+  quickAccess(selectQuickFavorites(store));
 
 /** The language the device is set to, read once: it cannot change while the app runs. */
 const DEVICE_LOCALE = detectLocale();
@@ -886,6 +888,10 @@ export const useApp = create<AppStore>((set, get) => {
       get().forgetSessions(doomed);
     },
 
+    moveSession: (id, toIndex) => {
+      set((current) => ({ sessions: moveTab(current.sessions, id, toIndex) }));
+    },
+
     dropPage: (page, target, drop) => {
       const fresh = target === null || page.kind === "folder";
       set(fresh ? { layout: null, tileIntent: null } : { tileIntent: { target, drop } });
@@ -1054,7 +1060,7 @@ export const useApp = create<AppStore>((set, get) => {
         activeId,
         Date.now(),
         pressure,
-        selectUsableQuickFavorites(get()),
+        selectQuickAccessFavorites(get()),
         get().sites,
         layout ? leaves(layout) : [],
       );
@@ -1578,10 +1584,6 @@ export const useApp = create<AppStore>((set, get) => {
     },
 
     enterIncognito: async () => {
-      if (useEntitlementStore.getState().status !== "pro") {
-        get().openSheet("paywall");
-        return;
-      }
       if (get().incognito.busy) return;
       setIncognitoBusy(true);
       try {
@@ -1625,10 +1627,6 @@ export const useApp = create<AppStore>((set, get) => {
     },
 
     unlockIncognito: async () => {
-      if (useEntitlementStore.getState().status !== "pro") {
-        get().openSheet("paywall");
-        return false;
-      }
       // Entering incognito already passed the check, so its own screens need no second one.
       if (get().incognito.active) return true;
       try {

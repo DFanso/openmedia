@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { DRAG_SLOP, reduceGesture, type GestureEvent, type GestureState } from "./gesture";
+import {
+  CARRY_HOLD_MS,
+  DRAG_SLOP,
+  carryHold,
+  reduceGesture,
+  strayedFromPress,
+  type GestureEvent,
+  type GestureState,
+} from "./gesture";
 
 const at = (x: number, y: number) => ({ x, y });
 
@@ -88,5 +96,24 @@ describe("floating button gesture", () => {
     ]);
     expect(effects).toEqual([{ type: "openFan" }, { type: "closeFan" }]);
     expect(state.phase).toBe("idle");
+  });
+});
+
+describe("carry hold", () => {
+  it("charges until the hold time, then is armed", () => {
+    expect(carryHold(null, false)).toBe("idle");
+    expect(carryHold(0, false)).toBe("charging");
+    expect(carryHold(CARRY_HOLD_MS - 1, false)).toBe("charging");
+    expect(carryHold(CARRY_HOLD_MS, false)).toBe("armed");
+  });
+
+  it("never arms once the pointer strayed before the hold finished", () => {
+    expect(carryHold(CARRY_HOLD_MS * 2, true)).toBe("idle");
+    expect(carryHold(10, true)).toBe("idle");
+  });
+
+  it("strays only past the drag slop", () => {
+    expect(strayedFromPress(DRAG_SLOP)).toBe(false);
+    expect(strayedFromPress(DRAG_SLOP + 1)).toBe(true);
   });
 });

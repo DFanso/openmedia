@@ -7,11 +7,8 @@ use serde::Serialize;
 use tauri::{AppHandle, State};
 
 use crate::commands::reload_script;
-use crate::entitlement::Entitlement;
 use crate::error::{Error, Result};
-use crate::library::{
-    FREE_FAVORITE_LIMIT, FavoriteInput, Library, MAX_FAVORITE_NAME_CHARS, PRO_FAVORITE_LIMIT,
-};
+use crate::library::{FAVORITE_LIMIT, FavoriteInput, Library, MAX_FAVORITE_NAME_CHARS};
 use crate::recipes::{
     RecipePreview, Recipes, bundled, bundled::Bundled, current_platform_tag, preview_recipe,
 };
@@ -152,15 +149,6 @@ fn options_for(entries: &[Bundled], platform: &str) -> Vec<OnboardingOption> {
     options
 }
 
-/// How many picks this person may apply: four, or six with Pro.
-fn pick_limit(pro: bool) -> usize {
-    if pro {
-        PRO_FAVORITE_LIMIT
-    } else {
-        FREE_FAVORITE_LIMIT
-    }
-}
-
 fn favorite_for(option: &OnboardingOption) -> FavoriteInput {
     FavoriteInput {
         name: option.name.chars().take(MAX_FAVORITE_NAME_CHARS).collect(),
@@ -172,7 +160,7 @@ fn favorite_for(option: &OnboardingOption) -> FavoriteInput {
 }
 
 /// Installs the picks and puts each installed recipe's homepage in quick access. The list of
-/// picks is checked first (no repeats, no more than 4, or 6 with Pro); a pick that is not an
+/// picks is checked first (no repeats, no more than 5); a pick that is not an
 /// official option, or that fails to save, is reported in `failed` and gets no favorite. Quick
 /// access becomes exactly the installed picks, and is left alone when none installed.
 fn apply_picks(
@@ -180,13 +168,9 @@ fn apply_picks(
     recipes: &Recipes,
     library: &Library,
     ids: &[String],
-    pro: bool,
 ) -> Result<OnboardingResult> {
-    if ids.len() > PRO_FAVORITE_LIMIT {
+    if ids.len() > FAVORITE_LIMIT {
         return Err(Error::Library("choose fewer sites".into()));
-    }
-    if ids.len() > pick_limit(pro) {
-        return Err(Error::ProRequired);
     }
     if ids
         .iter()
@@ -281,11 +265,9 @@ pub async fn onboarding_apply(
     app: AppHandle,
     recipes: State<'_, Recipes>,
     library: State<'_, Library>,
-    entitlement: State<'_, Entitlement>,
     recipe_ids: Vec<String>,
 ) -> Result<OnboardingResult> {
-    let pro = entitlement.require_pro().is_ok();
-    let result = apply_picks(bundled::all(), &recipes, &library, &recipe_ids, pro)?;
+    let result = apply_picks(bundled::all(), &recipes, &library, &recipe_ids)?;
     if !result.installed.is_empty() {
         reload_script(&app, &library, &recipes)?;
     }
@@ -426,21 +408,16 @@ mod tests {
     }
 
     #[test]
-    fn picks_are_limited_to_four_or_six_with_pro_and_may_not_repeat() {
+    fn picks_are_limited_to_five_and_may_not_repeat() {
         let (_dir, recipes, library) = temp();
         let ids = official_ids(current_platform_tag());
         let pick = |count: usize| ids[..count].to_vec();
-        let apply =
-            |ids: &[String], pro: bool| apply_picks(bundled::all(), &recipes, &library, ids, pro);
-        assert!(matches!(apply(&pick(5), false), Err(Error::ProRequired)));
-        assert!(matches!(
-            apply(&pick(5), true).map(|r| r.installed.len()),
-            Ok(5)
-        ));
-        let too_many = vec![ids[0].clone(); 7];
-        assert!(matches!(apply(&too_many, true), Err(Error::Library(_))));
+        let apply = |ids: &[String]| apply_picks(bundled::all(), &recipes, &library, ids);
+        assert!(matches!(apply(&pick(5)).map(|r| r.installed.len()), Ok(5)));
+        let too_many = vec![ids[0].clone(); 6];
+        assert!(matches!(apply(&too_many), Err(Error::Library(_))));
         let twice = [ids[0].clone(), ids[0].clone()];
-        assert!(matches!(apply(&twice, false), Err(Error::Library(_))));
+        assert!(matches!(apply(&twice), Err(Error::Library(_))));
     }
 
     #[test]
@@ -448,7 +425,7 @@ mod tests {
         let (_dir, recipes, library) = temp();
         let ids = official_ids(current_platform_tag());
         let picks = vec![ids[0].clone(), "market.official.not-offered".to_owned()];
-        let result = apply_picks(bundled::all(), &recipes, &library, &picks, false).unwrap();
+        let result = apply_picks(bundled::all(), &recipes, &library, &picks).unwrap();
         assert_eq!(result.installed, [ids[0].clone()]);
         assert_eq!(result.failed, ["market.official.not-offered"]);
         assert!(recipes.get(&ids[0]).is_some());
@@ -462,7 +439,7 @@ mod tests {
     fn applying_nothing_leaves_quick_access_alone() {
         let (_dir, recipes, library) = temp();
         let before = library.favorites().unwrap();
-        let result = apply_picks(bundled::all(), &recipes, &library, &[], false).unwrap();
+        let result = apply_picks(bundled::all(), &recipes, &library, &[]).unwrap();
         assert!(result.installed.is_empty() && result.failed.is_empty());
         assert_eq!(library.favorites().unwrap(), before);
     }

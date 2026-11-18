@@ -6,6 +6,34 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(incognito): no Pro gate
+
+**Area:** `feat(incognito)`
+
+**Change:** Incognito mode is free. Rust no longer calls `require_pro` on `unlock_incognito`, `enter_incognito`, `get_incognito_favorites` or `set_incognito_favorites`; the shell no longer redirects to the paywall when entering or unlocking incognito; the crown badges on the Incognito button in the fan and on the Incognito entries in Settings are gone; and the paywall list no longer names incognito. Losing Pro no longer switches incognito off (`leave_incognito` and `Transition.pro_lost` are removed). Pro still gates the AI assistant and Usage (stats and limits).
+
+### feat(favorites): no Pro gate, and hold a site button before dragging it
+
+**Area:** `feat(favorites)`
+
+**Change:** Free users now get everything Pro had for favorites: all five quick-access slots, the More favorites page, and adding past three without a paywall; no grayed-out slots or crowns on favorites. Rust no longer refuses a save past three (`favorites_need_pro` and the Entitlement check on `set_favorites`/`set_site_favorite` are gone), and the guide, the importer and the recipe library share one `FAVORITE_LIMIT` of 5. On desktop, a favorite, tab or folder button in the fan (and a favorite in a folder popup) is dragged out only after a 350 ms hold: the button swells with a filling ring, then lifts; moving before then keeps turning the dial. Sliding past the dial carries the last favorite only if the finger rested on it for the same time.
+
+### feat(keybindings): shortcuts for every favorite and folder
+
+**Area:** `feat(keybindings)`
+
+**Change:** Each favorite and each folder is now an action (`fav.<id>`, `folder.<name>`) in a *Favorites and folders* group of the Keyboard shortcuts screen, the palette and the menu bar, so any of them opens from a key of the user's choosing, not only the five in the floating button. They follow the set the fan shows (incognito's while incognito); `effectiveBindings` skips saved choices for ones that no longer exist, without deleting them. `useBindings` supplies the live action list and bindings; `runAction` resolves the dynamic ids.
+
+### feat(tabs): number and arrange open tabs
+
+**Area:** `feat(tabs)`
+
+**Problem:** The Tabs screen listed open sites active-first then by last use, while `tab.select1`..`tab.select8` and `tab.last` index the store's `sessions` order, so nobody could tell which number a tab had.
+
+**Change:** The Tabs screen lists `sessions` in shortcut order and shows each tab's number (1 to 8). The visible tab is marked, not moved. Tabs can be reordered with up/down buttons or by holding a row (350 ms, lifted with scale and shadow) and dragging (`moveSession`, `moveTab`). The fan keeps `orderedTabs`.
+
+**Verified:** Vitest for `moveTab` and `tabNumber`. **Not verified:** drag by touch on a device.
+
 ### fix(video-controls): drag to shrink works with the panel off, and the iOS float shows its page at once
 
 **Area:** `fix(video-controls)`, `perf(siteview)`

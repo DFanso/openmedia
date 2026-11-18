@@ -281,7 +281,6 @@ export const id: Messages = {
   "onboarding.quickEmpty":
     "Belum ada resep resmi untuk perangkat ini. Anda dapat menambahkannya nanti dari pustaka resep.",
   "onboarding.quickCount": "{count} dari {limit} dipilih",
-  "onboarding.quickProHint": "Itu batas maksimum paket Anda. Pro punya lebih banyak slot.",
   "onboarding.applying": "Menambahkan…",
   "onboarding.partial":
     "Tidak dapat menambahkan: {names}. Anda dapat menambahkannya nanti dari pustaka resep.",
@@ -425,7 +424,7 @@ export const id: Messages = {
   "favorites.quickEmpty":
     "Belum ada apa-apa di sini. Tambahkan favorit di bawah, atau beri bintang pada resep.",
   "favorites.more": "Favorit lainnya · {count}",
-  "favorites.moreLocked": "Favorit lainnya",
+  "favorites.moreTitle": "Favorit lainnya",
   "favorites.custom": "Favorit kustom",
   "favorites.addFromRecipes": "Tambahkan dari resep",
   "favorites.quickFull": "Akses cepat sudah penuh, jadi yang ini ditambahkan ke Favorit lainnya.",
@@ -802,7 +801,7 @@ export const id: Messages = {
   "notify.newActivity": "Aktivitas baru",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "Buka asisten AI, mode incognito, dan batas penggunaan.",
+  "paywall.subtitle": "Buka asisten AI dan batas penggunaan.",
   "paywall.close": "Tutup paywall",
   "paywall.locked": "Fitur Pro",
   "paywall.lifetime": "Seumur hidup",
@@ -853,6 +852,11 @@ export const id: Messages = {
     "Menutup situs hanya mengakhiri halaman yang terbuka. Favorit dan riwayat Anda tetap ada.",
   "tabs.closeOne": "Tutup {name}",
   "tabs.resetOne": "Atur ulang {name} ke halaman awal",
+  "tabs.moveUp": "Naikkan {name}",
+  "tabs.moveDown": "Turunkan {name}",
+  "tabs.number": "Tab {value}",
+  "tabs.arrangeNote":
+    "Angka adalah pintasan tab. Tahan lalu seret situs, atau pakai tanda panah, untuk mengubah urutan.",
   "tabs.quickAccess": "Akses cepat",
   "tabs.history": "Riwayat",
   "tabs.allHistory": "Semua riwayat ({count})",

@@ -22,8 +22,7 @@ use zeroize::Zeroizing;
 
 use crate::error::{Error, Result};
 use crate::library::{
-    FREE_FAVORITE_LIMIT, FavoriteInput, Library, MAX_FAVORITE_NAME_CHARS, PRO_FAVORITE_LIMIT,
-    SearchEngine,
+    FAVORITE_LIMIT, FavoriteInput, Library, MAX_FAVORITE_NAME_CHARS, SearchEngine,
 };
 use crate::recipes::bundled::Bundled;
 use crate::vault::{NewEntry, Vault};
@@ -265,7 +264,6 @@ pub struct Targets<'a> {
     pub vault: &'a Vault,
     pub secrets: &'a dyn crate::secrets::SecretStore,
     pub official: &'a [Bundled],
-    pub pro: bool,
     /// Installs one official recipe by id.
     pub install: &'a dyn Fn(&str) -> Result<()>,
 }
@@ -341,11 +339,7 @@ fn site_of_url(url: &str) -> Option<String> {
 
 /// Adds to the favorites without removing any, skipping sites already there, up to the limit.
 fn add_favorites(targets: &Targets<'_>, additions: Vec<FavoriteInput>) -> Result<usize> {
-    let limit = if targets.pro {
-        PRO_FAVORITE_LIMIT
-    } else {
-        FREE_FAVORITE_LIMIT
-    };
+    let limit = FAVORITE_LIMIT;
     let mut list: Vec<FavoriteInput> = targets
         .library
         .favorites()?
@@ -494,7 +488,7 @@ mod tests {
         }
     }
 
-    fn run(f: &Fixture, state: &ImportState, pro: bool, choices: &Choices) -> Result<ImportResult> {
+    fn run(f: &Fixture, state: &ImportState, choices: &Choices) -> Result<ImportResult> {
         let install = |id: &str| -> Result<()> {
             let bundled = bundled::find(id).ok_or(Error::UnknownOption)?;
             f.recipes.save_bundled(bundled.recipe.clone())?;
@@ -507,7 +501,6 @@ mod tests {
                 vault: &f.vault,
                 secrets: &f.secrets,
                 official: &f.official,
-                pro,
                 install: &install,
             },
             choices,
@@ -515,7 +508,7 @@ mod tests {
     }
 
     #[test]
-    fn applying_adds_favorites_within_the_free_limit_and_keeps_the_existing() {
+    fn applying_adds_favorites_within_the_limit_and_keeps_the_existing() {
         let f = fixture();
         let state = ImportState::default();
         let many: String = (0..8)
@@ -529,19 +522,18 @@ mod tests {
             .into_iter()
             .map(|s| s.site)
             .collect();
-        let before = f.library.favorite_count().unwrap();
+        let before = f.library.favorites().unwrap().len();
         let result = run(
             &f,
             &state,
-            false,
             &Choices {
                 sites,
                 ..Choices::default()
             },
         )
         .unwrap();
-        assert_eq!(result.favorites, FREE_FAVORITE_LIMIT - before);
-        assert_eq!(f.library.favorite_count().unwrap(), FREE_FAVORITE_LIMIT);
+        assert_eq!(result.favorites, FAVORITE_LIMIT - before);
+        assert_eq!(f.library.favorites().unwrap().len(), FAVORITE_LIMIT);
     }
 
     #[test]
@@ -562,7 +554,7 @@ mod tests {
             passwords: true,
             ..Choices::default()
         };
-        let result = run(&f, &state, true, &choices).unwrap();
+        let result = run(&f, &state, &choices).unwrap();
         assert_eq!(result.recipes, 1);
         assert!(f.recipes.get("market.official.youtube").is_some());
         assert_eq!(result.history, 5);
@@ -589,7 +581,7 @@ mod tests {
         state
             .absorb("url,username,password\nhttps://www.reddit.com/login,me,pw1\n")
             .unwrap();
-        let result = run(&f, &state, true, &Choices::default()).unwrap();
+        let result = run(&f, &state, &Choices::default()).unwrap();
         assert_eq!(result, ImportResult::default());
         assert!(f.library.history().unwrap().is_empty());
         assert!(f.vault.list(&f.secrets).unwrap().is_empty());
@@ -604,11 +596,11 @@ mod tests {
             recipes: vec!["market.nothing".into()],
             ..Choices::default()
         };
-        assert!(run(&f, &state, true, &bad_recipe).is_err());
+        assert!(run(&f, &state, &bad_recipe).is_err());
         let bad_site = Choices {
             sites: vec!["evil.example".into()],
             ..Choices::default()
         };
-        assert!(run(&f, &state, true, &bad_site).is_err());
+        assert!(run(&f, &state, &bad_site).is_err());
     }
 }

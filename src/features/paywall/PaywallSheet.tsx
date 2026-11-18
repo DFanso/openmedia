@@ -58,12 +58,7 @@ export function PaywallSheet() {
         <ul className="divide-y divide-hair">
           {[
             { title: t("ai.title"), description: t("ai.note") },
-            {
-              title: t("incognito.favoritesTitle"),
-              description: t("incognito.favoritesNote", { limit: 6 }),
-            },
             { title: t("stats.title"), description: t("stats.subtitle") },
-            { title: t("favorites.title"), description: t("favorites.note", { limit: 6 }) },
           ].map(({ title, description }) => (
             <li key={title} className="flex gap-3 py-3 first:pt-0 last:pb-0">
               <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-accent/10 text-accent">

@@ -3,12 +3,12 @@ import { appError, useApp } from "../../app/store";
 import logoMark from "../../assets/logo-mark.svg";
 import { useT } from "../../i18n/useT";
 import type { MessageKey } from "../../i18n/messages";
+import { QUICK_ACCESS_LIMIT } from "../../shared/favorites";
 import { HistoryIcon, IncognitoIcon, SlidersIcon, StatsIcon } from "../../shared/icons";
 import { useBackHandler } from "../back/useBackHandler";
 import { onboarding } from "../library/ipc";
-import { useEntitlementStore } from "../paywall/store";
 import { QuickAccessStep, type OptionsState } from "./QuickAccessStep";
-import { quickAccessLimit, toggleSelection } from "./selection";
+import { toggleSelection } from "./selection";
 
 interface DemoItemStyle extends CSSProperties {
   "--i": number;
@@ -170,7 +170,6 @@ function OnboardingBody() {
   const finishGuide = useApp((s) => s.finishGuide);
   const loadSites = useApp((s) => s.loadSites);
   const reloadFavorites = useApp((s) => s.reloadFavorites);
-  const isPro = useEntitlementStore((s) => s.status === "pro");
   const t = useT();
   const [index, setIndex] = useState(0);
   const [reachedQuick, setReachedQuick] = useState(false);
@@ -207,7 +206,7 @@ function OnboardingBody() {
   const libraryStep = index === LIBRARY_STEP;
   const step = index < STEPS.length ? STEPS[index] : null;
   const last = index === STEP_COUNT - 1;
-  const limit = quickAccessLimit(isPro);
+  const limit = QUICK_ACCESS_LIMIT;
 
   const finish = async () => {
     if (selected.length === 0 || notAdded !== null) {
@@ -281,7 +280,6 @@ function OnboardingBody() {
               options={options}
               selected={selected}
               limit={limit}
-              isPro={isPro}
               onToggle={(id) => setSelected((current) => toggleSelection(current, id, limit))}
               onRetry={retryOptions}
             />

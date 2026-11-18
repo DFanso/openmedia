@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import {
-  FREE_QUICK_ACCESS_LIMIT,
   QUICK_ACCESS_LIMIT,
   asInput,
   folderChoices,
@@ -10,22 +9,13 @@ import {
   recipeForFavorite,
   resolveLanding,
 } from "../../shared/favorites";
-import {
-  DownIcon,
-  ForwardIcon,
-  FolderIcon,
-  ProIcon,
-  PlusIcon,
-  StarIcon,
-  UpIcon,
-} from "../../shared/icons";
+import { DownIcon, ForwardIcon, FolderIcon, PlusIcon, StarIcon, UpIcon } from "../../shared/icons";
 import type { Favorite, FavoriteInput, Folder, SiteSettings } from "../../shared/ipc";
 import { overrideCount } from "../../shared/overrides";
 import { SiteTile } from "../../shared/SiteTile";
 import { siteOf } from "../../shared/site";
 import { isIos } from "../../shared/platform";
 import { normalizeWebUrl } from "../../shared/url";
-import { useEntitlementStore } from "../paywall/store";
 import { describeAddress } from "../history/address";
 import { MarginSlider } from "./MarginSlider";
 import { NavRow } from "./SiteParts";
@@ -75,9 +65,7 @@ interface EditorListProps {
 }
 
 /**
- * The quick-access group, the rest, and the add button, for whichever list it is given. Without
- * Pro only three slots are usable: the other two show grayed out, More favorites is locked, and
- * adding past three opens the paywall.
+ * The quick-access group, the rest, and the add button, for whichever list it is given.
  */
 export function FavoritesEditor({
   favorites,
@@ -91,13 +79,12 @@ export function FavoritesEditor({
   const problem = useApp((s) => s.error);
   const openSheet = useApp((s) => s.openSheet);
   const openRecipe = useApp((s) => s.openRecipe);
-  const isPro = useEntitlementStore((s) => s.status === "pro");
   const focusFavoriteId = useApp((s) => s.focusFavoriteId);
   const clearFavoriteFocus = useApp((s) => s.clearFavoriteFocus);
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const t = useT();
 
-  const limit = isPro ? QUICK_ACCESS_LIMIT : FREE_QUICK_ACCESS_LIMIT;
+  const limit = QUICK_ACCESS_LIMIT;
   const focusIndex =
     focusFavoriteId && part !== "more" && recipeSheet === "recipes"
       ? favorites.slice(0, limit).findIndex((favorite) => favorite.id === focusFavoriteId)
@@ -119,12 +106,6 @@ export function FavoritesEditor({
     );
   }, [focusFavoriteId, shownFocus, clearFavoriteFocus]);
   const quick = favorites.slice(0, limit);
-  const lockedSlots = isPro
-    ? []
-    : Array.from(
-        { length: QUICK_ACCESS_LIMIT - FREE_QUICK_ACCESS_LIMIT },
-        (_, i) => favorites[limit + i] ?? null,
-      );
   const more = favorites.slice(QUICK_ACCESS_LIMIT);
 
   const replaceAll = (next: FavoriteInput[]) => {
@@ -191,47 +172,17 @@ export function FavoritesEditor({
       ) : (
         <Group>{quick.map((favorite, index) => renderRow(favorite, index))}</Group>
       )}
-      {lockedSlots.length > 0 && (
-        <div className="mt-2">
-          <Group>
-            {lockedSlots.map((favorite, index) => (
-              <LockedFavoriteRow
-                key={favorite?.id ?? `locked-${index}`}
-                favorite={favorite}
-                onOpen={() => openSheet("paywall")}
-              />
-            ))}
-          </Group>
-        </div>
-      )}
-
-      {isPro ? (
-        more.length > 0 && (
-          <button
-            type="button"
-            onClick={() =>
-              openSheet(recipeSheet === "recipes" ? "more-favorites" : "incognito-more-favorites")
-            }
-            className="mt-5 flex w-full items-center justify-between px-1 pt-1 pb-2 text-start text-[13px] font-medium text-paper/60"
-          >
-            <span>{t("favorites.more", { count: more.length })}</span>
-            <span aria-hidden="true" className="text-paper/45 rtl:-scale-x-100">
-              <ForwardIcon />
-            </span>
-          </button>
-        )
-      ) : (
+      {more.length > 0 && (
         <button
           type="button"
-          onClick={() => openSheet("paywall")}
+          onClick={() =>
+            openSheet(recipeSheet === "recipes" ? "more-favorites" : "incognito-more-favorites")
+          }
           className="mt-5 flex w-full items-center justify-between px-1 pt-1 pb-2 text-start text-[13px] font-medium text-paper/60"
         >
-          <span className="flex items-center gap-2">
-            <ProIcon size={14} />
-            {t("favorites.moreLocked")}
-          </span>
-          <span aria-hidden="true" className="text-paper/45">
-            ⌄
+          <span>{t("favorites.more", { count: more.length })}</span>
+          <span aria-hidden="true" className="text-paper/45 rtl:-scale-x-100">
+            <ForwardIcon />
           </span>
         </button>
       )}
@@ -241,15 +192,10 @@ export function FavoritesEditor({
           <button
             type="button"
             aria-expanded={editing === "new"}
-            onClick={() =>
-              !isPro && favorites.length >= limit
-                ? openSheet("paywall")
-                : setEditing(editing === "new" ? null : "new")
-            }
+            onClick={() => setEditing(editing === "new" ? null : "new")}
             className="flex items-center gap-2 px-1 py-1 text-sm font-medium text-accent"
           >
             <PlusIcon /> {t("favorites.custom")}
-            {!isPro && favorites.length >= limit && <ProIcon size={14} />}
           </button>
           <button
             type="button"
@@ -285,45 +231,6 @@ export function FavoritesEditor({
 
       {problem && <p className="mt-3 px-1 text-sm text-accent">{problem}</p>}
     </>
-  );
-}
-
-/** A quick-access slot that needs Pro: grayed out, and a tap opens the plans. */
-function LockedFavoriteRow({
-  favorite,
-  onOpen,
-}: {
-  favorite: Favorite | null;
-  onOpen: () => void;
-}) {
-  const t = useT();
-  const host = favorite ? describeAddress(favorite.url).host : null;
-
-  return (
-    <button
-      type="button"
-      onClick={onOpen}
-      className="flex w-full items-center gap-3 py-2.5 pe-4 ps-4 text-start active:bg-paper/[0.05]"
-    >
-      <span className="flex min-w-0 flex-1 items-center gap-3 opacity-45 grayscale">
-        {favorite ? (
-          <SiteTile name={favorite.name} icon={favorite.icon} />
-        ) : (
-          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-paper/[0.08]">
-            <ProIcon size={16} />
-          </span>
-        )}
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-base font-medium">
-            {favorite ? favorite.name : t("paywall.title")}
-          </span>
-          {host && <span className="block truncate text-sm text-paper/55">{host}</span>}
-        </span>
-      </span>
-      <span className="pro-badge grid size-6 shrink-0 place-items-center rounded-full">
-        <ProIcon size={12} />
-      </span>
-    </button>
   );
 }
 

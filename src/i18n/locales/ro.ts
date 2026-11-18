@@ -288,7 +288,6 @@ export const ro: Messages = {
   "onboarding.quickEmpty":
     "Nu există încă rețete oficiale pentru acest dispozitiv. Poți adăuga câteva mai târziu din biblioteca de rețete.",
   "onboarding.quickCount": "{count} din {limit} alese",
-  "onboarding.quickProHint": "Acesta este maximul permis de planul tău. Pro are mai multe locuri.",
   "onboarding.applying": "Se adaugă…",
   "onboarding.partial":
     "Nu s-a putut adăuga: {names}. Le poți adăuga mai târziu din biblioteca de rețete.",
@@ -433,7 +432,7 @@ export const ro: Messages = {
   "favorites.quickEmpty":
     "Nimic aici încă. Adaugă mai jos un favorit sau marchează cu stea o rețetă.",
   "favorites.more": "Alte favorite · {count}",
-  "favorites.moreLocked": "Alte favorite",
+  "favorites.moreTitle": "Alte favorite",
   "favorites.custom": "Favorit personalizat",
   "favorites.addFromRecipes": "Adaugă din rețete",
   "favorites.quickFull": "Accesul rapid este plin, așa că acesta este adăugat la Alte favorite.",
@@ -815,7 +814,7 @@ export const ro: Messages = {
   "notify.newActivity": "Activitate nouă",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "Deblochează asistentul AI, modul incognito și limitele de utilizare.",
+  "paywall.subtitle": "Deblochează asistentul AI și limitele de utilizare.",
   "paywall.close": "Închide paywall-ul",
   "paywall.locked": "Funcție Pro",
   "paywall.lifetime": "Pe viață",
@@ -866,6 +865,11 @@ export const ro: Messages = {
     "Închiderea unui site încheie doar pagina lui deschisă. Favoritele și istoricul rămân.",
   "tabs.closeOne": "Închide {name}",
   "tabs.resetOne": "Resetează {name} la pagina de start",
+  "tabs.moveUp": "Mută {name} în sus",
+  "tabs.moveDown": "Mută {name} în jos",
+  "tabs.number": "Fila {value}",
+  "tabs.arrangeNote":
+    "Numerele sunt comenzile rapide ale filelor. Ține apăsat pe un site și trage, sau folosește săgețile, pentru a schimba ordinea.",
   "tabs.quickAccess": "Acces rapid",
   "tabs.history": "Istoric",
   "tabs.allHistory": "Tot istoricul ({count})",

@@ -283,7 +283,6 @@ export const hi: Messages = {
   "onboarding.quickEmpty":
     "इस डिवाइस के लिए अभी कोई आधिकारिक रेसिपी सूचीबद्ध नहीं है। आप बाद में रेसिपी लाइब्रेरी से कुछ जोड़ सकते हैं।",
   "onboarding.quickCount": "{limit} में से {count} चुनी गईं",
-  "onboarding.quickProHint": "आपके प्लान में इतनी ही जगह है। Pro में और स्लॉट मिलते हैं।",
   "onboarding.applying": "जोड़ी जा रही हैं…",
   "onboarding.partial":
     "जोड़ा नहीं जा सका: {names}। आप इन्हें बाद में रेसिपी लाइब्रेरी से जोड़ सकते हैं।",
@@ -425,7 +424,7 @@ export const hi: Messages = {
   "favorites.quickEmpty":
     "यहाँ अभी कुछ नहीं है। नीचे कोई पसंदीदा जोड़ें, या रेसिपी को तारांकित करें।",
   "favorites.more": "और पसंदीदा · {count}",
-  "favorites.moreLocked": "और पसंदीदा",
+  "favorites.moreTitle": "और पसंदीदा",
   "favorites.custom": "कस्टम पसंदीदा",
   "favorites.addFromRecipes": "रेसिपी से जोड़ें",
   "favorites.quickFull": "त्वरित पहुँच भर चुकी है, इसलिए यह “और पसंदीदा” में जोड़ दी गई है।",
@@ -797,7 +796,7 @@ export const hi: Messages = {
   "notify.newActivity": "नई गतिविधि",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "AI सहायक, इन्कोग्निटो मोड और उपयोग सीमाएँ अनलॉक करें।",
+  "paywall.subtitle": "AI सहायक और उपयोग सीमाएँ अनलॉक करें।",
   "paywall.close": "पेमेंट वॉल बंद करें",
   "paywall.locked": "Pro सुविधा",
   "paywall.lifetime": "आजीवन",
@@ -847,6 +846,11 @@ export const hi: Messages = {
     "साइट बंद करने से केवल उसका खुला पृष्ठ समाप्त होता है। आपके पसंदीदा और इतिहास बने रहते हैं।",
   "tabs.closeOne": "{name} बंद करें",
   "tabs.resetOne": "{name} को शुरुआती पृष्ठ पर रीसेट करें",
+  "tabs.moveUp": "{name} को ऊपर ले जाएँ",
+  "tabs.moveDown": "{name} को नीचे ले जाएँ",
+  "tabs.number": "टैब {value}",
+  "tabs.arrangeNote":
+    "संख्याएँ टैब शॉर्टकट हैं। क्रम बदलने के लिए किसी साइट को दबाए रखकर खींचें, या तीरों का उपयोग करें।",
   "tabs.quickAccess": "त्वरित पहुँच",
   "tabs.history": "इतिहास",
   "tabs.allHistory": "पूरा इतिहास ({count})",

@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -20,13 +21,12 @@ import { FolderPopup, type FolderMember } from "./FolderPopup";
 import { orderedTabs } from "../tabs/tabs";
 import { useT } from "../../i18n/useT";
 import {
-  FREE_QUICK_ACCESS_LIMIT,
+  QUICK_ACCESS_LIMIT,
   displayHost,
   folderIcon,
   folderKey,
   groupByFolder,
-  quickSlots,
-  usableQuickAccess,
+  quickAccess,
 } from "../../shared/favorites";
 import type { Favorite } from "../../shared/ipc";
 import { DARK_MODE_DEFAULT, darkActiveFor } from "../../shared/darkMode";
@@ -74,9 +74,13 @@ import {
   type Point,
 } from "./geometry";
 import {
+  CARRY_HOLD_MS,
   DRAG_SLOP,
   HOLD_MS,
+  carryHold,
+  strayedFromPress,
   reduceGesture,
+  type CarryHold,
   type GestureEffect,
   type GestureEvent,
   type GestureState,
@@ -251,6 +255,8 @@ interface DialButtonProps {
   /** What a drag out of this button carries; null for a button that cannot be dragged. */
   carry: Carry | null;
   onCarry: (event: PointerEvent<HTMLElement>, carry: Carry) => void;
+  /** The hold of a finger that slid onto this button from the floating button, for the same look. */
+  slidHold: CarryHold;
 }
 
 /** One button on the dial. It sits at its stop, follows a finger turning the dial, and fades out of the arc. */
@@ -272,9 +278,19 @@ function DialButton({
   onActivate,
   carry,
   onCarry,
+  slidHold,
 }: DialButtonProps) {
   const hold = holdOf(entry.target.kind);
-  const press = useRef<Point | null>(null);
+  const press = useRef<{ point: Point; at: number; strayed: boolean } | null>(null);
+  const armTimer = useRef(0);
+  const [pressHold, setPressHold] = useState<CarryHold>("idle");
+  const carryState = slidHold !== "idle" ? slidHold : pressHold;
+  const endPress = () => {
+    clearTimeout(armTimer.current);
+    press.current = null;
+    setPressHold("idle");
+  };
+  useEffect(() => () => clearTimeout(armTimer.current), []);
   const style: FanStyle = {
     "--x": `${slot.center.x}px`,
     "--y": `${slot.center.y}px`,
@@ -296,35 +312,59 @@ function DialButton({
       data-turn={turn ?? undefined}
       data-active={entry.active}
       data-hold={hold ? (entry.charging ? "charging" : "idle") : undefined}
+      data-carry={carry && carryState !== "idle" ? carryState : undefined}
       aria-label={entry.label}
       aria-pressed={entry.pressed}
       aria-busy={entry.busy}
       disabled={entry.busy}
       tabIndex={fanOpen && slot.opacity >= TOUCHABLE_OPACITY ? 0 : -1}
       onPointerDown={(event) => {
-        press.current = { x: event.clientX, y: event.clientY };
         onSpinStart(event, entry.lane);
         hold?.start();
+        if (!carry) return;
+        press.current = {
+          point: { x: event.clientX, y: event.clientY },
+          at: Date.now(),
+          strayed: false,
+        };
+        setPressHold(carryHold(0, false));
+        clearTimeout(armTimer.current);
+        armTimer.current = window.setTimeout(() => {
+          const current = press.current;
+          if (current) setPressHold(carryHold(Date.now() - current.at, current.strayed));
+        }, CARRY_HOLD_MS);
       }}
       onPointerMove={(event) => {
-        const from = press.current;
-        if (
-          carry &&
-          from &&
-          headsOutward(from, { x: event.clientX, y: event.clientY }, slot.center, origin)
-        ) {
-          press.current = null;
-          onCarry(event, carry);
-          return;
+        const current = press.current;
+        if (carry && current) {
+          const here = { x: event.clientX, y: event.clientY };
+          const held = carryHold(Date.now() - current.at, current.strayed);
+          if (
+            held === "charging" &&
+            strayedFromPress(Math.hypot(here.x - current.point.x, here.y - current.point.y))
+          ) {
+            current.strayed = true;
+            clearTimeout(armTimer.current);
+            setPressHold("idle");
+          } else if (held === "armed" && headsOutward(current.point, here, slot.center, origin)) {
+            endPress();
+            onCarry(event, carry);
+            return;
+          }
         }
         onSpinMove(event);
       }}
       onPointerUp={() => {
+        endPress();
         hold?.stop();
         onSpinEnd();
       }}
-      onPointerLeave={hold?.stop}
+      onPointerLeave={() => {
+        endPress();
+        hold?.stop();
+      }}
       onPointerCancel={() => {
+        endPress();
         hold?.stop();
         onSpinEnd();
       }}
@@ -348,7 +388,7 @@ function DialButton({
           {entry.caption}
         </span>
       )}
-      {hold && (
+      {(hold || carry) && (
         <svg className="fab-ring" viewBox="0 0 64 64" aria-hidden="true">
           <circle cx="32" cy="32" r="31" pathLength="1" />
         </svg>
@@ -427,22 +467,20 @@ function FloatingButton() {
   /** The folder whose favorites are showing in a popup. */
   const [folderName, setFolderName] = useState<string | null>(null);
 
-  const list = useMemo(() => quickSlots(favorites, isPro), [favorites, isPro]);
   const sessions = useApp((s) => s.sessions);
   const activeId = useApp((s) => s.activeId);
   const sites = useApp((s) => s.sites);
   const unread = useMemo(
-    () => unreadByFavorite(sessions, usableQuickAccess(favorites, isPro), activeId, sites),
-    [sessions, favorites, isPro, activeId, sites],
+    () => unreadByFavorite(sessions, quickAccess(favorites), activeId, sites),
+    [sessions, favorites, activeId, sites],
   );
   const anyUnread = unread.some((count) => count > 0);
   const resting = fabCenter(position.edge, position.yRatio * viewport.height, viewport, insets);
 
-  // The ring lists quick access first (loose favorites, and folders as one item each, then the
-  // locked slots Pro would open), then the open sites that are not quick access, then every other
+  // The ring lists quick access first (loose favorites, and folders as one item each), then the open sites that are not quick access, then every other
   // favorite. A folder is listed once, where its first favorite is, and holds every favorite filed
   // in it.
-  const usable = usableQuickAccess(favorites, isPro).length;
+  const usable = Math.min(favorites.length, QUICK_ACCESS_LIMIT);
   const { quickItems, openTabs, restItems } = useMemo(() => {
     const taken = new Set<string>();
     const sessionOf = (favorite: Favorite) => {
@@ -462,16 +500,13 @@ function FloatingButton() {
     const range = (from: number, to: number) =>
       Array.from({ length: Math.max(0, to - from) }, (_, k) => from + k);
     const quick = groupByFolder(favorites, range(0, usable)).map(itemOf);
-    // The locked slots Pro would open come last.
-    for (let index = usable; index < list.length; index++)
-      quick.push({ kind: "slot", index, live: false });
     const listed = new Set(
       quick.flatMap((item) => (item.kind === "folder" ? [folderKey(item.name)] : [])),
     );
     const open = orderedTabs(sessions, activeId).filter((session) => !taken.has(session.id));
     // A favorite past quick access that is open is already among the open sites.
     const openIds = new Set(open.map((session) => session.id));
-    const rest = groupByFolder(favorites, range(list.length, favorites.length))
+    const rest = groupByFolder(favorites, range(usable, favorites.length))
       .filter((entry) =>
         entry.kind === "folder"
           ? !listed.has(folderKey(entry.name))
@@ -482,7 +517,7 @@ function FloatingButton() {
       )
       .map(itemOf);
     return { quickItems: quick, openTabs: open, restItems: rest };
-  }, [favorites, list, usable, sessions, sites, activeId]);
+  }, [favorites, usable, sessions, sites, activeId]);
 
   const center: Point = gesture.phase === "dragging" ? gesture.position : resting;
   const fanOpen = gesture.phase === "fan";
@@ -506,20 +541,27 @@ function FloatingButton() {
       };
     }
     if (target.kind !== "favorite") return null;
-    const { favorite, locked } = slotAt(target.index);
-    return favorite && !locked
+    const favorite = favorites[target.index];
+    return favorite
       ? { page: { kind: "favorite", favorite }, label: favorite.name, icon: favorite.icon }
       : null;
   };
-  /** The last favorite or tab the finger slid over, so sliding on out of the dial carries it. */
-  const lastHover = useRef<FanTarget | null>(null);
-
-  /** A favorite's place in the quick-access menu, or past it: then it is only locked without Pro. */
-  const slotAt = (index: number) =>
-    list[index] ?? {
-      favorite: favorites[index] ?? null,
-      locked: !isPro && index >= FREE_QUICK_ACCESS_LIMIT,
+  /**
+   * The last favorite or tab the finger slid over, and since when it has rested there: sliding on
+   * out of the dial carries it only once it was held for `CARRY_HOLD_MS`.
+   */
+  const lastHover = useRef<{ target: FanTarget; since: number } | null>(null);
+  /** The hovered button whose hold has completed, for the lifted look. */
+  const [liftedHover, setLiftedHover] = useState<string | null>(null);
+  const hoverKey = hover && carryOf(hover) ? targetKey(hover) : null;
+  useEffect(() => {
+    if (hoverKey === null) return;
+    const timer = window.setTimeout(() => setLiftedHover(hoverKey), CARRY_HOLD_MS);
+    return () => {
+      clearTimeout(timer);
+      setLiftedHover(null);
     };
+  }, [hoverKey]);
 
   const select = (target: FanTarget) => {
     if (target.kind === "settings") openSheet("settings");
@@ -540,41 +582,32 @@ function FloatingButton() {
     } else if (target.kind === "controls") {
       setVideoPanel(!controlsOn);
     } else {
-      const slot = slotAt(target.index);
-      if (slot.locked) openSheet("paywall");
-      else if (slot.favorite) openFavorite(slot.favorite);
+      const favorite = favorites[target.index];
+      if (favorite) openFavorite(favorite);
     }
   };
 
   const favoriteEntry = (index: number, section: number, open: boolean): Entry => {
-    const { favorite, locked } = slotAt(index);
+    const favorite = favorites[index];
     const name = favorite?.name ?? "";
     return {
       lane: "ring",
       target: { kind: "favorite", index },
       size: FAVORITE_SIZE,
       section,
-      label: locked
-        ? t("paywall.title")
-        : unread[index] > 0
+      label:
+        unread[index] > 0
           ? `${t("fab.openFavorite", { name })}. ${t("notify.newActivity")}`
           : t("fab.openFavorite", { name }),
       caption: favorite?.name,
       site: true,
-      className: `text-lg font-medium text-white ${locked ? "brightness-75 grayscale" : ""}`,
+      className: "text-lg font-medium text-white",
       content: (
         <>
           {favorite?.icon ? (
             <img src={favorite.icon} alt="" draggable={false} className="size-7 rounded-md" />
-          ) : favorite ? (
-            monogram(favorite.name)
           ) : (
-            <ProIcon />
-          )}
-          {locked && favorite && (
-            <span className="pro-badge absolute -end-1.5 -top-1.5 z-10 grid size-5 place-items-center rounded-full">
-              <ProIcon size={12} />
-            </span>
+            monogram(favorite.name)
           )}
           {(unread[index] ?? 0) > 0 && <UnreadBadge count={unread[index]} />}
           {open && <OpenDot />}
@@ -705,16 +738,10 @@ function FloatingButton() {
       content: (
         <>
           <IncognitoIcon active={incognito.active} />
-          {!isPro ? (
-            <span className="pro-badge absolute -end-1.5 -top-1.5 z-10 grid size-5 place-items-center rounded-full">
-              <ProIcon size={12} />
+          {!incognito.active && (
+            <span className="absolute -end-1.5 -top-1.5 z-10 grid size-5 place-items-center rounded-full border border-white/70 bg-black/80 text-white">
+              <BiometricIcon size={12} />
             </span>
-          ) : (
-            !incognito.active && (
-              <span className="absolute -end-1.5 -top-1.5 z-10 grid size-5 place-items-center rounded-full border border-white/70 bg-black/80 text-white">
-                <BiometricIcon size={12} />
-              </span>
-            )
           )}
         </>
       ),
@@ -815,7 +842,6 @@ function FloatingButton() {
         ).map(({ favorite, index }) => ({
           favorite,
           index,
-          locked: !isPro && index >= FREE_QUICK_ACCESS_LIMIT,
           live: sessionForFavorite(sessions, favorite.url, sites) !== undefined,
           unread: unread[index] ?? 0,
         }));
@@ -971,16 +997,18 @@ function FloatingButton() {
     if (gestureRef.current.phase === "dragging") clearTimeout(holdTimer.current);
     if (gestureRef.current.phase !== "fan") lastHover.current = null;
     const hit = hitAt(point);
-    if (hit) lastHover.current = hit;
-    // A finger that slid onto a favorite and on past the dial takes the favorite with it.
+    if (hit && !sameTarget(lastHover.current?.target ?? null, hit))
+      lastHover.current = { target: hit, since: event.timeStamp };
+    // A finger that slid onto a favorite, rested there, and on past the dial takes it with it.
     const held = lastHover.current;
     if (
       gestureRef.current.phase === "fan" &&
       !hit &&
       held &&
+      carryHold(event.timeStamp - held.since, false) === "armed" &&
       Math.hypot(point.x - resting.x, point.y - resting.y) > DIAL_RADIUS + FAVORITE_SIZE
     ) {
-      const carry = carryOf(held);
+      const carry = carryOf(held.target);
       if (carry) {
         lastHover.current = null;
         startCarry(event, carry);
@@ -1045,7 +1073,7 @@ function FloatingButton() {
           darkHold.current = window.setTimeout(() => {
             darkHeld.current = true;
             setDarkCharging(false);
-            const own = pageSite ? usableQuickAccess(savedFavorites ?? [], isPro) : [];
+            const own = pageSite ? quickAccess(savedFavorites ?? []) : [];
             const match = own.find((favorite) => siteOf(favorite.url) === pageSite);
             if (pageSite && match && !incognito.active)
               openSiteSheet("site-dark-mode", pageSite, match.name);
@@ -1112,6 +1140,13 @@ function FloatingButton() {
           onActivate={activate}
           carry={carryOf(entry.target)}
           onCarry={startCarry}
+          slidHold={
+            sameTarget(hover, entry.target) && carryOf(entry.target)
+              ? liftedHover === targetKey(entry.target)
+                ? "armed"
+                : "charging"
+              : "idle"
+          }
         />
       ))}
 
@@ -1144,8 +1179,7 @@ function FloatingButton() {
           }
           onPick={(member) => {
             setFolderName(null);
-            if (member.locked) openSheet("paywall");
-            else openFavorite(member.favorite);
+            openFavorite(member.favorite);
           }}
         />
       )}

@@ -37,9 +37,7 @@ use crate::entitlement::Entitlement;
 use crate::error::{Error, Result};
 use crate::find_in_page;
 use crate::incognito::Incognito;
-use crate::library::{
-    Favorite, FavoriteInput, Folder, Library, Mode, SearchEngine, Theme, favorites_need_pro,
-};
+use crate::library::{Favorite, FavoriteInput, Folder, Library, Mode, SearchEngine, Theme};
 use crate::recipes::{
     OptionValue, Recipe, Recipes,
     bundled::{self, SearchHit},
@@ -63,25 +61,11 @@ pub async fn get_state(library: State<'_, Library>, boot: State<'_, Boot>) -> Re
     })
 }
 
-/// A free user may not grow the favorites past `FREE_FAVORITE_LIMIT`; see `favorites_need_pro`.
-fn check_favorites_allowed(
-    library: &Library,
-    entitlement: &Entitlement,
-    new_count: usize,
-) -> Result<()> {
-    if favorites_need_pro(library.favorite_count()?, new_count) {
-        entitlement.require_pro()?;
-    }
-    Ok(())
-}
-
 #[tauri::command]
 pub fn set_favorites(
     library: State<'_, Library>,
-    entitlement: State<'_, Entitlement>,
     favorites: Vec<FavoriteInput>,
 ) -> Result<Vec<Favorite>> {
-    check_favorites_allowed(&library, &entitlement, favorites.len())?;
     library.set_favorites(favorites)
 }
 
@@ -95,13 +79,11 @@ pub fn set_folders(library: State<'_, Library>, folders: Vec<Folder>) -> Result<
 #[tauri::command]
 pub fn set_site_favorite(
     library: State<'_, Library>,
-    entitlement: State<'_, Entitlement>,
     recipes: State<'_, Recipes>,
     recipe_id: String,
     favorite: bool,
 ) -> Result<Vec<Favorite>> {
     let inputs = sites::with_site_favorite(&recipes, &library.favorites()?, &recipe_id, favorite)?;
-    check_favorites_allowed(&library, &entitlement, inputs.len())?;
     library.set_favorites(inputs)
 }
 

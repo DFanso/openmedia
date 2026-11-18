@@ -18,13 +18,12 @@ interface Props {
   options: OptionsState;
   selected: readonly string[];
   limit: number;
-  isPro: boolean;
   onToggle: (recipeId: string) => void;
   onRetry: () => void;
 }
 
 /** The official recipes for this device as checkbox rows. Everything here can be skipped. */
-export function QuickAccessStep({ options, selected, limit, isPro, onToggle, onRetry }: Props) {
+export function QuickAccessStep({ options, selected, limit, onToggle, onRetry }: Props) {
   const t = useT();
 
   if (options.status === "loading") {
@@ -45,13 +44,7 @@ export function QuickAccessStep({ options, selected, limit, isPro, onToggle, onR
   }
 
   return (
-    <OptionList
-      options={options.options}
-      selected={selected}
-      limit={limit}
-      isPro={isPro}
-      onToggle={onToggle}
-    />
+    <OptionList options={options.options} selected={selected} limit={limit} onToggle={onToggle} />
   );
 }
 
@@ -62,7 +55,6 @@ function OptionList({
   options,
   selected,
   limit,
-  isPro,
   onToggle,
 }: Omit<Props, "options" | "onRetry"> & { options: OnboardingOption[] }) {
   const t = useT();
@@ -83,7 +75,6 @@ function OptionList({
     <div className="flex flex-col gap-3">
       <p className="text-sm text-paper/65" aria-live="polite">
         {t("onboarding.quickCount", { count: selected.length, limit })}
-        {full && !isPro && ` ${t("onboarding.quickProHint")}`}
       </p>
       <div className="flex gap-2">
         <input

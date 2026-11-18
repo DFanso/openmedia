@@ -278,7 +278,6 @@ export const bn: Messages = {
   "onboarding.quickEmpty":
     "এই ডিভাইসের জন্য এখনো কোনো অফিশিয়াল রেসিপি তালিকায় নেই। পরে রেসিপি লাইব্রেরি থেকে কিছু যোগ করতে পারবেন।",
   "onboarding.quickCount": "{limit}টির মধ্যে {count}টি বাছাই করা হয়েছে",
-  "onboarding.quickProHint": "আপনার প্ল্যানে এটিই সর্বোচ্চ। Pro-তে আরও জায়গা আছে।",
   "onboarding.applying": "যোগ করা হচ্ছে…",
   "onboarding.partial": "যোগ করা যায়নি: {names}। পরে রেসিপি লাইব্রেরি থেকে এগুলো যোগ করতে পারবেন।",
   "onboarding.libraryTitle": "রেসিপির একটি লাইব্রেরি।",
@@ -417,7 +416,7 @@ export const bn: Messages = {
   "favorites.quickEmpty":
     "এখানে এখনও কিছু নেই। নিচে একটি পছন্দ যোগ করুন, অথবা রেসিপিতে তারকা চিহ্ন দিন।",
   "favorites.more": "আরও পছন্দ · {count}",
-  "favorites.moreLocked": "আরও পছন্দ",
+  "favorites.moreTitle": "আরও পছন্দ",
   "favorites.custom": "কাস্টম পছন্দ",
   "favorites.addFromRecipes": "রেসিপি থেকে যোগ করুন",
   "favorites.quickFull": "দ্রুত অ্যাক্সেস পূর্ণ, তাই এটি আরও পছন্দের তালিকায় যোগ করা হয়েছে।",
@@ -789,7 +788,7 @@ export const bn: Messages = {
   "notify.newActivity": "নতুন কার্যকলাপ",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "AI সহকারী, ইনকোগনিটো মোড এবং ব্যবহারের সীমা চালু করুন।",
+  "paywall.subtitle": "AI সহকারী এবং ব্যবহারের সীমা চালু করুন।",
   "paywall.close": "পেওয়াল বন্ধ করুন",
   "paywall.locked": "Pro ফিচার",
   "paywall.lifetime": "আজীবন",
@@ -839,6 +838,11 @@ export const bn: Messages = {
   "tabs.closeNote": "সাইট বন্ধ করলে শুধু তার খোলা পেজ শেষ হয়। আপনার প্রিয় ও ইতিহাস থেকে যায়।",
   "tabs.closeOne": "{name} বন্ধ করুন",
   "tabs.resetOne": "{name} শুরুর পেজে রিসেট করুন",
+  "tabs.moveUp": "{name} উপরে সরান",
+  "tabs.moveDown": "{name} নিচে সরান",
+  "tabs.number": "ট্যাব {value}",
+  "tabs.arrangeNote":
+    "সংখ্যাগুলো ট্যাবের শর্টকাট। ক্রম বদলাতে কোনো সাইট ধরে টানুন বা তীর ব্যবহার করুন।",
   "tabs.quickAccess": "দ্রুত অ্যাক্সেস",
   "tabs.history": "ইতিহাস",
   "tabs.allHistory": "সম্পূর্ণ ইতিহাস ({count})",

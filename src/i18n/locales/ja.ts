@@ -284,7 +284,6 @@ export const ja: Messages = {
   "onboarding.quickEmpty":
     "公式レシピはこのデバイス向けにまだありません。あとでレシピライブラリから追加できます。",
   "onboarding.quickCount": "{limit} 件中 {count} 件を選択",
-  "onboarding.quickProHint": "ご利用のプランの上限です。Pro ならスロットが増えます。",
   "onboarding.applying": "追加中…",
   "onboarding.partial": "追加できませんでした：{names}。あとでレシピライブラリから追加できます。",
   "onboarding.libraryTitle": "レシピのライブラリ。",
@@ -423,7 +422,7 @@ export const ja: Messages = {
   "favorites.quickEmpty":
     "まだ何もありません。下からお気に入りを追加するか、レシピに★を付けてください。",
   "favorites.more": "その他のお気に入り · {count}",
-  "favorites.moreLocked": "その他のお気に入り",
+  "favorites.moreTitle": "その他のお気に入り",
   "favorites.custom": "カスタムお気に入り",
   "favorites.addFromRecipes": "レシピから追加",
   "favorites.quickFull":
@@ -793,7 +792,7 @@ export const ja: Messages = {
   "notify.newActivity": "新しいアクティビティ",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "AI アシスタント、秘密モード、使用量の制限を解除します。",
+  "paywall.subtitle": "AI アシスタントと使用量の制限を解除します。",
   "paywall.close": "ペイウォールを閉じる",
   "paywall.locked": "Pro 機能",
   "paywall.lifetime": "買い切り",
@@ -845,6 +844,11 @@ export const ja: Messages = {
     "サイトを閉じると、開いているページだけが終了します。お気に入りと履歴は残ります。",
   "tabs.closeOne": "{name}を閉じる",
   "tabs.resetOne": "{name}を最初のページに戻す",
+  "tabs.moveUp": "{name} を上へ移動",
+  "tabs.moveDown": "{name} を下へ移動",
+  "tabs.number": "タブ {value}",
+  "tabs.arrangeNote":
+    "番号はタブのショートカットです。サイトを長押ししてドラッグするか、矢印で順番を変えられます。",
   "tabs.quickAccess": "クイックアクセス",
   "tabs.history": "履歴",
   "tabs.allHistory": "すべての履歴（{count}）",

@@ -284,7 +284,6 @@ export const ms: Messages = {
   "onboarding.quickEmpty":
     "Belum ada resipi rasmi disenaraikan untuk peranti ini. Anda boleh menambahnya kemudian daripada pustaka resipi.",
   "onboarding.quickCount": "{count} daripada {limit} dipilih",
-  "onboarding.quickProHint": "Itu had maksimum pelan anda. Pro mempunyai lebih banyak slot.",
   "onboarding.applying": "Menambah…",
   "onboarding.partial":
     "Tidak dapat menambah: {names}. Anda boleh menambahnya kemudian daripada pustaka resipi.",
@@ -429,7 +428,7 @@ export const ms: Messages = {
   "favorites.quickEmpty":
     "Belum ada apa-apa di sini. Tambah kegemaran di bawah, atau tandakan bintang pada resipi.",
   "favorites.more": "Kegemaran lain · {count}",
-  "favorites.moreLocked": "Kegemaran lain",
+  "favorites.moreTitle": "Kegemaran lain",
   "favorites.custom": "Kegemaran tersuai",
   "favorites.addFromRecipes": "Tambah daripada resipi",
   "favorites.quickFull": "Akses pantas sudah penuh, jadi yang ini ditambah ke Kegemaran lain.",
@@ -806,7 +805,7 @@ export const ms: Messages = {
   "notify.newActivity": "Aktiviti baharu",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "Buka pembantu AI, mod incognito dan had penggunaan.",
+  "paywall.subtitle": "Buka pembantu AI dan had penggunaan.",
   "paywall.close": "Tutup paywall",
   "paywall.locked": "Ciri Pro",
   "paywall.lifetime": "Sepanjang hayat",
@@ -857,6 +856,11 @@ export const ms: Messages = {
     "Menutup laman hanya menamatkan halamannya yang terbuka. Kegemaran dan sejarah anda kekal.",
   "tabs.closeOne": "Tutup {name}",
   "tabs.resetOne": "Tetapkan semula {name} ke laman permulaan",
+  "tabs.moveUp": "Alih {name} ke atas",
+  "tabs.moveDown": "Alih {name} ke bawah",
+  "tabs.number": "Tab {value}",
+  "tabs.arrangeNote":
+    "Nombor ialah pintasan tab. Tekan lama dan seret laman, atau gunakan anak panah, untuk menukar susunan.",
   "tabs.quickAccess": "Akses pantas",
   "tabs.history": "Sejarah",
   "tabs.allHistory": "Semua sejarah ({count})",

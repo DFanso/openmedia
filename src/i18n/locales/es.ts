@@ -291,7 +291,6 @@ export const es: Messages = {
   "onboarding.quickEmpty":
     "Todavía no hay recetas oficiales para este dispositivo. Más tarde puedes añadir algunas desde la biblioteca de recetas.",
   "onboarding.quickCount": "{count} de {limit} elegidos",
-  "onboarding.quickProHint": "Es el máximo que permite tu plan. Pro tiene más espacios.",
   "onboarding.applying": "Añadiendo…",
   "onboarding.partial":
     "No se pudo añadir: {names}. Puedes añadirlas más tarde desde la biblioteca de recetas.",
@@ -435,7 +434,7 @@ export const es: Messages = {
   "favorites.quickEmpty":
     "Aquí no hay nada todavía. Añade un favorito abajo o marca una receta con una estrella.",
   "favorites.more": "Más favoritos · {count}",
-  "favorites.moreLocked": "Más favoritos",
+  "favorites.moreTitle": "Más favoritos",
   "favorites.custom": "Favorito personalizado",
   "favorites.addFromRecipes": "Añadir desde recetas",
   "favorites.quickFull": "El acceso rápido está lleno, así que este se añade a Más favoritos.",
@@ -814,7 +813,7 @@ export const es: Messages = {
   "notify.newActivity": "Nueva actividad",
 
   "paywall.title": "OpenMedia Pro",
-  "paywall.subtitle": "Desbloquea el asistente de IA, el modo incógnito y los límites de uso.",
+  "paywall.subtitle": "Desbloquea el asistente de IA y los límites de uso.",
   "paywall.close": "Cerrar muro de pago",
   "paywall.locked": "Función Pro",
   "paywall.lifetime": "De por vida",
@@ -866,6 +865,11 @@ export const es: Messages = {
     "Cerrar un sitio solo termina su página abierta. Tus favoritos y tu historial se conservan.",
   "tabs.closeOne": "Cerrar {name}",
   "tabs.resetOne": "Restablecer {name} a su página inicial",
+  "tabs.moveUp": "Subir {name}",
+  "tabs.moveDown": "Bajar {name}",
+  "tabs.number": "Pestaña {value}",
+  "tabs.arrangeNote":
+    "Los números son los atajos de pestañas. Mantén pulsado un sitio y arrástralo, o usa las flechas, para cambiar el orden.",
   "tabs.quickAccess": "Acceso rápido",
   "tabs.history": "Historial",
   "tabs.allHistory": "Todo el historial ({count})",

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ACTIONS } from "./actionList";
+import { ACTIONS, folderActionId, libraryActions } from "./actionList";
 import { conflictsOf, effectiveBindings, Matcher, type Press } from "./keymap";
 import { PROFILES, profileBindings } from "./presets";
 
@@ -107,5 +107,33 @@ describe("conflictsOf", () => {
       expect.arrayContaining(["view.top", "nav.history"]),
     );
     expect(conflictsOf(bindings, "nav.back", "Mod+l")).toEqual(["nav.address"]);
+  });
+});
+
+describe("favorite and folder actions", () => {
+  const favorite = { id: "abc", name: "Mail", url: "https://mail.test", notify: false };
+  const ids = (favorites = [favorite], folders = [{ name: " Work " }]) =>
+    new Set(libraryActions(favorites, folders).map((info) => info.id));
+
+  it("name one action per favorite and per folder", () => {
+    const actions = libraryActions([{ ...favorite, folder: "work" }], [{ name: "Work" }]);
+    expect(actions.map((info) => info.label)).toEqual(["Open Mail", "Open folder Work"]);
+    expect(actions[1].id).toBe(folderActionId("WORK "));
+  });
+
+  it("run when a binding on them is pressed", () => {
+    const overrides = { "fav.abc": ["Mod+Alt+7"], [folderActionId("Work")]: ["Mod+Alt+8"] };
+    const matcher = new Matcher(effectiveBindings("standard", overrides, true, ids()), "standard");
+    expect(matcher.press("Mod+Alt+7", false)).toEqual(run("fav.abc"));
+    expect(matcher.press("Mod+Alt+8", false)).toEqual(run(folderActionId("Work")));
+  });
+
+  it("are ignored, though kept, once the favorite is gone", () => {
+    const overrides = { "fav.gone": ["Mod+Alt+7"] };
+    const bindings = effectiveBindings("standard", overrides, false, ids());
+    expect(bindings.has("fav.gone")).toBe(false);
+    expect(new Matcher(bindings, "standard").press("Mod+Alt+7", false)).toEqual({
+      kind: "none",
+    });
   });
 });

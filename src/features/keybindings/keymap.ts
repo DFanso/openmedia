@@ -1,18 +1,27 @@
+import { isLibraryAction } from "./actionList";
 import { normalizeSequence, splitSequence, worksWhileTyping } from "./chord";
 import { profileBindings, profileOwnActions, profileTakesCounts, type Profile } from "./presets";
 
 /** The bindings a person chose, by action id. An entry replaces every default that action had. */
 export type Overrides = Readonly<Record<string, readonly string[]>>;
 
-/** Action id to the bindings in force, after the profile, the person's changes and conflicts. */
+const NO_IDS: ReadonlySet<string> = new Set();
+
+/**
+ * Action id to the bindings in force, after the profile, the person's changes and conflicts.
+ * `libraryIds` are the favorite and folder actions that exist now; choices kept for others stay
+ * saved but bind nothing.
+ */
 export function effectiveBindings(
   profile: Profile,
   overrides: Overrides,
   mac: boolean,
+  libraryIds: ReadonlySet<string> = NO_IDS,
 ): Map<string, string[]> {
   const bindings = profileBindings(profile, mac);
   const chosen = new Set<string>();
   for (const [id, sequences] of Object.entries(overrides)) {
+    if (isLibraryAction(id) && !libraryIds.has(id)) continue;
     const read = sequences
       .map((sequence) => normalizeSequence(sequence, mac))
       .filter((sequence): sequence is string => sequence !== null);

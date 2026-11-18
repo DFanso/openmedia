@@ -1,10 +1,11 @@
-import { useRef, type PointerEvent } from "react";
+import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { useT } from "../../i18n/useT";
-import { FolderIcon, ProIcon } from "../../shared/icons";
+import { FolderIcon } from "../../shared/icons";
 import type { Favorite } from "../../shared/ipc";
 import { useBackHandler } from "../back/useBackHandler";
+import { CARRY_HOLD_MS, carryHold, strayedFromPress, type CarryHold } from "./gesture";
 
-/** How far a press on a favorite moves before it is a drag out of the popup rather than a tap. */
+/** How far a held favorite moves before it is a drag out of the popup. */
 const CARRY_SLOP = 12;
 
 /** One favorite in a folder, with what the dial knows about it. */
@@ -12,8 +13,6 @@ export interface FolderMember {
   favorite: Favorite;
   /** Its place in the favorites list. */
   index: number;
-  /** Needs Pro; a tap opens the plans. */
-  locked: boolean;
   /** A site of it is open. */
   live: boolean;
   /** New activity in it, from its page title; 0 when none. */
@@ -44,7 +43,6 @@ export function FolderPopup({
   /** Opens every favorite in the folder side by side, in the folder's layout (desktop). */
   onOpenAll?: () => void;
 }) {
-  const press = useRef<{ x: number; y: number } | null>(null);
   const t = useT();
   useBackHandler(true, onClose);
 
@@ -78,72 +76,108 @@ export function FolderPopup({
         </div>
         <div className="grid grid-cols-3 gap-x-2 gap-y-4">
           {members.map((member) => (
-            <button
+            <MemberButton
               key={member.favorite.id}
-              type="button"
-              aria-label={
-                member.locked
-                  ? t("paywall.title")
-                  : t("fab.openFavorite", { name: member.favorite.name })
-              }
-              onPointerDown={(event) => {
-                press.current = { x: event.clientX, y: event.clientY };
-              }}
-              onPointerMove={(event) => {
-                const from = press.current;
-                if (!onCarry || !from || member.locked) return;
-                if (Math.hypot(event.clientX - from.x, event.clientY - from.y) <= CARRY_SLOP)
-                  return;
-                press.current = null;
-                onCarry(member, event);
-              }}
-              onClick={() => onPick(member)}
-              className="flex min-w-0 flex-col items-center gap-1.5 rounded-2xl px-1 py-2 active:bg-paper/[0.08]"
-            >
-              <span
-                className={`relative grid size-14 place-items-center rounded-2xl bg-accent/15 text-lg font-semibold text-accent uppercase ${
-                  member.locked ? "grayscale" : ""
-                }`}
-              >
-                {member.favorite.icon ? (
-                  <img
-                    src={member.favorite.icon}
-                    alt=""
-                    draggable={false}
-                    className="size-9 rounded-lg"
-                  />
-                ) : (
-                  member.favorite.name.trim().charAt(0) || "·"
-                )}
-                {member.locked && (
-                  <span className="pro-badge absolute -end-1.5 -top-1.5 grid size-5 place-items-center rounded-full">
-                    <ProIcon size={12} />
-                  </span>
-                )}
-                {member.unread > 0 && (
-                  <span
-                    aria-hidden="true"
-                    className="absolute -end-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full border-2 border-ink bg-accent px-1 text-[10px] leading-none font-semibold text-white"
-                  >
-                    {member.unread > 99 ? "99+" : member.unread}
-                  </span>
-                )}
-                {member.live && (
-                  <span
-                    aria-hidden="true"
-                    className="absolute -bottom-1.5 left-1/2 size-1.5 -translate-x-1/2 rounded-full bg-accent"
-                  />
-                )}
-              </span>
-              <span
-                className={`w-full truncate text-center text-[12px] ${member.locked ? "opacity-60" : ""}`}
-              >
-                {member.favorite.name}
-              </span>
-            </button>
+              member={member}
+              onPick={onPick}
+              onCarry={onCarry}
+            />
           ))}
         </div>
       </div>
     </>
+  );
+}
+
+/**
+ * One favorite of the popup. On desktop a press that is held lifts the tile, and only then does
+ * moving on drag the favorite out; a press that moves before that is not a drag.
+ */
+function MemberButton({
+  member,
+  onPick,
+  onCarry,
+}: {
+  member: FolderMember;
+  onPick: (member: FolderMember) => void;
+  onCarry?: (member: FolderMember, event: PointerEvent<HTMLButtonElement>) => void;
+}) {
+  const press = useRef<{ x: number; y: number; at: number; strayed: boolean } | null>(null);
+  const armTimer = useRef(0);
+  const [hold, setHold] = useState<CarryHold>("idle");
+  const t = useT();
+  useEffect(() => () => clearTimeout(armTimer.current), []);
+
+  const endPress = () => {
+    clearTimeout(armTimer.current);
+    press.current = null;
+    setHold("idle");
+  };
+
+  return (
+    <button
+      type="button"
+      aria-label={t("fab.openFavorite", { name: member.favorite.name })}
+      onPointerDown={(event) => {
+        if (!onCarry) return;
+        press.current = { x: event.clientX, y: event.clientY, at: Date.now(), strayed: false };
+        setHold(carryHold(0, false));
+        clearTimeout(armTimer.current);
+        armTimer.current = window.setTimeout(() => {
+          const current = press.current;
+          if (current) setHold(carryHold(Date.now() - current.at, current.strayed));
+        }, CARRY_HOLD_MS);
+      }}
+      onPointerMove={(event) => {
+        const from = press.current;
+        if (!onCarry || !from) return;
+        const moved = Math.hypot(event.clientX - from.x, event.clientY - from.y);
+        const held = carryHold(Date.now() - from.at, from.strayed);
+        if (held === "charging" && strayedFromPress(moved)) {
+          from.strayed = true;
+          clearTimeout(armTimer.current);
+          setHold("idle");
+        } else if (held === "armed" && moved > CARRY_SLOP) {
+          endPress();
+          onCarry(member, event);
+        }
+      }}
+      onPointerUp={endPress}
+      onPointerLeave={endPress}
+      onPointerCancel={endPress}
+      onClick={() => onPick(member)}
+      className="flex min-w-0 flex-col items-center gap-1.5 rounded-2xl px-1 py-2 active:bg-paper/[0.08]"
+    >
+      <span
+        data-carry={hold === "idle" ? undefined : hold}
+        className="carry-tile relative grid size-14 place-items-center rounded-2xl bg-accent/15 text-lg font-semibold text-accent uppercase"
+      >
+        {member.favorite.icon ? (
+          <img src={member.favorite.icon} alt="" draggable={false} className="size-9 rounded-lg" />
+        ) : (
+          member.favorite.name.trim().charAt(0) || "·"
+        )}
+        {member.unread > 0 && (
+          <span
+            aria-hidden="true"
+            className="absolute -end-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full border-2 border-ink bg-accent px-1 text-[10px] leading-none font-semibold text-white"
+          >
+            {member.unread > 99 ? "99+" : member.unread}
+          </span>
+        )}
+        {member.live && (
+          <span
+            aria-hidden="true"
+            className="absolute -bottom-1.5 left-1/2 size-1.5 -translate-x-1/2 rounded-full bg-accent"
+          />
+        )}
+        {onCarry && (
+          <svg className="fab-ring" viewBox="0 0 64 64" aria-hidden="true">
+            <circle cx="32" cy="32" r="31" pathLength="1" />
+          </svg>
+        )}
+      </span>
+      <span className="w-full truncate text-center text-[12px]">{member.favorite.name}</span>
+    </button>
   );
 }

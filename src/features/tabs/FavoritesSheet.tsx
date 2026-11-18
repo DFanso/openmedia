@@ -5,8 +5,7 @@ import { FavoriteRows } from "./FavoriteRows";
 
 /**
  * Every favorite of the set in use (the incognito one while incognito), opened from the Tabs
- * page, which shows only the first few. Favorites filed in a folder sit under it. Without Pro
- * the entries past the fourth are locked, as they are in the quick-access menu.
+ * page, which shows only the first few. Favorites filed in a folder sit under it.
  */
 export function FavoritesSheet() {
   const open = useApp((s) => s.sheet === "favorites");
