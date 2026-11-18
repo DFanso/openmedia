@@ -274,13 +274,13 @@ export const sv: Messages = {
     "OpenMedia öppnar riktiga webbplatser och döljer stillsamt det du inte bett om, som uppmaningarna att ”öppna appen” som står i vägen.",
   "onboarding.step2Title": "En enda knapp.",
   "onboarding.step2Body":
-    "Tryck på den för att skriva en adress och gå dit. Snart kan du be AI-assistenten ändra en webbplats åt dig.",
+    "Tryck på den för att skriva en adress, söka på webben eller be AI-assistenten ändra en webbplats åt dig.",
   "onboarding.step3Title": "Håll in för favoriter.",
   "onboarding.step3Body":
-    "Tryck och håll. Dra till en favorit och släpp för att öppna den. Inställningar är den lilla knappen som sitter för sig själv.",
+    "Tryck och håll. Glid till en favorit och släpp för att öppna den; vrid ratten runt knappen för fler. Ovanför finns Inkognito, Användning, Flikar, Historik, Profiler och Inställningar.",
   "onboarding.step4Title": "Gör den till din.",
   "onboarding.step4Body":
-    "Dra knappen till valfri kant så stannar den där. Ändra dina favoriter i Inställningar, och spela upp den här guiden igen när du vill.",
+    "Dra knappen upp eller ned längs kanten, eller skjut den utanför kanten för att gömma den; tryck på den lilla fliken för att ta fram den igen. Den stannar där du släpper den. Ändra dina favoriter i Inställningar och spela upp den här guiden igen där när du vill.",
   "onboarding.quickTitle": "Vad behöver du i snabbåtkomsten?",
   "onboarding.quickBody":
     "Välj de webbplatser du öppnar mest. OpenMedia lägger till deras officiella recept och placerar dem på din knapp.",

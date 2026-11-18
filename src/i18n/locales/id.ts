@@ -268,13 +268,13 @@ export const id: Messages = {
     "OpenMedia membuka situs web sungguhan dan diam-diam menyembunyikan bagian yang tidak Anda minta, seperti ajakan “buka aplikasi” yang menghalangi.",
   "onboarding.step2Title": "Satu tombol.",
   "onboarding.step2Body":
-    "Ketuk untuk mengetik alamat dan membuka. Segera Anda dapat meminta asisten AI mengubah situs untuk Anda.",
+    "Ketuk untuk mengetik alamat, mencari di web, atau meminta asisten AI mengubah sebuah situs untukmu.",
   "onboarding.step3Title": "Tahan untuk favorit.",
   "onboarding.step3Body":
-    "Tekan dan tahan. Geser ke sebuah favorit lalu lepas untuk membukanya. Pengaturan adalah set tombol kecil yang terpisah dari yang lain.",
+    "Tekan dan tahan. Geser ke favorit lalu lepas untuk membukanya; putar dial di sekitar tombol untuk yang lain. Di atasnya ada Penyamaran, Penggunaan, Tab, Riwayat, Profil, dan Pengaturan.",
   "onboarding.step4Title": "Buat jadi milik Anda.",
   "onboarding.step4Body":
-    "Seret tombol ke tepi kiri atau kanan dan tombol itu akan tetap di sana. Ubah favorit Anda di Pengaturan, dan ulangi panduan ini kapan saja di sana.",
+    "Seret tombol naik atau turun di tepi, atau dorong keluar tepi untuk menyembunyikannya; ketuk tab kecil untuk memunculkannya lagi. Tombol tetap di tempat kamu melepasnya. Ubah favorit di Pengaturan dan putar ulang panduan ini di sana kapan saja.",
   "onboarding.quickTitle": "Apa yang Anda butuhkan di akses cepat?",
   "onboarding.quickBody":
     "Pilih situs yang paling sering Anda buka. OpenMedia menambahkan resep resminya dan menaruhnya di tombol Anda.",

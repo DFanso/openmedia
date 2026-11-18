@@ -278,13 +278,13 @@ export const es: Messages = {
     "OpenMedia abre sitios web reales y oculta discretamente las partes que no pediste, como los avisos de «abrir la app» que estorban.",
   "onboarding.step2Title": "Un botón.",
   "onboarding.step2Body":
-    "Toca para escribir una dirección e ir. Pronto podrás pedir al asistente de IA que cambie un sitio por ti.",
+    "Tócalo para escribir una dirección, buscar en la web o pedirle al asistente de IA que cambie un sitio por ti.",
   "onboarding.step3Title": "Mantén pulsado para ver los favoritos.",
   "onboarding.step3Body":
-    "Mantén pulsado. Desliza hasta un favorito y suelta para abrirlo. Ajustes es el botón pequeño que está separado del resto.",
+    "Mantenlo pulsado. Desliza sobre un favorito y suelta para abrirlo; gira el dial alrededor del botón para ver más. Encima están Incógnito, Uso, Pestañas, Historial, Perfiles y Ajustes.",
   "onboarding.step4Title": "Hazlo tuyo.",
   "onboarding.step4Body":
-    "Arrastra el botón a cualquiera de los bordes y se quedará ahí. Cambia tus favoritos en Ajustes y vuelve a ver esta guía cuando quieras.",
+    "Arrastra el botón arriba o abajo por el borde, o empújalo fuera del borde para esconderlo; toca la pestaña pequeña para recuperarlo. Se queda donde lo dejes. Cambia tus favoritos en Ajustes y vuelve a ver esta guía allí cuando quieras.",
   "onboarding.quickTitle": "¿Qué necesitas en el acceso rápido?",
   "onboarding.quickBody":
     "Elige los sitios que más abres. OpenMedia añade sus recetas oficiales y las pone en tu botón.",

@@ -248,13 +248,13 @@ export const zhHans: Messages = {
   "onboarding.step1Body":
     "OpenMedia 打开真实网站，并悄悄隐藏你不需要的部分，比如挡路的“打开应用”提示。",
   "onboarding.step2Title": "一个按钮。",
-  "onboarding.step2Body": "点按即可输入网址并打开。很快你就能让 AI 助手帮你修改网站。",
+  "onboarding.step2Body": "点按它可输入网址、搜索网页，或让 AI 助手为你修改网站。",
   "onboarding.step3Title": "长按打开收藏。",
   "onboarding.step3Body":
-    "按住不放，滑到某个收藏上松手即可打开。“设置”是与其他按钮分开放的小按钮。",
+    "按住不放。滑到某个收藏上松手即可打开；绕按钮转动转盘可查看更多。上方依次是无痕、使用情况、标签页、历史记录、个人档案和设置。",
   "onboarding.step4Title": "按你的习惯来。",
   "onboarding.step4Body":
-    "把按钮拖到任意一侧边缘，它就会留在那里。在“设置”中更改收藏，也可以随时重新查看本指南。",
+    "沿边缘上下拖动按钮，或将它推出边缘以收起；点按小标签可让它回来。它会停在你放开的位置。在设置中更改收藏，并可随时在那里重新查看本指南。",
   "onboarding.quickTitle": "你想把什么放进快捷入口？",
   "onboarding.quickBody":
     "选择你最常打开的网站。OpenMedia 会添加它们的官方配方，并放到你的按钮上。",

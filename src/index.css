@@ -363,7 +363,12 @@ svg {
 }
 
 .demo-slide {
-  animation: demo-slide 3600ms ease-in-out infinite;
+  animation: demo-slide 5200ms ease-in-out infinite;
+}
+
+.demo-peek {
+  animation: demo-peek 5200ms ease-in-out infinite;
+  opacity: 0;
 }
 
 @keyframes demo-pop {
@@ -406,13 +411,41 @@ svg {
   }
 }
 
+/* Slide along the edge, then tuck away: the button leaves and the small tab takes its place. */
 @keyframes demo-slide {
   0%,
   100% {
-    transform: translateY(-48px);
+    transform: translate(0, -48px);
+    opacity: 1;
   }
-  50% {
-    transform: translateY(48px);
+  25% {
+    transform: translate(0, 48px);
+  }
+  45% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  58%,
+  80% {
+    transform: translate(80px, 0);
+    opacity: 0;
+  }
+  92% {
+    transform: translate(0, -48px);
+    opacity: 1;
+  }
+}
+
+@keyframes demo-peek {
+  0%,
+  50%,
+  88%,
+  100% {
+    opacity: 0;
+  }
+  62%,
+  78% {
+    opacity: 1;
   }
 }
 
@@ -428,7 +461,8 @@ svg {
   .demo-fan-item,
   .demo-ring,
   .demo-tap,
-  .demo-slide {
+  .demo-slide,
+  .demo-peek {
     animation: none;
   }
 

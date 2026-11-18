@@ -267,13 +267,13 @@ export const vi: Messages = {
     "OpenMedia mở các trang web thật và lặng lẽ ẩn những phần bạn không hỏi, như các bảng “mở ứng dụng” chen ngang.",
   "onboarding.step2Title": "Một nút.",
   "onboarding.step2Body":
-    "Chạm để gõ địa chỉ và đi. Sắp nữa bạn có thể nhờ trợ lý AI thay đổi một trang cho bạn.",
+    "Chạm vào để nhập địa chỉ, tìm trên web hoặc nhờ trợ lý AI thay đổi một trang web cho bạn.",
   "onboarding.step3Title": "Giữ để xem yêu thích.",
   "onboarding.step3Body":
-    "Nhấn và giữ. Trượt lên một mục yêu thích rồi thả ra để mở. Cài đặt là cụm nút nhỏ tách riêng khỏi phần còn lại.",
+    "Nhấn giữ. Trượt tới một mục yêu thích rồi thả để mở; xoay vòng quay quanh nút để xem thêm. Phía trên là Ẩn danh, Mức sử dụng, Thẻ, Lịch sử, Hồ sơ và Cài đặt.",
   "onboarding.step4Title": "Tùy chỉnh theo ý bạn.",
   "onboarding.step4Body":
-    "Kéo nút sang mép bên này hoặc bên kia và nó sẽ ở lại đó. Đổi yêu thích trong Cài đặt, và xem lại hướng dẫn này bất cứ lúc nào.",
+    "Kéo nút lên hoặc xuống dọc mép, hoặc đẩy ra ngoài mép để giấu; chạm vào thẻ nhỏ để đưa lại. Nút ở nguyên chỗ bạn thả. Đổi mục yêu thích trong Cài đặt và xem lại hướng dẫn này ở đó bất cứ lúc nào.",
   "onboarding.quickTitle": "Bạn cần gì trong truy cập nhanh?",
   "onboarding.quickBody":
     "Chọn những trang bạn mở nhiều nhất. OpenMedia sẽ thêm các công thức chính thức của chúng và đặt vào nút của bạn.",

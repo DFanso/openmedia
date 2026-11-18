@@ -280,13 +280,13 @@ export const fr: Messages = {
     "OpenMedia ouvre de vrais sites web et masque discrètement les éléments que vous n’avez pas demandés, comme les invites « ouvrir l’application » qui gênent.",
   "onboarding.step2Title": "Un bouton.",
   "onboarding.step2Body":
-    "Appuyez pour saisir une adresse et y aller. Bientôt, vous pourrez demander à l’assistant IA de modifier un site pour vous.",
+    "Touchez-le pour saisir une adresse, chercher sur le web ou demander à l’assistant IA de modifier un site pour vous.",
   "onboarding.step3Title": "Maintenez pour les favoris.",
   "onboarding.step3Body":
-    "Appuyez et maintenez. Glissez jusqu’à un favori et relâchez pour l’ouvrir. Les réglages sont le petit bouton situé à l’écart des autres.",
+    "Maintenez appuyé. Glissez sur un favori et relâchez pour l’ouvrir ; faites tourner le cadran autour du bouton pour en voir d’autres. Au-dessus : Navigation privée, Utilisation, Onglets, Historique, Profils et Réglages.",
   "onboarding.step4Title": "Faites-le vôtre.",
   "onboarding.step4Body":
-    "Faites glisser le bouton vers l’un des bords : il y restera. Modifiez vos favoris dans les réglages et revenez sur ce guide à tout moment.",
+    "Faites glisser le bouton le long du bord, ou poussez-le hors du bord pour le ranger ; touchez la petite languette pour le ramener. Il reste où vous le laissez. Changez vos favoris dans Réglages, où vous pouvez aussi revoir ce guide à tout moment.",
   "onboarding.quickTitle": "Que vous faut-il en accès rapide ?",
   "onboarding.quickBody":
     "Choisissez les sites que vous ouvrez le plus. OpenMedia ajoute leurs recettes officielles et les place sur votre bouton.",

@@ -276,13 +276,13 @@ export const pl: Messages = {
     "OpenMedia otwiera prawdziwe strony i po cichu ukrywa to, o co nie prosisz, na przykład natrętne komunikaty „otwórz w aplikacji”.",
   "onboarding.step2Title": "Jeden przycisk.",
   "onboarding.step2Body":
-    "Dotknij go, aby wpisać adres i przejść na stronę. Wkrótce poprosisz asystenta AI o zmianę witryny.",
+    "Dotknij, aby wpisać adres, wyszukać w sieci albo poprosić asystenta AI o zmianę witryny.",
   "onboarding.step3Title": "Przytrzymaj, aby zobaczyć ulubione.",
   "onboarding.step3Body":
-    "Naciśnij i przytrzymaj. Przesuń palec na ulubioną stronę i puść, aby ją otworzyć. Ustawienia to mały przycisk oddzielony od pozostałych.",
+    "Przytrzymaj. Przesuń na ulubioną pozycję i puść, aby ją otworzyć; obracaj tarczę wokół przycisku, by zobaczyć więcej. Powyżej są Incognito, Użycie, Karty, Historia, Profile i Ustawienia.",
   "onboarding.step4Title": "Dopasuj do siebie.",
   "onboarding.step4Body":
-    "Przeciągnij przycisk na dowolną krawędź, a tam zostanie. Zmieniaj ulubione w Ustawieniach, gdzie możesz też w każdej chwili odtworzyć ten przewodnik.",
+    "Przeciągnij przycisk w górę lub w dół wzdłuż krawędzi albo wypchnij go poza krawędź, by go schować; dotknij małej zakładki, by go przywrócić. Zostaje tam, gdzie go puścisz. Ulubione zmienisz w Ustawieniach, gdzie możesz też w każdej chwili odtworzyć ten przewodnik.",
   "onboarding.quickTitle": "Czego potrzebujesz w szybkim dostępie?",
   "onboarding.quickBody":
     "Wybierz witryny, które otwierasz najczęściej. OpenMedia doda ich oficjalne przepisy i umieści je na Twoim przycisku.",

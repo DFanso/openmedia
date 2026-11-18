@@ -278,13 +278,13 @@ export const it: Messages = {
     "OpenMedia apre siti web reali e nasconde in silenzio le parti che non hai richiesto, come gli inviti ad “aprire l’app” che intralciano.",
   "onboarding.step2Title": "Un pulsante.",
   "onboarding.step2Body":
-    "Tocca per digitare un indirizzo e andare. Presto potrai chiedere all’assistente IA di modificare un sito per te.",
+    "Toccalo per digitare un indirizzo, cercare sul web o chiedere all’assistente IA di modificare un sito per te.",
   "onboarding.step3Title": "Tieni premuto per i preferiti.",
   "onboarding.step3Body":
-    "Premi e tieni premuto. Scorri su un preferito e rilascia per aprirlo. Impostazioni è il piccolo pulsante separato dagli altri.",
+    "Tieni premuto. Scorri su un preferito e rilascia per aprirlo; ruota il quadrante attorno al pulsante per vederne altri. Sopra ci sono Incognito, Utilizzo, Schede, Cronologia, Profili e Impostazioni.",
   "onboarding.step4Title": "Rendilo tuo.",
   "onboarding.step4Body":
-    "Trascina il pulsante verso uno dei bordi e resterà lì. Cambia i preferiti nelle Impostazioni e rivedi questa guida quando vuoi.",
+    "Trascina il pulsante su o giù lungo il bordo, oppure spingilo fuori dal bordo per nasconderlo; tocca la linguetta per riportarlo. Resta dove lo lasci. Cambia i preferiti in Impostazioni e rivedi questa guida lì quando vuoi.",
   "onboarding.quickTitle": "Cosa ti serve nell’accesso rapido?",
   "onboarding.quickBody":
     "Scegli i siti che apri più spesso. OpenMedia aggiunge le loro ricette ufficiali e le mette sul tuo pulsante.",

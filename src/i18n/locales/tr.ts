@@ -275,13 +275,13 @@ export const tr: Messages = {
     "OpenMedia gerçek siteleri açar ve istemediğiniz kısımları, örneğin yolunuzun üstüne çıkan “uygulamayı aç” uyarılarını sessizce gizler.",
   "onboarding.step2Title": "Tek bir düğme.",
   "onboarding.step2Body":
-    "Adres yazıp gitmek için ona dokunun. Yakında YZ asistanından bir siteyi sizin için değiştirmesini isteyebileceksiniz.",
+    "Dokunarak adres yazın, web’de arayın ya da yapay zekâ asistanından bir siteyi sizin için değiştirmesini isteyin.",
   "onboarding.step3Title": "Favoriler için basılı tutun.",
   "onboarding.step3Body":
-    "Basılı tutun. Bir favorinin üzerine kaydırıp bırakarak açın. Ayarlar düğmesi, diğerlerinden ayrı duran küçük düğmedir.",
+    "Basılı tutun. Bir sık kullanana kaydırıp bırakarak açın; daha fazlası için düğmenin etrafındaki kadranı çevirin. Üstünde Gizli, Kullanım, Sekmeler, Geçmiş, Profiller ve Ayarlar yer alır.",
   "onboarding.step4Title": "Kendi halinize getirin.",
   "onboarding.step4Body":
-    "Düğmeyi herhangi bir kenara sürükleyin; orada kalır. Favorilerinizi Ayarlar'dan değiştirin ve bu kılavuzu istediğiniz zaman yeniden oynatın.",
+    "Düğmeyi kenar boyunca yukarı veya aşağı sürükleyin ya da gizlemek için kenarın dışına itin; geri getirmek için küçük sekmeye dokunun. Bıraktığınız yerde kalır. Sık kullanılanları Ayarlar’da değiştirin ve bu rehberi oradan istediğiniz zaman yeniden oynatın.",
   "onboarding.quickTitle": "Hızlı erişimde neye ihtiyacınız var?",
   "onboarding.quickBody":
     "En çok açtığınız siteleri seçin. OpenMedia bunların resmi tariflerini ekler ve düğmenize yerleştirir.",

@@ -273,13 +273,13 @@ export const en = {
     "OpenMedia opens real websites and quietly hides the parts you did not ask for, like the “open the app” prompts that get in the way.",
   "onboarding.step2Title": "One button.",
   "onboarding.step2Body":
-    "Tap it to type an address and go. Soon you will be able to ask the AI assistant to change a site for you.",
+    "Tap it to type an address, search the web, or ask the AI assistant to change a site for you.",
   "onboarding.step3Title": "Hold for favorites.",
   "onboarding.step3Body":
-    "Press and hold. Slide onto a favorite and let go to open it. Above the button sit Incognito, Usage, History and Settings.",
+    "Press and hold. Slide onto a favorite and let go to open it; drag round the button to turn the dial for more. Above it sit Incognito, Usage, Tabs, History, Profiles and Settings.",
   "onboarding.step4Title": "Make it yours.",
   "onboarding.step4Body":
-    "Drag the button to either edge to tuck it away; tap the small tab to bring it back. It stays where you leave it. Change your favorites in Settings, and replay this guide there any time.",
+    "Drag the button up or down an edge, or push it off the edge to tuck it away; tap the small tab to bring it back. It stays where you leave it. Change your favorites in Settings, and replay this guide there any time.",
   "onboarding.quickTitle": "What do you need in quick access?",
   "onboarding.quickBody":
     "Pick the sites you open most. OpenMedia adds their official recipes and puts them on your button.",

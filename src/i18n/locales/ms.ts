@@ -271,13 +271,13 @@ export const ms: Messages = {
     "OpenMedia membuka laman web sebenar dan menyenapkan bahagian yang anda tidak minta, seperti arahan “buka aplikasi” yang menghalang.",
   "onboarding.step2Title": "Satu butang.",
   "onboarding.step2Body":
-    "Ketuk untuk menaip alamat dan pergi. Tidak lama lagi anda boleh meminta pembantu AI mengubah laman untuk anda.",
+    "Ketik untuk menaip alamat, mencari di web, atau meminta pembantu AI mengubah sesuatu laman untuk anda.",
   "onboarding.step3Title": "Tekan panjang untuk kegemaran.",
   "onboarding.step3Body":
-    "Tekan dan tahan. Leret ke sesebuah kegemaran dan lepaskan untuk membukanya. Tetapan ialah set butang kecil yang berasingan daripada yang lain.",
+    "Tekan dan tahan. Luncur ke atas kegemaran lalu lepas untuk membukanya; putar dail di sekeliling butang untuk lagi. Di atasnya ada Incognito, Penggunaan, Tab, Sejarah, Profil dan Tetapan.",
   "onboarding.step4Title": "Jadikan milik anda.",
   "onboarding.step4Body":
-    "Seret butang ke tepi mana-mana dan ia akan kekal di situ. Tukar kegemaran anda dalam Tetapan, dan ulang panduan ini bila-bila masa di situ.",
+    "Seret butang ke atas atau bawah di tepi, atau tolak keluar tepi untuk menyembunyikannya; ketik tab kecil untuk membawanya kembali. Ia kekal di tempat anda lepaskan. Tukar kegemaran dalam Tetapan dan mainkan semula panduan ini di sana bila-bila masa.",
   "onboarding.quickTitle": "Apa yang anda perlukan dalam akses pantas?",
   "onboarding.quickBody":
     "Pilih laman yang paling kerap anda buka. OpenMedia menambah resipi rasminya dan meletakkannya pada butang anda.",

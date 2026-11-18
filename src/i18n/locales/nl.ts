@@ -274,13 +274,13 @@ export const nl: Messages = {
     "OpenMedia opent echte websites en verbergt stilletjes de onderdelen waar je niet om vroeg, zoals de meldingen “open de app” die in de weg zitten.",
   "onboarding.step2Title": "Eén knop.",
   "onboarding.step2Body":
-    "Tik erop om een adres te typen en te gaan. Binnenkort kun je de AI-assistent vragen een site voor je aan te passen.",
+    "Tik erop om een adres te typen, het web te doorzoeken of de AI-assistent een site voor je te laten aanpassen.",
   "onboarding.step3Title": "Houd ingedrukt voor favorieten.",
   "onboarding.step3Body":
-    "Houd de knop ingedrukt. Schuif naar een favoriet en laat los om die te openen. Instellingen is de kleine knop die apart staat.",
+    "Houd ingedrukt. Schuif naar een favoriet en laat los om te openen; draai de schijf rond de knop voor meer. Erboven staan Incognito, Gebruik, Tabbladen, Geschiedenis, Profielen en Instellingen.",
   "onboarding.step4Title": "Maak het van jou.",
   "onboarding.step4Body":
-    "Sleep de knop naar een van de randen en hij blijft daar staan. Wijzig je favorieten in Instellingen, en speel deze handleiding daar op elk moment opnieuw af.",
+    "Sleep de knop langs de rand omhoog of omlaag, of duw hem voorbij de rand om hem weg te stoppen; tik op het kleine tabje om hem terug te halen. Hij blijft waar je hem loslaat. Wijzig je favorieten in Instellingen en speel deze gids daar op elk moment opnieuw af.",
   "onboarding.quickTitle": "Wat heb je nodig in snelle toegang?",
   "onboarding.quickBody":
     "Kies de sites die je het vaakst opent. OpenMedia voegt hun officiële recepten toe en zet ze op je knop.",

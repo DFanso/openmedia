@@ -273,13 +273,13 @@ export const cs: Messages = {
     "OpenMedia otevírá skutečné weby a nenápadně skrývá části, o které jste nestáli, například výzvy „otevřít v aplikaci“, které překážejí.",
   "onboarding.step2Title": "Jedno tlačítko.",
   "onboarding.step2Body":
-    "Klepnutím zadáte adresu a přejdete na web. Brzy bude možné požádat asistenta AI, aby web upravil za vás.",
+    "Klepnutím zadáte adresu, vyhledáte na webu, nebo požádáte AI asistenta, aby za vás upravil web.",
   "onboarding.step3Title": "Podržením zobrazíte oblíbené.",
   "onboarding.step3Body":
-    "Stiskněte a podržte. Přejeďte na oblíbenou stránku a pusťte, tím ji otevřete. Nastavení je malé tlačítko oddělené od ostatních.",
+    "Stiskněte a podržte. Přejeďte na oblíbenou položku a pusťte ji, tím ji otevřete; kruhem kolem tlačítka otáčejte pro další. Nad ním jsou Inkognito, Využití, Karty, Historie, Profily a Nastavení.",
   "onboarding.step4Title": "Přizpůsobte si to.",
   "onboarding.step4Body":
-    "Přetáhněte tlačítko k libovolnému okraji a zůstane tam. Oblíbené změníte v Nastavení, kde si také můžete tohoto průvodce kdykoli znovu přehrát.",
+    "Tlačítko přetáhněte nahoru či dolů podél okraje, nebo ho odsuňte za okraj a schovejte; malou záložkou ho vrátíte. Zůstane, kde ho necháte. Oblíbené změníte v Nastavení, kde si můžete tohoto průvodce kdykoli znovu přehrát.",
   "onboarding.quickTitle": "Co potřebujete v rychlém přístupu?",
   "onboarding.quickBody":
     "Vyberte weby, které otevíráte nejčastěji. OpenMedia přidá jejich oficiální recepty a umístí je na vaše tlačítko.",

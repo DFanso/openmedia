@@ -275,13 +275,13 @@ export const ro: Messages = {
     "OpenMedia deschide site-uri reale și ascunde discret părțile pe care nu le-ai cerut, precum mesajele „deschide aplicația” care te încurcă.",
   "onboarding.step2Title": "Un singur buton.",
   "onboarding.step2Body":
-    "Atinge-l pentru a scrie o adresă și a merge acolo. În curând vei putea cere asistentului AI să modifice un site pentru tine.",
+    "Atinge-l ca să scrii o adresă, să cauți pe web sau să ceri asistentului AI să schimbe un site pentru tine.",
   "onboarding.step3Title": "Ține apăsat pentru favorite.",
   "onboarding.step3Body":
-    "Apasă și ține. Glisează peste un favorit și ridică degetul pentru a-l deschide. Setările sunt butonul mic, aflat separat de celelalte.",
+    "Ține apăsat. Glisează pe un favorit și ridică degetul ca să-l deschizi; rotește cadranul din jurul butonului pentru mai multe. Deasupra sunt Incognito, Utilizare, File, Istoric, Profiluri și Setări.",
   "onboarding.step4Title": "Fă-l al tău.",
   "onboarding.step4Body":
-    "Trage butonul spre oricare margine și rămâne acolo. Schimbă-ți favoritele în Setări și redă acest ghid din nou oricând, tot acolo.",
+    "Trage butonul în sus sau în jos pe margine sau împinge-l dincolo de margine ca să-l ascunzi; atinge mica filă ca să-l aduci înapoi. Rămâne unde îl lași. Schimbă favoritele în Setări și reia acest ghid de acolo oricând.",
   "onboarding.quickTitle": "Ce ai nevoie la acces rapid?",
   "onboarding.quickBody":
     "Alege site-urile pe care le deschizi cel mai des. OpenMedia le adaugă rețetele oficiale și le pune pe butonul tău.",

@@ -249,13 +249,13 @@ export const zhHant: Messages = {
   "onboarding.step1Body":
     "OpenMedia 會開啟真實網站，並悄悄隱藏你不需要的部分，例如擋路的「開啟 App」提示。",
   "onboarding.step2Title": "一個按鈕。",
-  "onboarding.step2Body": "點一下就能輸入網址並前往。很快你就能請 AI 助理替你修改網站。",
+  "onboarding.step2Body": "點一下可輸入網址、搜尋網頁，或請 AI 助理為你修改網站。",
   "onboarding.step3Title": "長按開啟我的最愛。",
   "onboarding.step3Body":
-    "按住不放，滑到某個我的最愛上再放開，就會開啟它。「設定」是與其他按鈕分開的小按鈕。",
+    "按住不放。滑到某個收藏上放開即可開啟；繞按鈕轉動轉盤可查看更多。上方依序是無痕、使用情況、分頁、歷史記錄、個人檔案和設定。",
   "onboarding.step4Title": "照你的習慣來。",
   "onboarding.step4Body":
-    "把按鈕拖到任一側邊緣，它就會留在那裡。我的最愛可以在「設定」中調整，這份指南也能隨時重新查看。",
+    "沿邊緣上下拖曳按鈕，或將它推出邊緣以收起；點一下小標籤即可讓它回來。它會停在你放開的位置。在設定中更改收藏，並可隨時在那裡重新觀看本指南。",
   "onboarding.quickTitle": "你想把什麼放進快速存取？",
   "onboarding.quickBody":
     "選擇你最常開啟的網站。OpenMedia 會加入它們的官方配方，並放到你的按鈕上。",

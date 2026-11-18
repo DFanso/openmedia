@@ -271,13 +271,13 @@ export const de: Messages = {
     "OpenMedia öffnet echte Websites und blendet unaufdringlich die Teile aus, die du nicht wolltest, etwa die „In App öffnen“-Hinweise, die im Weg stehen.",
   "onboarding.step2Title": "Eine Taste.",
   "onboarding.step2Body":
-    "Tippe darauf, um eine Adresse einzugeben und loszugehen. Bald kannst du den KI-Assistenten bitten, eine Website für dich zu ändern.",
+    "Tippe darauf, um eine Adresse einzugeben, im Web zu suchen oder den KI-Assistenten zu bitten, eine Website für dich zu ändern.",
   "onboarding.step3Title": "Für Favoriten gedrückt halten.",
   "onboarding.step3Body":
-    "Gedrückt halten. Auf einen Favoriten ziehen und loslassen, um ihn zu öffnen. Die Einstellungen sind die kleine Schaltfläche, die von den anderen getrennt ist.",
+    "Gedrückt halten. Auf einen Favoriten ziehen und loslassen, um ihn zu öffnen; dreh das Rad um die Taste für mehr. Darüber: Inkognito, Nutzung, Tabs, Verlauf, Profile und Einstellungen.",
   "onboarding.step4Title": "Mach es zu deinem.",
   "onboarding.step4Body":
-    "Zieh die Schaltfläche an einen der beiden Ränder, und sie bleibt dort. Ändere deine Favoriten in den Einstellungen und spiele diese Anleitung dort jederzeit erneut ab.",
+    "Zieh die Taste am Rand nach oben oder unten, oder schieb sie über den Rand, um sie zu verstecken; tippe auf den kleinen Reiter, um sie zurückzuholen. Sie bleibt, wo du sie lässt. Ändere deine Favoriten in den Einstellungen und spiele diese Anleitung dort jederzeit erneut ab.",
   "onboarding.quickTitle": "Was brauchst du im Schnellzugriff?",
   "onboarding.quickBody":
     "Wähle die Websites, die du am häufigsten öffnest. OpenMedia fügt ihre offiziellen Rezepte hinzu und legt sie auf deine Schaltfläche.",
