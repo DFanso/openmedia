@@ -125,7 +125,7 @@ function MemberButton({
         clearTimeout(armTimer.current);
         armTimer.current = window.setTimeout(() => {
           const current = press.current;
-          if (current) setHold(carryHold(Date.now() - current.at, current.strayed));
+          if (current && !current.strayed) setHold("armed");
         }, CARRY_HOLD_MS);
       }}
       onPointerMove={(event) => {

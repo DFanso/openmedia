@@ -331,7 +331,7 @@ function DialButton({
         clearTimeout(armTimer.current);
         armTimer.current = window.setTimeout(() => {
           const current = press.current;
-          if (current) setPressHold(carryHold(Date.now() - current.at, current.strayed));
+          if (current && !current.strayed) setPressHold("armed");
         }, CARRY_HOLD_MS);
       }}
       onPointerMove={(event) => {
@@ -1141,10 +1141,8 @@ function FloatingButton() {
           carry={carryOf(entry.target)}
           onCarry={startCarry}
           slidHold={
-            sameTarget(hover, entry.target) && carryOf(entry.target)
-              ? liftedHover === targetKey(entry.target)
-                ? "armed"
-                : "charging"
+            liftedHover === targetKey(entry.target) && sameTarget(hover, entry.target)
+              ? "armed"
               : "idle"
           }
         />
