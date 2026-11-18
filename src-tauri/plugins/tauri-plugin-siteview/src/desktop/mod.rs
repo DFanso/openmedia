@@ -1265,9 +1265,15 @@ impl<R: Runtime> Siteview<R> {
         check_evaluate_result(json)
     }
 
-    /// Reads no pixel: the page script's own color is used on the Mac. Rust-only like `evaluate`.
-    pub fn sample_color(&self, _request: SampleColorRequest) -> Result<Option<String>> {
-        Ok(None)
+    /// The color the active page shows at a point of its viewport. Rust-only like `evaluate`.
+    /// `None` where the system web view gives no pixel (Windows, Linux): the page script's own
+    /// color is used there.
+    pub fn sample_color(&self, request: SampleColorRequest) -> Result<Option<String>> {
+        if !request.x.is_finite() || !request.y.is_finite() {
+            return Ok(None);
+        }
+        let webview = self.inner.active_webview()?;
+        platform::sample_color(&webview, request.x, request.y)
     }
 }
 

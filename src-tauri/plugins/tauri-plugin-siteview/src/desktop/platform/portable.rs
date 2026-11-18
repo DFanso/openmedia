@@ -32,6 +32,11 @@ pub const APPLIES_RULE_LISTS: bool = false;
 /// Only macOS filters the shell's clicks by region; here the regions are kept in the plugin state.
 pub fn set_regions(_regions: Vec<Rect>) {}
 
+/// These system web views give no pixel to read, so the page script's own color is used.
+pub fn sample_color<R: Runtime>(_webview: &Webview<R>, _x: f64, _y: f64) -> Result<Option<String>> {
+    Ok(None)
+}
+
 /// The shell's web view fills the window, so a page's coordinates need no offset.
 pub fn content_insets<R: Runtime>(_webview: &Webview<R>) -> Result<(f64, f64, f64, f64)> {
     Ok((0.0, 0.0, 0.0, 0.0))
