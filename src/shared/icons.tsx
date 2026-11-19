@@ -308,3 +308,10 @@ export const DatabaseIcon = () => (
     <path d="M5 6.5v11c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8v-11M5 12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8" />
   </Icon>
 );
+
+export const SpeakerIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4Z" />
+    <path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" />
+  </Icon>
+);
