@@ -6,6 +6,44 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): Mobile site brings the mobile page back
+
+**Area:** `fix(siteview)`
+
+**Problem:** After *Desktop site*, tapping *Mobile site* left the page on its desktop layout.
+
+**Change:** When a site's desktop choice changes, the iOS and Android plugins load the page's address as a new navigation (iOS also past the cache) instead of `reload()`, which kept the content mode, user agent and zoom the page was first loaded with. A hidden iOS page does the same when it is shown again.
+
+**Verified:** nothing run. **Not verified:** on a device or simulator; the cause is inferred from the code, not reproduced.
+
+### feat(settings): phone Settings is a list of parts, each its own page
+
+**Area:** `feat(settings)`
+
+**Problem:** After the desktop Settings got a sidebar of parts, a phone still showed them as a row of chips above one long list of folding sections: seven names to scroll sideways, and a page that said nothing about what was in each part.
+
+**Change:** The first page of Settings on a phone is a list of the parts, each with an icon and the names of what it holds. A tap opens that part as a page with a back arrow; Back, the edge swipe and Android's back return to the list. Blocks no longer fold away on a phone: a quiet label over the card, the note under it. Reopening Settings starts on the list. Desktop is unchanged. No new strings.
+
+**Verified:** TypeScript, ESLint, Prettier, Vitest; the list, a part page, back and the Android back handler (off while a page sits over Settings) in a browser harness at 390 px, and the desktop layout at 1200 px. **Not verified:** on an iOS or Android device; the edge swipe off a part page.
+
+### fix(desktop): the app stays clickable after a cold start or a minimize with media playing
+
+**Area:** `fix(desktop)`
+
+**Problem:** Sometimes after launch, and most often after minimizing while media played, nothing in the app could be clicked. Two causes: the shell's click regions were remembered as sent even when the send failed (and not re-sent after the window came back), and native code answers every click outside the regions it holds with "not the shell"; and a pause decided as the window was minimized could finish after the resume decided as it came back, leaving the page's media suspended.
+
+**Change:** `regionReporter.ts` forgets a failed send and `useHitRegions` re-sends the regions when the window becomes visible or focused. In the desktop plugin, `settle_media` decides and applies each pause or resume under one gate, so they finish in the order they were decided.
+
+**Verified:** Vitest for the reporter, `cargo clippy -D warnings` on the plugin. **Not verified:** in the running desktop app; the freeze was not reproduced here.
+
+### feat(tabs): a speaker badge on sites that are playing media
+
+**Area:** `feat(tabs)`
+
+**Change:** A site playing audible sound or video gets a small speaker badge on its icon's top corner in the Tabs screen, the floating button's fan and the folder popup. The site views report a new `playing` flag in `siteview:state`, found by asking the page every ~2 s (macOS, Windows, Linux, iOS, Android). Muted media and media inside iframes do not count.
+
+**Verified:** Vitest, TypeScript, ESLint, Prettier, `cargo test`/`clippy -D warnings` on the plugin (macOS). **Not verified:** on a running app, iOS, Android, Windows, Linux (Swift, Kotlin and the portable desktop path are not compiled here).
+
 ### fix(desktop): the color picker reads the pixel the page shows on macOS
 
 **Area:** `fix(desktop)`

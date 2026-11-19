@@ -26,6 +26,10 @@ The only default favorite is the default search engine, Google: onboarding sets 
 
 Two kinds of gate, two icons. A crown (`ProIcon`, in a navy badge) means the paywall: Usage, the assistant's Chat mode and show it without Pro. A biometric icon (`BiometricIcon`) means Face ID, Touch ID or the passcode: Face ID's face glyph on a device that has Face ID, a fingerprint on Touch ID devices, Android and the Mac (Rust's `biometry_kind` asks the plugin, which reads `LAContext.biometryType` on iOS; Android cannot tell a face from a finger). It appears on: the locked incognito section in Settings, the Incognito recipes row, and the Incognito button in the fan (it asks for the check before entering). Incognito is free: none of these shows a crown.
 
+### Playing-media indicator
+
+A site that is playing sound or video shows a small speaker badge on the top corner of its icon: on the Tabs screen (open tabs and quick-access rows), on the floating button's fan and folder popup. Each native site view asks its page every ~2 s (desktop: `eval_with_callback` from the poll loop; iOS `evaluateJavaScript`; Android `evaluateJavascript`) whether a `video`/`audio` element of the page's own document is playing, unmuted, with volume and enough data to play, and reports the answer as `playing` in the `siteview:state` event. Muted autoplay (feeds) does not count; media in iframes is not seen. The answer is a boolean from hostile page code: it can only decide whether a badge shows. Frontend: `playingByFavorite` (`src/features/web/unreadWatch.ts`), `PlayingBadge` (`src/shared/PlayingBadge.tsx`).
+
 ### Unread badges and notifications
 
 A page that has unread items usually says so in its title: `(3) Messenger`. For each quick-access favorite's live session the shell reads that leading `(N)` or `[N]` (`unreadCount`, `src/shared/unread.ts`; a generic title convention, not per-site code). The count appears as a badge on the fan item, and a dot on the floating button when any hidden favorite has one. The page on screen is never badged.
@@ -54,9 +58,9 @@ The splash is drawn by `index.html` itself, with the logo and the stylesheet inl
 
 ## Settings
 
-Settings uses one scrolling screen for collapsible sections, with Incognito favorites as its one locked section. Normal and Incognito Recipes each open their own page. Settings and History share the `shared/Screen.tsx` page frame. Expand a section by tapping its heading or using the keyboard. Closing and reopening Settings restores the compact default.
+Settings is split into seven parts: General, Browsing, Controls, Sites and recipes, Incognito, AI assistant, Data and help (`SETTINGS_CATEGORIES` in `SettingsNav.tsx`). On a phone the first page is a list of the parts (`SettingsIndex`: an icon, the name, and under it the names of what is inside); a tap opens that part as its own page with a back arrow, and Back (the arrow, the edge swipe, Android's back) returns to the list, which Back or the cross then closes. Each part is short, so its blocks (`Section`: a quiet label over the card, the note under it) do not fold away. Reopening Settings starts on the list again. On desktop the parts are a sidebar and the page opens on General. Incognito favorites stay the one locked section (`LockedSection`). Normal and Incognito Recipes each open their own page. Settings and History share the `shared/Screen.tsx` page frame.
 
-Pages opened from Settings (Recipes, Incognito Recipes, Recipe library, Share, and the paywall) sit on top of it. Closing a page returns to Settings with its scroll position and open sections intact; Incognito favorites are cleared and relocked when entering or leaving the Incognito Recipes page.
+Pages opened from Settings (Recipes, Incognito Recipes, Recipe library, Share, and the paywall) sit on top of it. Closing a page returns to Settings on the part it was opened from, with its scroll position intact; Incognito favorites are cleared and relocked when entering or leaving the Incognito Recipes page.
 
 - **Appearance:** System, Light or Dark. Stored in `library.json` and applied to OpenMedia's own screens only (and the Android status bar icons and the backdrop). It never reaches a page: how pages look is Dark mode ([Dark Mode for Pages](./dark-mode.md)).
 - **Dark mode:** a row that opens the General dark mode page (`DarkModeScreen`): the master switch, method, brightness, contrast, sepia, grayscale, the dark scheme colours, schedule, page options and the sites with specific settings.
