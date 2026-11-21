@@ -215,6 +215,9 @@ pub struct AppState {
     /// Drops the pop-ups and redirects a page opens on its own that are no sign-in. Part of ad
     /// blocking: it has no effect while ad blocking is off.
     pub block_popups: bool,
+    /// Opens the most used favorites quietly once the first page has loaded, so switching to one is
+    /// instant. On by default.
+    pub preload_favorites: bool,
     /// Pixels kept clear under every page, unless the site has its own.
     pub bottom_margin: u32,
     /// The sites whose media keeps playing in the background.
@@ -264,6 +267,8 @@ struct LibraryData {
     /// On by default, and only in force while `ad_block` is on.
     #[serde(default = "enabled")]
     block_popups: bool,
+    #[serde(default = "enabled")]
+    preload_favorites: bool,
     /// Toggles the user changed, by recipe id and then option id. Anything absent keeps the
     /// recipe's default, so shipping a recipe with a new option needs no migration.
     #[serde(default)]
@@ -434,6 +439,7 @@ impl Library {
             theme: data.theme,
             ad_block: data.ad_block,
             block_popups: data.block_popups,
+            preload_favorites: data.preload_favorites,
             bottom_margin: data.bottom_margin,
             background_media_sites: data.background_media_sites.iter().cloned().collect(),
             picture_in_picture_sites: data.picture_in_picture_sites.iter().cloned().collect(),
@@ -614,6 +620,12 @@ impl Library {
     pub fn set_block_popups(&self, enabled: bool) -> Result<()> {
         let mut data = self.lock()?;
         data.block_popups = enabled;
+        self.save(&data)
+    }
+
+    pub fn set_preload_favorites(&self, enabled: bool) -> Result<()> {
+        let mut data = self.lock()?;
+        data.preload_favorites = enabled;
         self.save(&data)
     }
 
@@ -1160,6 +1172,7 @@ fn default_data() -> LibraryData {
         theme: Theme::System,
         ad_block: true,
         block_popups: true,
+        preload_favorites: true,
         site_options: OptionChoices::new(),
         bottom_margin: 0,
         site_bottom_margins: BTreeMap::new(),
@@ -2094,6 +2107,14 @@ mod tests {
         library.set_ad_block(false).unwrap();
         assert!(!library.ad_block_enabled().unwrap());
         assert!(!reload(&dir).state().unwrap().ad_block);
+    }
+
+    #[test]
+    fn preloading_favorites_is_on_by_default_and_remembered() {
+        let (dir, library) = library();
+        assert!(library.state().unwrap().preload_favorites);
+        library.set_preload_favorites(false).unwrap();
+        assert!(!reload(&dir).state().unwrap().preload_favorites);
     }
 
     #[test]

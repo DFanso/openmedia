@@ -326,6 +326,9 @@ export const pl: Messages = {
   "settings.blockPopups": "Blokuj wyskakujące okna i przekierowania",
   "settings.blockPopupsNote":
     "Odrzuca okna i przekierowania, które strona otwiera sama, poza logowaniem. Dotyczy stron otwieranych później.",
+  "settings.preloadFavorites": "Wczytuj ulubione z wyprzedzeniem",
+  "settings.preloadFavoritesNote":
+    "Po załadowaniu otwartej strony po cichu otwiera najczęściej używane ulubione, aby przełączenie na nie było natychmiastowe. Zużywa trochę danych i baterii.",
   "web.popupBlocked":
     "Zablokowano wyskakujące okno lub przekierowanie do {host}. Jeśli logowanie lub płatność się nie powiodły, wyłącz w Ustawieniach blokowanie wyskakujących okien i przekierowań.",
   "settings.backButton": "Pływający przycisk wstecz",

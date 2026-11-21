@@ -21,6 +21,7 @@ const startup = {
   theme: "system",
   adBlock: false,
   blockPopups: true,
+  preloadFavorites: true,
   bottomMargin: 0,
   backgroundMediaSites: [],
   pictureInPictureSites: [],

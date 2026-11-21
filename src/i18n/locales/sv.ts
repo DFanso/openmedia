@@ -324,6 +324,9 @@ export const sv: Messages = {
   "settings.blockPopups": "Blockera popup-fönster och omdirigeringar",
   "settings.blockPopupsNote":
     "Släpper fönster och omdirigeringar som en sida öppnar av sig själv, utom inloggningar. Gäller sidor du öppnar efteråt.",
+  "settings.preloadFavorites": "Förladda favoriter",
+  "settings.preloadFavoritesNote":
+    "Öppnar tyst de favoriter du använder mest när sidan du öppnade har laddats, så att det går direkt att byta till dem. Använder lite data och batteri.",
   "web.popupBlocked":
     "Ett popup-fönster eller en omdirigering till {host} blockerades. Om en inloggning eller betalning misslyckades, stäng av Blockera popup-fönster och omdirigeringar i Inställningar.",
   "settings.backButton": "Flytande bakåtknapp",

@@ -322,6 +322,9 @@ export const cs: Messages = {
   "settings.blockPopups": "Blokovat vyskakovací okna a přesměrování",
   "settings.blockPopupsNote":
     "Zahazuje okna a přesměrování, která stránka otevře sama, kromě přihlášení. Platí pro stránky, které otevřete příště.",
+  "settings.preloadFavorites": "Předem načítat oblíbené",
+  "settings.preloadFavoritesNote":
+    "Po načtení stránky, kterou jste otevřeli, tiše otevře nejpoužívanější oblíbené, takže přepnutí na ně je okamžité. Spotřebuje trochu dat a baterie.",
   "web.popupBlocked":
     "Zablokováno vyskakovací okno nebo přesměrování na {host}. Pokud selhalo přihlášení nebo platba, vypněte v Nastavení blokování vyskakovacích oken a přesměrování.",
   "settings.backButton": "Plovoucí tlačítko Zpět",

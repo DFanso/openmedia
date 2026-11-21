@@ -8,6 +8,19 @@ pub struct Rect {
     pub height: f64,
 }
 
+/// A list named `X` + this suffix is a variant of list `X` (the same rules, fewer of them), made for
+/// a site that asked for less. Variants of one list are kept together when the system's store is
+/// cleaned, so opening one site does not throw away the lists another site uses.
+pub const VARIANT_SUFFIX: &str = "-net";
+
+/// Whether the list `stored` in the system's store is still wanted, given the ids `keep` that were
+/// just asked for: it is, when its own id or any variant of its base was asked for.
+pub fn is_kept_in_store(keep: &[String], stored: &str) -> bool {
+    let base = |id: &str| id.strip_suffix(VARIANT_SUFFIX).unwrap_or(id).to_owned();
+    let stored_base = base(stored);
+    keep.iter().any(|id| base(id) == stored_base)
+}
+
 /// A WebKit content rule list, compiled on demand. `id` names it in WebKit's persistent store, so
 /// the JSON file at `path` is only read when the store does not already hold `id`.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -36,6 +49,15 @@ pub struct OpenRequest {
     pub block_popups: bool,
     #[serde(default)]
     pub content_rule_lists: Vec<ContentRuleList>,
+    /// Whether the lists' element-hiding rules apply to this page. When false, `content_rule_lists`
+    /// are already the variants without them, and a later `set_content_rule_lists` keeps this page
+    /// on `variants`.
+    #[serde(default = "yes")]
+    pub element_hiding: bool,
+}
+
+fn yes() -> bool {
+    true
 }
 
 /// Names one open session: `activate` shows it, `close` tears it down.
@@ -58,6 +80,11 @@ pub struct NotifyRequest {
 pub struct SetContentRuleListsRequest {
     pub enabled: bool,
     pub lists: Vec<ContentRuleList>,
+    /// The same lists without their element-hiding rules, for the pages opened with
+    /// `element_hiding: false`. Only iOS keeps pages on their variant; elsewhere the lists apply
+    /// to every page and these are ignored.
+    #[serde(default)]
+    pub variants: Vec<ContentRuleList>,
 }
 
 /// Replaces the script injected at document start and reloads the open site view, so the page
@@ -318,4 +345,35 @@ pub enum BiometryKind {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BiometryResponse {
     pub kind: BiometryKind,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_page_opens_with_element_hiding_unless_it_says_otherwise() {
+        let open = |extra: &str| -> OpenRequest {
+            serde_json::from_str(&format!(
+                r#"{{"session":"s","profile":"p","url":"https://a.example/","adBlockEnabled":true,"blockPopups":true{extra}}}"#
+            ))
+            .unwrap()
+        };
+        assert!(open("").element_hiding);
+        assert!(!open(r#","elementHiding":false"#).element_hiding);
+    }
+
+    #[test]
+    fn a_variant_and_its_base_are_kept_together_and_an_older_version_is_not() {
+        let only_variant = vec!["openmedia-easylist-aaa-net".to_owned()];
+        assert!(is_kept_in_store(&only_variant, "openmedia-easylist-aaa"));
+        assert!(is_kept_in_store(
+            &only_variant,
+            "openmedia-easylist-aaa-net"
+        ));
+        let only_base = vec!["openmedia-easylist-aaa".to_owned()];
+        assert!(is_kept_in_store(&only_base, "openmedia-easylist-aaa-net"));
+        assert!(!is_kept_in_store(&only_base, "openmedia-easylist-bbb"));
+        assert!(!is_kept_in_store(&only_base, "openmedia-easylist-bbb-net"));
+    }
 }

@@ -192,6 +192,7 @@ pub fn run() {
             commands::adopt_boot_session,
             commands::set_ad_block,
             commands::set_block_popups,
+            commands::set_preload_favorites,
             commands::get_sites,
             commands::set_site_option,
             recipe_library::library_list,

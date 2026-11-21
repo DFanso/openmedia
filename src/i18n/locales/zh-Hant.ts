@@ -293,6 +293,9 @@ export const zhHant: Messages = {
   "settings.blockPopups": "封鎖彈出視窗與重新導向",
   "settings.blockPopupsNote":
     "捨棄頁面自行開啟的視窗與重新導向（登入除外）。對之後開啟的頁面生效。",
+  "settings.preloadFavorites": "預先載入我的最愛",
+  "settings.preloadFavoritesNote":
+    "在你開啟的頁面載入完成後，靜靜地開啟最常用的我的最愛，切換過去即刻完成。會耗用少量流量與電量。",
   "web.popupBlocked":
     "已封鎖前往 {host} 的彈出視窗或重新導向。若登入或付款失敗，請在設定中關閉「封鎖彈出視窗與重新導向」。",
   "settings.backButton": "浮動返回按鈕",

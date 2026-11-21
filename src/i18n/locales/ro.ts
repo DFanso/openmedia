@@ -325,6 +325,9 @@ export const ro: Messages = {
   "settings.blockPopups": "Blochează ferestrele pop-up și redirecționările",
   "settings.blockPopupsNote":
     "Elimină ferestrele și redirecționările pe care o pagină le deschide singură, cu excepția autentificărilor. Se aplică paginilor deschise ulterior.",
+  "settings.preloadFavorites": "Preîncarcă favoritele",
+  "settings.preloadFavoritesNote":
+    "Deschide discret favoritele pe care le folosești cel mai des după ce se încarcă pagina deschisă, astfel încât trecerea la ele să fie instantanee. Consumă puțin trafic și baterie.",
   "web.popupBlocked":
     "A fost blocat un pop-up sau o redirecționare către {host}. Dacă o autentificare sau o plată a eșuat, dezactivează Blochează ferestrele pop-up și redirecționările în Setări.",
   "settings.backButton": "Buton Înapoi plutitor",

@@ -322,6 +322,9 @@ export const de: Messages = {
   "settings.blockPopups": "Pop-ups und Weiterleitungen blockieren",
   "settings.blockPopupsNote":
     "Verwirft Fenster und Weiterleitungen, die eine Seite von selbst öffnet, außer Anmeldungen. Gilt für Seiten, die du danach öffnest.",
+  "settings.preloadFavorites": "Favoriten vorab laden",
+  "settings.preloadFavoritesNote":
+    "Öffnet die am häufigsten genutzten Favoriten still, sobald die geöffnete Seite geladen ist, damit der Wechsel sofort geht. Verbraucht etwas Daten und Akku.",
   "web.popupBlocked":
     "Ein Pop-up oder eine Weiterleitung zu {host} wurde blockiert. Falls eine Anmeldung oder Zahlung fehlschlug, schalte „Pop-ups und Weiterleitungen blockieren“ in den Einstellungen aus.",
   "settings.backButton": "Schwebende Zurück-Taste",

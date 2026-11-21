@@ -321,6 +321,9 @@ export const en = {
   "settings.blockPopups": "Block pop-ups and redirects",
   "settings.blockPopupsNote":
     "Drops windows and redirects a page opens on its own, except sign-ins. Applies to pages you open next.",
+  "settings.preloadFavorites": "Preload favorites",
+  "settings.preloadFavoritesNote":
+    "Quietly opens the favorites you use most once the page you opened has loaded, so switching to them is instant. Uses some data and battery.",
   "web.popupBlocked":
     "Blocked a pop-up or redirect to {host}. If a sign-in or payment failed, turn off Block pop-ups and redirects in Settings.",
   "settings.backButton": "Floating back button",

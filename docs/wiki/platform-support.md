@@ -115,6 +115,10 @@ A single black or white frame at the moment a new page is revealed remained afte
 - **iOS 17 is the minimum.** `forIdentifier:` is iOS 17+, and the Tauri iOS template defaults to 15, so `tauri.conf.json` sets `bundle.iOS.minimumSystemVersion` to 17.0. This resolves the roadmap's open question on older iOS versions.
 - Android requires `MULTI_PROFILE` and `WEB_MESSAGE_LISTENER` at runtime; Kotlin implements these checks and has no single-profile fallback. Device/emulator behavior remains unverified.
 
+## Preloading favorites
+
+Sites are slow to load mostly because of the site's own server (Instagram's HTML takes about 1.2 s to arrive from the host before anything on the device is involved), so the app hides the wait instead: once the page the reader asked for has drawn, plus `WARM_DELAY_MS` (2.5 s, so it has the network to itself), `warmFavorites` in `store.ts` opens the two favorites the reader is most likely to want next, quietly, as ordinary sessions behind the page in front. `pickWarmFavorites` (`features/web/warm.ts`) predicts from the last 14 days of recorded time per site (`usage.report`), then the order of the reader's favorites; it skips sites already open, hub pages and duplicates of one site. The shell sends one `openAll` action with the front page as `focus`, so the front page is activated again at once. Nothing is done in incognito, in a window layout, on a blank tab, while anything plays, or with *Preload favorites* off in Settings (on by default, `preloadFavorites` in `library.json`). A warmed session is a normal session: it counts toward the session cap, is spared like any favorite, is paused while hidden, and is closed by the idle sweep. iPhone 17 Pro Max simulator: the app's web content processes went from 2 to 4 about 2.5 s after the page painted, and the front page stayed in front. **Not measured:** a flash of the warmed page while its `open` runs, the time saved when switching to a warmed favorite, memory and data on a device.
+
 ## Startup
 
 Cold start used to show an empty screen (launch screen), then the splash, then an empty screen again until a heavy page painted. Measured and fixed in `perf/startup-handoff`.

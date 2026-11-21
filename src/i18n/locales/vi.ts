@@ -316,6 +316,9 @@ export const vi: Messages = {
   "settings.blockPopups": "Chặn cửa sổ bật lên và chuyển hướng",
   "settings.blockPopupsNote":
     "Loại bỏ cửa sổ và chuyển hướng mà trang tự mở, trừ đăng nhập. Áp dụng cho các trang bạn mở tiếp theo.",
+  "settings.preloadFavorites": "Tải trước mục yêu thích",
+  "settings.preloadFavoritesNote":
+    "Lặng lẽ mở các mục yêu thích bạn dùng nhiều nhất sau khi trang bạn mở tải xong, để chuyển sang chúng ngay lập tức. Tốn một ít dữ liệu và pin.",
   "web.popupBlocked":
     "Đã chặn một cửa sổ bật lên hoặc chuyển hướng tới {host}. Nếu đăng nhập hoặc thanh toán thất bại, hãy tắt Chặn cửa sổ bật lên và chuyển hướng trong Cài đặt.",
   "settings.backButton": "Nút quay lại nổi",

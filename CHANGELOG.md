@@ -6,6 +6,66 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### perf(shell): the favorites you are most likely to open next load quietly behind the page in front
+
+**Area:** `perf(shell)`
+
+**Problem:** Most of a page's load time is the site's own server, which the app cannot speed up; every first switch to a favorite waited for it.
+
+**Change:** `warmFavorites` (store) opens the two favorites with the most recorded time in the last 14 days, 2.5 s after the front page has drawn, as ordinary sessions behind it (one `openAll` action focused on the front page). New setting *Preload favorites* (`preloadFavorites`, on by default, all 29 locales). Skipped in incognito, in window layouts, on a blank tab, while anything plays. Details: `docs/wiki/platform-support.md#preloading-favorites`.
+
+**Verified:** Vitest for the prediction; on the simulator the app's web content processes went from 2 to 4 about 2.5 s after the page painted and the front page stayed in front. **Not verified:** the saving when switching, a flash of the warmed page during its open, memory and data on a device, Android and desktop.
+
+### fix(recipes): Reddit's "Get the Reddit app" bar is hidden when logged in
+
+**Area:** `fix(recipes)`
+
+**Change:** `app-sheet` matched `div[id^="configured-xpromo-"]`; the logged-in feed's bar is `rpl-alert-banner#configured-xpromo-…`, so the selector now matches the id prefix on any element (3.0.1). Fixture `feed-with-promos.html` carries it.
+
+**Verified:** on the simulator with the rule installed the bar was gone while scrolling a feed. **Not verified:** a device.
+
+### feat(worker): accept `recipe.performance`
+
+**Area:** `feat(worker)`
+
+**Change:** `openmedia-worker` `src/validate.ts` accepts and canonicalizes `performance` (`adBlock`, `entry`) with the app's rules (one site is the last two labels, stricter than the device's list). Committed in the worker repository, not pushed.
+
+### perf(recipes): a page the site redirects is opened at its final address (`performance.entry`)
+
+**Area:** `perf(recipes)`
+
+**Problem:** YouTube, Facebook, Twitch and WhatsApp Web answer a phone's request for their usual address with a redirect (`www.youtube.com` to `m.youtube.com`), one more round trip and one more secure connection before the first byte, every time the page opens.
+
+**Change:** a recipe may carry `performance.entry` (`from`, `to`, optional `platform`): when the app is asked to open exactly `from` it opens `to`. `open_session` asks `Recipes::entry_for`, so launch, favorites, hub tabs and typed addresses all use it; only an exact address is rewritten, both ends must be covered by the recipe and on one site, and the YouTube, Facebook, Twitch and WhatsApp recipes mark theirs `mobile` because a computer is not redirected. Format: `docs/wiki/recipe-format.md#performance`.
+
+**Verified:** `cargo test recipes::` (schema, validation, platform and exact-address cases). iPhone 17 Pro Max simulator, with the updated YouTube recipe installed: the page was opened at `https://m.youtube.com/` (native log), and load to first commit took 0.65 to 0.73 s against 0.92 to 0.99 s through `www.youtube.com` (three runs each, alternated). **Not verified:** a device; Facebook, Twitch and WhatsApp end to end (their redirects were read with `curl` and an iPhone user agent); the Worker's `validate.ts` still refuses a shared recipe that carries `performance`. A recipe already added from the library keeps its old copy until it is updated there.
+
+### perf(recipes): a recipe can leave the ad blocker's element-hiding rules off for its site (`performance.adBlock`)
+
+**Area:** `perf(recipes)`
+
+**Problem:** The ad blocker's lists carry about 37,000 element-hiding rules (`css-display-none`). On Instagram, whose ads are posts in its own feed, they hide nothing and slow every page: first contentful paint 735 to 841 ms with every list, 557 to 615 ms without those rules, 432 to 470 ms with no lists at all (three runs each, iPhone 17 Pro Max simulator). YouTube and Reddit showed no measurable difference.
+
+**Change:** `performance.adBlock.elementHiding: false` in a recipe. `open_session` asks `Recipes::skips_element_hiding` and passes the native side `AdBlock::rule_lists_without_hiding`: each list's id plus `-net`, the same rules minus the `css-display-none` ones, derived from the full file once and cached beside it. The iOS and macOS stores keep both versions of a list while either is asked for (`ruleListBase`, `is_kept_in_store`), otherwise opening Instagram would delete the lists every other site uses. The Instagram recipe sets it. Request blocking is untouched. Switching ad blocking off and on in Settings keeps such a page on the variant lists on iOS (`OpenRequest.element_hiding`, `SetContentRuleListsRequest.variants`); on macOS the full lists apply again until the page is reopened, Android has one list set for all pages.
+
+**Verified:** `cargo test` (variant content, cache cleaning, store keep rule), `cargo clippy -D warnings`; with the feature built in, on the simulator, four alternated runs of Instagram: first contentful paint 551 to 625 ms with `elementHiding: false` and 735 to 832 ms without. **Not verified:** a device; Android; macOS; that no ad slot Instagram shows is now left visible (none was seen).
+
+### fix(recipes): Instagram's "Use the app" bar above the tab bar is hidden when logged in
+
+**Area:** `fix(recipes)`
+
+**Change:** the Instagram recipe's `app-prompts` option gains `use-the-app-bar`, which hides the fixed strip (a button and a close icon) that stays above the tab bar of a logged-in feed. Both `:has` conditions together matched exactly that one element on the live page; the first alone matched 6. Fixture `logged-in-feed.html` carries the strip.
+
+**Verified:** `cargo test recipes::`; on the simulator with the rule installed, the strip's computed `display` was `none` and the tab bar and the post below filled the space with no gap (screenshot). **Not verified:** a device; other languages' wording (the selector uses structure, not text).
+
+### fix(shell): one `set_rect` at a time
+
+**Area:** `fix(shell)`
+
+**Change:** `useSiteViewRect` keeps one `set_rect` in flight and reads the rectangle when it sends it, so a rectangle taken before the layout settled cannot arrive after a newer one and leave a strip of empty space under the page. Hardening beside the `adopt_boot_session` fix below, which was the cause found for the strip.
+
+**Verified:** TypeScript, ESLint, Prettier. **Not verified:** that the old behaviour ever reordered two commands; there is no automated test for the hook.
+
 ### fix(video): the reader's mute carries to the next reel; the floating button's controls toggle is per site
 
 **Area:** `fix(video)`
@@ -23,6 +83,20 @@ All notable changes to OpenMedia are documented here.
 **Change:** `panel` now defaults to off in `VIDEO_CONTROLS_DEFAULT` and `VideoControls::default()`. It is one tap on the floating button's video controls switch (or Settings > Video controls) to turn on, still per site as well. A library that never saved video controls, or saved them without `panel`, loads with it off; one that saved `panel: true` keeps it. Drag to shrink stays on.
 
 **Verified:** see the PR. **Not verified:** on a device.
+
+### fix(siteview): a page no longer stops short of the bottom of the screen (iOS)
+
+**Area:** `fix(siteview)`
+
+**Problem:** On iOS a page often ended about 96 pt above the bottom of the screen (the safe areas' height), leaving a strip of app background under it. It came with a fresh install's first launch and stayed until something resized the shell.
+
+**Cause:** The shell lays out more than once as it starts. `adopt_boot_session` (the shell taking over the page Rust opens at launch) was given the rectangle the shell read at its first layout, waited for the page's open to finish, and then applied that rectangle with `set_rect`, replacing the settled one the shell had sent in the meantime. Nothing sent another, because the shell's size had not changed since.
+
+**Change:** `adopt_boot_session` no longer applies a rectangle to the page it adopts. The shell's own `set_rect`, sent at every layout, is the only source; the rectangle the command takes is now used only when the page has to be opened afresh.
+
+**Verified:** `cargo clippy --workspace -D warnings`, `cargo fmt --check`, TypeScript, Prettier; in the iOS Simulator (iPhone 17 Pro Max), a fresh install and first launch left the page short in 3 of 4 runs before the change and in 0 of 8 after it (read from the pixels under the page, and from the rectangles the plugin received, where the stale one arrived last). **Not verified:** on a device, Android or desktop (the same command runs there, but the problem was only looked for on iOS).
+
+**PR:** n/a
 
 ### fix(siteview): Mobile site brings the mobile page back
 

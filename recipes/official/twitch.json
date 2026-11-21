@@ -2,10 +2,15 @@
   "schema": 1,
   "id": "market.official.twitch",
   "name": "Twitch",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.twitch.tv/*"],
+  "performance": {
+    "entry": [
+      { "from": "https://www.twitch.tv/", "to": "https://m.twitch.tv/", "platform": "mobile" }
+    ]
+  },
   "options": [
     {
       "id": "app-nags",

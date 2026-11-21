@@ -324,6 +324,9 @@ export const tr: Messages = {
   "settings.blockPopups": "Açılır pencereleri ve yönlendirmeleri engelle",
   "settings.blockPopupsNote":
     "Bir sayfanın kendiliğinden açtığı pencereleri ve yönlendirmeleri, oturum açma hariç, atar. Bundan sonra açtığınız sayfalara uygulanır.",
+  "settings.preloadFavorites": "Favorileri önceden yükle",
+  "settings.preloadFavoritesNote":
+    "Açtığınız sayfa yüklendikten sonra en çok kullandığınız favorileri sessizce açar; böylece onlara geçmek anında olur. Biraz veri ve pil kullanır.",
   "web.popupBlocked":
     "{host} için bir açılır pencere veya yönlendirme engellendi. Oturum açma ya da ödeme başarısız olduysa Ayarlar'dan Açılır pencereleri ve yönlendirmeleri engelle seçeneğini kapatın.",
   "settings.backButton": "Yüzen geri düğmesi",

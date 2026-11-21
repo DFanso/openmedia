@@ -6,8 +6,7 @@ use tauri_plugin_siteview::{
     ClearSiteDataRequest, ColorScheme, ContentRuleList, EvaluateRequest, FetchFaviconRequest,
     OpenRequest, Rect, SampleColorRequest, SessionRequest, SetBackgroundMediaRequest,
     SetColorSchemeRequest, SetContentRuleListsRequest, SetDesktopSitesRequest,
-    SetDocumentStartScriptRequest, SetPictureInPictureRequest, SetRectRequest, ShareRequest,
-    SiteviewExt,
+    SetDocumentStartScriptRequest, SetPictureInPictureRequest, ShareRequest, SiteviewExt,
     validate::{parse_session_id, parse_web_url},
 };
 use url::Url;
@@ -240,11 +239,20 @@ const SITE_ERROR_EVENT: &str = "siteview:error";
 
 /// Builds the rule lists on a blocking thread: the first run converts the bundled lists, which
 /// parses several megabytes.
-async fn build_rule_lists(ad_block: &AdBlock) -> Result<Vec<ContentRuleList>> {
+async fn build_rule_lists(
+    ad_block: &AdBlock,
+    element_hiding: bool,
+) -> Result<Vec<ContentRuleList>> {
     let ad_block = ad_block.clone();
-    tauri::async_runtime::spawn_blocking(move || ad_block.rule_lists())
-        .await
-        .map_err(|e| Error::AdBlock(e.to_string()))?
+    tauri::async_runtime::spawn_blocking(move || {
+        if element_hiding {
+            ad_block.rule_lists()
+        } else {
+            ad_block.rule_lists_without_hiding()
+        }
+    })
+    .await
+    .map_err(|e| Error::AdBlock(e.to_string()))?
 }
 
 async fn build_page_script(ad_block: &AdBlock, url: String) -> Result<String> {
@@ -271,15 +279,19 @@ pub(crate) async fn open_session(
     let library = app.state::<Library>();
     let recipes = app.state::<Recipes>();
     parse_session_id(&session)?;
-    parse_web_url(&url)?;
+    let page = parse_web_url(&url)?;
+    let element_hiding = !recipes.skips_element_hiding(&page);
+    let url = recipes.entry_for(&page).map_or(url, String::from);
     let ad_block = app.state::<AdBlock>();
     let ad_block_enabled = library.ad_block_enabled()?;
     let mut blocking_failures = Vec::new();
     let content_rule_lists = if ad_block_enabled {
-        build_rule_lists(&ad_block).await.unwrap_or_else(|error| {
-            blocking_failures.push(error.to_string());
-            Vec::new()
-        })
+        build_rule_lists(&ad_block, element_hiding)
+            .await
+            .unwrap_or_else(|error| {
+                blocking_failures.push(error.to_string());
+                Vec::new()
+            })
     } else {
         Vec::new()
     };
@@ -310,6 +322,7 @@ pub(crate) async fn open_session(
         ad_block_enabled,
         block_popups: library.popup_blocking_enabled()?,
         content_rule_lists,
+        element_hiding,
     })?;
     let blocking_failure = (!blocking_failures.is_empty()).then(|| blocking_failures.join("; "));
     Ok(blocking_failure)
@@ -330,9 +343,14 @@ pub async fn open_site(app: AppHandle, session: String, url: String, rect: Rect)
     Ok(())
 }
 
-/// Takes over the page opened at launch (`boot.rs`): waits for its open to finish, gives it the
-/// shell's real rectangle and re-announces its state, which the shell was not yet listening for.
-/// If there is no such page, or opening it failed, opens `url` as `open_site` would.
+/// Takes over the page opened at launch (`boot.rs`): waits for its open to finish, shows it and
+/// re-announces its state, which the shell was not yet listening for. If there is no such page, or
+/// opening it failed, opens `url` as `open_site` would, in `rect`.
+///
+/// The adopted page is not given `rect`: it was read when the shell started, while the shell was
+/// still laying out, and the wait for the open can outlast later layouts. Applying it then put
+/// the page back at the first layout's size (on iOS, 96 pt short of the screen, the safe areas'
+/// height). The shell's own `set_rect`, sent at every layout, is the one source of the rectangle.
 #[tauri::command]
 pub async fn adopt_boot_session(
     app: AppHandle,
@@ -343,9 +361,7 @@ pub async fn adopt_boot_session(
 ) -> Result<()> {
     let warning = match boot.adopt(&session).await {
         Some(warning) => {
-            let plugin = app.siteview();
-            plugin.set_rect(SetRectRequest { rect })?;
-            plugin.activate(SessionRequest { session })?;
+            app.siteview().activate(SessionRequest { session })?;
             warning
         }
         None => open_session(&app, session, url, Some(rect)).await?,
@@ -363,14 +379,27 @@ pub async fn set_ad_block(
     ad_block: State<'_, AdBlock>,
     enabled: bool,
 ) -> Result<()> {
-    let lists = if enabled {
-        build_rule_lists(&ad_block).await?
+    let (lists, variants) = if enabled {
+        (
+            build_rule_lists(&ad_block, true).await?,
+            build_rule_lists(&ad_block, false).await?,
+        )
     } else {
-        Vec::new()
+        (Vec::new(), Vec::new())
     };
     app.siteview()
-        .set_content_rule_lists(SetContentRuleListsRequest { enabled, lists })?;
+        .set_content_rule_lists(SetContentRuleListsRequest {
+            enabled,
+            lists,
+            variants,
+        })?;
     library.set_ad_block(enabled)
+}
+
+/// Turns the quiet opening of the most used favorites at launch on or off.
+#[tauri::command]
+pub fn set_preload_favorites(library: State<'_, Library>, enabled: bool) -> Result<()> {
+    library.set_preload_favorites(enabled)
 }
 
 /// Turns pop-up and redirect blocking on or off. It takes effect for pages opened afterwards.

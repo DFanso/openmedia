@@ -327,6 +327,9 @@ export const es: Messages = {
   "settings.blockPopups": "Bloquear ventanas emergentes y redirecciones",
   "settings.blockPopupsNote":
     "Descarta las ventanas y redirecciones que una página abre por sí sola, salvo los inicios de sesión. Se aplica a las páginas que abras después.",
+  "settings.preloadFavorites": "Precargar favoritos",
+  "settings.preloadFavoritesNote":
+    "Abre en silencio los favoritos que más usas cuando carga la página que abriste, para que cambiar a ellos sea instantáneo. Usa algo de datos y batería.",
   "web.popupBlocked":
     "Se bloqueó una ventana emergente o redirección a {host}. Si falló un inicio de sesión o un pago, desactiva Bloquear ventanas emergentes y redirecciones en Ajustes.",
   "settings.backButton": "Botón de retroceso flotante",

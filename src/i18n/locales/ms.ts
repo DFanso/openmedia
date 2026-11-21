@@ -321,6 +321,9 @@ export const ms: Messages = {
   "settings.blockPopups": "Sekat pop timbul dan lencongan",
   "settings.blockPopupsNote":
     "Membuang tetingkap dan lencongan yang dibuka sendiri oleh halaman, kecuali log masuk. Terpakai untuk halaman yang anda buka selepas ini.",
+  "settings.preloadFavorites": "Pramuat kegemaran",
+  "settings.preloadFavoritesNote":
+    "Membuka kegemaran yang paling kerap anda guna secara senyap selepas halaman yang anda buka dimuatkan, supaya bertukar ke sana serta-merta. Menggunakan sedikit data dan bateri.",
   "web.popupBlocked":
     "Pop timbul atau lencongan ke {host} disekat. Jika log masuk atau pembayaran gagal, matikan Sekat pop timbul dan lencongan dalam Tetapan.",
   "settings.backButton": "Butang kembali terapung",

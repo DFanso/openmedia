@@ -181,6 +181,8 @@ export interface AppState {
   adBlock: boolean;
   /** Drops pop-ups and redirects that are no sign-in; in force only while `adBlock` is on. */
   blockPopups: boolean;
+  /** Opens the most used favorites quietly once the first page has loaded. */
+  preloadFavorites: boolean;
   /** Pixels kept clear under every page that has no margin of its own. */
   bottomMargin: number;
   /** The sites (registrable domains) whose media keeps playing while hidden or in the background. */
@@ -670,6 +672,7 @@ export const library = {
   setAdBlock: (enabled: boolean) => command("set_ad_block", { enabled }),
   /** Persists the choice; pages opened afterwards use it. */
   setBlockPopups: (enabled: boolean) => command("set_block_popups", { enabled }),
+  setPreloadFavorites: (enabled: boolean) => command("set_preload_favorites", { enabled }),
   /** The recipes with their toggles, from the normal choices or the incognito ones. */
   getSites: (incognito: boolean) => invoke<SiteSettings[]>("get_sites", { incognito }),
   /**
@@ -705,8 +708,9 @@ export const library = {
   openSite: (session: string, url: string, rect: Rect) =>
     command("open_site", { session, url, rect }),
   /**
-   * Takes over the page Rust opened at launch: gives it the real rectangle and re-announces its
-   * state. If that page is gone, opens `url` instead; see `adopt_boot_session` in Rust.
+   * Takes over the page Rust opened at launch and re-announces its state; its rectangle is the one
+   * `setRect` keeps. If that page is gone, opens `url` in `rect` instead; see `adopt_boot_session`
+   * in Rust.
    */
   adoptBootSession: (session: string, url: string, rect: Rect) =>
     command("adopt_boot_session", { session, url, rect }),

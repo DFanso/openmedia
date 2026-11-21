@@ -327,6 +327,9 @@ export const pt: Messages = {
   "settings.blockPopups": "Bloquear pop-ups e redirecionamentos",
   "settings.blockPopupsNote":
     "Descarta janelas e redirecionamentos que uma página abre sozinha, exceto inícios de sessão. Vale para as páginas que abrir a seguir.",
+  "settings.preloadFavorites": "Pré-carregar favoritos",
+  "settings.preloadFavoritesNote":
+    "Abre discretamente os favoritos que mais usa quando a página aberta termina de carregar, para trocar para eles ser instantâneo. Usa um pouco de dados e bateria.",
   "web.popupBlocked":
     "Um pop-up ou redirecionamento para {host} foi bloqueado. Se um início de sessão ou pagamento falhou, desative Bloquear pop-ups e redirecionamentos em Definições.",
   "settings.backButton": "Botão de voltar flutuante",

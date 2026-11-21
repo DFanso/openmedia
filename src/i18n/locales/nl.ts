@@ -324,6 +324,9 @@ export const nl: Messages = {
   "settings.blockPopups": "Pop-ups en doorverwijzingen blokkeren",
   "settings.blockPopupsNote":
     "Weigert vensters en doorverwijzingen die een pagina zelf opent, behalve inlogacties. Geldt voor pagina's die je hierna opent.",
+  "settings.preloadFavorites": "Favorieten vooraf laden",
+  "settings.preloadFavoritesNote":
+    "Opent stilletjes je meestgebruikte favorieten zodra de geopende pagina geladen is, zodat overschakelen direct gaat. Gebruikt wat data en batterij.",
   "web.popupBlocked":
     "Een pop-up of doorverwijzing naar {host} is geblokkeerd. Is inloggen of betalen mislukt, zet dan Pop-ups en doorverwijzingen blokkeren uit in Instellingen.",
   "settings.backButton": "Zwevende terugknop",
