@@ -318,6 +318,9 @@ export const id: Messages = {
   "settings.blockPopups": "Blokir pop-up dan pengalihan",
   "settings.blockPopupsNote":
     "Membuang jendela dan pengalihan yang dibuka halaman sendiri, kecuali proses masuk. Berlaku untuk halaman yang Anda buka berikutnya.",
+  "settings.preloadFavorites": "Muat awal favorit",
+  "settings.preloadFavoritesNote":
+    "Membuka favorit yang paling sering Anda pakai secara diam-diam setelah halaman yang Anda buka selesai dimuat, sehingga berpindah ke sana instan. Memakai sedikit data dan baterai.",
   "web.popupBlocked":
     "Pop-up atau pengalihan ke {host} diblokir. Jika proses masuk atau pembayaran gagal, matikan Blokir pop-up dan pengalihan di Pengaturan.",
   "settings.backButton": "Tombol kembali mengambang",

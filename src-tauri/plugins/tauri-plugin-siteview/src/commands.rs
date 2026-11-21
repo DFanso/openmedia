@@ -103,6 +103,7 @@ pub(crate) async fn set_content_rule_lists<R: Runtime>(
     request: SetContentRuleListsRequest,
 ) -> Result<()> {
     validate_rule_lists(&request.lists)?;
+    validate_rule_lists(&request.variants)?;
     app.siteview().set_content_rule_lists(request)
 }
 

@@ -328,6 +328,9 @@ export const it: Messages = {
   "settings.blockPopups": "Blocca pop-up e reindirizzamenti",
   "settings.blockPopupsNote":
     "Scarta le finestre e i reindirizzamenti che una pagina apre da sola, tranne gli accessi. Vale per le pagine che aprirai dopo.",
+  "settings.preloadFavorites": "Precarica i preferiti",
+  "settings.preloadFavoritesNote":
+    "Apre in silenzio i preferiti che usi di più quando la pagina aperta è caricata, così passare a loro è istantaneo. Usa un po' di dati e batteria.",
   "web.popupBlocked":
     "Bloccato un pop-up o un reindirizzamento verso {host}. Se un accesso o un pagamento non è riuscito, disattiva Blocca pop-up e reindirizzamenti in Impostazioni.",
   "settings.backButton": "Pulsante Indietro fluttuante",

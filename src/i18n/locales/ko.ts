@@ -316,6 +316,9 @@ export const ko: Messages = {
   "settings.blockPopups": "팝업 및 리디렉션 차단",
   "settings.blockPopupsNote":
     "페이지가 스스로 여는 창과 리디렉션을 로그인만 빼고 차단합니다. 이후에 여는 페이지부터 적용됩니다.",
+  "settings.preloadFavorites": "즐겨찾기 미리 불러오기",
+  "settings.preloadFavoritesNote":
+    "열어 둔 페이지가 로드되면 자주 쓰는 즐겨찾기를 조용히 열어 두어 바로 전환할 수 있습니다. 데이터와 배터리를 조금 사용합니다.",
   "web.popupBlocked":
     "{host}(으)로의 팝업 또는 리디렉션을 차단했습니다. 로그인이나 결제가 실패했다면 설정에서 팝업 및 리디렉션 차단을 끄세요.",
   "settings.backButton": "플로팅 뒤로 가기 버튼",

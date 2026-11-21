@@ -319,6 +319,9 @@ export const ja: Messages = {
   "settings.blockPopups": "ポップアップとリダイレクトをブロック",
   "settings.blockPopupsNote":
     "ページが自動で開くウィンドウやリダイレクトを、ログインを除いて破棄します。このあと開くページに適用されます。",
+  "settings.preloadFavorites": "お気に入りを先読み",
+  "settings.preloadFavoritesNote":
+    "開いたページの読み込みが終わると、よく使うお気に入りを静かに開いておき、すぐに切り替えられます。データとバッテリーを少し使います。",
   "web.popupBlocked":
     "{host} へのポップアップまたはリダイレクトをブロックしました。ログインや支払いに失敗した場合は、設定で「ポップアップとリダイレクトをブロック」をオフにしてください。",
   "settings.backButton": "フローティング戻るボタン",

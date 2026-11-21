@@ -5,6 +5,7 @@ import { pageShowing } from "../../app/splash";
 import { useT } from "../../i18n/useT";
 import { Spinner } from "../../shared/Spinner";
 import { usePageMargin } from "./usePageMargin";
+import { WARM_DELAY_MS } from "./warm";
 import { readRect, useSiteViewRect } from "./useSiteViewRect";
 import { observeTitle, quickFavoriteOf, type Watch } from "./unreadWatch";
 import { quickAccess } from "../../shared/favorites";
@@ -86,6 +87,18 @@ export function WebLayer() {
   const bottomMargin = usePageMargin();
 
   useSiteViewRect(slot);
+
+  // Once the page the reader asked for has drawn, the favorites they are most likely to open next
+  // start loading behind it. Once per launch, and not before the page has had the network to itself.
+  const frontPainted = useApp((s) => selectPage(s)?.painted === true);
+  const warmed = useRef(false);
+  const warmFavorites = useApp((s) => s.warmFavorites);
+  useEffect(() => {
+    if (!frontPainted || warmed.current) return;
+    warmed.current = true;
+    const timer = window.setTimeout(() => void warmFavorites(), WARM_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [frontPainted, warmFavorites]);
 
   // A blank page over the one in front leaves it alive underneath: tell the native side, so what it
   // plays is handled as that of a page left for another.

@@ -291,6 +291,9 @@ export const zhHans: Messages = {
   "settings.adBlock": "屏蔽广告和跟踪器",
   "settings.blockPopups": "拦截弹窗和重定向",
   "settings.blockPopupsNote": "丢弃页面自行打开的窗口和重定向（登录除外）。对之后打开的页面生效。",
+  "settings.preloadFavorites": "预加载收藏",
+  "settings.preloadFavoritesNote":
+    "在你打开的页面加载完成后，悄悄打开最常用的收藏，切换过去即刻完成。会消耗少量流量和电量。",
   "web.popupBlocked":
     "已拦截指向 {host} 的弹窗或重定向。如果登录或付款失败，请在设置中关闭“拦截弹窗和重定向”。",
   "settings.backButton": "悬浮返回按钮",

@@ -273,6 +273,8 @@ class OpenArgs: Decodable {
   let adBlockEnabled: Bool
   let blockPopups: Bool
   let contentRuleLists: [RuleListArgs]?
+  /// False when `contentRuleLists` are the variants without element hiding; see `Session.elementHiding`.
+  let elementHiding: Bool?
   let onEvent: Channel
 }
 
@@ -313,6 +315,8 @@ class FetchFaviconArgs: Decodable {
 class SetContentRuleListsArgs: Decodable {
   let enabled: Bool
   let lists: [RuleListArgs]
+  /// The lists without element-hiding rules, for the sessions opened with `elementHiding: false`.
+  let variants: [RuleListArgs]?
 }
 
 class SetDocumentStartScriptArgs: Decodable {
@@ -489,6 +493,9 @@ private final class Session {
   var recipeScript: String?
   var adBlockScriptlet: String?
   var adBlockEnabled: Bool
+  /// False for a session opened on the variant lists (its recipe turned element hiding off); it
+  /// stays on the variants when the lists are swapped.
+  var elementHiding = true
   /// False during the initial load and user-initiated navigation; see `DomainScope.verdict`.
   var settled = false
   /// True once the first load has committed; before that a timeout must not reveal a blank page.
@@ -745,6 +752,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
         recipeScript: args.documentStartScript,
         adBlockScriptlet: args.adBlockScriptlet,
         adBlockEnabled: args.adBlockEnabled)
+      session.elementHiding = args.elementHiding ?? true
       session.ruleListIds = Set(cached.map(\.identifier))
       session.ruleLists = cached
       session.profileId = profileId
@@ -942,8 +950,10 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       }
       self.ruleListGeneration += 1
       self.dropStandby()
-      let (ruleLists, failure) = await self.loadRuleLists(args.lists)
+      let (fullLists, failure) = await self.loadRuleLists(args.lists)
+      let (variantLists, variantFailure) = await self.loadRuleLists(args.variants ?? [])
       for session in self.sessions.values {
+        let ruleLists = session.elementHiding || variantLists.isEmpty ? fullLists : variantLists
         let controller = session.view.configuration.userContentController
         session.adBlockEnabled = args.enabled
         self.installUserScripts(
@@ -960,7 +970,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
           session.needsReload = true
         }
       }
-      if let failure { self.send(ErrorEvent(message: failure)) }
+      if let failure = failure ?? variantFailure { self.send(ErrorEvent(message: failure)) }
       invoke.resolve()
     }
   }

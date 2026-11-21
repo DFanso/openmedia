@@ -33,6 +33,7 @@ class OpenArgs {
     var adBlockEnabled: Boolean = false
     var blockPopups: Boolean = true
     var contentRuleLists: List<RuleListArgs>? = null
+    var elementHiding: Boolean = true
     var onEvent: Channel? = null
 }
 
@@ -82,6 +83,7 @@ class FetchFaviconArgs {
 class SetContentRuleListsArgs {
     var enabled: Boolean = false
     var lists: List<RuleListArgs> = emptyList()
+    var variants: List<RuleListArgs> = emptyList()
 }
 
 @InvokeArg

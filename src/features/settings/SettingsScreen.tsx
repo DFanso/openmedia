@@ -338,6 +338,8 @@ function BrowsingSection() {
   const blockPopups = useApp((s) => s.state?.blockPopups ?? true);
   const setAdBlock = useApp((s) => s.setAdBlock);
   const setBlockPopups = useApp((s) => s.setBlockPopups);
+  const preloadFavorites = useApp((s) => s.state?.preloadFavorites ?? true);
+  const setPreloadFavorites = useApp((s) => s.setPreloadFavorites);
   const setSearchEngine = useApp((s) => s.setSearchEngine);
   const t = useT();
 
@@ -358,6 +360,12 @@ function BrowsingSection() {
             onChange={(on) => void setBlockPopups(on)}
           />
         </div>
+        <Switch
+          label={t("settings.preloadFavorites")}
+          description={t("settings.preloadFavoritesNote")}
+          checked={preloadFavorites}
+          onChange={(on) => void setPreloadFavorites(on)}
+        />
         <div className="flex flex-col gap-2 px-4 py-3.5">
           <div className="text-xs text-paper/60">{t("settings.searchEngine")}</div>
           <Picker

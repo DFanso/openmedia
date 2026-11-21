@@ -49,6 +49,15 @@ pub struct OpenRequest {
     pub block_popups: bool,
     #[serde(default)]
     pub content_rule_lists: Vec<ContentRuleList>,
+    /// Whether the lists' element-hiding rules apply to this page. When false, `content_rule_lists`
+    /// are already the variants without them, and a later `set_content_rule_lists` keeps this page
+    /// on `variants`.
+    #[serde(default = "yes")]
+    pub element_hiding: bool,
+}
+
+fn yes() -> bool {
+    true
 }
 
 /// Names one open session: `activate` shows it, `close` tears it down.
@@ -71,6 +80,11 @@ pub struct NotifyRequest {
 pub struct SetContentRuleListsRequest {
     pub enabled: bool,
     pub lists: Vec<ContentRuleList>,
+    /// The same lists without their element-hiding rules, for the pages opened with
+    /// `element_hiding: false`. Only iOS keeps pages on their variant; elsewhere the lists apply
+    /// to every page and these are ignored.
+    #[serde(default)]
+    pub variants: Vec<ContentRuleList>,
 }
 
 /// Replaces the script injected at document start and reloads the open site view, so the page
@@ -336,6 +350,18 @@ pub struct BiometryResponse {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_page_opens_with_element_hiding_unless_it_says_otherwise() {
+        let open = |extra: &str| -> OpenRequest {
+            serde_json::from_str(&format!(
+                r#"{{"session":"s","profile":"p","url":"https://a.example/","adBlockEnabled":true,"blockPopups":true{extra}}}"#
+            ))
+            .unwrap()
+        };
+        assert!(open("").element_hiding);
+        assert!(!open(r#","elementHiding":false"#).element_hiding);
+    }
 
     #[test]
     fn a_variant_and_its_base_are_kept_together_and_an_older_version_is_not() {

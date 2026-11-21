@@ -322,6 +322,7 @@ pub(crate) async fn open_session(
         ad_block_enabled,
         block_popups: library.popup_blocking_enabled()?,
         content_rule_lists,
+        element_hiding,
     })?;
     let blocking_failure = (!blocking_failures.is_empty()).then(|| blocking_failures.join("; "));
     Ok(blocking_failure)
@@ -378,14 +379,27 @@ pub async fn set_ad_block(
     ad_block: State<'_, AdBlock>,
     enabled: bool,
 ) -> Result<()> {
-    let lists = if enabled {
-        build_rule_lists(&ad_block, true).await?
+    let (lists, variants) = if enabled {
+        (
+            build_rule_lists(&ad_block, true).await?,
+            build_rule_lists(&ad_block, false).await?,
+        )
     } else {
-        Vec::new()
+        (Vec::new(), Vec::new())
     };
     app.siteview()
-        .set_content_rule_lists(SetContentRuleListsRequest { enabled, lists })?;
+        .set_content_rule_lists(SetContentRuleListsRequest {
+            enabled,
+            lists,
+            variants,
+        })?;
     library.set_ad_block(enabled)
+}
+
+/// Turns the quiet opening of the most used favorites at launch on or off.
+#[tauri::command]
+pub fn set_preload_favorites(library: State<'_, Library>, enabled: bool) -> Result<()> {
+    library.set_preload_favorites(enabled)
 }
 
 /// Turns pop-up and redirect blocking on or off. It takes effect for pages opened afterwards.

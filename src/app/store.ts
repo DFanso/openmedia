@@ -15,6 +15,8 @@ import {
   type PreparedRequest,
 } from "../features/ai/ipc";
 import { hubForFavorite } from "../shared/hubs";
+import { localDay } from "../features/stats/format";
+import { WARM_USAGE_DAYS, pickWarmFavorites } from "../features/web/warm";
 import { siteOf } from "../shared/site";
 import { incognito as incognitoIpc } from "../features/incognito/ipc";
 import {
@@ -35,6 +37,8 @@ import {
   techDetect,
   type DetectedTech,
   siteView,
+  usage,
+  type SiteUsage,
   type Accessibility,
   type DarkMode,
   type SiteDark,
@@ -361,6 +365,14 @@ export interface AppStore {
   setSearchEngine: (engine: SearchEngine) => Promise<void>;
   setAdBlock: (enabled: boolean) => Promise<void>;
   setBlockPopups: (enabled: boolean) => Promise<void>;
+  setPreloadFavorites: (enabled: boolean) => Promise<void>;
+  /**
+   * Opens the favorites the reader is most likely to want next, quietly, behind the page in front:
+   * each loads in its own session and the page in front stays in front. Does nothing in
+   * incognito, in a window layout, on a blank tab, while anything is playing or when the setting
+   * is off.
+   */
+  warmFavorites: () => Promise<void>;
   /** Shows or hides the color picker on the floating button's fan. */
   setColorPicker: (enabled: boolean) => Promise<void>;
   /** Shows or hides the technology detector on the floating button's fan. */
@@ -1211,6 +1223,68 @@ export const useApp = create<AppStore>((set, get) => {
           error: appError(error),
         }));
       }
+    },
+
+    setPreloadFavorites: async (enabled) => {
+      const previous = get().state?.preloadFavorites;
+      set((current) => ({
+        state: current.state && { ...current.state, preloadFavorites: enabled },
+      }));
+      try {
+        await library.setPreloadFavorites(enabled);
+      } catch (error) {
+        set((current) => ({
+          state:
+            current.state && previous !== undefined
+              ? { ...current.state, preloadFavorites: previous }
+              : current.state,
+          error: appError(error),
+        }));
+      }
+    },
+
+    warmFavorites: async () => {
+      const ready = () => {
+        const { state, incognito, activeId, blankTab, layout, sessions } = get();
+        return (
+          state?.preloadFavorites === true &&
+          !incognito.active &&
+          activeId !== null &&
+          !blankTab &&
+          layout === null &&
+          !sessions.some((session) => session.playing)
+        );
+      };
+      if (!ready()) return;
+      let sites: SiteUsage[] = [];
+      try {
+        sites = (await usage.report(localDay(new Date()), WARM_USAGE_DAYS)).sites;
+      } catch {
+        // Without usage the order of the favorites decides.
+      }
+      const frontId = get().activeId;
+      if (!ready() || frontId === null) return;
+      const { state, sessions, sites: installed } = get();
+      const picks = pickWarmFavorites(
+        (state?.favorites ?? []).filter(
+          (favorite) => hubForFavorite(installed, favorite.url) === undefined,
+        ),
+        sessions,
+        sites,
+      );
+      if (picks.length === 0) return;
+      const now = Date.now();
+      const opens = picks.map((favorite) => ({
+        id: crypto.randomUUID(),
+        url: favoriteStartUrl(favorite),
+      }));
+      set((current) => ({
+        sessions: [
+          ...current.sessions,
+          ...opens.map(({ id, url }) => newSession(id, "favorite", url, now)),
+        ],
+        action: { nonce: ++nonce, type: "openAll", opens, focus: frontId },
+      }));
     },
 
     setBlockPopups: async (enabled) => {

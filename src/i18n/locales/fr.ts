@@ -331,6 +331,9 @@ export const fr: Messages = {
   "settings.blockPopups": "Bloquer les pop-ups et les redirections",
   "settings.blockPopupsNote":
     "Écarte les fenêtres et redirections qu'une page ouvre d'elle-même, sauf les connexions. S'applique aux pages que vous ouvrirez ensuite.",
+  "settings.preloadFavorites": "Précharger les favoris",
+  "settings.preloadFavoritesNote":
+    "Ouvre discrètement vos favoris les plus utilisés une fois la page ouverte chargée, pour y passer instantanément. Consomme un peu de données et de batterie.",
   "web.popupBlocked":
     "Un pop-up ou une redirection vers {host} a été bloqué. Si une connexion ou un paiement a échoué, désactivez Bloquer les pop-ups et les redirections dans Réglages.",
   "settings.backButton": "Bouton de retour flottant",
