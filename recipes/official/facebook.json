@@ -2,10 +2,15 @@
   "schema": 1,
   "id": "market.official.facebook",
   "name": "Facebook",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.facebook.com/*"],
+  "performance": {
+    "entry": [
+      { "from": "https://www.facebook.com/", "to": "https://m.facebook.com/", "platform": "mobile" }
+    ]
+  },
   "options": [
     {
       "id": "app-prompts",

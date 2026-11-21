@@ -2,10 +2,15 @@
   "schema": 1,
   "id": "market.official.youtube",
   "name": "YouTube",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://www.youtube.com/*", "https://m.youtube.com/*", "https://youtube.com/*"],
+  "performance": {
+    "entry": [
+      { "from": "https://www.youtube.com/", "to": "https://m.youtube.com/", "platform": "mobile" }
+    ]
+  },
   "options": [
     {
       "id": "open-app",

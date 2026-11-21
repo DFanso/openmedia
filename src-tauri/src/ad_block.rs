@@ -19,7 +19,7 @@ use adblock::{
 };
 use base64::{Engine as _, prelude::BASE64_STANDARD};
 use sha2::{Digest, Sha256};
-use tauri_plugin_siteview::ContentRuleList;
+use tauri_plugin_siteview::{ContentRuleList, VARIANT_SUFFIX};
 
 use crate::error::{Error, Result};
 use crate::library::write_atomically;
@@ -161,6 +161,35 @@ impl AdBlock {
         }))
     }
 
+    /// The lists for a site that does not want the element-hiding rules (`performance.adBlock`):
+    /// each list's id with `-net` appended, holding the same rules without the `css-display-none`
+    /// ones. Derived from the full lists' files the first time and kept beside them. The native
+    /// side treats `X-net` as a variant of `X` when it cleans its store (`VARIANT_SUFFIX`).
+    pub fn rule_lists_without_hiding(&self) -> Result<Vec<ContentRuleList>> {
+        let full = self.rule_lists()?;
+        let _one_at_a_time = self
+            .0
+            .conversion
+            .lock()
+            .map_err(|_| Error::AdBlock("a conversion panicked".into()))?;
+        full.into_iter()
+            .map(|list| {
+                let net_path = PathBuf::from(&list.path)
+                    .with_file_name(format!("{}{VARIANT_SUFFIX}.json", list.id));
+                if !net_path.exists() {
+                    write_atomically(&net_path, without_hiding(&list.path)?.as_bytes())?;
+                }
+                Ok(ContentRuleList {
+                    id: format!("{}{VARIANT_SUFFIX}", list.id),
+                    path: net_path
+                        .to_str()
+                        .ok_or_else(|| Error::AdBlock("the cache path is not valid UTF-8".into()))?
+                        .to_owned(),
+                })
+            })
+            .collect()
+    }
+
     /// The lists for the native side, converting any whose JSON is not on disk yet. A list's id
     /// changes with its content, so a file that exists is current and is never rewritten.
     pub fn rule_lists(&self) -> Result<Vec<ContentRuleList>> {
@@ -246,10 +275,10 @@ impl AdBlock {
         path.file_name()
             .and_then(|n| n.to_str())
             .is_some_and(|name| {
-                self.0
-                    .sources
-                    .iter()
-                    .any(|s| name == format!("{}.json", s.id))
+                self.0.sources.iter().any(|s| {
+                    name == format!("{}.json", s.id)
+                        || name == format!("{}{VARIANT_SUFFIX}.json", s.id)
+                })
             })
     }
 }
@@ -336,6 +365,21 @@ fn content_rules_json(lists: &[&str]) -> Result<String> {
     drop_hides_made_from_lone_exceptions(&mut rules, lists);
     include_subdomains(&mut rules);
     serde_json::to_string(&rules).map_err(|e| Error::AdBlock(e.to_string()))
+}
+
+/// The JSON of the list at `path` without its `css-display-none` rules. Exceptions stay: they only
+/// cancel earlier rules and cost nothing the page notices.
+fn without_hiding(path: &str) -> Result<String> {
+    let text = fs::read_to_string(path)?;
+    let mut rules: Vec<serde_json::Value> =
+        serde_json::from_str(&text).map_err(|error| Error::AdBlock(error.to_string()))?;
+    rules.retain(|rule| rule["action"]["type"] != "css-display-none");
+    if rules.is_empty() {
+        return Err(Error::AdBlock(
+            "a filter list has nothing but element-hiding rules".into(),
+        ));
+    }
+    serde_json::to_string(&rules).map_err(|error| Error::AdBlock(error.to_string()))
 }
 
 /// The converter turns an element-hiding exception (`example.org#@#svg`) into a hide of that
@@ -635,6 +679,53 @@ mod tests {
         let second = ad_block.rule_lists().expect("second run reuses");
         assert_eq!(second, first);
         assert_eq!(fs::read_to_string(&file).expect("read"), "sentinel");
+    }
+
+    #[test]
+    fn the_variant_without_hiding_keeps_every_other_rule_and_survives_cleanup() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let ad_block = ad_block_with(
+            dir.path(),
+            "||ads.example.com^\n##.banner\n@@||ads.example.com/ok^\n",
+        );
+
+        let full = ad_block.rule_lists().expect("full");
+        let net = ad_block.rule_lists_without_hiding().expect("net");
+        assert_eq!(net[0].id, format!("{}-net", full[0].id));
+        let kinds = |list: &ContentRuleList| -> Vec<String> {
+            let rules: Vec<Value> =
+                serde_json::from_str(&fs::read_to_string(&list.path).expect("read")).expect("json");
+            rules
+                .iter()
+                .map(|rule| {
+                    rule["action"]["type"]
+                        .as_str()
+                        .unwrap_or_default()
+                        .to_owned()
+                })
+                .collect()
+        };
+        assert!(kinds(&full[0]).contains(&"css-display-none".to_owned()));
+        let without = kinds(&net[0]);
+        assert!(!without.contains(&"css-display-none".to_owned()));
+        assert!(without.contains(&"block".to_owned()));
+        assert!(without.contains(&"ignore-previous-rules".to_owned()));
+        validate_rule_lists(&net).expect("the native side accepts the variant");
+
+        ad_block
+            .rule_lists()
+            .expect("a later conversion cleans the cache");
+        assert!(Path::new(&net[0].path).exists(), "the variant is current");
+    }
+
+    #[test]
+    fn a_changed_list_removes_the_old_variant_too() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let old = ad_block_with(dir.path(), "||ads.example.com^\n##.banner\n");
+        let old_net = old.rule_lists_without_hiding().expect("old");
+        let new = ad_block_with(dir.path(), "||ads.example.net^\n##.banner\n");
+        new.rule_lists().expect("new");
+        assert!(!Path::new(&old_net[0].path).exists());
     }
 
     #[test]

@@ -6,6 +6,42 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### perf(recipes): a page the site redirects is opened at its final address (`performance.entry`)
+
+**Area:** `perf(recipes)`
+
+**Problem:** YouTube, Facebook, Twitch and WhatsApp Web answer a phone's request for their usual address with a redirect (`www.youtube.com` to `m.youtube.com`), one more round trip and one more secure connection before the first byte, every time the page opens.
+
+**Change:** a recipe may carry `performance.entry` (`from`, `to`, optional `platform`): when the app is asked to open exactly `from` it opens `to`. `open_session` asks `Recipes::entry_for`, so launch, favorites, hub tabs and typed addresses all use it; only an exact address is rewritten, both ends must be covered by the recipe and on one site, and the YouTube, Facebook, Twitch and WhatsApp recipes mark theirs `mobile` because a computer is not redirected. Format: `docs/wiki/recipe-format.md#performance`.
+
+**Verified:** `cargo test recipes::` (schema, validation, platform and exact-address cases). iPhone 17 Pro Max simulator, with the updated YouTube recipe installed: the page was opened at `https://m.youtube.com/` (native log), and load to first commit took 0.65 to 0.73 s against 0.92 to 0.99 s through `www.youtube.com` (three runs each, alternated). **Not verified:** a device; Facebook, Twitch and WhatsApp end to end (their redirects were read with `curl` and an iPhone user agent); the Worker's `validate.ts` still refuses a shared recipe that carries `performance`. A recipe already added from the library keeps its old copy until it is updated there.
+
+### perf(recipes): a recipe can leave the ad blocker's element-hiding rules off for its site (`performance.adBlock`)
+
+**Area:** `perf(recipes)`
+
+**Problem:** The ad blocker's lists carry about 37,000 element-hiding rules (`css-display-none`). On Instagram, whose ads are posts in its own feed, they hide nothing and slow every page: first contentful paint 735 to 841 ms with every list, 557 to 615 ms without those rules, 432 to 470 ms with no lists at all (three runs each, iPhone 17 Pro Max simulator). YouTube and Reddit showed no measurable difference.
+
+**Change:** `performance.adBlock.elementHiding: false` in a recipe. `open_session` asks `Recipes::skips_element_hiding` and passes the native side `AdBlock::rule_lists_without_hiding`: each list's id plus `-net`, the same rules minus the `css-display-none` ones, derived from the full file once and cached beside it. The iOS and macOS stores keep both versions of a list while either is asked for (`ruleListBase`, `is_kept_in_store`), otherwise opening Instagram would delete the lists every other site uses. The Instagram recipe sets it. Request blocking is untouched. Switching ad blocking off and on in Settings re-attaches the full lists to open pages until they are opened again.
+
+**Verified:** `cargo test` (variant content, cache cleaning, store keep rule), `cargo clippy -D warnings`; with the feature built in, on the simulator, four alternated runs of Instagram: first contentful paint 551 to 625 ms with `elementHiding: false` and 735 to 832 ms without. **Not verified:** a device; Android; macOS; that no ad slot Instagram shows is now left visible (none was seen).
+
+### fix(recipes): Instagram's "Use the app" bar above the tab bar is hidden when logged in
+
+**Area:** `fix(recipes)`
+
+**Change:** the Instagram recipe's `app-prompts` option gains `use-the-app-bar`, which hides the fixed strip (a button and a close icon) that stays above the tab bar of a logged-in feed. Both `:has` conditions together matched exactly that one element on the live page; the first alone matched 6. Fixture `logged-in-feed.html` carries the strip.
+
+**Verified:** `cargo test recipes::`; on the simulator with the rule installed, the strip's computed `display` was `none` and the tab bar and the post below filled the space with no gap (screenshot). **Not verified:** a device; other languages' wording (the selector uses structure, not text).
+
+### fix(shell): one `set_rect` at a time
+
+**Area:** `fix(shell)`
+
+**Change:** `useSiteViewRect` keeps one `set_rect` in flight and reads the rectangle when it sends it, so a rectangle taken before the layout settled cannot arrive after a newer one and leave a strip of empty space under the page. Hardening beside the `adopt_boot_session` fix below, which was the cause found for the strip.
+
+**Verified:** TypeScript, ESLint, Prettier. **Not verified:** that the old behaviour ever reordered two commands; there is no automated test for the hook.
+
 ### fix(video): the reader's mute carries to the next reel; the floating button's controls toggle is per site
 
 **Area:** `fix(video)`

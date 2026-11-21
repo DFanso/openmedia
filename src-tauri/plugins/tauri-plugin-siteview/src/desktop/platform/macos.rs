@@ -425,7 +425,7 @@ unsafe fn remove_stale(store: &objc2::rc::Retained<WKContentRuleListStore>, keep
             return;
         };
         for identifier in identifiers.iter() {
-            if !keep.contains(&identifier.to_string()) {
+            if !crate::models::is_kept_in_store(&keep, &identifier.to_string()) {
                 let removed = RcBlock::new(|_error: *mut NSError| {});
                 unsafe {
                     inner.removeContentRuleListForIdentifier_completionHandler(

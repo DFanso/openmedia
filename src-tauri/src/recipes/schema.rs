@@ -5,6 +5,7 @@ use url::Url;
 
 use super::crowd::{self, SegmentCategory, VideoId};
 use super::matcher::Matcher;
+use super::performance::Performance;
 use super::prune::{self, PruneRemove};
 use super::route::{RouteGlob, validate_target};
 use super::script_policy::{self, Finding, MAX_CODE_BYTES, MAX_SCRIPT_RULES, MAX_TOTAL_CODE_BYTES};
@@ -490,6 +491,9 @@ pub struct Recipe {
     /// Present when the recipe is a hub: the pages to open as tabs.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hub: Option<Hub>,
+    /// What was measured to make this site open faster; see `performance.rs`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub performance: Option<Performance>,
 }
 
 impl Recipe {
@@ -570,6 +574,7 @@ impl Recipe {
         }
         self.validate_options()?;
         self.validate_hub()?;
+        self.validate_performance()?;
         self.validate_homepage()?;
         self.validate_script_totals()?;
         self.validate_video_menus()?;
@@ -798,6 +803,13 @@ impl Recipe {
                 "recipe {} has an invalid homepage",
                 self.id
             ))),
+        }
+    }
+
+    fn validate_performance(&self) -> Result<()> {
+        match &self.performance {
+            Some(performance) => performance.validate(&self.id, |url| self.covers(url)),
+            None => Ok(()),
         }
     }
 

@@ -239,11 +239,20 @@ const SITE_ERROR_EVENT: &str = "siteview:error";
 
 /// Builds the rule lists on a blocking thread: the first run converts the bundled lists, which
 /// parses several megabytes.
-async fn build_rule_lists(ad_block: &AdBlock) -> Result<Vec<ContentRuleList>> {
+async fn build_rule_lists(
+    ad_block: &AdBlock,
+    element_hiding: bool,
+) -> Result<Vec<ContentRuleList>> {
     let ad_block = ad_block.clone();
-    tauri::async_runtime::spawn_blocking(move || ad_block.rule_lists())
-        .await
-        .map_err(|e| Error::AdBlock(e.to_string()))?
+    tauri::async_runtime::spawn_blocking(move || {
+        if element_hiding {
+            ad_block.rule_lists()
+        } else {
+            ad_block.rule_lists_without_hiding()
+        }
+    })
+    .await
+    .map_err(|e| Error::AdBlock(e.to_string()))?
 }
 
 async fn build_page_script(ad_block: &AdBlock, url: String) -> Result<String> {
@@ -270,15 +279,19 @@ pub(crate) async fn open_session(
     let library = app.state::<Library>();
     let recipes = app.state::<Recipes>();
     parse_session_id(&session)?;
-    parse_web_url(&url)?;
+    let page = parse_web_url(&url)?;
+    let element_hiding = !recipes.skips_element_hiding(&page);
+    let url = recipes.entry_for(&page).map_or(url, String::from);
     let ad_block = app.state::<AdBlock>();
     let ad_block_enabled = library.ad_block_enabled()?;
     let mut blocking_failures = Vec::new();
     let content_rule_lists = if ad_block_enabled {
-        build_rule_lists(&ad_block).await.unwrap_or_else(|error| {
-            blocking_failures.push(error.to_string());
-            Vec::new()
-        })
+        build_rule_lists(&ad_block, element_hiding)
+            .await
+            .unwrap_or_else(|error| {
+                blocking_failures.push(error.to_string());
+                Vec::new()
+            })
     } else {
         Vec::new()
     };
@@ -366,7 +379,7 @@ pub async fn set_ad_block(
     enabled: bool,
 ) -> Result<()> {
     let lists = if enabled {
-        build_rule_lists(&ad_block).await?
+        build_rule_lists(&ad_block, true).await?
     } else {
         Vec::new()
     };

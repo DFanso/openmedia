@@ -2,10 +2,19 @@
   "schema": 1,
   "id": "market.official.whatsapp",
   "name": "WhatsApp",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["mobile"],
   "match": ["https://*.whatsapp.com/*"],
+  "performance": {
+    "entry": [
+      {
+        "from": "https://web.whatsapp.com/",
+        "to": "https://web.whatsapp.com/mobile/",
+        "platform": "mobile"
+      }
+    ]
+  },
   "options": [
     {
       "id": "app-nags",

@@ -2,6 +2,7 @@ pub mod bundled;
 mod compile;
 mod crowd;
 mod matcher;
+mod performance;
 mod prune;
 mod route;
 mod schema;
@@ -129,6 +130,28 @@ impl Recipes {
             .into_iter()
             .filter(|recipe| recipe.covers(url))
             .collect()
+    }
+
+    /// The address to open in place of `url`, when a recipe covering it has measured a faster way
+    /// to the same page (`performance.entry`).
+    pub fn entry_for(&self, url: &Url) -> Option<Url> {
+        self.covering(url).iter().find_map(|recipe| {
+            recipe
+                .performance
+                .as_ref()?
+                .entry_for(url, current_platform_tag())
+        })
+    }
+
+    /// Whether a recipe covering `url` asks for the ad blocker's element-hiding rules to be left
+    /// off (`performance.adBlock`).
+    pub fn skips_element_hiding(&self, url: &Url) -> bool {
+        self.covering(url).iter().any(|recipe| {
+            recipe
+                .performance
+                .as_ref()
+                .is_some_and(|performance| performance.skips_element_hiding())
+        })
     }
 
     /// The script injected into every site view: all recipes, matched by the page itself.

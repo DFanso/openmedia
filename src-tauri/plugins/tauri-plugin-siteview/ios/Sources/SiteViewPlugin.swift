@@ -2505,12 +2505,20 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
+  /// A list named `X-net` is a variant of `X` (the same rules without element hiding, made for a
+  /// site that asked for less; `VARIANT_SUFFIX` in the plugin's `models.rs`). The store keeps both
+  /// while either is asked for, so opening one site does not delete what another site uses.
+  private func ruleListBase(_ id: String) -> String {
+    id.hasSuffix("-net") ? String(id.dropLast("-net".count)) : id
+  }
+
   /// Old list versions stay in WebKit's store until removed; each is several megabytes.
   private func removeStaleRuleLists(keeping ids: Set<String>, in store: WKContentRuleListStore) async {
     let stored: [String] = await withCheckedContinuation { continuation in
       store.getAvailableContentRuleListIdentifiers { continuation.resume(returning: $0 ?? []) }
     }
-    for id in stored where !ids.contains(id) {
+    let bases = Set(ids.map(ruleListBase))
+    for id in stored where !bases.contains(ruleListBase(id)) {
       await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
         store.removeContentRuleList(forIdentifier: id) { _ in continuation.resume() }
       }

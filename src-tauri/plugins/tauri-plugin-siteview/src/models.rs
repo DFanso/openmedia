@@ -8,6 +8,19 @@ pub struct Rect {
     pub height: f64,
 }
 
+/// A list named `X` + this suffix is a variant of list `X` (the same rules, fewer of them), made for
+/// a site that asked for less. Variants of one list are kept together when the system's store is
+/// cleaned, so opening one site does not throw away the lists another site uses.
+pub const VARIANT_SUFFIX: &str = "-net";
+
+/// Whether the list `stored` in the system's store is still wanted, given the ids `keep` that were
+/// just asked for: it is, when its own id or any variant of its base was asked for.
+pub fn is_kept_in_store(keep: &[String], stored: &str) -> bool {
+    let base = |id: &str| id.strip_suffix(VARIANT_SUFFIX).unwrap_or(id).to_owned();
+    let stored_base = base(stored);
+    keep.iter().any(|id| base(id) == stored_base)
+}
+
 /// A WebKit content rule list, compiled on demand. `id` names it in WebKit's persistent store, so
 /// the JSON file at `path` is only read when the store does not already hold `id`.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -318,4 +331,23 @@ pub enum BiometryKind {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BiometryResponse {
     pub kind: BiometryKind,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_variant_and_its_base_are_kept_together_and_an_older_version_is_not() {
+        let only_variant = vec!["openmedia-easylist-aaa-net".to_owned()];
+        assert!(is_kept_in_store(&only_variant, "openmedia-easylist-aaa"));
+        assert!(is_kept_in_store(
+            &only_variant,
+            "openmedia-easylist-aaa-net"
+        ));
+        let only_base = vec!["openmedia-easylist-aaa".to_owned()];
+        assert!(is_kept_in_store(&only_base, "openmedia-easylist-aaa-net"));
+        assert!(!is_kept_in_store(&only_base, "openmedia-easylist-bbb"));
+        assert!(!is_kept_in_store(&only_base, "openmedia-easylist-bbb-net"));
+    }
 }

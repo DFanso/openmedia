@@ -869,6 +869,7 @@ fn custom_recipe(domain: &str) -> Result<Recipe> {
             notes: Some("Created by the in-app assistant.".to_owned()),
         }),
         hub: None,
+        performance: None,
     })
 }
 

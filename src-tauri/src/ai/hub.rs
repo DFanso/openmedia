@@ -554,6 +554,7 @@ fn parse_answer(text: &str, looked: &Looked) -> Result<(Recipe, String, String, 
             notes: Some("Created by the in-app assistant.".to_owned()),
         }),
         hub: Some(Hub { tabs }),
+        performance: None,
     };
     let json =
         serde_json::to_string(&recipe).map_err(|_| invalid_answer("the hub could not be built"))?;
@@ -706,6 +707,7 @@ mod tests {
             rules: Vec::new(),
             meta: None,
             hub: None,
+            performance: None,
         }
     }
 
