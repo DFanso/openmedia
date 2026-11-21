@@ -6,6 +6,30 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): a page in front is focused, so Reels play without a first tap (iOS)
+
+**Area:** `fix(siteview)`
+
+**Problem:** On a fresh launch a Reel showed a still frame until the reader tapped it.
+
+**Cause:** an untouched web view has no focus (`document.hasFocus()` false) and Instagram's player pauses every video it starts then (its own code, seen with a stack trace on `pause`). One tap gave the page focus.
+
+**Change:** `focusActivePage` makes the page in front the first responder on show, first paint, return to the foreground, uncovering and keyboard hide, and not while the keyboard is up, the shell covers the page or a sign-in window is open. Details: `docs/wiki/platform-support.md#short-form-video-feeds-ios`.
+
+**Verified:** simulator, no tap: `hasFocus` true, 1.80 s of progress in 1.8 s (before: false, 0.03 s); the video kept playing after the app went home and came back; typing in the shell's address field still worked. **Not verified:** a device, a software keyboard.
+
+### fix(recipes): Instagram Reels fit above the bottom bar and no longer show the end of the previous Reel
+
+**Area:** `fix(recipes)`
+
+**Problem:** the name, caption, audio row and buttons of a Reel sat under Instagram's bottom bar, and the end of the previous Reel showed over the top of the next.
+
+**Cause:** the list is `100% - 45px - safe-area` tall (815 px) and each player `100dvh` (894 px).
+
+**Change:** new `reels-layout` option (annoyance, on by default) and rule `reel-fits-slot` (`height: 100%` on the player wrapper chain), scoped to `/reels/` and `/reel/`; fixture `logged-in-reels.html`; recipe 2.4.0.
+
+**Verified:** simulator, logged in: video 815 px in an 815 px slot, lowest overlay row 795 px against the bar at 810 px (before: 894 px video, 874 px), no overlap of neighbors over 6 swipes, 8 fast flicks and 3 back. **Not verified:** a device; Facebook Reels and Stories; a recipe already added keeps its old copy until updated.
+
 ### perf(shell): the favorites you are most likely to open next load quietly behind the page in front
 
 **Area:** `perf(shell)`

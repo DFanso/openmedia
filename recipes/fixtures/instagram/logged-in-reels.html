@@ -1,0 +1,16 @@
+<!doctype html>
+<!-- Logged-in /reels/ structure observed on the iOS Simulator (iPhone UA 440x894), 2026-11-21: a fixed, scrolling list whose items are `height: 100%`; each holds a `data-virtualized` slot, then a wrapper, then the player wrapper that Instagram gives `height: 100dvh`. Text and attributes removed. -->
+<html><body>
+<div id="react-root">
+  <div style="position: fixed; overflow-y: scroll">
+    <div style="height: 100%">
+      <div data-virtualized="false">
+        <div>
+          <div><div><video src="/reel.mp4"></video></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div data-keep><a href="/" data-keep>Home</a></div>
+</div>
+</body></html>
