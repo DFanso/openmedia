@@ -636,6 +636,9 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   private var watchingWindows = false
   /// True while the shell covers the page in front with a page of its own (a new tab).
   private var covered = false
+  /// True while the keyboard is up, whoever asked for it. The page is not given the focus then: it
+  /// would take the keyboard away from the shell's address field.
+  private var keyboardUp = false
   /// Pages that were left for another while their video played: the page stays alive, hidden, so
   /// its picture-in-picture window keeps playing, until the window is closed or the page in front
   /// plays a video of its own.
@@ -687,6 +690,16 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       self?.sessions.values.forEach { $0.windowOpen = false }
       self?.refreshMedia()
       self?.checkFloats()
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { self?.focusActivePage() }
+    }
+    NotificationCenter.default.addObserver(
+      forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main
+    ) { [weak self] _ in self?.keyboardUp = true }
+    NotificationCenter.default.addObserver(
+      forName: UIResponder.keyboardDidHideNotification, object: nil, queue: .main
+    ) { [weak self] _ in
+      self?.keyboardUp = false
+      self?.focusActivePage()
     }
     NotificationCenter.default.addObserver(
       forName: UIApplication.willResignActiveNotification, object: nil, queue: .main
@@ -824,6 +837,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     DispatchQueue.main.async {
       self.covered = args.covered
       self.refreshMedia()
+      self.focusActivePage()
       invoke.resolve()
     }
   }
@@ -2253,6 +2267,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     if let host = shell?.superview { session.view.frame = pageFrame(in: host) }
     router?.siteView = session.view
     refreshMedia()
+    focusActivePage()
     if session.needsReload && !session.blocked {
       session.needsReload = false
       if session.view.url == nil {
@@ -2348,6 +2363,23 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     guard let session = session(of: view) else { return }
     session.painted = true
     sendState(session)
+    focusActivePage()
+  }
+
+  /// Makes the page in front the window's first responder, so its document has the focus. A web
+  /// view that has not been touched is not focused, and a site that pauses its video when its page
+  /// has lost focus (Instagram's Reels do) then stops every video it starts, leaving a still frame
+  /// until the first tap. Nothing is done while the app is away, the shell has a page over this one,
+  /// the keyboard is up, or a sign-in window is open. Focus is only a state: it raises no keyboard.
+  private func focusActivePage() {
+    DispatchQueue.main.async { [weak self] in
+      guard let self, self.appForeground, !self.covered, !self.keyboardUp, self.signInWindow == nil,
+        let session = self.activeId.flatMap({ self.sessions[$0] }),
+        !session.blocked, !session.view.isHidden, session.view.window != nil,
+        !session.view.isFirstResponder
+      else { return }
+      _ = session.view.becomeFirstResponder()
+    }
   }
 
   private func scheduleReveal(_ view: WKWebView) {
@@ -2696,6 +2728,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     return url
   }
 }
+
 
 @_cdecl("init_plugin_siteview")
 public func initPlugin() -> Plugin {
