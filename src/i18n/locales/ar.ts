@@ -105,6 +105,9 @@ export const ar: Messages = {
   "commandBar.openAiSettings": "فتح الإعدادات > المساعد الذكي",
 
   "fab.openFavorite": "فتح {name}",
+  "fab.openBookmark": "فتح الإشارة المرجعية: {name}",
+  "fab.saveBookmark": "حفظ هذه الصفحة في خانة الإشارة المرجعية",
+  "fab.saveBookmarkHint": "حفظ الصفحة",
   "fab.history": "السجل",
   "fab.usage": "الاستخدام",
   "fab.settings": "الإعدادات",
@@ -414,6 +417,12 @@ export const ar: Messages = {
   "settings.languageLabel": "لغة التطبيق",
   "settings.languageSystem": "لغة النظام",
   "settings.searchEngine": "محرك البحث",
+  "bookmark.title": "إشارة مرجعية",
+  "bookmark.note":
+    "صفحة واحدة تفتحها من الزر، مجانًا. اضغط مطولًا على الزر ثم انقر خانة الإشارة المرجعية لحفظ الصفحة التي أنت عليها، ثم انقرها للعودة إليها. لا يُحفظ شيء في وضع التصفح المتخفي.",
+  "bookmark.empty": "لم تُحفظ أي صفحة بعد.",
+  "bookmark.save": "حفظ الصفحة الحالية",
+  "bookmark.replace": "الاستبدال بالصفحة الحالية",
 
   "favorites.title": "المفضلة",
   "favorites.note":

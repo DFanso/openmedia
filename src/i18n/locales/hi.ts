@@ -103,6 +103,9 @@ export const hi: Messages = {
   "commandBar.openAiSettings": "सेटिंग्स > AI सहायक खोलें",
 
   "fab.openFavorite": "{name} खोलें",
+  "fab.openBookmark": "बुकमार्क खोलें: {name}",
+  "fab.saveBookmark": "यह पेज बुकमार्क स्लॉट में सहेजें",
+  "fab.saveBookmarkHint": "पेज सहेजें",
   "fab.history": "इतिहास",
   "fab.usage": "उपयोग",
   "fab.settings": "सेटिंग्स",
@@ -428,6 +431,12 @@ export const hi: Messages = {
   "settings.languageLabel": "ऐप की भाषा",
   "settings.languageSystem": "सिस्टम की भाषा",
   "settings.searchEngine": "सर्च इंजन",
+  "bookmark.title": "बुकमार्क",
+  "bookmark.note":
+    "बटन से खुलने वाला एक पेज, मुफ़्त। बटन दबाकर रखें और बुकमार्क स्लॉट पर टैप करें ताकि जिस पेज पर आप हैं वह सहेजा जाए, फिर लौटने के लिए उस पर टैप करें। इनकॉग्निटो में सहेजा नहीं जाता।",
+  "bookmark.empty": "अभी कोई पेज सहेजा नहीं गया है।",
+  "bookmark.save": "मौजूदा पेज सहेजें",
+  "bookmark.replace": "मौजूदा पेज से बदलें",
 
   "favorites.title": "पसंदीदा",
   "favorites.note":

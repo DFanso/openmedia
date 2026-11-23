@@ -106,6 +106,9 @@ export const si: Messages = {
   "commandBar.openAiSettings": "සැකසුම් > AI සහායක විවෘත කරන්න",
 
   "fab.openFavorite": "{name} විවෘත කරන්න",
+  "fab.openBookmark": "පිටු සලකුණ විවෘත කරන්න: {name}",
+  "fab.saveBookmark": "මෙම පිටුව පිටු සලකුණු ස්ථානයේ සුරකින්න",
+  "fab.saveBookmarkHint": "පිටුව සුරකින්න",
   "fab.history": "ඉතිහාසය",
   "fab.usage": "භාවිතය",
   "fab.settings": "සැකසුම්",
@@ -425,6 +428,12 @@ export const si: Messages = {
   "settings.languageLabel": "ඇප් භාෂාව",
   "settings.languageSystem": "පද්ධතියේ භාෂාව",
   "settings.searchEngine": "සෙවුම් යන්ත්‍රය",
+  "bookmark.title": "පිටු සලකුණ",
+  "bookmark.note":
+    "බොත්තමෙන් විවෘත කළ හැකි එක් පිටුවක්, නොමිලේ. බොත්තම තදකර අල්ලා පිටු සලකුණු ස්ථානය තට්ටු කර ඔබ සිටින පිටුව සුරකින්න, පසුව ආපසු යාමට එය තට්ටු කරන්න. අප්‍රකට මාදිලියේදී සුරැකෙන්නේ නැත.",
+  "bookmark.empty": "තවම පිටුවක් සුරැකී නැත.",
+  "bookmark.save": "වත්මන් පිටුව සුරකින්න",
+  "bookmark.replace": "වත්මන් පිටුවෙන් ප්‍රතිස්ථාපනය කරන්න",
 
   "favorites.title": "ආදරණීය",
   "favorites.note":

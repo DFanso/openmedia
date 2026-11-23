@@ -109,6 +109,9 @@ export const ta: Messages = {
   "commandBar.openAiSettings": "அமைப்புகள் > AI உதவியாளர் என்பதைத் திற",
 
   "fab.openFavorite": "{name} ஐத் திற",
+  "fab.openBookmark": "புக்மார்க்கைத் திற: {name}",
+  "fab.saveBookmark": "இந்தப் பக்கத்தை புக்மார்க் இடத்தில் சேமி",
+  "fab.saveBookmarkHint": "பக்கத்தைச் சேமி",
   "fab.history": "வரலாறு",
   "fab.usage": "பயன்பாடு",
   "fab.settings": "அமைப்புகள்",
@@ -442,6 +445,12 @@ export const ta: Messages = {
   "settings.languageLabel": "செயலி மொழி",
   "settings.languageSystem": "அமைப்பு மொழி",
   "settings.searchEngine": "தேடுபொறி",
+  "bookmark.title": "புக்மார்க்",
+  "bookmark.note":
+    "பொத்தானிலிருந்து திறக்கக்கூடிய ஒரு பக்கம், இலவசம். பொத்தானை அழுத்திப் பிடித்து புக்மார்க் இடத்தைத் தட்டினால் நீங்கள் இருக்கும் பக்கம் சேமிக்கப்படும்; பிறகு திரும்ப அதைத் தட்டுங்கள். மறைநிலையில் சேமிக்கப்படாது.",
+  "bookmark.empty": "இன்னும் எந்தப் பக்கமும் சேமிக்கப்படவில்லை.",
+  "bookmark.save": "தற்போதைய பக்கத்தைச் சேமி",
+  "bookmark.replace": "தற்போதைய பக்கத்தால் மாற்று",
 
   "favorites.title": "பிடித்துக்கொள்ளவிடைகள்",
   "favorites.note":
