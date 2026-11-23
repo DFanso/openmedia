@@ -429,6 +429,10 @@ export const cs: Messages = {
   "settings.languageLabel": "Jazyk aplikace",
   "settings.languageSystem": "Systémový jazyk",
   "settings.searchEngine": "Vyhledávač",
+  "settings.startPage": "Úvodní stránka",
+  "settings.startPageLast": "Poslední stránka, na které jsem byl",
+  "settings.startPageSearch": "Domovská stránka {engine}",
+  "settings.startPageNote": "Co aplikace otevře při spuštění. Změna platí od příštího spuštění.",
 
   "favorites.title": "Oblíbené",
   "favorites.note":

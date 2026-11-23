@@ -436,6 +436,11 @@ export const ro: Messages = {
   "settings.languageLabel": "Limba aplicației",
   "settings.languageSystem": "Limba sistemului",
   "settings.searchEngine": "Motor de căutare",
+  "settings.startPage": "Pagina de start",
+  "settings.startPageLast": "Ultima pagină pe care am fost",
+  "settings.startPageSearch": "Pagina principală {engine}",
+  "settings.startPageNote":
+    "Ce deschide aplicația la pornire. Schimbarea se aplică de la următoarea pornire.",
 
   "favorites.title": "Favorite",
   "favorites.note":

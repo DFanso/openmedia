@@ -440,6 +440,11 @@ export const el: Messages = {
   "settings.languageLabel": "Γλώσσα εφαρμογής",
   "settings.languageSystem": "Γλώσσα συστήματος",
   "settings.searchEngine": "Μηχανή αναζήτησης",
+  "settings.startPage": "Αρχική σελίδα",
+  "settings.startPageLast": "Η τελευταία σελίδα που ήμουν",
+  "settings.startPageSearch": "Αρχική σελίδα του {engine}",
+  "settings.startPageNote":
+    "Τι ανοίγει η εφαρμογή όταν ξεκινά. Η αλλαγή ισχύει από την επόμενη εκκίνηση.",
 
   "favorites.title": "Αγαπημένα",
   "favorites.note":

@@ -425,6 +425,11 @@ export const vi: Messages = {
   "settings.languageLabel": "Ngôn ngữ ứng dụng",
   "settings.languageSystem": "Ngôn ngữ hệ thống",
   "settings.searchEngine": "Công cụ tìm kiếm",
+  "settings.startPage": "Trang khởi động",
+  "settings.startPageLast": "Trang tôi xem lần cuối",
+  "settings.startPageSearch": "Trang chủ {engine}",
+  "settings.startPageNote":
+    "Trang ứng dụng mở khi khởi động. Thay đổi có hiệu lực từ lần mở tiếp theo.",
 
   "favorites.title": "Yêu thích",
   "favorites.note":

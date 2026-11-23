@@ -53,6 +53,7 @@ import {
   type SearchEngine,
   type SiteSettings,
   type SiteViewState,
+  type StartPage,
   type Theme,
   type ProfileInput,
   type ProfileList,
@@ -371,6 +372,8 @@ export interface AppStore {
   setLocale: (locale: string | null) => Promise<void>;
   /** Picks the engine the command bar searches with. */
   setSearchEngine: (engine: SearchEngine) => Promise<void>;
+  /** Picks what the app opens at launch. */
+  setStartPage: (startPage: StartPage) => Promise<void>;
   setAdBlock: (enabled: boolean) => Promise<void>;
   setBlockPopups: (enabled: boolean) => Promise<void>;
   setPreloadFavorites: (enabled: boolean) => Promise<void>;
@@ -1236,6 +1239,22 @@ export const useApp = create<AppStore>((set, get) => {
           state:
             current.state && previous !== undefined
               ? { ...current.state, searchEngine: previous }
+              : current.state,
+          error: appError(error),
+        }));
+      }
+    },
+
+    setStartPage: async (startPage) => {
+      const previous = get().state?.startPage;
+      set((current) => ({ state: current.state && { ...current.state, startPage } }));
+      try {
+        await library.setStartPage(startPage);
+      } catch (error) {
+        set((current) => ({
+          state:
+            current.state && previous !== undefined
+              ? { ...current.state, startPage: previous }
               : current.state,
           error: appError(error),
         }));

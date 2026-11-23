@@ -124,6 +124,8 @@ export interface SiteDark {
   /** Tenths of a pixel, 0 to 10. */
   textStroke?: number;
 }
+/** What the app opens at launch: the last page (else the first favorite), or the search engine's home page. */
+export type StartPage = "lastPage" | "searchHome";
 
 export interface Favorite {
   id: string;
@@ -207,6 +209,7 @@ export interface AppState {
   darkMode: DarkMode;
   /** Per-site dark mode choices by registrable domain. */
   darkSites: Record<string, SiteDark>;
+  startPage: StartPage;
 }
 
 /** The page Rust already started loading at launch; the shell takes it over. */
@@ -668,6 +671,8 @@ export const library = {
   /** Remembers the language the user picked; null puts the app back on the device's language. */
   setLocale: (locale: string | null) => command("set_locale", { locale }),
   setSearchEngine: (engine: SearchEngine) => command("set_search_engine", { engine }),
+  /** Applies from the next launch; see `start_url` in Rust. */
+  setStartPage: (startPage: StartPage) => command("set_start_page", { startPage }),
   /** Persists the choice and reloads the open page under it; see `set_ad_block` in Rust. */
   setAdBlock: (enabled: boolean) => command("set_ad_block", { enabled }),
   /** Persists the choice; pages opened afterwards use it. */

@@ -420,6 +420,10 @@ export const bn: Messages = {
   "settings.languageLabel": "অ্যাপের ভাষা",
   "settings.languageSystem": "সিস্টেমের ভাষা",
   "settings.searchEngine": "সার্চ ইঞ্জিন",
+  "settings.startPage": "শুরুর পাতা",
+  "settings.startPageLast": "শেষ যে পাতায় ছিলাম",
+  "settings.startPageSearch": "{engine}-এর হোম পেজ",
+  "settings.startPageNote": "অ্যাপ চালু হলে যা খোলে। পরিবর্তনটি পরের বার চালু করলে কার্যকর হবে।",
 
   "favorites.title": "পছন্দের তালিকা",
   "favorites.note":

@@ -409,6 +409,11 @@ export const th: Messages = {
   "settings.languageLabel": "ภาษาของแอป",
   "settings.languageSystem": "ภาษาระบบ",
   "settings.searchEngine": "เครื่องมือค้นหา",
+  "settings.startPage": "หน้าเริ่มต้น",
+  "settings.startPageLast": "หน้าล่าสุดที่ฉันเปิดอยู่",
+  "settings.startPageSearch": "หน้าแรกของ {engine}",
+  "settings.startPageNote":
+    "สิ่งที่แอปเปิดเมื่อเริ่มทำงาน การเปลี่ยนแปลงจะมีผลตั้งแต่การเปิดครั้งถัดไป",
 
   "favorites.title": "รายการโปรด",
   "favorites.note":

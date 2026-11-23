@@ -426,6 +426,10 @@ export const ja: Messages = {
   "settings.languageLabel": "アプリの言語",
   "settings.languageSystem": "システムの言語",
   "settings.searchEngine": "検索エンジン",
+  "settings.startPage": "起動時のページ",
+  "settings.startPageLast": "最後に開いていたページ",
+  "settings.startPageSearch": "{engine} のホームページ",
+  "settings.startPageNote": "アプリの起動時に開くページです。変更は次回の起動から反映されます。",
 
   "favorites.title": "お気に入り",
   "favorites.note":

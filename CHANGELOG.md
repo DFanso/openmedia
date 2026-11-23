@@ -14,6 +14,14 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** see the PR. **Not verified:** on a device or simulator; native-speaker review of the new strings.
 
+### feat(settings): the app can start on the search engine's home page
+
+**Area:** `feat(settings)`
+
+**Change:** Settings > Browsing has a new "Start page" choice under Search engine: "The last page I was on" (the default, unchanged behavior) or "<engine> home page", which makes every launch open the picked engine's front page (`https://www.google.com/` for Google, `https://duckduckgo.com/` for DuckDuckGo, and so on). Stored in `library.json` as `startPage` (`set_start_page`); a library saved before the setting keeps opening the last page. Core still opens the start page itself at launch (`Library::start_url`), so the choice applies from the next launch. Four new strings in all 29 locales, machine-drafted.
+
+**Verified:** see the PR. **Not verified:** a launch on a device or simulator; native-speaker review of the new strings.
+
 ### fix(siteview): close the native fullscreen video left over after returning from picture-in-picture (iOS)
 
 **Area:** `fix(siteview)`

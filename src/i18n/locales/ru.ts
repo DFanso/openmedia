@@ -433,6 +433,11 @@ export const ru: Messages = {
   "settings.languageLabel": "Язык приложения",
   "settings.languageSystem": "Системный язык",
   "settings.searchEngine": "Поисковая система",
+  "settings.startPage": "Стартовая страница",
+  "settings.startPageLast": "Последняя открытая страница",
+  "settings.startPageSearch": "Главная страница {engine}",
+  "settings.startPageNote":
+    "Что приложение открывает при запуске. Изменение вступит в силу при следующем запуске.",
 
   "favorites.title": "Избранное",
   "favorites.note":

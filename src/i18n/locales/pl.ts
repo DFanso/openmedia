@@ -435,6 +435,11 @@ export const pl: Messages = {
   "settings.languageLabel": "Język aplikacji",
   "settings.languageSystem": "Język systemu",
   "settings.searchEngine": "Wyszukiwarka",
+  "settings.startPage": "Strona startowa",
+  "settings.startPageLast": "Ostatnio otwarta strona",
+  "settings.startPageSearch": "Strona główna {engine}",
+  "settings.startPageNote":
+    "Co aplikacja otwiera przy uruchomieniu. Zmiana działa od następnego uruchomienia.",
 
   "favorites.title": "Ulubione",
   "favorites.note":

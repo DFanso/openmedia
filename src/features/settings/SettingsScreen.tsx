@@ -7,8 +7,12 @@ import { useT } from "../../i18n/useT";
 import { useChat } from "../ai/chatStore";
 import { Screen } from "../../shared/Screen";
 import { useBackHandler } from "../back/useBackHandler";
-import type { SearchEngine, Theme } from "../../shared/ipc";
-import { DEFAULT_SEARCH_ENGINE, SEARCH_ENGINES } from "../../shared/searchEngines";
+import type { SearchEngine, StartPage, Theme } from "../../shared/ipc";
+import {
+  DEFAULT_SEARCH_ENGINE,
+  SEARCH_ENGINES,
+  searchEngineName,
+} from "../../shared/searchEngines";
 import { AccessibilitySection } from "./AccessibilitySection";
 import { KeybindingsLink } from "../keybindings/KeybindingsScreen";
 import { DarkModeLink } from "./DarkModeScreen";
@@ -336,11 +340,13 @@ function BrowsingSection() {
   const adBlock = useApp((s) => s.state?.adBlock ?? true);
   const searchEngine = useApp((s) => s.state?.searchEngine ?? DEFAULT_SEARCH_ENGINE);
   const blockPopups = useApp((s) => s.state?.blockPopups ?? true);
+  const startPage = useApp((s) => s.state?.startPage ?? "lastPage");
   const setAdBlock = useApp((s) => s.setAdBlock);
   const setBlockPopups = useApp((s) => s.setBlockPopups);
   const preloadFavorites = useApp((s) => s.state?.preloadFavorites ?? true);
   const setPreloadFavorites = useApp((s) => s.setPreloadFavorites);
   const setSearchEngine = useApp((s) => s.setSearchEngine);
+  const setStartPage = useApp((s) => s.setStartPage);
   const t = useT();
 
   return (
@@ -374,6 +380,22 @@ function BrowsingSection() {
             options={SEARCH_ENGINES.map((engine) => ({ value: engine.id, label: engine.name }))}
             onChange={(next) => void setSearchEngine(next as SearchEngine)}
           />
+        </div>
+        <div className="flex flex-col gap-2 px-4 py-3.5">
+          <div className="text-xs text-paper/60">{t("settings.startPage")}</div>
+          <Picker
+            label={t("settings.startPage")}
+            value={startPage}
+            options={[
+              { value: "lastPage", label: t("settings.startPageLast") },
+              {
+                value: "searchHome",
+                label: t("settings.startPageSearch", { engine: searchEngineName(searchEngine) }),
+              },
+            ]}
+            onChange={(next) => void setStartPage(next as StartPage)}
+          />
+          <div className="text-sm leading-snug text-paper/55">{t("settings.startPageNote")}</div>
         </div>
       </Group>
     </Section>

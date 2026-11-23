@@ -226,8 +226,7 @@ export const ar: Messages = {
   "usage.scheduleNoDays": "اختر يومًا واحدًا على الأقل.",
   "usage.scheduleSameTime": "يجب أن يختلف وقت الإغلاق عن وقت الفتح.",
   "usage.scheduleClosed": "مغلق الآن",
-  "usage.scheduleNotice":
-    "{name} مغلق بحسب جدولك. سيُفتح عند {time}. المواقع الأخرى ما زالت متاحة.",
+  "usage.scheduleNotice": "{name} مغلق بحسب جدولك. سيُفتح عند {time}. المواقع الأخرى ما زالت متاحة.",
   "usage.scheduleNoticeAlways": "{name} مغلق بحسب جدولك. المواقع الأخرى ما زالت متاحة.",
   "usage.pauseScreenTitle": "شاشة التوقف",
   "usage.pauseScreenHint":
@@ -316,8 +315,7 @@ export const ar: Messages = {
   "web.popupBlocked":
     "تم حظر نافذة منبثقة أو إعادة توجيه إلى {host}. إذا فشل تسجيل الدخول أو الدفع، أوقف حظر النوافذ المنبثقة وإعادة التوجيه من الإعدادات.",
   "settings.backButton": "زر رجوع عائم",
-  "settings.backButtonNote":
-    "يظهر دائمًا. يغلق الإعدادات والصفحات الأخرى أولًا، ثم يرجع في الصفحة.",
+  "settings.backButtonNote": "يظهر دائمًا. يغلق الإعدادات والصفحات الأخرى أولًا، ثم يرجع في الصفحة.",
   "settings.colorPicker": "منتقي الألوان",
   "settings.colorPickerNote":
     "يضيف منتقي ألوان إلى الزر العائم. اضغط عليه، ثم اسحب الدائرة فوق لون وقبِل لقراءته.",
@@ -414,6 +412,10 @@ export const ar: Messages = {
   "settings.languageLabel": "لغة التطبيق",
   "settings.languageSystem": "لغة النظام",
   "settings.searchEngine": "محرك البحث",
+  "settings.startPage": "صفحة البدء",
+  "settings.startPageLast": "آخر صفحة كنت عليها",
+  "settings.startPageSearch": "الصفحة الرئيسية لـ {engine}",
+  "settings.startPageNote": "ما يفتحه التطبيق عند تشغيله. يسري التغيير من التشغيل التالي.",
 
   "favorites.title": "المفضلة",
   "favorites.note":
@@ -648,8 +650,7 @@ export const ar: Messages = {
   "share.github.error.busy": "هناك الكثير من الأشخاص يشاركون الآن. حاول مرة أخرى بعد بضع دقائق.",
   "share.github.error.failed": "حدث خطأ ولم يتم إرسال وصفتك. حاول مرة أخرى.",
   "share.github.error.cancelled": "لم تكمل تسجيل الدخول، لذا لم يتم إرسال أي شيء.",
-  "share.github.error.timeout":
-    "استغرق الأمر وقتًا طويلًا، لذا لم يتم إرسال أي شيء. حاول مرة أخرى.",
+  "share.github.error.timeout": "استغرق الأمر وقتًا طويلًا، لذا لم يتم إرسال أي شيء. حاول مرة أخرى.",
 
   "ai.title": "المساعد الذكي",
   "ai.note":
@@ -865,8 +866,7 @@ export const ar: Messages = {
   "settings.darkSites": "مواقع بإعدادات خاصة",
   "settings.darkSitesNote":
     "تنطبق هذه الإعدادات على كل موقع ما لم تكن له إعدادات خاصة. اضبطها في المفضلة.",
-  "fab.darkMode":
-    "الوضع الداكن. اضغط لتشغيله أو إيقافه لكل المواقع، واضغط مطولًا للإعدادات العامة.",
+  "fab.darkMode": "الوضع الداكن. اضغط لتشغيله أو إيقافه لكل المواقع، واضغط مطولًا للإعدادات العامة.",
   "fab.darkModeSite": "الوضع الداكن لهذا الموقع. اضغط لتشغيله أو إيقافه، واضغط مطولًا لإعداداته.",
   "favorites.darkEffectiveOn": "الوضع الداكن مفعّل لهذا الموقع.",
   "favorites.darkEffectiveOff": "الوضع الداكن متوقف لهذا الموقع.",
@@ -937,8 +937,7 @@ export const ar: Messages = {
   "downloads.folder": "مجلد التنزيل",
   "downloads.folderNote": "مسار كامل. اتركه فارغًا لاستخدام مجلد التنزيلات في هذا الجهاز.",
   "downloads.segments": "الاتصالات لكل ملف",
-  "downloads.segmentsNote":
-    "قد تسرّع عدة اتصالات تنزيل ملف كبير. بعض الخوادم تسمح باتصال واحد فقط.",
+  "downloads.segmentsNote": "قد تسرّع عدة اتصالات تنزيل ملف كبير. بعض الخوادم تسمح باتصال واحد فقط.",
   "downloads.mask": "قالب التسمية",
   "downloads.maskNote":
     "سمِّ الملفات من الرموز المدرجة أدناه. تبدأ الشرطة المائلة مجلدًا. التواريخ بتوقيت UTC.",
