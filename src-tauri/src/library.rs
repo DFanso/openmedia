@@ -1065,8 +1065,6 @@ fn icon_for_host(data: &LibraryData, host: &str) -> Option<String> {
         .cloned()
 }
 
-/// Drops the icons of sites the user no longer has anywhere, and keeps the cache bounded: the
-/// oldest visited sites go first, a favorite's icon (normal or incognito) never does.
 /// The title as the bookmark keeps it: trimmed, without control characters, cut to
 /// `MAX_BOOKMARK_TITLE_CHARS`, and the host (without `www.`) when nothing is left.
 fn bookmark_title(title: &str, host: &str) -> String {
@@ -1085,6 +1083,8 @@ fn bookmark_title(title: &str, host: &str) -> String {
     }
 }
 
+/// Drops the icons of sites the user no longer has anywhere, and keeps the cache bounded: the
+/// oldest visited sites go first, a favorite's icon (normal or incognito) never does.
 fn prune_icons(data: &mut LibraryData) {
     let favorites: Vec<String> = data
         .favorites
