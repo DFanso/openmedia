@@ -429,6 +429,11 @@ export const en = {
   "settings.languageLabel": "App language",
   "settings.languageSystem": "System language",
   "settings.searchEngine": "Search engine",
+  "settings.startPage": "Start page",
+  "settings.startPageLast": "The last page I was on",
+  "settings.startPageSearch": "{engine} home page",
+  "settings.startPageNote":
+    "What the app opens when it starts. The change applies from the next launch.",
 
   "favorites.title": "Favorites",
   "favorites.note":

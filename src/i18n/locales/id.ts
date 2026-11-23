@@ -428,6 +428,11 @@ export const id: Messages = {
   "settings.languageLabel": "Bahasa aplikasi",
   "settings.languageSystem": "Bahasa sistem",
   "settings.searchEngine": "Mesin telusur",
+  "settings.startPage": "Halaman awal",
+  "settings.startPageLast": "Halaman terakhir yang saya buka",
+  "settings.startPageSearch": "Beranda {engine}",
+  "settings.startPageNote":
+    "Yang dibuka aplikasi saat dimulai. Perubahan berlaku mulai peluncuran berikutnya.",
 
   "favorites.title": "Favorit",
   "favorites.note":

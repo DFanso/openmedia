@@ -63,16 +63,14 @@ export const bn: Messages = {
   "import.chooseMore": "আরও ফাইল যোগ করুন",
   "import.direct": "এই কম্পিউটারের কোনো ব্রাউজার থেকে সরাসরি ইমপোর্ট করুন",
   "import.readingFrom": "{browser} পড়া হচ্ছে…",
-  "import.accessNote":
-    "সংরক্ষিত পাসওয়ার্ডে ঢোকার অনুমতি চাইলে অনুমতি দিন। সবকিছু এই ডিভাইসেই থাকে।",
+  "import.accessNote": "সংরক্ষিত পাসওয়ার্ডে ঢোকার অনুমতি চাইলে অনুমতি দিন। সবকিছু এই ডিভাইসেই থাকে।",
   "import.orFiles":
     "অথবা অন্য ব্রাউজার থেকে এক্সপোর্ট করা ফাইল বেছে নিন: বুকমার্ক (HTML), ইতিহাস ও পাসওয়ার্ড (CSV)।",
   "import.locked":
     "আপনার ব্রাউজার {count}টি সংরক্ষিত পাসওয়ার্ড লক করে রেখেছে, তাই পড়া যায়নি। আনতে হলে ব্রাউজারের পাসওয়ার্ড সেটিংস থেকে এক্সপোর্ট করে নিচের ফাইলটি বেছে নিন।",
   "import.reading": "পড়া হচ্ছে…",
   "import.tooLarge": "{name} ইমপোর্ট করার জন্য খুব বড়।",
-  "import.nothing":
-    "ওই ফাইলগুলোর কোনোটিই বুকমার্ক, ইতিহাস, পাসওয়ার্ড বা সার্চ ইঞ্জিনের মতো মনে হয়নি।",
+  "import.nothing": "ওই ফাইলগুলোর কোনোটিই বুকমার্ক, ইতিহাস, পাসওয়ার্ড বা সার্চ ইঞ্জিনের মতো মনে হয়নি।",
   "import.found":
     "{bookmarks}টি বুকমার্ক, {history}টি ইতিহাস এন্ট্রি এবং {passwords}টি সংরক্ষিত পাসওয়ার্ড পাওয়া গেছে।",
   "import.recipes": "আপনার ব্যবহৃত সাইটের জন্য রেসিপি চালু করুন",
@@ -209,8 +207,7 @@ export const bn: Messages = {
     "একটি দৈনিক সীমা বেছে নিন। এর আগে আপনি একটি অনুস্মারক পাবেন, এবং সীমায় পৌঁছালে এখানে সময় গণনা বন্ধ হয়ে যাবে।",
   "usage.partStopAfterHint": "এই অংশে সময় মধ্যরাত পর্যন্ত গণনা হয় না। সাইটের বাকি অংশ খোলা থাকে।",
   "usage.partTimeCheck": "সময় পরীক্ষা: {host}-এ {part}",
-  "usage.partLimitReached":
-    "{host}-এ {part} তার দৈনিক সীমা অতিক্রম করেছে। এখানে আর সময় গণনা হয় না।",
+  "usage.partLimitReached": "{host}-এ {part} তার দৈনিক সীমা অতিক্রম করেছে। এখানে আর সময় গণনা হয় না।",
   "usage.partStatusReached": "সীমা ছাড়িয়ে গেছে। এখানে আর সময় গণনা হয় না।",
   "usage.saveHint":
     "ছেড়ে দিলে পরিবর্তন সংরক্ষিত হয়। সাইট স্ক্রিনে থাকা অবস্থায় সময় গণনা হয় এবং মধ্যরাতে রিসেট হয়।",
@@ -228,8 +225,7 @@ export const bn: Messages = {
   "usage.scheduleClosed": "এখন বন্ধ",
   "usage.scheduleNotice":
     "আপনার সময়সূচি অনুযায়ী {name} বন্ধ। এটি {time}-এ খুলবে। অন্য সাইটগুলো এখনও পাওয়া যাবে।",
-  "usage.scheduleNoticeAlways":
-    "আপনার সময়সূচি অনুযায়ী {name} বন্ধ। অন্য সাইটগুলো এখনও পাওয়া যাবে।",
+  "usage.scheduleNoticeAlways": "আপনার সময়সূচি অনুযায়ী {name} বন্ধ। অন্য সাইটগুলো এখনও পাওয়া যাবে।",
   "usage.pauseScreenTitle": "বিরতি স্ক্রিন",
   "usage.pauseScreenHint":
     "এই সাইট খোলার আগে, বা আবার ফিরে আসার সময়, শ্বাসের বৃত্তের সঙ্গে কয়েক সেকেন্ড অপেক্ষা করুন।",
@@ -344,8 +340,7 @@ export const bn: Messages = {
   "tech.cat.design": "ডিজাইন ও ফন্ট",
   "tech.cat.delivery": "হোস্টিং ও ডেলিভারি",
   "settings.bottomMargin": "গ্লোবাল নিচের মার্জিন",
-  "settings.bottomMarginNote":
-    "স্ক্রিনের নিচের দিকে সরে যাওয়া মেনুর জন্য প্রতিটি পেজের নিচে ফাঁকা রাখে।",
+  "settings.bottomMarginNote": "স্ক্রিনের নিচের দিকে সরে যাওয়া মেনুর জন্য প্রতিটি পেজের নিচে ফাঁকা রাখে।",
   "settings.bottomMarginLabel": "সব সাইটের নিচের মার্জিন",
   "settings.accessibility": "অ্যাক্সেসিবিলিটি",
   "settings.accessibilityNote": "এগুলো অ্যাপে এবং আপনার খোলা পেজে প্রযোজ্য।",
@@ -420,6 +415,10 @@ export const bn: Messages = {
   "settings.languageLabel": "অ্যাপের ভাষা",
   "settings.languageSystem": "সিস্টেমের ভাষা",
   "settings.searchEngine": "সার্চ ইঞ্জিন",
+  "settings.startPage": "শুরুর পাতা",
+  "settings.startPageLast": "শেষ যে পাতায় ছিলাম",
+  "settings.startPageSearch": "{engine}-এর হোম পেজ",
+  "settings.startPageNote": "অ্যাপ চালু হলে যা খোলে। পরিবর্তনটি পরের বার চালু করলে কার্যকর হবে।",
 
   "favorites.title": "পছন্দের তালিকা",
   "favorites.note":
@@ -540,14 +539,12 @@ export const bn: Messages = {
   "settings.darkResetButton": "রিসেট",
   "recipes.hubPages": "পৃষ্ঠা",
   "recipes.openHubPage": "{label} খুলুন",
-  "recipes.hubNote":
-    "একটি হাব একসাথে কয়েকটি সাইট খোলে। প্রতিটি পৃষ্ঠা নিজস্ব সাইট, নিজস্ব কুকি সহ।",
+  "recipes.hubNote": "একটি হাব একসাথে কয়েকটি সাইট খোলে। প্রতিটি পৃষ্ঠা নিজস্ব সাইট, নিজস্ব কুকি সহ।",
   "favorites.bottomMargin": "নিচের মার্জিন",
   "favorites.darkModeLabel": "{site} ডার্ক মোড",
   "favorites.darkOn": "সবসময় চালু",
   "favorites.darkOff": "বন্ধ",
-  "recipes.sharedMargin":
-    "সাধারণ মার্জিন ব্যবহার করে। এই সাইটের নিজস্ব মার্জিন দিতে স্লাইডারটি সরান।",
+  "recipes.sharedMargin": "সাধারণ মার্জিন ব্যবহার করে। এই সাইটের নিজস্ব মার্জিন দিতে স্লাইডারটি সরান।",
   "recipes.ownMargin": "এই সাইটের নিজস্ব মার্জিন আছে।",
   "recipes.siteMarginLabel": "{name} নিচের মার্জিন",
   "recipes.useSharedMargin": "সাধারণ মার্জিন ব্যবহার করুন",
@@ -638,8 +635,7 @@ export const bn: Messages = {
   "share.github.summary": "কয়েকটি শব্দে বর্ণনা করুন",
   "share.github.count": "{count} / 140",
   "share.github.needAccount": "আপনার একটি বিনামূল্যের GitHub অ্যাকাউন্ট লাগবে।",
-  "share.github.whatSent":
-    "আপনার রেসিপি ও GitHub ব্যবহারকারীর নাম OpenMedia টিমের কাছে পাঠানো হবে।",
+  "share.github.whatSent": "আপনার রেসিপি ও GitHub ব্যবহারকারীর নাম OpenMedia টিমের কাছে পাঠানো হবে।",
   "share.github.afterReview": "টিম পর্যালোচনা করে অনুমোদন দেওয়ার পর সবাই এটি একটি আপডেটে পাবেন।",
   "share.github.continue": "GitHub দিয়ে চালিয়ে যান",
   "share.github.send": "রেসিপি শেয়ার করুন",
@@ -647,8 +643,7 @@ export const bn: Messages = {
   "share.github.signOut": "আপনি নন? সাইন আউট করুন",
   "share.github.waiting": "এইমাত্র খোলা ব্রাউজারে GitHub-এ সাইন ইন করুন, তারপর এখানে ফিরে আসুন।",
   "share.github.working": "আপনার রেসিপি পাঠানো হচ্ছে…",
-  "share.github.thanks":
-    "ধন্যবাদ! পর্যালোচনা ও অনুমোদনের পর আপনার রেসিপি পরবর্তী আপডেটে পাওয়া যাবে।",
+  "share.github.thanks": "ধন্যবাদ! পর্যালোচনা ও অনুমোদনের পর আপনার রেসিপি পরবর্তী আপডেটে পাওয়া যাবে।",
   "share.github.see": "GitHub-এ দেখুন",
   "share.github.tryAgain": "আবার চেষ্টা করুন",
   "share.github.error.tooNew":
@@ -658,8 +653,7 @@ export const bn: Messages = {
   "share.github.error.invalid": "এই রেসিপিটি শেয়ার করা যাবে না।",
   "share.github.error.offline":
     "OpenMedia টিমের সঙ্গে যোগাযোগ করা যায়নি। আপনার সংযোগ দেখে নিয়ে আবার চেষ্টা করুন।",
-  "share.github.error.busy":
-    "এখন অনেক মানুষ শেয়ার করছেন। অনুগ্রহ করে কয়েক মিনিট পর আবার চেষ্টা করুন।",
+  "share.github.error.busy": "এখন অনেক মানুষ শেয়ার করছেন। অনুগ্রহ করে কয়েক মিনিট পর আবার চেষ্টা করুন।",
   "share.github.error.failed":
     "কিছু একটা ভুল হয়েছে, আপনার রেসিপি পাঠানো হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন।",
   "share.github.error.cancelled": "আপনি সাইন ইন শেষ করেননি, তাই কিছু পাঠানো হয়নি।",
@@ -733,8 +727,7 @@ export const bn: Messages = {
   "assistant.script.afterAccept": "আপনি গ্রহণ করার পরেই কোড চলে।",
   "assistant.script.powers": "এই কোড কী করতে পারে",
   "assistant.script.line": "লাইন {line}",
-  "assistant.script.shareable":
-    "এটি স্ক্রিপ্ট নিরাপত্তার নিয়মের মধ্যেই থাকে, তাই শেয়ার করা যায়।",
+  "assistant.script.shareable": "এটি স্ক্রিপ্ট নিরাপত্তার নিয়মের মধ্যেই থাকে, তাই শেয়ার করা যায়।",
   "assistant.script.notShareable":
     "এটি এমন কিছু ব্যবহার করে যা স্ক্রিপ্ট নিরাপত্তার নিয়ম অনুমোদন করে না, তাই শেয়ার করা যায় না।",
   "assistant.script.power.network": "নেটওয়ার্কে ডেটা পাঠানো",
@@ -744,8 +737,7 @@ export const bn: Messages = {
   "assistant.script.power.navigation": "পেজটিকে অন্য কোথাও পাঠানো",
   "assistant.script.power.automation": "আপনার হয়ে ক্লিক, জমা বা কাজ করা",
   "assistant.script.power.credentials": "আপনি যা টাইপ করেন বা ব্যক্তিগত ডেটা পড়া",
-  "assistant.script.power.other":
-    "স্ক্রিপ্ট নিরাপত্তার নিয়ম অনুমোদন করে না এমন সুবিধা ব্যবহার করুন",
+  "assistant.script.power.other": "স্ক্রিপ্ট নিরাপত্তার নিয়ম অনুমোদন করে না এমন সুবিধা ব্যবহার করুন",
   "assistant.requestQuote": "“{request}”",
   "assistant.unmatched":
     "এই পেজে {count}টি নিয়ম কিছুর সঙ্গে মেলেনি। | এই পেজে {count}টি নিয়ম কিছুর সঙ্গে মেলেনি।",
@@ -756,8 +748,7 @@ export const bn: Messages = {
     "পরিবর্তনের অনুরোধ করতে একটি AI প্রদানকারী ও কী যোগ করুন। ঠিকানা দিয়ে এখনও ওয়েবসাইট খোলা যাবে।",
   "assistant.blockedNoPage": "আগে একটি সাইট খুলুন, তারপর পরিবর্তনের বর্ণনা দিন।",
   "assistant.errorMissingKey": "প্রদানকারীর বৈধ কী দরকার। সেটিংস > AI সহকারীতে এটি দেখুন।",
-  "assistant.errorRateLimit":
-    "প্রদানকারী এই কী-এর রেট লিমিট প্রয়োগ করছে। একটু পরে আবার চেষ্টা করুন।",
+  "assistant.errorRateLimit": "প্রদানকারী এই কী-এর রেট লিমিট প্রয়োগ করছে। একটু পরে আবার চেষ্টা করুন।",
   "assistant.errorNetwork": "প্রদানকারীর সঙ্গে সংযোগ করা যায়নি। আপনার সংযোগ পরীক্ষা করুন।",
   "assistant.errorProvider":
     "প্রদানকারী একটি ত্রুটি ফিরিয়েছে। আবার চেষ্টা করুন, অথবা সেটিংসে অন্য মডেল বেছে নিন।",
@@ -787,8 +778,7 @@ export const bn: Messages = {
   "chats.favorites": "পছন্দের তালিকা",
   "chats.history": "ইতিহাস",
   "chats.none": "এই সাইটের জন্য এখনও কোনো চ্যাট নেই।",
-  "chats.emptyBody":
-    "একটি সাইট খুলুন, বারে চ্যাট বেছে সহকারীকে প্রশ্ন করুন। আপনার চ্যাট এখানে দেখা যাবে।",
+  "chats.emptyBody": "একটি সাইট খুলুন, বারে চ্যাট বেছে সহকারীকে প্রশ্ন করুন। আপনার চ্যাট এখানে দেখা যাবে।",
   "assistant.historyEmpty": "এই সাইটের জন্য এখনও কোনো চ্যাট সংরক্ষিত নেই।",
   "assistant.chatEmpty": "এই পেজে একটি পরিবর্তনের বর্ণনা দিন, যেমন “প্রস্তাবিত ভিডিও লুকান”।",
   "assistant.chatAbout": "{site} নিয়ে চ্যাট",
@@ -820,8 +810,7 @@ export const bn: Messages = {
   "paywall.empty": "এই মুহূর্তে কোনো প্ল্যান নেই।",
   "paywall.error": "কিছু একটা ভুল হয়েছে। আবার চেষ্টা করুন।",
   "paywall.unavailable": "এই সংস্করণে কেনাকাটা সম্ভব নয়।",
-  "paywall.legalUnavailable":
-    "গোপনীয়তা নীতি ও শর্তের পাতা ঠিক না হওয়া পর্যন্ত কেনাকাটা সম্ভব নয়।",
+  "paywall.legalUnavailable": "গোপনীয়তা নীতি ও শর্তের পাতা ঠিক না হওয়া পর্যন্ত কেনাকাটা সম্ভব নয়।",
   "paywall.disclosure":
     "সাবস্ক্রিপশন স্বয়ংক্রিয়ভাবে নবায়ন হয় যতক্ষণ না আপনি পর্যায় শেষ হওয়ার অন্তত ২৪ ঘণ্টা আগে আপনার ডিভাইসের স্টোর সেটিংসে তা বাতিল করেন। প্রতিটি প্ল্যানে স্টোরের স্থানীয় মূল্য ও ফ্রি ট্রায়াল দেখানো হয়।",
   "paywall.privacy": "গোপনীয়তা নীতি",
@@ -853,8 +842,7 @@ export const bn: Messages = {
   "tabs.moveUp": "{name} উপরে সরান",
   "tabs.moveDown": "{name} নিচে সরান",
   "tabs.number": "ট্যাব {value}",
-  "tabs.arrangeNote":
-    "সংখ্যাগুলো ট্যাবের শর্টকাট। ক্রম বদলাতে কোনো সাইট ধরে টানুন বা তীর ব্যবহার করুন।",
+  "tabs.arrangeNote": "সংখ্যাগুলো ট্যাবের শর্টকাট। ক্রম বদলাতে কোনো সাইট ধরে টানুন বা তীর ব্যবহার করুন।",
   "tabs.quickAccess": "দ্রুত অ্যাক্সেস",
   "tabs.history": "ইতিহাস",
   "tabs.allHistory": "সম্পূর্ণ ইতিহাস ({count})",
@@ -880,16 +868,13 @@ export const bn: Messages = {
   "settings.darkSites": "নির্দিষ্ট সেটিংসওয়ালা সাইট",
   "settings.darkSitesNote":
     "কোনো সাইটের নির্দিষ্ট সেটিংস না থাকলে এই সেটিংস সব সাইটে প্রযোজ্য। ফেভারিটে সেগুলো ঠিক করুন।",
-  "fab.darkMode":
-    "ডার্ক মোড। সব সাইটের জন্য চালু বা বন্ধ করতে ট্যাপ করুন, সাধারণ সেটিংসের জন্য চেপে ধরুন।",
-  "fab.darkModeSite":
-    "এই সাইটের ডার্ক মোড। চালু বা বন্ধ করতে ট্যাপ করুন, এর সেটিংসের জন্য চেপে ধরুন।",
+  "fab.darkMode": "ডার্ক মোড। সব সাইটের জন্য চালু বা বন্ধ করতে ট্যাপ করুন, সাধারণ সেটিংসের জন্য চেপে ধরুন।",
+  "fab.darkModeSite": "এই সাইটের ডার্ক মোড। চালু বা বন্ধ করতে ট্যাপ করুন, এর সেটিংসের জন্য চেপে ধরুন।",
   "favorites.darkEffectiveOn": "এই সাইটে ডার্ক মোড চালু আছে।",
   "favorites.darkEffectiveOff": "এই সাইটে ডার্ক মোড বন্ধ আছে।",
   "site.darkTitle": "ডার্ক মোড: {name}",
   "site.videoTitle": "ভিডিও নিয়ন্ত্রণ: {name}",
-  "site.subtitle":
-    "শুধু এই সাইটে প্রযোজ্য। এখানে বদলানো পর্যন্ত প্রতিটি সেটিং সাধারণ সেটিং অনুসরণ করে।",
+  "site.subtitle": "শুধু এই সাইটে প্রযোজ্য। এখানে বদলানো পর্যন্ত প্রতিটি সেটিং সাধারণ সেটিং অনুসরণ করে।",
   "site.overridden": "এই সাইটের জন্য নির্দিষ্ট",
   "site.followGeneralFor": "সাধারণ অনুসরণ করুন: {setting}",
   "site.resetAll": "সবকিছু সাধারণে ফিরিয়ে দিন",
@@ -955,8 +940,7 @@ export const bn: Messages = {
   "downloads.folder": "ডাউনলোড ফোল্ডার",
   "downloads.folderNote": "একটি পূর্ণ পাথ। এই ডিভাইসের ডাউনলোড ফোল্ডার ব্যবহার করতে ফাঁকা রাখুন।",
   "downloads.segments": "প্রতি ফাইলে সংযোগ",
-  "downloads.segmentsNote":
-    "একাধিক সংযোগ বড় ফাইল দ্রুত করতে পারে। কিছু সার্ভার শুধু একটি অনুমতি দেয়।",
+  "downloads.segmentsNote": "একাধিক সংযোগ বড় ফাইল দ্রুত করতে পারে। কিছু সার্ভার শুধু একটি অনুমতি দেয়।",
   "downloads.mask": "নামকরণ মাস্ক",
   "downloads.maskNote":
     "নিচে তালিকাভুক্ত টোকেন দিয়ে ফাইলের নাম দিন। স্ল্যাশ দিলে নতুন ফোল্ডার শুরু হয়। তারিখ UTC-তে।",

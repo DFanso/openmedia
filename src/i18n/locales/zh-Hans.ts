@@ -391,6 +391,10 @@ export const zhHans: Messages = {
   "settings.languageLabel": "应用语言",
   "settings.languageSystem": "跟随系统语言",
   "settings.searchEngine": "搜索引擎",
+  "settings.startPage": "启动页面",
+  "settings.startPageLast": "上次浏览的页面",
+  "settings.startPageSearch": "{engine} 主页",
+  "settings.startPageNote": "应用启动时打开的页面。更改将在下次启动时生效。",
 
   "favorites.title": "收藏",
   "favorites.note":

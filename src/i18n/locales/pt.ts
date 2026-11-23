@@ -437,6 +437,11 @@ export const pt: Messages = {
   "settings.languageLabel": "Idioma do app",
   "settings.languageSystem": "Idioma do sistema",
   "settings.searchEngine": "Mecanismo de pesquisa",
+  "settings.startPage": "Página inicial",
+  "settings.startPageLast": "A última página em que estive",
+  "settings.startPageSearch": "Página inicial do {engine}",
+  "settings.startPageNote":
+    "O que o app abre ao iniciar. A mudança vale a partir da próxima abertura.",
 
   "favorites.title": "Favoritos",
   "favorites.note":

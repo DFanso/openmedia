@@ -434,6 +434,10 @@ export const sv: Messages = {
   "settings.languageLabel": "Appspråk",
   "settings.languageSystem": "Systemspråk",
   "settings.searchEngine": "Sökmotor",
+  "settings.startPage": "Startsida",
+  "settings.startPageLast": "Den senaste sidan jag var på",
+  "settings.startPageSearch": "Startsidan för {engine}",
+  "settings.startPageNote": "Det appen öppnar när den startar. Ändringen gäller från nästa start.",
 
   "favorites.title": "Favoriter",
   "favorites.note":

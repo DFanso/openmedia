@@ -394,6 +394,10 @@ export const zhHant: Messages = {
   "settings.languageLabel": "App 語言",
   "settings.languageSystem": "系統語言",
   "settings.searchEngine": "搜尋引擎",
+  "settings.startPage": "啟動頁面",
+  "settings.startPageLast": "上次瀏覽的頁面",
+  "settings.startPageSearch": "{engine} 首頁",
+  "settings.startPageNote": "App 啟動時開啟的頁面。變更會在下次啟動時生效。",
 
   "favorites.title": "我的最愛",
   "favorites.note":

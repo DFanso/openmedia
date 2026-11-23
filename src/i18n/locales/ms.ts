@@ -432,6 +432,11 @@ export const ms: Messages = {
   "settings.languageLabel": "Bahasa aplikasi",
   "settings.languageSystem": "Bahasa sistem",
   "settings.searchEngine": "Enjin carian",
+  "settings.startPage": "Halaman mula",
+  "settings.startPageLast": "Halaman terakhir yang saya buka",
+  "settings.startPageSearch": "Halaman utama {engine}",
+  "settings.startPageNote":
+    "Perkara yang dibuka oleh apl apabila ia bermula. Perubahan berkuat kuasa pada pelancaran seterusnya.",
 
   "favorites.title": "Kegemaran",
   "favorites.note":
