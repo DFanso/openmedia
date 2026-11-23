@@ -432,6 +432,11 @@ export const ko: Messages = {
   "bookmark.empty": "아직 저장된 페이지가 없습니다.",
   "bookmark.save": "현재 페이지 저장",
   "bookmark.replace": "현재 페이지로 바꾸기",
+  "settings.startPage": "시작 페이지",
+  "settings.startPageLast": "마지막으로 보던 페이지",
+  "settings.startPageSearch": "{engine} 홈페이지",
+  "settings.startPageNote":
+    "앱을 시작할 때 여는 페이지입니다. 변경 사항은 다음 실행부터 적용됩니다.",
 
   "favorites.title": "즐겨찾기",
   "favorites.note":
@@ -862,6 +867,12 @@ export const ko: Messages = {
   "tabs.number": "탭 {value}",
   "tabs.arrangeNote":
     "번호는 탭 단축키입니다. 사이트를 길게 눌러 끌거나 화살표를 사용해 순서를 바꾸세요.",
+  "tabs.recentlyClosed": "최근에 닫은 사이트",
+  "tabs.closedEmpty":
+    "직접 닫았거나 메모리를 아끼려고 앱이 닫은 사이트가 앱을 종료할 때까지 여기에 표시됩니다.",
+  "tabs.closedAgo": "{value} 닫음",
+  "tabs.reopen": "{name} 다시 열기",
+  "tabs.reopenShort": "다시 열기",
   "tabs.quickAccess": "빠른 접근",
   "tabs.history": "기록",
   "tabs.allHistory": "전체 기록({count})",

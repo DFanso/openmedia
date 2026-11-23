@@ -14,6 +14,7 @@ import { Group, GroupLabel, primaryBlockButton, quietButton } from "../settings/
 import { findFavoriteSession, type Session } from "../web/sessions";
 import { FavoriteRows } from "./FavoriteRows";
 import { formatMs, secondsTodayFor, tabNumber } from "./tabs";
+import type { ClosedTab } from "./closedTabs";
 
 /** How long a press has to stay put before the row lifts and can be dragged. */
 const HOLD_MS = 350;
@@ -24,9 +25,17 @@ const NO_HISTORY: string[] = [];
 /** How many recent addresses the Tabs screen shows; the History screen has them all. */
 const HISTORY_PREVIEW = 8;
 
-/** Every open site, the quick-access sites and recent history in one place, with how each open site performs. */
+/**
+ * Every open site, the sites closed since launch, the quick-access sites and recent history in one
+ * place, with how each open site performs.
+ */
 export function TabsSheet() {
   const open = useApp((s) => s.sheet === "tabs");
+  return open ? <TabsPage /> : null;
+}
+
+/** Mounted only while open, so the times it shows are counted from the moment it opened. */
+function TabsPage() {
   const closeSheet = useApp((s) => s.closeSheet);
   const openSheet = useApp((s) => s.openSheet);
   const sessions = useApp((s) => s.sessions);
@@ -41,13 +50,14 @@ export function TabsSheet() {
   const resetSession = useApp((s) => s.resetSession);
   const closeOtherSessions = useApp((s) => s.closeOtherSessions);
   const moveSession = useApp((s) => s.moveSession);
+  const closedTabs = useApp((s) => s.closedTabs);
+  const reopenClosedTab = useApp((s) => s.reopenClosedTab);
   const t = useT();
   const [report, setReport] = useState<UsageReport | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [drag, setDrag] = useState<{ from: number; to: number } | null>(null);
 
   useEffect(() => {
-    if (!open) return;
     let cancelled = false;
     usage
       .report(localDay(new Date()), 1)
@@ -60,9 +70,7 @@ export function TabsSheet() {
     return () => {
       cancelled = true;
     };
-  }, [open]);
-
-  if (!open) return null;
+  }, []);
 
   const tabs = sessions;
 
@@ -120,6 +128,25 @@ export function TabsSheet() {
         </section>
 
         <section>
+          <GroupLabel>{t("tabs.recentlyClosed")}</GroupLabel>
+          {closedTabs.length === 0 ? (
+            <Empty text={t("tabs.closedEmpty")} />
+          ) : (
+            <Group>
+              {closedTabs.map((tab) => (
+                <ClosedRow
+                  key={tab.id}
+                  tab={tab}
+                  now={now}
+                  favorites={favorites}
+                  onOpen={() => reopenClosedTab(tab.id)}
+                />
+              ))}
+            </Group>
+          )}
+        </section>
+
+        <section>
           <GroupLabel>{t("tabs.quickAccess")}</GroupLabel>
           {favorites.length === 0 ? (
             <Empty text={t("favorites.quickEmpty")} />
@@ -171,6 +198,41 @@ export function TabsSheet() {
         </section>
       </div>
     </Screen>
+  );
+}
+
+function ClosedRow({
+  tab,
+  now,
+  favorites,
+  onOpen,
+}: {
+  tab: ClosedTab;
+  now: number;
+  favorites: readonly Favorite[];
+  onOpen: () => void;
+}) {
+  const t = useT();
+  const locale = useApp(selectLocale);
+  const host = displayHost(tab.url);
+  const icon = useIconForUrl(tab.url, favorites);
+  const title = tab.title ?? host;
+  return (
+    <button
+      type="button"
+      aria-label={t("tabs.reopen", { name: title })}
+      onClick={onOpen}
+      className="flex w-full items-center gap-3 px-4 py-3 text-start active:bg-paper/[0.06]"
+    >
+      <SiteTile name={host} icon={icon} />
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-base font-medium">{title}</span>
+        <span className="block truncate text-sm text-paper/55">
+          {host} · {t("tabs.closedAgo", { value: relativeAge(now - tab.closedAt, locale) })}
+        </span>
+      </span>
+      <span className="shrink-0 text-sm text-accent">{t("tabs.reopenShort")}</span>
+    </button>
   );
 }
 
@@ -484,7 +546,7 @@ function TabsCloseIcon() {
 /** `3 minutes ago` in the app's language. */
 function relativeAge(ms: number, locale: string): string {
   const formatter = new Intl.RelativeTimeFormat(locale, { numeric: "auto", style: "short" });
-  const minutes = Math.round(ms / 60_000);
+  const minutes = Math.round(Math.max(0, ms) / 60_000);
   if (minutes < 1) return formatter.format(0, "minute");
   if (minutes < 60) return formatter.format(-minutes, "minute");
   return formatter.format(-Math.round(minutes / 60), "hour");

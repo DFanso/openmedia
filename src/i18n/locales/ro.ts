@@ -445,6 +445,11 @@ export const ro: Messages = {
   "bookmark.empty": "Nicio pagină salvată încă.",
   "bookmark.save": "Salvează pagina curentă",
   "bookmark.replace": "Înlocuiește cu pagina curentă",
+  "settings.startPage": "Pagina de start",
+  "settings.startPageLast": "Ultima pagină pe care am fost",
+  "settings.startPageSearch": "Pagina principală {engine}",
+  "settings.startPageNote":
+    "Ce deschide aplicația la pornire. Schimbarea se aplică de la următoarea pornire.",
 
   "favorites.title": "Favorite",
   "favorites.note":
@@ -891,6 +896,12 @@ export const ro: Messages = {
   "tabs.number": "Fila {value}",
   "tabs.arrangeNote":
     "Numerele sunt comenzile rapide ale filelor. Ține apăsat pe un site și trage, sau folosește săgețile, pentru a schimba ordinea.",
+  "tabs.recentlyClosed": "Închise recent",
+  "tabs.closedEmpty":
+    "Site-urile pe care le închizi sau pe care aplicația le închide ca să economisească memorie apar aici până la închiderea aplicației.",
+  "tabs.closedAgo": "închis {value}",
+  "tabs.reopen": "Redeschide {name}",
+  "tabs.reopenShort": "Redeschide",
   "tabs.quickAccess": "Acces rapid",
   "tabs.history": "Istoric",
   "tabs.allHistory": "Tot istoricul ({count})",

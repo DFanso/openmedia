@@ -442,6 +442,11 @@ export const de: Messages = {
   "bookmark.empty": "Noch keine Seite gespeichert.",
   "bookmark.save": "Aktuelle Seite speichern",
   "bookmark.replace": "Durch die aktuelle Seite ersetzen",
+  "settings.startPage": "Startseite",
+  "settings.startPageLast": "Die zuletzt besuchte Seite",
+  "settings.startPageSearch": "Startseite von {engine}",
+  "settings.startPageNote":
+    "Was die App beim Start öffnet. Die Änderung gilt ab dem nächsten Start.",
 
   "favorites.title": "Favoriten",
   "favorites.note":
@@ -897,6 +902,12 @@ export const de: Messages = {
   "tabs.number": "Tab {value}",
   "tabs.arrangeNote":
     "Die Nummern sind die Tab-Kürzel. Halte eine Seite gedrückt und ziehe sie, oder nutze die Pfeile, um die Reihenfolge zu ändern.",
+  "tabs.recentlyClosed": "Kürzlich geschlossen",
+  "tabs.closedEmpty":
+    "Seiten, die du schließt oder die die App schließt, um Speicher zu sparen, stehen hier, bis die App beendet wird.",
+  "tabs.closedAgo": "geschlossen {value}",
+  "tabs.reopen": "{name} wieder öffnen",
+  "tabs.reopenShort": "Wieder öffnen",
   "tabs.quickAccess": "Schnellzugriff",
   "tabs.history": "Verlauf",
   "tabs.allHistory": "Gesamter Verlauf ({count})",

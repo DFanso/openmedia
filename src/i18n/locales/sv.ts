@@ -443,6 +443,10 @@ export const sv: Messages = {
   "bookmark.empty": "Ingen sida sparad än.",
   "bookmark.save": "Spara den aktuella sidan",
   "bookmark.replace": "Ersätt med den aktuella sidan",
+  "settings.startPage": "Startsida",
+  "settings.startPageLast": "Den senaste sidan jag var på",
+  "settings.startPageSearch": "Startsidan för {engine}",
+  "settings.startPageNote": "Det appen öppnar när den startar. Ändringen gäller från nästa start.",
 
   "favorites.title": "Favoriter",
   "favorites.note":
@@ -881,6 +885,12 @@ export const sv: Messages = {
   "tabs.number": "Flik {value}",
   "tabs.arrangeNote":
     "Siffrorna är flikgenvägarna. Håll ned en webbplats och dra, eller använd pilarna, för att ändra ordningen.",
+  "tabs.recentlyClosed": "Nyligen stängda",
+  "tabs.closedEmpty":
+    "Webbplatser du stänger, eller som appen stänger för att spara minne, visas här tills appen avslutas.",
+  "tabs.closedAgo": "stängd {value}",
+  "tabs.reopen": "Öppna {name} igen",
+  "tabs.reopenShort": "Öppna igen",
   "tabs.quickAccess": "Snabbåtkomst",
   "tabs.history": "Historik",
   "tabs.allHistory": "All historik ({count})",

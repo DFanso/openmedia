@@ -429,6 +429,10 @@ export const bn: Messages = {
   "bookmark.empty": "এখনও কোনো পাতা সংরক্ষিত হয়নি।",
   "bookmark.save": "বর্তমান পাতা সংরক্ষণ করুন",
   "bookmark.replace": "বর্তমান পাতা দিয়ে বদলান",
+  "settings.startPage": "শুরুর পাতা",
+  "settings.startPageLast": "শেষ যে পাতায় ছিলাম",
+  "settings.startPageSearch": "{engine}-এর হোম পেজ",
+  "settings.startPageNote": "অ্যাপ চালু হলে যা খোলে। পরিবর্তনটি পরের বার চালু করলে কার্যকর হবে।",
 
   "favorites.title": "পছন্দের তালিকা",
   "favorites.note":
@@ -864,6 +868,12 @@ export const bn: Messages = {
   "tabs.number": "ট্যাব {value}",
   "tabs.arrangeNote":
     "সংখ্যাগুলো ট্যাবের শর্টকাট। ক্রম বদলাতে কোনো সাইট ধরে টানুন বা তীর ব্যবহার করুন।",
+  "tabs.recentlyClosed": "সম্প্রতি বন্ধ করা",
+  "tabs.closedEmpty":
+    "আপনি যে সাইটগুলো বন্ধ করেন, বা মেমরি বাঁচাতে অ্যাপ যেগুলো বন্ধ করে, অ্যাপ বন্ধ না হওয়া পর্যন্ত এখানে থাকে।",
+  "tabs.closedAgo": "বন্ধ হয়েছে {value}",
+  "tabs.reopen": "{name} আবার খুলুন",
+  "tabs.reopenShort": "আবার খুলুন",
   "tabs.quickAccess": "দ্রুত অ্যাক্সেস",
   "tabs.history": "ইতিহাস",
   "tabs.allHistory": "সম্পূর্ণ ইতিহাস ({count})",

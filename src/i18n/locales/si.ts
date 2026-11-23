@@ -434,6 +434,10 @@ export const si: Messages = {
   "bookmark.empty": "තවම පිටුවක් සුරැකී නැත.",
   "bookmark.save": "වත්මන් පිටුව සුරකින්න",
   "bookmark.replace": "වත්මන් පිටුවෙන් ප්‍රතිස්ථාපනය කරන්න",
+  "settings.startPage": "ආරම්භක පිටුව",
+  "settings.startPageLast": "මා අවසානයට සිටි පිටුව",
+  "settings.startPageSearch": "{engine} මුල් පිටුව",
+  "settings.startPageNote": "යෙදුම ආරම්භ වන විට විවෘත කරන දේ. වෙනස ඊළඟ ආරම්භයේ සිට ක්‍රියාත්මක වේ.",
 
   "favorites.title": "ආදරණීය",
   "favorites.note":
@@ -872,6 +876,12 @@ export const si: Messages = {
   "tabs.number": "ටැබය {value}",
   "tabs.arrangeNote":
     "අංක යනු ටැබ කෙටිමං වේ. අනුපිළිවෙල වෙනස් කිරීමට අඩවියක් අල්ලාගෙන ඇදගන්න, නැතහොත් ඊතල භාවිත කරන්න.",
+  "tabs.recentlyClosed": "මෑතකදී වසා දැමූ",
+  "tabs.closedEmpty":
+    "ඔබ වසන අඩවි, හෝ මතකය ඉතිරි කිරීමට යෙදුම වසන අඩවි, යෙදුම වසන තුරු මෙහි පෙන්වයි.",
+  "tabs.closedAgo": "වසා දැමුවේ {value}",
+  "tabs.reopen": "{name} නැවත විවෘත කරන්න",
+  "tabs.reopenShort": "නැවත විවෘත කරන්න",
   "tabs.quickAccess": "ඉක්මන් ප්‍රවේශය",
   "tabs.history": "ඉතිහාසය",
   "tabs.allHistory": "සම්පූර්ණ ඉතිහාසය ({count})",

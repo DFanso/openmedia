@@ -441,6 +441,11 @@ export const tr: Messages = {
   "bookmark.empty": "Henüz kaydedilmiş sayfa yok.",
   "bookmark.save": "Geçerli sayfayı kaydet",
   "bookmark.replace": "Geçerli sayfayla değiştir",
+  "settings.startPage": "Başlangıç sayfası",
+  "settings.startPageLast": "En son bulunduğum sayfa",
+  "settings.startPageSearch": "{engine} ana sayfası",
+  "settings.startPageNote":
+    "Uygulamanın açılırken gösterdiği sayfa. Değişiklik bir sonraki açılışta geçerli olur.",
 
   "favorites.title": "Favoriler",
   "favorites.note":
@@ -878,6 +883,12 @@ export const tr: Messages = {
   "tabs.number": "Sekme {value}",
   "tabs.arrangeNote":
     "Numaralar sekme kısayollarıdır. Sırayı değiştirmek için bir siteye basılı tutup sürükleyin ya da okları kullanın.",
+  "tabs.recentlyClosed": "Son kapatılanlar",
+  "tabs.closedEmpty":
+    "Kapattığınız ya da uygulamanın bellek kazanmak için kapattığı siteler, uygulama kapanana kadar burada listelenir.",
+  "tabs.closedAgo": "kapatıldı {value}",
+  "tabs.reopen": "{name} sitesini yeniden aç",
+  "tabs.reopenShort": "Yeniden aç",
   "tabs.quickAccess": "Hızlı erişim",
   "tabs.history": "Geçmiş",
   "tabs.allHistory": "Tüm geçmiş ({count})",

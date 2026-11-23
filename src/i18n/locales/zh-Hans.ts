@@ -400,6 +400,10 @@ export const zhHans: Messages = {
   "bookmark.empty": "还没有保存页面。",
   "bookmark.save": "保存当前页面",
   "bookmark.replace": "替换为当前页面",
+  "settings.startPage": "启动页面",
+  "settings.startPageLast": "上次浏览的页面",
+  "settings.startPageSearch": "{engine} 主页",
+  "settings.startPageNote": "应用启动时打开的页面。更改将在下次启动时生效。",
 
   "favorites.title": "收藏",
   "favorites.note":
@@ -805,6 +809,11 @@ export const zhHans: Messages = {
   "tabs.moveDown": "将 {name} 下移",
   "tabs.number": "标签页 {value}",
   "tabs.arrangeNote": "数字即标签页快捷键。长按网站并拖动，或使用箭头，即可调整顺序。",
+  "tabs.recentlyClosed": "最近关闭",
+  "tabs.closedEmpty": "你关闭的网站，或应用为节省内存而关闭的网站，会列在这里，直到应用退出。",
+  "tabs.closedAgo": "{value}关闭",
+  "tabs.reopen": "重新打开 {name}",
+  "tabs.reopenShort": "重新打开",
   "tabs.quickAccess": "快速访问",
   "tabs.history": "历史记录",
   "tabs.allHistory": "全部历史记录（{count}）",

@@ -447,6 +447,11 @@ export const es: Messages = {
   "bookmark.empty": "Aún no hay ninguna página guardada.",
   "bookmark.save": "Guardar la página actual",
   "bookmark.replace": "Reemplazar por la página actual",
+  "settings.startPage": "Página de inicio",
+  "settings.startPageLast": "La última página en la que estuve",
+  "settings.startPageSearch": "Página principal de {engine}",
+  "settings.startPageNote":
+    "Lo que abre la app al iniciarse. El cambio se aplica a partir del próximo inicio.",
 
   "favorites.title": "Favoritos",
   "favorites.note":
@@ -891,6 +896,12 @@ export const es: Messages = {
   "tabs.number": "Pestaña {value}",
   "tabs.arrangeNote":
     "Los números son los atajos de pestañas. Mantén pulsado un sitio y arrástralo, o usa las flechas, para cambiar el orden.",
+  "tabs.recentlyClosed": "Cerrados recientemente",
+  "tabs.closedEmpty":
+    "Los sitios que cierras, o que la app cierra para ahorrar memoria, aparecen aquí hasta que se cierra la app.",
+  "tabs.closedAgo": "cerrado {value}",
+  "tabs.reopen": "Volver a abrir {name}",
+  "tabs.reopenShort": "Volver a abrir",
   "tabs.quickAccess": "Acceso rápido",
   "tabs.history": "Historial",
   "tabs.allHistory": "Todo el historial ({count})",

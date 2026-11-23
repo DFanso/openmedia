@@ -14,6 +14,22 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** see the PR. **Not verified:** the fan on a device or simulator; the Rust side was not compiled (see the PR); native-speaker review of the new strings.
 
+### feat(tabs): reopen recently closed sites from the Tabs screen
+
+**Area:** `feat(tabs)`
+
+**Change:** The Tabs screen has a "Recently closed" section under Open sites. It lists up to ten sites closed since launch, newest first: the ones the user closed and the ones the app closed by itself to save memory. A tap reopens the page where it was (or switches to it if it is open again). Resetting a tab to its start page does not list the old page. Kept in memory only (`closedTabs`), never written to disk, and emptied when incognito starts or ends and when history is cleared. The Tabs page now mounts only while open, so its "used … ago" times count from the moment it opened. Five new strings in all 29 locales, machine-drafted.
+
+**Verified:** see the PR. **Not verified:** on a device or simulator; native-speaker review of the new strings.
+
+### feat(settings): the app can start on the search engine's home page
+
+**Area:** `feat(settings)`
+
+**Change:** Settings > Browsing has a new "Start page" choice under Search engine: "The last page I was on" (the default, unchanged behavior) or "<engine> home page", which makes every launch open the picked engine's front page (`https://www.google.com/` for Google, `https://duckduckgo.com/` for DuckDuckGo, and so on). Stored in `library.json` as `startPage` (`set_start_page`); a library saved before the setting keeps opening the last page. Core still opens the start page itself at launch (`Library::start_url`), so the choice applies from the next launch. Four new strings in all 29 locales, machine-drafted.
+
+**Verified:** see the PR. **Not verified:** a launch on a device or simulator; native-speaker review of the new strings.
+
 ### fix(siteview): close the native fullscreen video left over after returning from picture-in-picture (iOS)
 
 **Area:** `fix(siteview)`

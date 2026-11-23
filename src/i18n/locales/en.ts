@@ -438,6 +438,11 @@ export const en = {
   "bookmark.empty": "No page saved yet.",
   "bookmark.save": "Save the current page",
   "bookmark.replace": "Replace with the current page",
+  "settings.startPage": "Start page",
+  "settings.startPageLast": "The last page I was on",
+  "settings.startPageSearch": "{engine} home page",
+  "settings.startPageNote":
+    "What the app opens when it starts. The change applies from the next launch.",
 
   "favorites.title": "Favorites",
   "favorites.note":
@@ -869,6 +874,12 @@ export const en = {
   "tabs.number": "Tab {value}",
   "tabs.arrangeNote":
     "The numbers are the tab shortcuts. Hold a site and drag, or use the arrows, to change the order.",
+  "tabs.recentlyClosed": "Recently closed",
+  "tabs.closedEmpty":
+    "Sites you close, or that the app closes to save memory, are listed here until the app quits.",
+  "tabs.closedAgo": "closed {value}",
+  "tabs.reopen": "Reopen {name}",
+  "tabs.reopenShort": "Reopen",
   "tabs.quickAccess": "Quick access",
   "tabs.history": "History",
   "tabs.allHistory": "All history ({count})",

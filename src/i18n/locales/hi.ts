@@ -437,6 +437,10 @@ export const hi: Messages = {
   "bookmark.empty": "अभी कोई पेज सहेजा नहीं गया है।",
   "bookmark.save": "मौजूदा पेज सहेजें",
   "bookmark.replace": "मौजूदा पेज से बदलें",
+  "settings.startPage": "शुरुआती पेज",
+  "settings.startPageLast": "आख़िरी पेज जिस पर मैं था",
+  "settings.startPageSearch": "{engine} का होम पेज",
+  "settings.startPageNote": "ऐप शुरू होने पर क्या खोलता है। बदलाव अगली बार ऐप खोलने पर लागू होगा।",
 
   "favorites.title": "पसंदीदा",
   "favorites.note":
@@ -872,6 +876,12 @@ export const hi: Messages = {
   "tabs.number": "टैब {value}",
   "tabs.arrangeNote":
     "संख्याएँ टैब शॉर्टकट हैं। क्रम बदलने के लिए किसी साइट को दबाए रखकर खींचें, या तीरों का उपयोग करें।",
+  "tabs.recentlyClosed": "हाल ही में बंद",
+  "tabs.closedEmpty":
+    "आप जो साइटें बंद करते हैं, या जिन्हें ऐप मेमोरी बचाने के लिए बंद करता है, वे ऐप बंद होने तक यहाँ दिखती हैं।",
+  "tabs.closedAgo": "बंद हुई {value}",
+  "tabs.reopen": "{name} फिर से खोलें",
+  "tabs.reopenShort": "फिर से खोलें",
   "tabs.quickAccess": "त्वरित पहुँच",
   "tabs.history": "इतिहास",
   "tabs.allHistory": "पूरा इतिहास ({count})",

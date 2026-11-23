@@ -65,7 +65,7 @@ pub enum Theme {
 }
 
 /// The search engine the command bar uses for text that is not an address. The shell owns the
-/// address of each one; Rust only remembers which was picked.
+/// search address of each one; Rust knows only its home page, for the start page.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum SearchEngine {
@@ -77,6 +77,33 @@ pub enum SearchEngine {
     Ecosia,
     Startpage,
     Yahoo,
+}
+
+impl SearchEngine {
+    /// The engine's front page, which the app opens at launch when the start page asks for it.
+    /// Same hosts as the shell's `searchEngines.ts`.
+    pub fn home_url(self) -> &'static str {
+        match self {
+            Self::DuckDuckGo => "https://duckduckgo.com/",
+            Self::Google => "https://www.google.com/",
+            Self::Bing => "https://www.bing.com/",
+            Self::Brave => "https://search.brave.com/",
+            Self::Ecosia => "https://www.ecosia.org/",
+            Self::Startpage => "https://www.startpage.com/",
+            Self::Yahoo => "https://search.yahoo.com/",
+        }
+    }
+}
+
+/// What the app opens at launch.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum StartPage {
+    /// The page the user was last on, else the first favorite.
+    #[default]
+    LastPage,
+    /// The home page of the search engine the user picked.
+    SearchHome,
 }
 
 /// Which set of favorites and recipe choices is in play. Incognito is the second, separate set
@@ -256,6 +283,8 @@ pub struct AppState {
     pub dark_sites: BTreeMap<String, SiteDark>,
     /// The page in the fan's bookmark slot, if one is saved.
     pub bookmark: Option<Bookmark>,
+    /// What the app opens at launch.
+    pub start_page: StartPage,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -362,6 +391,9 @@ struct LibraryData {
     /// The page in the fan's bookmark slot. Normal set only: nothing is saved while incognito.
     #[serde(default)]
     bookmark: Option<Bookmark>,
+    /// The last page until the user picks the search engine's home page.
+    #[serde(default)]
+    start_page: StartPage,
 }
 
 /// The user's favorites, page, theme and provider settings, persisted as one JSON file per
@@ -428,10 +460,14 @@ impl Library {
         Ok(self.lock()?.locale.clone())
     }
 
-    /// The page to open at launch: the last page the user was on, else the first favorite. An
-    /// address that no longer parses is skipped, so a damaged file cannot leave the app empty.
+    /// The page to open at launch: the search engine's home page when the user asked for it,
+    /// otherwise the last page the user was on, else the first favorite. An address that no
+    /// longer parses is skipped, so a damaged file cannot leave the app empty.
     pub fn start_url(&self) -> Result<Option<String>> {
         let data = self.lock()?;
+        if data.start_page == StartPage::SearchHome {
+            return Ok(Some(data.search_engine.home_url().to_owned()));
+        }
         Ok(data
             .last_url
             .iter()
@@ -474,6 +510,7 @@ impl Library {
                 .bookmark
                 .clone()
                 .filter(|bookmark| parse_web_url(&bookmark.url).is_ok()),
+            start_page: data.start_page,
         })
     }
 
@@ -511,6 +548,12 @@ impl Library {
     pub fn set_search_engine(&self, engine: SearchEngine) -> Result<()> {
         let mut data = self.lock()?;
         data.search_engine = engine;
+        self.save(&data)
+    }
+
+    pub fn set_start_page(&self, start_page: StartPage) -> Result<()> {
+        let mut data = self.lock()?;
+        data.start_page = start_page;
         self.save(&data)
     }
 
@@ -1257,6 +1300,7 @@ fn default_data() -> LibraryData {
         dark_mode: DarkMode::default(),
         dark_sites: BTreeMap::new(),
         bookmark: None,
+        start_page: StartPage::LastPage,
         incognito_site_options: OptionChoices::new(),
         incognito_favorites: None,
         incognito_folders: Vec::new(),
@@ -1772,6 +1816,53 @@ mod tests {
         library.set_favorites(vec![]).unwrap();
         library.clear_history().unwrap();
         assert_eq!(library.start_url().unwrap(), None);
+    }
+
+    #[test]
+    fn the_search_home_start_page_opens_the_picked_engine_whatever_the_last_page() {
+        let (dir, library) = library();
+        library
+            .set_last_url("https://m.youtube.com/feed", &[])
+            .unwrap();
+        library.set_search_engine(SearchEngine::Google).unwrap();
+        library.set_start_page(StartPage::SearchHome).unwrap();
+        assert_eq!(
+            library.start_url().unwrap().as_deref(),
+            Some("https://www.google.com/")
+        );
+        library.set_favorites(vec![]).unwrap();
+        library.clear_history().unwrap();
+        let reloaded = reload(&dir);
+        assert_eq!(reloaded.state().unwrap().start_page, StartPage::SearchHome);
+        assert_eq!(
+            reloaded.start_url().unwrap().as_deref(),
+            Some("https://www.google.com/")
+        );
+        library.set_start_page(StartPage::LastPage).unwrap();
+        assert_eq!(library.start_url().unwrap(), None);
+    }
+
+    #[test]
+    fn every_search_home_is_a_web_address() {
+        for engine in [
+            SearchEngine::DuckDuckGo,
+            SearchEngine::Google,
+            SearchEngine::Bing,
+            SearchEngine::Brave,
+            SearchEngine::Ecosia,
+            SearchEngine::Startpage,
+            SearchEngine::Yahoo,
+        ] {
+            assert!(parse_web_url(engine.home_url()).is_ok(), "{engine:?}");
+        }
+    }
+
+    #[test]
+    fn a_library_saved_before_the_start_page_opens_the_last_page() {
+        let mut saved = serde_json::to_value(default_data()).unwrap();
+        saved.as_object_mut().unwrap().remove("startPage");
+        let data: LibraryData = serde_json::from_value(saved).unwrap();
+        assert_eq!(data.start_page, StartPage::LastPage);
     }
 
     #[test]

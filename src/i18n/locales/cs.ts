@@ -438,6 +438,10 @@ export const cs: Messages = {
   "bookmark.empty": "Zatím není uložena žádná stránka.",
   "bookmark.save": "Uložit aktuální stránku",
   "bookmark.replace": "Nahradit aktuální stránkou",
+  "settings.startPage": "Úvodní stránka",
+  "settings.startPageLast": "Poslední stránka, na které jsem byl",
+  "settings.startPageSearch": "Domovská stránka {engine}",
+  "settings.startPageNote": "Co aplikace otevře při spuštění. Změna platí od příštího spuštění.",
 
   "favorites.title": "Oblíbené",
   "favorites.note":
@@ -875,6 +879,12 @@ export const cs: Messages = {
   "tabs.number": "Karta {value}",
   "tabs.arrangeNote":
     "Čísla odpovídají zkratkám karet. Pořadí změníte podržením a přetažením webu nebo šipkami.",
+  "tabs.recentlyClosed": "Nedávno zavřené",
+  "tabs.closedEmpty":
+    "Weby, které zavřete nebo které aplikace zavře kvůli paměti, jsou tu, dokud aplikaci neukončíte.",
+  "tabs.closedAgo": "zavřeno {value}",
+  "tabs.reopen": "Znovu otevřít {name}",
+  "tabs.reopenShort": "Znovu otevřít",
   "tabs.quickAccess": "Rychlý přístup",
   "tabs.history": "Historie",
   "tabs.allHistory": "Celá historie ({count})",

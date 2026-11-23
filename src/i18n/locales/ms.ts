@@ -441,6 +441,11 @@ export const ms: Messages = {
   "bookmark.empty": "Belum ada halaman disimpan.",
   "bookmark.save": "Simpan halaman semasa",
   "bookmark.replace": "Ganti dengan halaman semasa",
+  "settings.startPage": "Halaman mula",
+  "settings.startPageLast": "Halaman terakhir yang saya buka",
+  "settings.startPageSearch": "Halaman utama {engine}",
+  "settings.startPageNote":
+    "Perkara yang dibuka oleh apl apabila ia bermula. Perubahan berkuat kuasa pada pelancaran seterusnya.",
 
   "favorites.title": "Kegemaran",
   "favorites.note":
@@ -882,6 +887,12 @@ export const ms: Messages = {
   "tabs.number": "Tab {value}",
   "tabs.arrangeNote":
     "Nombor ialah pintasan tab. Tekan lama dan seret laman, atau gunakan anak panah, untuk menukar susunan.",
+  "tabs.recentlyClosed": "Baru ditutup",
+  "tabs.closedEmpty":
+    "Laman yang anda tutup, atau yang ditutup oleh apl untuk menjimatkan memori, disenaraikan di sini sehingga apl ditutup.",
+  "tabs.closedAgo": "ditutup {value}",
+  "tabs.reopen": "Buka semula {name}",
+  "tabs.reopenShort": "Buka semula",
   "tabs.quickAccess": "Akses pantas",
   "tabs.history": "Sejarah",
   "tabs.allHistory": "Semua sejarah ({count})",

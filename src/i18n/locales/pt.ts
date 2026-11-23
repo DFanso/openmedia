@@ -446,6 +446,11 @@ export const pt: Messages = {
   "bookmark.empty": "Nenhuma página salva ainda.",
   "bookmark.save": "Salvar a página atual",
   "bookmark.replace": "Substituir pela página atual",
+  "settings.startPage": "Página inicial",
+  "settings.startPageLast": "A última página em que estive",
+  "settings.startPageSearch": "Página inicial do {engine}",
+  "settings.startPageNote":
+    "O que o app abre ao iniciar. A mudança vale a partir da próxima abertura.",
 
   "favorites.title": "Favoritos",
   "favorites.note":
@@ -884,6 +889,12 @@ export const pt: Messages = {
   "tabs.number": "Aba {value}",
   "tabs.arrangeNote":
     "Os números são os atalhos das abas. Mantenha um site pressionado e arraste, ou use as setas, para mudar a ordem.",
+  "tabs.recentlyClosed": "Fechados recentemente",
+  "tabs.closedEmpty":
+    "Os sites que você fecha, ou que o app fecha para poupar memória, ficam aqui até o app ser fechado.",
+  "tabs.closedAgo": "fechado {value}",
+  "tabs.reopen": "Reabrir {name}",
+  "tabs.reopenShort": "Reabrir",
   "tabs.quickAccess": "Acesso rápido",
   "tabs.history": "Histórico",
   "tabs.allHistory": "Todo o histórico ({count})",

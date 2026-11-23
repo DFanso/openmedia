@@ -418,6 +418,11 @@ export const th: Messages = {
   "bookmark.empty": "ยังไม่ได้บันทึกหน้าใด",
   "bookmark.save": "บันทึกหน้าปัจจุบัน",
   "bookmark.replace": "แทนที่ด้วยหน้าปัจจุบัน",
+  "settings.startPage": "หน้าเริ่มต้น",
+  "settings.startPageLast": "หน้าล่าสุดที่ฉันเปิดอยู่",
+  "settings.startPageSearch": "หน้าแรกของ {engine}",
+  "settings.startPageNote":
+    "สิ่งที่แอปเปิดเมื่อเริ่มทำงาน การเปลี่ยนแปลงจะมีผลตั้งแต่การเปิดครั้งถัดไป",
 
   "favorites.title": "รายการโปรด",
   "favorites.note":
@@ -838,6 +843,12 @@ export const th: Messages = {
   "tabs.number": "แท็บ {value}",
   "tabs.arrangeNote":
     "ตัวเลขคือคีย์ลัดของแท็บ กดค้างที่เว็บไซต์แล้วลาก หรือใช้ปุ่มลูกศรเพื่อเปลี่ยนลำดับ",
+  "tabs.recentlyClosed": "ปิดล่าสุด",
+  "tabs.closedEmpty":
+    "เว็บไซต์ที่คุณปิด หรือที่แอปปิดเพื่อประหยัดหน่วยความจำ จะแสดงที่นี่จนกว่าแอปจะปิด",
+  "tabs.closedAgo": "ปิดเมื่อ {value}",
+  "tabs.reopen": "เปิด {name} อีกครั้ง",
+  "tabs.reopenShort": "เปิดอีกครั้ง",
   "tabs.quickAccess": "ทางลัด",
   "tabs.history": "ประวัติ",
   "tabs.allHistory": "ประวัติทั้งหมด ({count})",

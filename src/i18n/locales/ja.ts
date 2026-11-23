@@ -435,6 +435,10 @@ export const ja: Messages = {
   "bookmark.empty": "まだページが保存されていません。",
   "bookmark.save": "今のページを保存",
   "bookmark.replace": "今のページに置き換える",
+  "settings.startPage": "起動時のページ",
+  "settings.startPageLast": "最後に開いていたページ",
+  "settings.startPageSearch": "{engine} のホームページ",
+  "settings.startPageNote": "アプリの起動時に開くページです。変更は次回の起動から反映されます。",
 
   "favorites.title": "お気に入り",
   "favorites.note":
@@ -870,6 +874,12 @@ export const ja: Messages = {
   "tabs.number": "タブ {value}",
   "tabs.arrangeNote":
     "番号はタブのショートカットです。サイトを長押ししてドラッグするか、矢印で順番を変えられます。",
+  "tabs.recentlyClosed": "最近閉じたサイト",
+  "tabs.closedEmpty":
+    "閉じたサイトや、メモリ節約のためにアプリが閉じたサイトは、アプリを終了するまでここに表示されます。",
+  "tabs.closedAgo": "{value}に閉じました",
+  "tabs.reopen": "{name} を再び開く",
+  "tabs.reopenShort": "再び開く",
   "tabs.quickAccess": "クイックアクセス",
   "tabs.history": "履歴",
   "tabs.allHistory": "すべての履歴（{count}）",

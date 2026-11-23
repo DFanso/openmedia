@@ -403,6 +403,10 @@ export const zhHant: Messages = {
   "bookmark.empty": "尚未儲存頁面。",
   "bookmark.save": "儲存目前頁面",
   "bookmark.replace": "以目前頁面取代",
+  "settings.startPage": "啟動頁面",
+  "settings.startPageLast": "上次瀏覽的頁面",
+  "settings.startPageSearch": "{engine} 首頁",
+  "settings.startPageNote": "App 啟動時開啟的頁面。變更會在下次啟動時生效。",
 
   "favorites.title": "我的最愛",
   "favorites.note":
@@ -809,6 +813,11 @@ export const zhHant: Messages = {
   "tabs.moveDown": "將 {name} 下移",
   "tabs.number": "分頁 {value}",
   "tabs.arrangeNote": "數字即分頁快速鍵。長按網站並拖曳，或使用箭頭，即可調整順序。",
+  "tabs.recentlyClosed": "最近關閉",
+  "tabs.closedEmpty": "你關閉的網站，或 App 為節省記憶體而關閉的網站，會列在這裡，直到 App 結束。",
+  "tabs.closedAgo": "{value}關閉",
+  "tabs.reopen": "重新開啟 {name}",
+  "tabs.reopenShort": "重新開啟",
   "tabs.quickAccess": "快速存取",
   "tabs.history": "歷史記錄",
   "tabs.allHistory": "全部歷史記錄（{count}）",

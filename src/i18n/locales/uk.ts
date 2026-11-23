@@ -443,6 +443,11 @@ export const uk: Messages = {
   "bookmark.empty": "Сторінку ще не збережено.",
   "bookmark.save": "Зберегти поточну сторінку",
   "bookmark.replace": "Замінити поточною сторінкою",
+  "settings.startPage": "Стартова сторінка",
+  "settings.startPageLast": "Остання відкрита сторінка",
+  "settings.startPageSearch": "Головна сторінка {engine}",
+  "settings.startPageNote":
+    "Що застосунок відкриває під час запуску. Зміна діятиме з наступного запуску.",
 
   "favorites.title": "Обране",
   "favorites.note":
@@ -882,6 +887,12 @@ export const uk: Messages = {
   "tabs.number": "Вкладка {value}",
   "tabs.arrangeNote":
     "Номери — це гарячі клавіші вкладок. Щоб змінити порядок, утримуйте сайт і перетягніть його або скористайтеся стрілками.",
+  "tabs.recentlyClosed": "Нещодавно закриті",
+  "tabs.closedEmpty":
+    "Сайти, які ви закрили або які застосунок закрив, щоб заощадити пам'ять, видно тут до виходу із застосунку.",
+  "tabs.closedAgo": "закрито {value}",
+  "tabs.reopen": "Знову відкрити {name}",
+  "tabs.reopenShort": "Відкрити знову",
   "tabs.quickAccess": "Швидкий доступ",
   "tabs.history": "Історія",
   "tabs.allHistory": "Уся історія ({count})",

@@ -437,6 +437,11 @@ export const id: Messages = {
   "bookmark.empty": "Belum ada halaman yang disimpan.",
   "bookmark.save": "Simpan halaman saat ini",
   "bookmark.replace": "Ganti dengan halaman saat ini",
+  "settings.startPage": "Halaman awal",
+  "settings.startPageLast": "Halaman terakhir yang saya buka",
+  "settings.startPageSearch": "Beranda {engine}",
+  "settings.startPageNote":
+    "Yang dibuka aplikasi saat dimulai. Perubahan berlaku mulai peluncuran berikutnya.",
 
   "favorites.title": "Favorit",
   "favorites.note":
@@ -878,6 +883,12 @@ export const id: Messages = {
   "tabs.number": "Tab {value}",
   "tabs.arrangeNote":
     "Angka adalah pintasan tab. Tahan lalu seret situs, atau pakai tanda panah, untuk mengubah urutan.",
+  "tabs.recentlyClosed": "Baru ditutup",
+  "tabs.closedEmpty":
+    "Situs yang Anda tutup, atau yang ditutup aplikasi untuk menghemat memori, tercantum di sini sampai aplikasi ditutup.",
+  "tabs.closedAgo": "ditutup {value}",
+  "tabs.reopen": "Buka lagi {name}",
+  "tabs.reopenShort": "Buka lagi",
   "tabs.quickAccess": "Akses cepat",
   "tabs.history": "Riwayat",
   "tabs.allHistory": "Semua riwayat ({count})",

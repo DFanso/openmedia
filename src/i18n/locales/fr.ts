@@ -451,6 +451,11 @@ export const fr: Messages = {
   "bookmark.empty": "Aucune page enregistrée pour l'instant.",
   "bookmark.save": "Enregistrer la page actuelle",
   "bookmark.replace": "Remplacer par la page actuelle",
+  "settings.startPage": "Page de démarrage",
+  "settings.startPageLast": "La dernière page consultée",
+  "settings.startPageSearch": "Page d'accueil de {engine}",
+  "settings.startPageNote":
+    "Ce que l'app ouvre au démarrage. Le changement s'applique au prochain lancement.",
 
   "favorites.title": "Favoris",
   "favorites.note":
@@ -901,6 +906,12 @@ export const fr: Messages = {
   "tabs.number": "Onglet {value}",
   "tabs.arrangeNote":
     "Les numéros sont les raccourcis des onglets. Maintenez un site et faites-le glisser, ou utilisez les flèches, pour changer l'ordre.",
+  "tabs.recentlyClosed": "Fermés récemment",
+  "tabs.closedEmpty":
+    "Les sites que vous fermez, ou que l'app ferme pour économiser la mémoire, restent ici jusqu'à la fermeture de l'app.",
+  "tabs.closedAgo": "fermé {value}",
+  "tabs.reopen": "Rouvrir {name}",
+  "tabs.reopenShort": "Rouvrir",
   "tabs.quickAccess": "Accès rapide",
   "tabs.history": "Historique",
   "tabs.allHistory": "Tout l'historique ({count})",

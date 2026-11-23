@@ -447,6 +447,10 @@ export const it: Messages = {
   "bookmark.empty": "Nessuna pagina salvata.",
   "bookmark.save": "Salva la pagina attuale",
   "bookmark.replace": "Sostituisci con la pagina attuale",
+  "settings.startPage": "Pagina iniziale",
+  "settings.startPageLast": "L'ultima pagina visitata",
+  "settings.startPageSearch": "Home page di {engine}",
+  "settings.startPageNote": "Cosa apre l'app all'avvio. La modifica vale dal prossimo avvio.",
 
   "favorites.title": "Preferiti",
   "favorites.note":
@@ -889,6 +893,12 @@ export const it: Messages = {
   "tabs.number": "Scheda {value}",
   "tabs.arrangeNote":
     "I numeri sono le scorciatoie delle schede. Tieni premuto un sito e trascinalo, o usa le frecce, per cambiare l'ordine.",
+  "tabs.recentlyClosed": "Chiusi di recente",
+  "tabs.closedEmpty":
+    "I siti che chiudi, o che l'app chiude per risparmiare memoria, restano qui finché l'app non viene chiusa.",
+  "tabs.closedAgo": "chiuso {value}",
+  "tabs.reopen": "Riapri {name}",
+  "tabs.reopenShort": "Riapri",
   "tabs.quickAccess": "Accesso rapido",
   "tabs.history": "Cronologia",
   "tabs.allHistory": "Tutta la cronologia ({count})",

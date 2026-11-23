@@ -451,6 +451,11 @@ export const ta: Messages = {
   "bookmark.empty": "இன்னும் எந்தப் பக்கமும் சேமிக்கப்படவில்லை.",
   "bookmark.save": "தற்போதைய பக்கத்தைச் சேமி",
   "bookmark.replace": "தற்போதைய பக்கத்தால் மாற்று",
+  "settings.startPage": "தொடக்கப் பக்கம்",
+  "settings.startPageLast": "நான் கடைசியாக இருந்த பக்கம்",
+  "settings.startPageSearch": "{engine} முகப்புப் பக்கம்",
+  "settings.startPageNote":
+    "ஆப் தொடங்கும்போது திறப்பது. மாற்றம் அடுத்த முறை தொடங்கும்போது நடைமுறைக்கு வரும்.",
 
   "favorites.title": "பிடித்துக்கொள்ளவிடைகள்",
   "favorites.note":
@@ -899,6 +904,12 @@ export const ta: Messages = {
   "tabs.number": "தாவல் {value}",
   "tabs.arrangeNote":
     "எண்கள் தாவல் குறுக்குவழிகள். வரிசையை மாற்ற தளத்தை அழுத்திப் பிடித்து இழுக்கவும், அல்லது அம்புகளைப் பயன்படுத்தவும்.",
+  "tabs.recentlyClosed": "சமீபத்தில் மூடியவை",
+  "tabs.closedEmpty":
+    "நீங்கள் மூடும் தளங்கள், அல்லது நினைவகத்தைச் சேமிக்க ஆப் மூடும் தளங்கள், ஆப் மூடப்படும் வரை இங்கே இருக்கும்.",
+  "tabs.closedAgo": "மூடப்பட்டது {value}",
+  "tabs.reopen": "{name} மீண்டும் திற",
+  "tabs.reopenShort": "மீண்டும் திற",
   "tabs.quickAccess": "விரைவு அணுகல்",
   "tabs.history": "வரலாறு",
   "tabs.allHistory": "முழு வரலாறு ({count})",

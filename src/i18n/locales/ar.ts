@@ -423,6 +423,10 @@ export const ar: Messages = {
   "bookmark.empty": "لم تُحفظ أي صفحة بعد.",
   "bookmark.save": "حفظ الصفحة الحالية",
   "bookmark.replace": "الاستبدال بالصفحة الحالية",
+  "settings.startPage": "صفحة البدء",
+  "settings.startPageLast": "آخر صفحة كنت عليها",
+  "settings.startPageSearch": "الصفحة الرئيسية لـ {engine}",
+  "settings.startPageNote": "ما يفتحه التطبيق عند تشغيله. يسري التغيير من التشغيل التالي.",
 
   "favorites.title": "المفضلة",
   "favorites.note":
@@ -843,6 +847,12 @@ export const ar: Messages = {
   "tabs.number": "علامة التبويب {value}",
   "tabs.arrangeNote":
     "الأرقام هي اختصارات علامات التبويب. اضغط مطولًا على موقع واسحبه، أو استخدم الأسهم، لتغيير الترتيب.",
+  "tabs.recentlyClosed": "المغلقة مؤخرًا",
+  "tabs.closedEmpty":
+    "المواقع التي تغلقها، أو التي يغلقها التطبيق لتوفير الذاكرة، تظهر هنا حتى يُغلق التطبيق.",
+  "tabs.closedAgo": "أُغلق {value}",
+  "tabs.reopen": "إعادة فتح {name}",
+  "tabs.reopenShort": "إعادة الفتح",
   "tabs.quickAccess": "الوصول السريع",
   "tabs.history": "السجل",
   "tabs.allHistory": "كل السجل ({count})",

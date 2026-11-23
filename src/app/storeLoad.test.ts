@@ -38,6 +38,7 @@ const startup = {
   darkMode: DARK_MODE_DEFAULT,
   darkSites: {},
   bookmark: null,
+  startPage: "lastPage",
   bootSession: { id: "boot-session", url: "https://m.youtube.com/watch?v=example" },
   profiles: { active: "default", profiles: [{ id: "default" }] },
   desktop: false,

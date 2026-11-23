@@ -449,6 +449,11 @@ export const el: Messages = {
   "bookmark.empty": "Δεν έχει αποθηκευτεί σελίδα ακόμα.",
   "bookmark.save": "Αποθήκευση τρέχουσας σελίδας",
   "bookmark.replace": "Αντικατάσταση με την τρέχουσα σελίδα",
+  "settings.startPage": "Αρχική σελίδα",
+  "settings.startPageLast": "Η τελευταία σελίδα που ήμουν",
+  "settings.startPageSearch": "Αρχική σελίδα του {engine}",
+  "settings.startPageNote":
+    "Τι ανοίγει η εφαρμογή όταν ξεκινά. Η αλλαγή ισχύει από την επόμενη εκκίνηση.",
 
   "favorites.title": "Αγαπημένα",
   "favorites.note":
@@ -895,6 +900,12 @@ export const el: Messages = {
   "tabs.number": "Καρτέλα {value}",
   "tabs.arrangeNote":
     "Οι αριθμοί είναι οι συντομεύσεις καρτελών. Κρατήστε πατημένο έναν ιστότοπο και σύρετέ τον ή χρησιμοποιήστε τα βέλη για να αλλάξετε τη σειρά.",
+  "tabs.recentlyClosed": "Έκλεισαν πρόσφατα",
+  "tabs.closedEmpty":
+    "Οι ιστότοποι που κλείνετε, ή που κλείνει η εφαρμογή για εξοικονόμηση μνήμης, εμφανίζονται εδώ μέχρι να κλείσει η εφαρμογή.",
+  "tabs.closedAgo": "έκλεισε {value}",
+  "tabs.reopen": "Άνοιγμα ξανά: {name}",
+  "tabs.reopenShort": "Άνοιγμα ξανά",
   "tabs.quickAccess": "Γρήγορη πρόσβαση",
   "tabs.history": "Ιστορικό",
   "tabs.allHistory": "Όλο το ιστορικό ({count})",
