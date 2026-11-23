@@ -86,6 +86,7 @@ import {
   type Path,
 } from "../features/tiling/layout";
 import { windowsToFolder } from "../features/tiling/folderSave";
+import { rememberClosed, withoutClosed, type ClosedTab } from "../features/tabs/closedTabs";
 import { useEntitlementStore } from "../features/paywall/store";
 import { isProRequired } from "../features/paywall/ipc";
 import { detectLocale, resolveLocale, type Locale } from "../i18n/locales";
@@ -247,6 +248,11 @@ export interface AppStore {
   /** Where the page being opened is to land; set only for the instant a drop opens it. */
   tileIntent: DropIntent | null;
   action: SessionAction | null;
+  /**
+   * Sites that were open and closed since launch, by the user or to save memory, newest first.
+   * Memory only, and dropped when incognito starts or ends and when history is cleared.
+   */
+  closedTabs: ClosedTab[];
   /** Edge the floating button rests on; the back button takes the other one. */
   fabEdge: Edge;
   sites: SiteSettings[];
@@ -340,6 +346,8 @@ export interface AppStore {
   openFolder: (name: string) => void;
   /** Saves the windows as a folder, which keeps their layout; false when there is nothing to save. */
   saveWindowsToFolder: (name: string) => Promise<boolean>;
+  /** Opens a closed site again where it was, or switches to it if that page is open again already. */
+  reopenClosedTab: (id: string) => void;
   setSessionState: (state: SiteViewState) => void;
   /** A native `open` failed: forget the session and go back to the one that was showing. */
   sessionOpenFailed: (id: string) => void;
@@ -733,6 +741,7 @@ export const useApp = create<AppStore>((set, get) => {
     layout: null,
     tileIntent: null,
     action: null,
+    closedTabs: [],
     fabEdge: loadPosition().edge,
     sites: [],
     incognito: { active: false, favorites: [], folders: [], busy: false },
@@ -899,6 +908,11 @@ export const useApp = create<AppStore>((set, get) => {
       void siteView.close(id).catch(() => {});
       set((current) => ({
         sessions: current.sessions.filter((session) => session.id !== id),
+        closedTabs: rememberClosed(
+          current.closedTabs,
+          current.sessions.filter((session) => session.id === id),
+          Date.now(),
+        ),
         activeId: next,
         layout: remaining.layout,
         action:
@@ -917,7 +931,9 @@ export const useApp = create<AppStore>((set, get) => {
       }
       startSession(session.openedUrl, session.source, undefined, session.hubId);
       set({ tileIntent: null });
+      const closedTabs = get().closedTabs;
       get().closeSession(id);
+      set({ closedTabs });
     },
 
     closeOtherSessions: () => {
@@ -1048,6 +1064,17 @@ export const useApp = create<AppStore>((set, get) => {
       return next !== null && get().saveFolders(next.folders, next.favorites);
     },
 
+    reopenClosedTab: (id) => {
+      const tab = get().closedTabs.find((entry) => entry.id === id);
+      if (!tab) return;
+      set((current) => ({ closedTabs: withoutClosed(current.closedTabs, id) }));
+      const live = get().sessions.find(
+        (session) => session.hubId === tab.hubId && (session.url ?? session.openedUrl) === tab.url,
+      );
+      if (live) switchTo(live.id);
+      else startSession(tab.url, tab.source, undefined, tab.hubId);
+    },
+
     setSessionState: (page) =>
       set((current) => ({
         sessions: current.sessions.map((session) =>
@@ -1084,6 +1111,11 @@ export const useApp = create<AppStore>((set, get) => {
           current.layout === null ? (frontGone ? null : current.activeId) : remaining.activeId;
         return {
           sessions: current.sessions.filter((session) => !ids.includes(session.id)),
+          closedTabs: rememberClosed(
+            current.closedTabs,
+            current.sessions.filter((session) => ids.includes(session.id)),
+            Date.now(),
+          ),
           activeId,
           layout: remaining.layout,
           action:
@@ -1160,6 +1192,7 @@ export const useApp = create<AppStore>((set, get) => {
         await library.clearHistory();
         set((current) => ({
           state: current.state && { ...current.state, history: [], lastUrl: null },
+          closedTabs: [],
         }));
       } catch (error) {
         set({ error: appError(error) });
@@ -1718,6 +1751,7 @@ export const useApp = create<AppStore>((set, get) => {
         });
         resetChats();
         get().trimSessions("routine");
+        set({ closedTabs: [] });
         applyIcons();
         void fetchIcons(favorites.map((favorite) => favorite.url));
       } catch (error) {
@@ -1738,6 +1772,7 @@ export const useApp = create<AppStore>((set, get) => {
         });
         resetChats();
         get().trimSessions("routine");
+        set({ closedTabs: [] });
       } catch (error) {
         setIncognitoBusy(false);
         set({ error: appError(error) });

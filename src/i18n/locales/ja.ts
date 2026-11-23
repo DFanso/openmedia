@@ -865,6 +865,12 @@ export const ja: Messages = {
   "tabs.number": "タブ {value}",
   "tabs.arrangeNote":
     "番号はタブのショートカットです。サイトを長押ししてドラッグするか、矢印で順番を変えられます。",
+  "tabs.recentlyClosed": "最近閉じたサイト",
+  "tabs.closedEmpty":
+    "閉じたサイトや、メモリ節約のためにアプリが閉じたサイトは、アプリを終了するまでここに表示されます。",
+  "tabs.closedAgo": "{value}に閉じました",
+  "tabs.reopen": "{name} を再び開く",
+  "tabs.reopenShort": "再び開く",
   "tabs.quickAccess": "クイックアクセス",
   "tabs.history": "履歴",
   "tabs.allHistory": "すべての履歴（{count}）",

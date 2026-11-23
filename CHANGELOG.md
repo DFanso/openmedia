@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(tabs): reopen recently closed sites from the Tabs screen
+
+**Area:** `feat(tabs)`
+
+**Change:** The Tabs screen has a "Recently closed" section under Open sites. It lists up to ten sites closed since launch, newest first: the ones the user closed and the ones the app closed by itself to save memory. A tap reopens the page where it was (or switches to it if it is open again). Resetting a tab to its start page does not list the old page. Kept in memory only (`closedTabs`), never written to disk, and emptied when incognito starts or ends and when history is cleared. The Tabs page now mounts only while open, so its "used … ago" times count from the moment it opened. Five new strings in all 29 locales, machine-drafted.
+
+**Verified:** see the PR. **Not verified:** on a device or simulator; native-speaker review of the new strings.
+
 ### feat(settings): the app can start on the search engine's home page
 
 **Area:** `feat(settings)`

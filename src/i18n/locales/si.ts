@@ -831,6 +831,12 @@ export const si: Messages = {
   "tabs.number": "ටැබය {value}",
   "tabs.arrangeNote":
     "අංක යනු ටැබ කෙටිමං වේ. අනුපිළිවෙල වෙනස් කිරීමට අඩවියක් අල්ලාගෙන ඇදගන්න, නැතහොත් ඊතල භාවිත කරන්න.",
+  "tabs.recentlyClosed": "මෑතකදී වසා දැමූ",
+  "tabs.closedEmpty":
+    "ඔබ වසන අඩවි, හෝ මතකය ඉතිරි කිරීමට යෙදුම වසන අඩවි, යෙදුම වසන තුරු මෙහි පෙන්වයි.",
+  "tabs.closedAgo": "වසා දැමුවේ {value}",
+  "tabs.reopen": "{name} නැවත විවෘත කරන්න",
+  "tabs.reopenShort": "නැවත විවෘත කරන්න",
   "tabs.quickAccess": "ඉක්මන් ප්‍රවේශය",
   "tabs.history": "ඉතිහාසය",
   "tabs.allHistory": "සම්පූර්ණ ඉතිහාසය ({count})",

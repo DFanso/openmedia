@@ -865,6 +865,12 @@ export const en = {
   "tabs.number": "Tab {value}",
   "tabs.arrangeNote":
     "The numbers are the tab shortcuts. Hold a site and drag, or use the arrows, to change the order.",
+  "tabs.recentlyClosed": "Recently closed",
+  "tabs.closedEmpty":
+    "Sites you close, or that the app closes to save memory, are listed here until the app quits.",
+  "tabs.closedAgo": "closed {value}",
+  "tabs.reopen": "Reopen {name}",
+  "tabs.reopenShort": "Reopen",
   "tabs.quickAccess": "Quick access",
   "tabs.history": "History",
   "tabs.allHistory": "All history ({count})",

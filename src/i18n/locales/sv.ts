@@ -876,6 +876,12 @@ export const sv: Messages = {
   "tabs.number": "Flik {value}",
   "tabs.arrangeNote":
     "Siffrorna är flikgenvägarna. Håll ned en webbplats och dra, eller använd pilarna, för att ändra ordningen.",
+  "tabs.recentlyClosed": "Nyligen stängda",
+  "tabs.closedEmpty":
+    "Webbplatser du stänger, eller som appen stänger för att spara minne, visas här tills appen avslutas.",
+  "tabs.closedAgo": "stängd {value}",
+  "tabs.reopen": "Öppna {name} igen",
+  "tabs.reopenShort": "Öppna igen",
   "tabs.quickAccess": "Snabbåtkomst",
   "tabs.history": "Historik",
   "tabs.allHistory": "All historik ({count})",

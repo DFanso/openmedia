@@ -188,3 +188,57 @@ describe("a new tab", () => {
     expect(useApp.getState().sessions).toHaveLength(2);
   });
 });
+
+describe("recently closed sites", () => {
+  const live = (id: string, lastUsed: number) => ({
+    ...newSession(id, "typed", `https://${id}.example/`, lastUsed),
+    lastUsed,
+  });
+
+  beforeEach(() => {
+    useApp.setState({ closedTabs: [], action: null });
+  });
+
+  it("lists a site closed by the user, a site the app closed, and none of the open ones", () => {
+    useApp.setState({ sessions: [live("a", 10), live("b", 20), live("c", 5)], activeId: "b" });
+    useApp.getState().closeSession("a");
+    useApp.getState().forgetSessions(["c"]);
+    expect(useApp.getState().closedTabs.map((tab) => tab.url)).toEqual([
+      "https://c.example/",
+      "https://a.example/",
+    ]);
+  });
+
+  it("reopens a closed site in a new session and takes it off the list", () => {
+    useApp.setState({ sessions: [live("a", 10), live("b", 20)], activeId: "b" });
+    useApp.getState().closeSession("a");
+    const [closed] = useApp.getState().closedTabs;
+    useApp.getState().reopenClosedTab(closed.id);
+    const { sessions, activeId, action, closedTabs } = useApp.getState();
+    expect(closedTabs).toEqual([]);
+    expect(sessions.find((s) => s.id === activeId)?.openedUrl).toBe("https://a.example/");
+    expect(action).toMatchObject({ type: "open", url: "https://a.example/", previousId: "b" });
+  });
+
+  it("leaves a tab reset to its start page off the list", () => {
+    const now = Date.now();
+    useApp.setState({ sessions: [live("a", now), live("b", now)], activeId: "b" });
+    useApp.getState().resetSession("a");
+    expect(useApp.getState().closedTabs).toEqual([]);
+  });
+
+  it("switches to the page instead when it is open again already", () => {
+    useApp.setState({ sessions: [live("a", 10), live("b", 20)], activeId: "b" });
+    useApp.getState().closeSession("a");
+    const [closed] = useApp.getState().closedTabs;
+    useApp.setState((s) => ({ sessions: [...s.sessions, live("again", 30)] }));
+    useApp.setState((s) => ({
+      sessions: s.sessions.map((session) =>
+        session.id === "again" ? { ...session, openedUrl: "https://a.example/" } : session,
+      ),
+    }));
+    useApp.getState().reopenClosedTab(closed.id);
+    expect(useApp.getState().activeId).toBe("again");
+    expect(useApp.getState().sessions).toHaveLength(2);
+  });
+});

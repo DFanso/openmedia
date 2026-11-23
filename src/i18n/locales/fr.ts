@@ -897,6 +897,12 @@ export const fr: Messages = {
   "tabs.number": "Onglet {value}",
   "tabs.arrangeNote":
     "Les numéros sont les raccourcis des onglets. Maintenez un site et faites-le glisser, ou utilisez les flèches, pour changer l'ordre.",
+  "tabs.recentlyClosed": "Fermés récemment",
+  "tabs.closedEmpty":
+    "Les sites que vous fermez, ou que l'app ferme pour économiser la mémoire, restent ici jusqu'à la fermeture de l'app.",
+  "tabs.closedAgo": "fermé {value}",
+  "tabs.reopen": "Rouvrir {name}",
+  "tabs.reopenShort": "Rouvrir",
   "tabs.quickAccess": "Accès rapide",
   "tabs.history": "Historique",
   "tabs.allHistory": "Tout l'historique ({count})",

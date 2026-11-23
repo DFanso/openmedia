@@ -870,6 +870,12 @@ export const cs: Messages = {
   "tabs.number": "Karta {value}",
   "tabs.arrangeNote":
     "Čísla odpovídají zkratkám karet. Pořadí změníte podržením a přetažením webu nebo šipkami.",
+  "tabs.recentlyClosed": "Nedávno zavřené",
+  "tabs.closedEmpty":
+    "Weby, které zavřete nebo které aplikace zavře kvůli paměti, jsou tu, dokud aplikaci neukončíte.",
+  "tabs.closedAgo": "zavřeno {value}",
+  "tabs.reopen": "Znovu otevřít {name}",
+  "tabs.reopenShort": "Znovu otevřít",
   "tabs.quickAccess": "Rychlý přístup",
   "tabs.history": "Historie",
   "tabs.allHistory": "Celá historie ({count})",

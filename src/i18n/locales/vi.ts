@@ -865,6 +865,12 @@ export const vi: Messages = {
   "tabs.number": "Thẻ {value}",
   "tabs.arrangeNote":
     "Các số là phím tắt của thẻ. Nhấn giữ một trang rồi kéo, hoặc dùng mũi tên, để đổi thứ tự.",
+  "tabs.recentlyClosed": "Đã đóng gần đây",
+  "tabs.closedEmpty":
+    "Các trang bạn đóng, hoặc ứng dụng đóng để tiết kiệm bộ nhớ, được liệt kê ở đây cho đến khi thoát ứng dụng.",
+  "tabs.closedAgo": "đã đóng {value}",
+  "tabs.reopen": "Mở lại {name}",
+  "tabs.reopenShort": "Mở lại",
   "tabs.quickAccess": "Truy cập nhanh",
   "tabs.history": "Lịch sử",
   "tabs.allHistory": "Toàn bộ lịch sử ({count})",

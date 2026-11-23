@@ -884,6 +884,12 @@ export const it: Messages = {
   "tabs.number": "Scheda {value}",
   "tabs.arrangeNote":
     "I numeri sono le scorciatoie delle schede. Tieni premuto un sito e trascinalo, o usa le frecce, per cambiare l'ordine.",
+  "tabs.recentlyClosed": "Chiusi di recente",
+  "tabs.closedEmpty":
+    "I siti che chiudi, o che l'app chiude per risparmiare memoria, restano qui finché l'app non viene chiusa.",
+  "tabs.closedAgo": "chiuso {value}",
+  "tabs.reopen": "Riapri {name}",
+  "tabs.reopenShort": "Riapri",
   "tabs.quickAccess": "Accesso rapido",
   "tabs.history": "Cronologia",
   "tabs.allHistory": "Tutta la cronologia ({count})",
